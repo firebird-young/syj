@@ -592,16 +592,18 @@
                     <div id="pickupProductList">
                         <div class="rule-item" data-type="pickup">
                             <span class="rule-label">产品 1：</span>
-                            <select class="pickup-product" style="width:130px;" onchange="checkPickupProducts()">
+                            <select class="pickup-product" style="width:130px;" onchange="togglePickupQty(this);checkPickupProducts()">
                                 <option value="">选择产品</option>
                                 <option value="crane">仙鹤莲池</option>
                                 <option value="fortune">进宝</option>
                                 <option value="success">马到功成</option>
                                 <option value="wealth">招财</option>
                             </select>
-                            <span style="font-size:13px;color:#4e5969;">数量：</span>
-                            <input type="number" value="20" style="width:80px;">
-                            <span style="color:#86909c;font-size:13px;">件</span>
+                            <span class="pickup-qty" style="display:none;">
+                                <span style="font-size:13px;color:#4e5969;">数量：</span>
+                                <input type="number" value="20" style="width:80px;">
+                                <span style="color:#86909c;font-size:13px;">件</span>
+                            </span>
                             <button class="btn btn-danger-text" onclick="removePickupProduct(this)">删除</button>
                         </div>
                     </div>
@@ -678,6 +680,13 @@ function syncPickupRewardExtra() {
     var parent = document.getElementById('pickupRewardRow');
     var sel = document.getElementById('pickupRewardType');
     syncRewardExtraIn(parent, sel ? sel.value : 'cash');
+}
+
+// 提货产品下拉选择后，显示/隐藏数量输入
+function togglePickupQty(sel) {
+    var item = sel.closest('.rule-item');
+    var qty = item.querySelector('.pickup-qty');
+    if (qty) qty.style.display = sel.value ? '' : 'none';
 }
 
 function checkPickupProducts() {
@@ -771,16 +780,18 @@ function addPickupProduct() {
     div.setAttribute('data-type', 'pickup');
     div.innerHTML = [
         '<span class="rule-label">产品 ' + idx + '：</span>',
-        '<select class="pickup-product" style="width:130px;" onchange="checkPickupProducts()">',
+        '<select class="pickup-product" style="width:130px;" onchange="togglePickupQty(this);checkPickupProducts()">',
         '    <option value="">选择产品</option>',
         '    <option value="crane">仙鹤莲池</option>',
         '    <option value="fortune">进宝</option>',
         '    <option value="success">马到功成</option>',
         '    <option value="wealth">招财</option>',
         '</select>',
-        '<span style="font-size:13px;color:#4e5969;">数量：</span>',
-        '<input type="number" value="10" style="width:80px;">',
-        '<span style="color:#86909c;font-size:13px;">件</span>',
+        '<span class="pickup-qty" style="display:none;">',
+        '    <span style="font-size:13px;color:#4e5969;">数量：</span>',
+        '    <input type="number" value="10" style="width:80px;">',
+        '    <span style="color:#86909c;font-size:13px;">件</span>',
+        '</span>',
         '<button class="btn btn-danger-text" onclick="removePickupProduct(this)">删除</button>'
     ].join('');
     list.appendChild(div);
