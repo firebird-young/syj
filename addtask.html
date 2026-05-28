@@ -526,7 +526,6 @@
                                         <select class="share-reward-type" onchange="syncShareReward(this)">
                                             <option value="cash">现金</option>
                                             <option value="product">产品</option>
-                                            <option value="new_product">新品优先权</option>
                                         </select>
                                     </div>
                                     <div class="reward-line">
@@ -551,11 +550,6 @@
                                                 <option value="a2">user_002</option>
                                                 <option value="a3">user_003</option>
                                             </select>
-                                        </span>
-                                        <span class="reward-extra reward-extra-new_product">
-                                            <span class="label-text">数量：</span>
-                                            <input type="number" value="3" style="width:80px;">
-                                            <span style="color:#9ba6b9;font-size:13px;">件</span>
                                         </span>
                                     </div>
                                 </div>
@@ -625,41 +619,16 @@
                             <span class="label-text">奖励对象：</span>
                             <select id="pickupRewardTarget">
                                 <option value="tasker">任务方</option>
-                                <option value="target">任务对方</option>
                             </select>
                         </div>
                         <div class="reward-line">
                             <span class="label-text">奖励类型：</span>
-                            <select id="pickupRewardType" onchange="syncPickupRewardExtra()">
-                                <option value="cash">现金</option>
-                                <option value="product">产品</option>
+                            <select id="pickupRewardType">
                                 <option value="new_product">新品优先权</option>
                             </select>
                         </div>
                         <div class="reward-line">
-                            <span id="pickupExtraCash" class="reward-extra reward-extra-cash show">
-                                <span class="label-text">奖励金额：</span>
-                                <input type="number" value="500">
-                                <span style="color:#9ba6b9;font-size:13px;">元</span>
-                            </span>
-                            <span id="pickupExtraProduct" class="reward-extra reward-extra-product">
-                                <span class="label-text">选择产品：</span>
-                                <select>
-                                    <option value="crane">仙鹤莲池</option>
-                                    <option value="fortune">进宝</option>
-                                    <option value="success">马到功成</option>
-                                    <option value="wealth">招财</option>
-                                </select>
-                                <span class="label-text">奖励份数：</span>
-                                <input type="number" value="1" style="width:80px;">
-                                <span class="label-text">赠送账号：</span>
-                                <select>
-                                    <option value="a1">user_001</option>
-                                    <option value="a2">user_002</option>
-                                    <option value="a3">user_003</option>
-                                </select>
-                            </span>
-                            <span id="pickupExtraNewProduct" class="reward-extra reward-extra-new_product">
+                            <span id="pickupExtraNewProduct" class="reward-extra reward-extra-new_product show">
                                 <span class="label-text">数量：</span>
                                 <input type="number" value="3" style="width:80px;">
                                 <span style="color:#9ba6b9;font-size:13px;">件</span>
@@ -748,7 +717,6 @@ function addShareRule() {
         '            <select class="share-reward-type" onchange="syncShareReward(this)">',
         '                <option value="cash">现金</option>',
         '                <option value="product">产品</option>',
-        '                <option value="new_product">新品优先购</option>',
         '            </select>',
         '        </div>',
         '        <div class="reward-line">',
@@ -773,11 +741,6 @@ function addShareRule() {
         '                    <option value="a2">user_002</option>',
         '                    <option value="a3">user_003</option>',
         '                </select>',
-        '            </span>',
-        '            <span class="reward-extra reward-extra-new_product">',
-        '                <span class="label-text">数量：</span>',
-        '                <input type="number" value="3" style="width:80px;">',
-        '                <span style="color:#9ba6b9;font-size:13px;">件</span>',
         '            </span>',
         '        </div>',
         '    </div>',
