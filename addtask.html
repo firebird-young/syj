@@ -589,54 +589,83 @@
             <div class="form-row">
                 <div class="form-label"><span class="required">*</span>任务规则</div>
                 <div class="form-control">
-                    <div id="pickupProductList">
-                        <div class="rule-item" data-type="pickup">
-                            <span class="rule-label">产品 1：</span>
-                            <select class="pickup-product" style="width:130px;" onchange="togglePickupQty(this);checkPickupProducts()">
-                                <option value="">选择产品</option>
-                                <option value="crane">仙鹤莲池</option>
-                                <option value="fortune">进宝</option>
-                                <option value="success">马到功成</option>
-                                <option value="wealth">招财</option>
-                            </select>
-                            <span class="pickup-qty" style="display:none;">
-                                <span style="font-size:13px;color:#4e5969;">数量：</span>
-                                <input type="number" value="20" style="width:80px;">
-                                <span style="color:#86909c;font-size:13px;">件</span>
-                            </span>
-                            <button class="btn btn-danger-text" onclick="removePickupProduct(this)">删除</button>
-                        </div>
-                    </div>
-                    <button class="btn btn-add" onclick="addPickupProduct()" style="margin-top:8px;">
-                        ＋ 新增产品
-                    </button>
-                </div>
-            </div>
+                    <div id="pickupRuleList">
+                        <!-- 规则组：每个规则组包含 产品列表（且关系）+ 独立奖励配置 -->
+                        <div class="rule-group">
+                            <div class="rule-item" style="background:#f0f4ff;border-color:#d6e0ff;border-radius:10px 10px 0 0;border-bottom:none;">
+                                <span class="rule-label" style="font-weight:600;color:#4f7cff;">规则 1</span>
+                                <button class="btn btn-danger-text" onclick="removePickupRule(this)">删除本规则</button>
+                            </div>
+                            <div style="border:1px solid #d6e0ff;border-top:none;border-radius:0 0 10px 10px;padding:12px 16px;background:#fafcff;">
+                                <div style="font-size:13px;color:#4e5a6e;margin-bottom:8px;font-weight:500;">产品条件（且关系）：</div>
+                                <div class="pickup-products-inner">
+                                    <div class="rule-item" style="margin-bottom:6px;">
+                                        <span class="rule-label">产品 1：</span>
+                                        <select class="pickup-product" style="width:130px;" onchange="togglePickupQty(this)">
+                                            <option value="">选择产品</option>
+                                            <option value="crane">仙鹤莲池</option>
+                                            <option value="fortune">进宝</option>
+                                            <option value="success">马到功成</option>
+                                            <option value="wealth">招财</option>
+                                        </select>
+                                        <span class="pickup-qty" style="display:none;">
+                                            <span style="font-size:13px;color:#4e5969;">数量：</span>
+                                            <input type="number" value="20" style="width:80px;">
+                                            <span style="color:#86909c;font-size:13px;">件</span>
+                                        </span>
+                                        <button class="btn btn-danger-text" onclick="removePickupProduct(this)">删除</button>
+                                    </div>
+                                </div>
+                                <button class="btn btn-add" onclick="addPickupProduct(this)" style="margin-top:4px;height:30px;font-size:12px;">＋ 新增产品</button>
 
-            <div id="pickupRewardRow" class="form-row" style="display:none;">
-                <div class="form-label"><span class="required">*</span>奖励配置</div>
-                <div class="form-control">
-                    <div class="reward-block">
-                        <div class="reward-line">
-                            <span class="label-text">奖励对象：</span>
-                            <select id="pickupRewardTarget">
-                                <option value="tasker">任务方</option>
-                            </select>
-                        </div>
-                        <div class="reward-line">
-                            <span class="label-text">奖励类型：</span>
-                            <select id="pickupRewardType">
-                                <option value="new_product">新品优先权</option>
-                            </select>
-                        </div>
-                        <div class="reward-line">
-                            <span id="pickupExtraNewProduct" class="reward-extra reward-extra-new_product show">
-                                <span class="label-text">数量：</span>
-                                <input type="number" value="3" style="width:80px;">
-                                <span style="color:#9ba6b9;font-size:13px;">件</span>
-                            </span>
+                                <div style="margin-top:16px;padding-top:14px;border-top:1px dashed #e2e6ee;">
+                                    <div style="font-size:13px;color:#4e5a6e;margin-bottom:10px;font-weight:500;">奖励配置：</div>
+                                    <div class="reward-block">
+                                        <div class="reward-line" style="gap:8px;">
+                                            <span class="label-text" style="min-width:60px;font-size:13px;">奖励对象：</span>
+                                            <select class="pickup-reward-target" style="height:34px;min-width:120px;">
+                                                <option value="tasker">任务方</option>
+                                            </select>
+                                        </div>
+                                        <div class="reward-line" style="gap:8px;">
+                                            <span class="label-text" style="min-width:60px;font-size:13px;">奖励类型：</span>
+                                            <select class="pickup-reward-type" style="height:34px;min-width:140px;" onchange="syncPickupRewardExtra(this)">
+                                                <option value="new_product">新品优先权</option>
+                                                <option value="cash">现金</option>
+                                                <option value="product">产品</option>
+                                            </select>
+                                        </div>
+                                        <div class="reward-line" style="gap:8px;">
+                                            <span class="reward-extra pickup-reward-extra-new_product show">
+                                                <span class="label-text" style="min-width:60px;font-size:13px;">数量：</span>
+                                                <input type="number" value="3" style="width:80px;height:34px;">
+                                                <span style="color:#9ba6b9;font-size:13px;">件</span>
+                                            </span>
+                                            <span class="reward-extra pickup-reward-extra-cash">
+                                                <span class="label-text" style="min-width:60px;font-size:13px;">奖励金额：</span>
+                                                <input type="number" value="500" style="width:100px;height:34px;">
+                                                <span style="color:#9ba6b9;font-size:13px;">元</span>
+                                            </span>
+                                            <span class="reward-extra pickup-reward-extra-product">
+                                                <span class="label-text" style="min-width:60px;font-size:13px;">选择产品：</span>
+                                                <select style="height:34px;min-width:110px;">
+                                                    <option value="crane">仙鹤莲池</option>
+                                                    <option value="fortune">进宝</option>
+                                                    <option value="success">马到功成</option>
+                                                    <option value="wealth">招财</option>
+                                                </select>
+                                                <span class="label-text" style="min-width:50px;font-size:13px;">份数：</span>
+                                                <input type="number" value="1" style="width:70px;height:34px;">
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
+                    <button class="btn btn-add" onclick="addPickupRule()" style="margin-top:8px;">
+                        ＋ 新增规则
+                    </button>
                 </div>
             </div>
         </div>
@@ -656,7 +685,6 @@ function switchTaskType() {
 }
 
 switchTaskType();
-checkPickupProducts();
 
 function syncRewardExtraIn(parent, val) {
     var extras = parent.querySelectorAll('.reward-extra');
@@ -676,10 +704,14 @@ function syncShareReward(sel) {
     syncRewardExtraIn(group, sel.value);
 }
 
-function syncPickupRewardExtra() {
-    var parent = document.getElementById('pickupRewardRow');
-    var sel = document.getElementById('pickupRewardType');
-    syncRewardExtraIn(parent, sel ? sel.value : 'cash');
+function syncPickupRewardExtra(sel) {
+    var group = sel.closest('.rule-group');
+    if (!group) return;
+    var extras = group.querySelectorAll('.reward-extra');
+    extras.forEach(function(el) { el.classList.remove('show'); });
+    var val = sel.value;
+    var target = group.querySelector('.pickup-reward-extra-' + val);
+    if (target) target.classList.add('show');
 }
 
 // 提货产品下拉选择后，显示/隐藏数量输入
@@ -687,14 +719,6 @@ function togglePickupQty(sel) {
     var item = sel.closest('.rule-item');
     var qty = item.querySelector('.pickup-qty');
     if (qty) qty.style.display = sel.value ? '' : 'none';
-}
-
-function checkPickupProducts() {
-    var products = document.querySelectorAll('#pickupProductList .pickup-product');
-    var hasProduct = false;
-    products.forEach(function(sel) { if (sel.value) hasProduct = true; });
-    var rewardRow = document.getElementById('pickupRewardRow');
-    if (rewardRow) rewardRow.style.display = hasProduct ? '' : 'none';
 }
 
 function addShareRule() {
@@ -772,15 +796,110 @@ function reindexShareRules() {
     });
 }
 
-function addPickupProduct() {
-    var list = document.getElementById('pickupProductList');
-    var idx = list.children.length + 1;
+// ===== 提货规则管理 =====
+
+function addPickupRule() {
+    var list = document.getElementById('pickupRuleList');
+    var idx = list.querySelectorAll('.rule-group').length + 1;
+    var group = document.createElement('div');
+    group.className = 'rule-group';
+    group.innerHTML = [
+        '<div class="rule-item" style="background:#f0f4ff;border-color:#d6e0ff;border-radius:10px 10px 0 0;border-bottom:none;">',
+        '    <span class="rule-label" style="font-weight:600;color:#4f7cff;">规则 ' + idx + '</span>',
+        '    <button class="btn btn-danger-text" onclick="removePickupRule(this)">删除本规则</button>',
+        '</div>',
+        '<div style="border:1px solid #d6e0ff;border-top:none;border-radius:0 0 10px 10px;padding:12px 16px;background:#fafcff;">',
+        '    <div style="font-size:13px;color:#4e5a6e;margin-bottom:8px;font-weight:500;">产品条件（且关系）：</div>',
+        '    <div class="pickup-products-inner">',
+        '        <div class="rule-item" style="margin-bottom:6px;">',
+        '            <span class="rule-label">产品 1：</span>',
+        '            <select class="pickup-product" style="width:130px;" onchange="togglePickupQty(this)">',
+        '                <option value="">选择产品</option>',
+        '                <option value="crane">仙鹤莲池</option>',
+        '                <option value="fortune">进宝</option>',
+        '                <option value="success">马到功成</option>',
+        '                <option value="wealth">招财</option>',
+        '            </select>',
+        '            <span class="pickup-qty" style="display:none;">',
+        '                <span style="font-size:13px;color:#4e5969;">数量：</span>',
+        '                <input type="number" value="10" style="width:80px;">',
+        '                <span style="color:#86909c;font-size:13px;">件</span>',
+        '            </span>',
+        '            <button class="btn btn-danger-text" onclick="removePickupProduct(this)">删除</button>',
+        '        </div>',
+        '    </div>',
+        '    <button class="btn btn-add" onclick="addPickupProduct(this)" style="margin-top:4px;height:30px;font-size:12px;">＋ 新增产品</button>',
+        '    <div style="margin-top:16px;padding-top:14px;border-top:1px dashed #e2e6ee;">',
+        '        <div style="font-size:13px;color:#4e5a6e;margin-bottom:10px;font-weight:500;">奖励配置：</div>',
+        '        <div class="reward-block">',
+        '            <div class="reward-line" style="gap:8px;">',
+        '                <span class="label-text" style="min-width:60px;font-size:13px;">奖励对象：</span>',
+        '                <select class="pickup-reward-target" style="height:34px;min-width:120px;">',
+        '                    <option value="tasker">任务方</option>',
+        '                </select>',
+        '            </div>',
+        '            <div class="reward-line" style="gap:8px;">',
+        '                <span class="label-text" style="min-width:60px;font-size:13px;">奖励类型：</span>',
+        '                <select class="pickup-reward-type" style="height:34px;min-width:140px;" onchange="syncPickupRewardExtra(this)">',
+        '                    <option value="new_product">新品优先权</option>',
+        '                    <option value="cash">现金</option>',
+        '                    <option value="product">产品</option>',
+        '                </select>',
+        '            </div>',
+        '            <div class="reward-line" style="gap:8px;">',
+        '                <span class="reward-extra pickup-reward-extra-new_product show">',
+        '                    <span class="label-text" style="min-width:60px;font-size:13px;">数量：</span>',
+        '                    <input type="number" value="3" style="width:80px;height:34px;">',
+        '                    <span style="color:#9ba6b9;font-size:13px;">件</span>',
+        '                </span>',
+        '                <span class="reward-extra pickup-reward-extra-cash">',
+        '                    <span class="label-text" style="min-width:60px;font-size:13px;">奖励金额：</span>',
+        '                    <input type="number" value="500" style="width:100px;height:34px;">',
+        '                    <span style="color:#9ba6b9;font-size:13px;">元</span>',
+        '                </span>',
+        '                <span class="reward-extra pickup-reward-extra-product">',
+        '                    <span class="label-text" style="min-width:60px;font-size:13px;">选择产品：</span>',
+        '                    <select style="height:34px;min-width:110px;">',
+        '                        <option value="crane">仙鹤莲池</option>',
+        '                        <option value="fortune">进宝</option>',
+        '                        <option value="success">马到功成</option>',
+        '                        <option value="wealth">招财</option>',
+        '                    </select>',
+        '                    <span class="label-text" style="min-width:50px;font-size:13px;">份数：</span>',
+        '                    <input type="number" value="1" style="width:70px;height:34px;">',
+        '                </span>',
+        '            </div>',
+        '        </div>',
+        '    </div>',
+        '</div>'
+    ].join('');
+    list.appendChild(group);
+}
+
+function removePickupRule(btn) {
+    var group = btn.closest('.rule-group');
+    if (group) group.remove();
+    reindexPickupRules();
+}
+
+function reindexPickupRules() {
+    var groups = document.querySelectorAll('#pickupRuleList .rule-group');
+    groups.forEach(function(group, i) {
+        var label = group.querySelector('.rule-item .rule-label');
+        if (label) label.textContent = '规则 ' + (i + 1);
+    });
+}
+
+function addPickupProduct(btn) {
+    var innerContainer = btn.closest('[style*="border:1px solid"]').querySelector('.pickup-products-inner');
+    var items = innerContainer.querySelectorAll('.rule-item');
+    var idx = items.length + 1;
     var div = document.createElement('div');
     div.className = 'rule-item';
-    div.setAttribute('data-type', 'pickup');
+    div.style.marginBottom = '6px';
     div.innerHTML = [
         '<span class="rule-label">产品 ' + idx + '：</span>',
-        '<select class="pickup-product" style="width:130px;" onchange="togglePickupQty(this);checkPickupProducts()">',
+        '<select class="pickup-product" style="width:130px;" onchange="togglePickupQty(this)">',
         '    <option value="">选择产品</option>',
         '    <option value="crane">仙鹤莲池</option>',
         '    <option value="fortune">进宝</option>',
@@ -794,17 +913,18 @@ function addPickupProduct() {
         '</span>',
         '<button class="btn btn-danger-text" onclick="removePickupProduct(this)">删除</button>'
     ].join('');
-    list.appendChild(div);
+    innerContainer.appendChild(div);
 }
 
 function removePickupProduct(btn) {
+    var innerContainer = btn.closest('.pickup-products-inner');
     btn.closest('.rule-item').remove();
-    reindexPickupProducts();
-    checkPickupProducts();
+    reindexPickupProducts(innerContainer);
 }
 
-function reindexPickupProducts() {
-    var items = document.querySelectorAll('#pickupProductList .rule-item');
+function reindexPickupProducts(container) {
+    if (!container) container = document;
+    var items = container.querySelectorAll('.rule-item');
     items.forEach(function(item, i) {
         var label = item.querySelector('.rule-label');
         if (label) label.textContent = '产品 ' + (i + 1) + '：';
