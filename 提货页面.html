@@ -6,16 +6,19 @@
     <title>提货</title>
     <style>
         * { margin:0; padding:0; box-sizing:border-box; }
-        body {
+        html, body {
+            height: 100%;
             font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
             background: #f5f6fa;
-            padding-bottom: 30px;
+        }
+        body {
             max-width: 420px;
             margin: 0 auto;
-            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
         }
 
-        /* 头部 */
         .header {
             background: #fff;
             padding: 44px 16px 14px;
@@ -24,6 +27,7 @@
             font-weight: 600;
             color: #1a1a2e;
             position: relative;
+            flex-shrink: 0;
             border-bottom: 1px solid #f0f0f0;
         }
         .header .back {
@@ -35,557 +39,461 @@
             line-height: 1;
             cursor: pointer;
         }
+        .header .rule-count {
+            position: absolute;
+            right: 16px;
+            bottom: 14px;
+            font-size: 12px;
+            font-weight: 400;
+            color: #9ba6b9;
+        }
 
-        /* 卡片 */
-        .card {
+        .scroll-area {
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 12px;
+        }
+
+        /* ===== 持有卡片 ===== */
+        .holdings-card {
             background: #fff;
             border-radius: 12px;
-            margin: 12px 16px;
-            padding: 16px;
+            margin: 12px 16px 8px;
+            padding: 14px 16px;
             box-shadow: 0 1px 4px rgba(0,0,0,0.04);
         }
-        .card-title {
-            font-size: 15px;
+        .holdings-title {
+            font-size: 14px;
             font-weight: 600;
             color: #1a1a2e;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
+        }
+        .holdings-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .holding-item {
+            flex: 1;
+            min-width: 75px;
+            background: #f7f9fd;
+            border-radius: 8px;
+            padding: 6px 8px;
+            text-align: center;
+        }
+        .holding-item .name {
+            font-size: 11px;
+            color: #4e5a6e;
+            margin-bottom: 1px;
+        }
+        .holding-item .qty {
+            font-size: 16px;
+            font-weight: 700;
+            color: #34a853;
         }
 
-        /* 产品列表 */
+        /* ===== 规则卡片（全部展开，无勾选） ===== */
+        .rule-card {
+            background: #fff;
+            border-radius: 12px;
+            margin: 8px 16px;
+            padding: 14px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        }
+        .rule-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .rule-card-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a2e;
+        }
+        .rule-card .reward-tag {
+            font-size: 10px;
+            color: #4f7cff;
+            background: #f0f4ff;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 500;
+            flex-shrink: 0;
+        }
+
         .product-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 0;
+            padding: 4px 0;
             border-bottom: 1px solid #f5f5f5;
         }
-        .product-item:last-child {
-            border-bottom: none;
-        }
-        .product-info {
-            flex: 1;
-        }
-        .product-name {
-            font-size: 14px;
-            font-weight: 500;
-            color: #1a1a2e;
-        }
-        .product-spec {
-            font-size: 12px;
-            color: #9ba6b9;
-            margin-top: 2px;
-        }
-        .product-qty {
-            text-align: right;
-        }
+        .product-item:last-child { border-bottom: none; }
+        .product-info { flex: 1; }
+        .product-name { font-size: 13px; font-weight: 500; color: #1a1a2e; }
+        .product-spec { font-size: 11px; color: #9ba6b9; margin-top: 1px; }
+        .product-qty { text-align: right; }
         .product-qty .required {
-            font-size: 15px;
-            font-weight: 600;
-            color: #4f7cff;
+            font-size: 14px; font-weight: 600; color: #4f7cff;
         }
-        .product-qty .label {
-            font-size: 11px;
-            color: #9ba6b9;
-        }
-        .product-qty .owned {
-            font-size: 15px;
-            font-weight: 600;
-            color: #34a853;
-        }
-        .product-qty .owned.low {
-            color: #e74c5e;
+        .product-qty .label { font-size: 10px; color: #9ba6b9; }
+
+        .section-sub-title {
+            font-size: 12px; font-weight: 500; color: #4e5a6e;
+            margin: 8px 0 3px;
         }
 
-        .qty-divider {
-            height: 1px;
-            background: #f0f0f0;
-            margin: 4px 0;
-        }
-
-        /* 提取数量区 */
-        .claim-section {
-            margin: 12px 16px;
-        }
-        .claim-card {
-            background: #fff;
-            border-radius: 12px;
-            padding: 16px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-        }
-        .claim-row {
+        .rule-claim-area {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #f0f0f0;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            padding: 8px 0;
+            justify-content: space-between;
         }
-        .claim-label {
-            font-size: 14px;
+        .rule-claim-area .label {
+            font-size: 13px;
             color: #4e5a6e;
         }
-        .claim-value {
-            font-size: 14px;
-            font-weight: 600;
-            color: #1a1a2e;
+        .rule-claim-area .hint {
+            font-size: 11px;
+            color: #9ba6b9;
+            margin-left: 4px;
         }
-        .claim-value.highlight {
-            color: #4f7cff;
-            font-size: 18px;
-        }
-
-        .claim-input-area {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-top: 1px solid #f0f0f0;
-            margin-top: 8px;
-        }
-        .claim-input-wrap {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .claim-input-wrap input {
-            width: 100px;
-            height: 40px;
+        .rule-qty-input {
+            width: 60px;
+            height: 34px;
             text-align: center;
-            font-size: 20px;
+            font-size: 15px;
             font-weight: 600;
             border: 1.5px solid #e2e6ee;
             border-radius: 8px;
             outline: none;
             color: #1a1a2e;
-            transition: border-color 0.2s;
         }
-        .claim-input-wrap input:focus {
+        .rule-qty-input:focus {
             border-color: #4f7cff;
+            box-shadow: 0 0 0 3px rgba(79,124,255,0.10);
         }
-        .claim-input-wrap .unit {
+
+        /* ===== 底部固定区域 ===== */
+        .bottom-fixed {
+            flex-shrink: 0;
+            background: #fff;
+            border-top: 1px solid #edf0f5;
+            box-shadow: 0 -4px 12px rgba(0,0,0,0.06);
+            padding: 10px 16px 20px;
+        }
+
+        .summary-section { margin-bottom: 8px; }
+        .summary-title {
             font-size: 13px;
-            color: #9ba6b9;
-        }
-        .claim-hint {
-            font-size: 12px;
-            color: #9ba6b9;
-            text-align: right;
-        }
-        .claim-hint strong {
-            color: #4f7cff;
             font-weight: 600;
-        }
-
-        /* 按钮组 */
-        .qty-adjust {
-            display: inline-flex;
-            align-items: center;
-            gap: 0;
-        }
-        .qty-adjust button {
-            width: 36px;
-            height: 36px;
-            border: 1.5px solid #e2e6ee;
-            background: #fff;
-            font-size: 18px;
-            color: #4e5a6e;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.15s;
-        }
-        .qty-adjust button:active {
-            background: #f0f2f7;
-        }
-        .qty-adjust button:first-child {
-            border-radius: 8px 0 0 8px;
-        }
-        .qty-adjust button:last-child {
-            border-radius: 0 8px 8px 0;
-        }
-        .qty-adjust button:disabled {
-            color: #d0d5dd;
-            cursor: not-allowed;
-        }
-        .qty-adjust input {
-            width: 52px;
-            height: 36px;
-            text-align: center;
-            font-size: 16px;
-            font-weight: 600;
-            border: 1.5px solid #e2e6ee;
-            border-left: none;
-            border-right: none;
-            outline: none;
             color: #1a1a2e;
+            margin-bottom: 4px;
         }
-
-        /* 收货地址 */
-        .address-card {
-            background: #fff;
-            border-radius: 12px;
-            margin: 12px 16px;
-            padding: 16px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-        }
-        .address-header {
+        .summary-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
+            padding: 2px 0;
         }
-        .address-header .card-title {
-            margin-bottom: 0;
+        .summary-row .s-name { font-size: 12px; color: #4e5a6e; }
+        .summary-row .s-detail { text-align: right; }
+        .summary-row .s-detail .s-consumed {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a2e;
         }
-        .address-select {
+        .summary-row .s-detail .s-consumed.over { color: #e74c5e; }
+        .summary-row .s-detail .s-sep {
+            color: #9ba6b9;
+            margin: 0 3px;
+            font-size: 12px;
+        }
+        .summary-row .s-detail .s-hold { font-size: 12px; color: #9ba6b9; }
+        .summary-row .s-detail .s-over-mark {
+            font-size: 10px;
+            color: #e74c5e;
+            display: block;
+        }
+        .summary-status {
+            text-align: center;
+            margin-top: 4px;
+            padding-top: 4px;
+            border-top: 1px solid #f0f0f0;
+        }
+        .summary-status .ok {
+            font-size: 12px;
+            color: #34a853;
+            font-weight: 500;
+        }
+        .summary-status .fail {
+            font-size: 12px;
+            color: #e74c5e;
+            font-weight: 500;
+        }
+
+        .address-section {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 0 0;
+            border-top: 1px solid #f0f0f0;
+            margin-top: 6px;
+        }
+        .address-left { flex: 1; min-width: 0; }
+        .address-left .addr-label { font-size: 11px; color: #9ba6b9; }
+        .address-left .addr-text {
             font-size: 13px;
+            color: #1a1a2e;
+            font-weight: 500;
+            margin-top: 1px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .address-change {
+            font-size: 12px;
             color: #4f7cff;
             cursor: pointer;
             font-weight: 500;
-        }
-        .address-info {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-        }
-        .address-info .avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: #e8ecf5;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-            color: #4e5a6e;
             flex-shrink: 0;
-        }
-        .address-detail {
-            flex: 1;
-        }
-        .address-detail .name {
-            font-size: 14px;
-            font-weight: 600;
-            color: #1a1a2e;
-        }
-        .address-detail .name .phone {
-            font-weight: 400;
-            color: #9ba6b9;
             margin-left: 8px;
         }
-        .address-detail .addr {
-            font-size: 13px;
-            color: #4e5a6e;
-            margin-top: 4px;
-            line-height: 1.4;
-        }
-        .address-empty {
-            font-size: 14px;
-            color: #9ba6b9;
-            text-align: center;
-            padding: 20px 0;
-        }
 
-        /* 提交按钮 */
-        .submit-area {
-            margin: 20px 16px 0;
-        }
         .btn-submit {
-            width: 100%;
-            height: 48px;
-            background: #4f7cff;
-            color: #fff;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .btn-submit:active {
-            background: #3d68e8;
-        }
-        .btn-submit:disabled {
-            background: #c8cedb;
-            cursor: not-allowed;
-        }
-        .submit-hint {
-            font-size: 12px;
-            color: #9ba6b9;
-            text-align: center;
-            margin-top: 10px;
-            line-height: 1.5;
-            padding: 0 8px;
-        }
-
-        /* 进度展示 */
-        .progress-bar {
-            width: 100%;
-            height: 4px;
-            background: #edf0f5;
-            border-radius: 2px;
+            width: 100%; height: 44px;
+            background: #4f7cff; color: #fff;
+            border: none; border-radius: 10px;
+            font-size: 15px; font-weight: 600;
+            cursor: pointer; transition: background 0.2s;
             margin-top: 8px;
-            overflow: hidden;
         }
-        .progress-bar .fill {
-            height: 100%;
-            background: #4f7cff;
-            border-radius: 2px;
-            transition: width 0.3s;
-        }
-
-        /* 分割标题 */
-        .section-title {
-            font-size: 14px;
-            font-weight: 600;
-            color: #1a1a2e;
-            padding: 4px 16px 0;
-        }
-
-        /* max提示 */
-        .max-note {
-            font-size: 11px;
-            color: #e74c5e;
-            margin-top: 4px;
-            text-align: right;
+        .btn-submit:active { background: #3d68e8; }
+        .btn-submit:disabled { background: #c8cedb; cursor: not-allowed; }
+        .submit-hint {
+            font-size: 11px; color: #9ba6b9;
+            text-align: center; margin-top: 4px;
+            line-height: 1.4;
         }
     </style>
 </head>
 <body>
 
-<!-- 头部 -->
 <div class="header">
     <span class="back">&larr;</span>
     提货
+    <span class="rule-count">共 <strong id="totalRulesCount">3</strong> 条规则</span>
 </div>
 
-<!-- ===== 规则要求数量 ===== -->
-<div class="card">
-    <div class="card-title">任务要求</div>
-    <div id="requiredList">
-        <div class="product-item">
-            <div class="product-info">
-                <div class="product-name">仙鹤莲池</div>
-                <div class="product-spec">每份需提货 10 件</div>
-            </div>
-            <div class="product-qty">
-                <div class="required">10</div>
-                <div class="label">件/份</div>
-            </div>
-        </div>
-        <div class="product-item">
-            <div class="product-info">
-                <div class="product-name">进宝</div>
-                <div class="product-spec">每份需提货 5 件</div>
-            </div>
-            <div class="product-qty">
-                <div class="required">5</div>
-                <div class="label">件/份</div>
-            </div>
-        </div>
+<div class="scroll-area">
+
+    <div class="holdings-card">
+        <div class="holdings-title">我的持有</div>
+        <div class="holdings-grid" id="holdingsGrid"></div>
     </div>
+
+    <div id="ruleCardContainer"></div>
+
 </div>
 
-<!-- ===== 用户拥有数量 ===== -->
-<div class="card">
-    <div class="card-title">我的持有</div>
-    <div id="ownedList">
-        <div class="product-item">
-            <div class="product-info">
-                <div class="product-name">仙鹤莲池</div>
-            </div>
-            <div class="product-qty">
-                <div class="owned">32</div>
-                <div class="label">件</div>
-            </div>
+<div class="bottom-fixed">
+    <div class="summary-section">
+        <div class="summary-title">消耗汇总</div>
+        <div id="summaryBody">
+            <div style="text-align:center;padding:4px 0;font-size:12px;color:#9ba6b9;">请填写份数</div>
         </div>
-        <div class="product-item">
-            <div class="product-info">
-                <div class="product-name">进宝</div>
-            </div>
-            <div class="product-qty">
-                <div class="owned low">3</div>
-                <div class="label">件</div>
-            </div>
-        </div>
+        <div class="summary-status" id="summaryStatus"></div>
     </div>
-</div>
 
-<!-- ===== 提取数量 ===== -->
-<div class="claim-section">
-    <div class="claim-card">
-        <div class="claim-row">
-            <span class="claim-label">可提取份数</span>
-            <span class="claim-value highlight" id="maxClaimDisplay">3</span>
+    <div class="address-section">
+        <div class="address-left">
+            <div class="addr-label">收货地址</div>
+            <div class="addr-text">张三 138****5678 · 广东省深圳市南山区科技园南区粤海街道高新大厦A座1201</div>
         </div>
-        <div class="claim-row">
-            <span class="claim-label">该任务最多可提取</span>
-            <span class="claim-value" id="taskMaxDisplay">5</span>
-        </div>
-        <div class="progress-bar">
-            <div class="fill" id="progressFill" style="width:60%;"></div>
-        </div>
+        <span class="address-change" onclick="alert('选择地址')">更换</span>
+    </div>
 
-        <div class="claim-input-area">
-            <span class="claim-label">提取份数</span>
-            <div style="display:flex;align-items:center;gap:8px;">
-                <div class="qty-adjust">
-                    <button id="qtyMinus" onclick="adjustQty(-1)">-</button>
-                    <input type="number" id="claimQtyInput" value="0" min="0" max="3" onchange="onQtyChange()">
-                    <button id="qtyPlus" onclick="adjustQty(1)">+</button>
-                </div>
-                <span style="font-size:13px;color:#9ba6b9;">份</span>
-            </div>
-        </div>
-        <div class="claim-hint">
-            该任务您最多可提取 <strong id="maxClaimHint">3</strong> 份
-        </div>
-        <div class="max-note" id="maxNote">
-            * 受限于您的持有数量和任务规则上限，取两者较小值
-        </div>
-    </div>
-</div>
-
-<!-- ===== 收货地址 ===== -->
-<div class="address-card">
-    <div class="address-header">
-        <div class="card-title">收货地址</div>
-        <span class="address-select" onclick="alert('选择地址')">更换 &gt;</span>
-    </div>
-    <div class="address-info">
-        <div class="avatar">张</div>
-        <div class="address-detail">
-            <div class="name">张三 <span class="phone">138****5678</span></div>
-            <div class="addr">广东省深圳市南山区科技园南区粤海街道高新大厦A座1201</div>
-        </div>
-    </div>
-</div>
-
-<!-- ===== 提交 ===== -->
-<div class="submit-area">
-    <button class="btn-submit" id="submitBtn" onclick="submitPickup()">确定提取</button>
-    <div class="submit-hint">
-        实物提取后预计30个工作日内发货，该数字资产将从区块链上销毁
-    </div>
+    <button class="btn-submit" id="submitBtn" onclick="submitPickup()" disabled>请填写份数</button>
+    <div class="submit-hint">实物提取后预计30个工作日内发货，该数字资产将从区块链上销毁</div>
 </div>
 
 <script>
-// ===== 模拟数据 =====
-var config = {
-    // 规则要求：每个产品的每份需要数量
-    requirements: { crane: 10, fortune: 5 },
-    // 用户持有
-    holdings: { crane: 32, fortune: 3 },
-    // 任务总上限
-    taskMax: 5
-};
+var rulesData = [
+    { id: 1, name: '规则 1', reward: '新品优先权 × 3', requirements: { crane: 10, fortune: 5 }, taskMax: 5 },
+    { id: 2, name: '规则 2', reward: '新品优先权 × 2', requirements: { crane: 8, wealth: 12 }, taskMax: 3 },
+    { id: 3, name: '规则 3', reward: '新品优先权 × 1', requirements: { success: 15, fortune: 8, wealth: 10 }, taskMax: 2 }
+];
 
-var productNames = { crane: '仙鹤莲池', fortune: '进宝' };
+var globalHoldings = { crane: 32, fortune: 8, success: 10, wealth: 20 };
 
-// 计算可提取份数 = min(各产品 holdings/requirements 向下取整的最小值, taskMax)
-function calcMaxClaim() {
-    var maxByProduct = Infinity;
-    for (var key in config.requirements) {
-        var req = config.requirements[key];
-        var hold = config.holdings[key] || 0;
-        var can = Math.floor(hold / req);
-        if (can < maxByProduct) maxByProduct = can;
+var productNames = { crane: '仙鹤莲池', fortune: '进宝', success: '马到功成', wealth: '招财' };
+
+var ruleQtys = {};
+rulesData.forEach(function(r) { ruleQtys[r.id] = 0; });
+
+function renderHoldings() {
+    var grid = document.getElementById('holdingsGrid');
+    grid.innerHTML = '';
+    for (var key in globalHoldings) {
+        var div = document.createElement('div');
+        div.className = 'holding-item';
+        div.innerHTML = '<div class="name">' + productNames[key] + '</div><div class="qty">' + globalHoldings[key] + '</div>';
+        grid.appendChild(div);
     }
-    var maxClaim = Math.min(maxByProduct, config.taskMax);
-    return isFinite(maxClaim) ? maxClaim : 0;
 }
 
-var maxClaim = calcMaxClaim();
+function renderRules() {
+    var container = document.getElementById('ruleCardContainer');
+    container.innerHTML = '';
 
-// 更新UI
-document.getElementById('maxClaimDisplay').textContent = maxClaim;
-document.getElementById('taskMaxDisplay').textContent = config.taskMax;
-document.getElementById('maxClaimHint').textContent = maxClaim;
-document.getElementById('claimQtyInput').max = maxClaim;
+    rulesData.forEach(function(rule) {
+        var card = document.createElement('div');
+        card.className = 'rule-card';
 
-// 进度条
-var progressPct = config.taskMax > 0 ? (maxClaim / config.taskMax * 100) : 0;
-document.getElementById('progressFill').style.width = Math.min(progressPct, 100) + '%';
-
-// 检查持有不足的产品
-var items = document.querySelectorAll('#ownedList .product-item');
-var idx = 0;
-for (var key in config.holdings) {
-    var req = config.requirements[key] || 0;
-    var hold = config.holdings[key] || 0;
-    var el = items[idx];
-    if (el) {
-        var qtyDiv = el.querySelector('.owned');
-        qtyDiv.textContent = hold;
-        if (hold < req) {
-            qtyDiv.classList.add('low');
-        } else {
-            qtyDiv.classList.remove('low');
+        var reqHtml = '';
+        for (var key in rule.requirements) {
+            var req = rule.requirements[key];
+            reqHtml += [
+                '<div class="product-item">',
+                '    <div class="product-info">',
+                '        <div class="product-name">' + productNames[key] + '</div>',
+                '        <div class="product-spec">每份需提货 ' + req + ' 件</div>',
+                '    </div>',
+                '    <div class="product-qty">',
+                '        <div class="required">' + req + '</div>',
+                '        <div class="label">件/份</div>',
+                '    </div>',
+                '</div>'
+            ].join('');
         }
-    }
-    idx++;
+
+        card.innerHTML = [
+            '<div class="rule-card-header">',
+            '    <div class="rule-card-title">' + rule.name + '</div>',
+            '    <span class="reward-tag">' + rule.reward + '</span>',
+            '</div>',
+            '<div class="section-sub-title">任务要求</div>',
+            '<div>' + reqHtml + '</div>',
+            '<div class="rule-claim-area">',
+            '    <div>',
+            '        <span class="label">提取份数</span>',
+            '        <span class="hint">（0~' + rule.taskMax + '份）</span>',
+            '    </div>',
+            '    <input type="number" class="rule-qty-input" id="qty_' + rule.id + '" value="' + ruleQtys[rule.id] + '" min="0" max="' + rule.taskMax + '" onchange="onQtyChange(' + rule.id + ', this.value)">',
+            '</div>'
+        ].join('');
+
+        container.appendChild(card);
+    });
 }
 
-// 数量调整
-function adjustQty(delta) {
-    var input = document.getElementById('claimQtyInput');
-    var val = parseInt(input.value) || 0;
-    var newVal = val + delta;
-    if (newVal < 0) newVal = 0;
-    if (newVal > maxClaim) newVal = maxClaim;
-    input.value = newVal;
-    onQtyChange();
+function onQtyChange(ruleId, val) {
+    var rule = rulesData.find(function(r) { return r.id === ruleId; });
+    if (!rule) return;
+    var qty = parseInt(val) || 0;
+    if (qty < 0) qty = 0;
+    if (qty > rule.taskMax) qty = rule.taskMax;
+    ruleQtys[ruleId] = qty;
+    document.getElementById('qty_' + ruleId).value = qty;
+    updateSummary();
 }
 
-function onQtyChange() {
-    var input = document.getElementById('claimQtyInput');
-    var val = parseInt(input.value) || 0;
-    if (val < 0) val = 0;
-    if (val > maxClaim) val = maxClaim;
-    input.value = val;
-    updateQtyDisplay(val);
-}
-
-// 更新当前数量预览
-function updateQtyDisplay(qty) {
-    // 计算各产品消耗
-    for (var key in config.requirements) {
-        var req = config.requirements[key];
-        var consumed = qty * req;
-        var remain = (config.holdings[key] || 0) - consumed;
-        // 找到对应的产品行
-        var items = document.querySelectorAll('#ownedList .product-item');
-        var found = false;
-        for (var i = 0; i < items.length; i++) {
-            var nameEl = items[i].querySelector('.product-name');
-            if (nameEl && nameEl.textContent === productNames[key]) {
-                var qtyDiv = items[i].querySelector('.owned');
-                // 不修改原始数量，仅在视觉上通过颜色变化提示
-                if (remain < 0) {
-                    qtyDiv.style.color = '#e74c5e';
-                } else if (remain < config.requirements[key]) {
-                    qtyDiv.style.color = '#f59e0b';
-                } else {
-                    qtyDiv.style.color = '';
-                }
-                found = true;
-                break;
-            }
+function calcTotalConsumption() {
+    var total = {};
+    var anyHasQty = false;
+    rulesData.forEach(function(rule) {
+        var qty = ruleQtys[rule.id] || 0;
+        if (qty <= 0) return;
+        anyHasQty = true;
+        for (var key in rule.requirements) {
+            total[key] = (total[key] || 0) + rule.requirements[key] * qty;
         }
-    }
+    });
+    return { total: total, anyHasQty: anyHasQty };
 }
 
-// 提交
-function submitPickup() {
-    var qty = parseInt(document.getElementById('claimQtyInput').value) || 0;
-    if (qty <= 0) {
-        alert('请至少提取1份');
+function updateSummary() {
+    var result = calcTotalConsumption();
+    var summaryBody = document.getElementById('summaryBody');
+    var summaryStatus = document.getElementById('summaryStatus');
+    var btn = document.getElementById('submitBtn');
+
+    if (!result.anyHasQty) {
+        summaryBody.innerHTML = '<div style="text-align:center;padding:4px 0;font-size:12px;color:#9ba6b9;">请填写份数</div>';
+        summaryStatus.innerHTML = '';
+        btn.disabled = true;
+        btn.textContent = '请填写份数';
         return;
     }
-    alert('提货成功！您已提交 ' + qty + ' 份的提取申请。');
+
+    var html = '';
+    var allOk = true;
+
+    for (var key in result.total) {
+        var consumed = result.total[key];
+        var hold = globalHoldings[key] || 0;
+        var over = consumed > hold;
+        if (over) allOk = false;
+
+        html += [
+            '<div class="summary-row">',
+            '    <span class="s-name">' + productNames[key] + '</span>',
+            '    <div class="s-detail">',
+            '        <span class="s-consumed' + (over ? ' over' : '') + '">' + consumed + '</span>',
+            '        <span class="s-sep">/</span>',
+            '        <span class="s-hold">' + hold + '</span>',
+            (over ? '<span class="s-over-mark">超出 ' + (consumed - hold) + ' 件</span>' : ''),
+            '    </div>',
+            '</div>'
+        ].join('');
+    }
+
+    summaryBody.innerHTML = html;
+
+    if (allOk) {
+        summaryStatus.innerHTML = '<span class="ok">✓ 持有充足，可以提取</span>';
+        btn.disabled = false;
+        btn.textContent = '确定提取';
+    } else {
+        summaryStatus.innerHTML = '<span class="fail">✗ 部分产品超出持有，请减少份数</span>';
+        btn.disabled = true;
+        btn.textContent = '持有不足，无法提取';
+    }
 }
 
-// 初始化
-onQtyChange();
+function submitPickup() {
+    var result = calcTotalConsumption();
+    if (!result.anyHasQty) {
+        alert('请至少填写一份规则的数量');
+        return;
+    }
+    for (var key in result.total) {
+        if (result.total[key] > (globalHoldings[key] || 0)) {
+            alert('产品「' + productNames[key] + '」消耗超出持有，请调整份数');
+            return;
+        }
+    }
+    var detail = '';
+    rulesData.forEach(function(rule) {
+        var qty = ruleQtys[rule.id] || 0;
+        if (qty > 0) {
+            detail += rule.name + ' × ' + qty + ' 份 → ' + rule.reward + '\n';
+        }
+    });
+    detail += '\n消耗明细：\n';
+    for (var key in result.total) {
+        detail += '  ' + productNames[key] + '：' + result.total[key] + ' 件\n';
+    }
+    alert('提货申请提交成功！\n\n' + detail);
+}
+
+document.getElementById('totalRulesCount').textContent = rulesData.length;
+renderHoldings();
+renderRules();
+updateSummary();
 </script>
 </body>
 </html>
