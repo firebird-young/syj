@@ -567,21 +567,25 @@
         <div id="pickupContent" class="task-type-content">
 
             <div class="form-row">
-                <div class="form-label"><span class="required">*</span>任务完成总次数</div>
+                <div class="form-label">任务终止条件</div>
                 <div class="form-control">
-                    <div class="inline-group">
-                        <input type="number" placeholder="总次数" value="10" style="width:160px;">
-                        <span style="color:#86909c;font-size:13px;">次</span>
+                    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                        <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:14px;color:#4e5a6e;">
+                            <input type="checkbox" id="stopOnReward" onchange="toggleStopCondition()">
+                            当奖励内容到达数量后自动结束任务
+                        </label>
+                        <span id="stopRewardHint" style="display:none;font-size:12px;color:#9ba6b9;">（基于所有规则奖励中的新品优先权累计数量）</span>
                     </div>
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-label"><span class="required">*</span>单人最多完成次数</div>
-                <div class="form-control">
-                    <div class="inline-group">
-                        <input type="number" placeholder="单人上限" value="3" style="width:160px;">
-                        <span style="color:#86909c;font-size:13px;">次</span>
+                    <div id="stopConditionConfig" style="display:none;margin-top:10px;padding:10px 14px;background:#fff8e6;border-radius:8px;">
+                        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                            <span style="font-size:13px;color:#e67e22;font-weight:500;">奖励内容累计发放达到</span>
+                            <select id="stopRewardType" style="height:34px;border:1px solid #f0dbb0;border-radius:6px;padding:0 8px;font-size:13px;color:#e67e22;font-weight:500;outline:none;">
+                                <option value="new_product">新品优先权</option>
+                            </select>
+                            <input type="number" id="stopRewardQty" value="100" style="width:100px;height:34px;border:1px solid #f0dbb0;border-radius:6px;padding:0 8px;font-size:14px;font-weight:600;color:#e67e22;text-align:center;outline:none;">
+                            <span style="font-size:13px;color:#e67e22;">件时自动结束</span>
+                        </div>
+                        <div style="font-size:11px;color:#9ba6b9;margin-top:4px;">系统统计所有规则中已发放的对应奖励总数，达到设定值后任务自动终止</div>
                     </div>
                 </div>
             </div>
@@ -590,7 +594,7 @@
                 <div class="form-label"><span class="required">*</span>任务规则</div>
                 <div class="form-control">
                     <div id="pickupRuleList">
-                        <!-- 规则组：每个规则组包含 产品列表（且关系）+ 独立奖励配置 -->
+                        <!-- 规则组：每个规则组包含 产品列表（且关系）+ 每人上限 + 独立奖励配置 -->
                         <div class="rule-group">
                             <div class="rule-item" style="background:#f0f4ff;border-color:#d6e0ff;border-radius:10px 10px 0 0;border-bottom:none;">
                                 <span class="rule-label" style="font-weight:600;color:#4f7cff;">规则 1</span>
@@ -618,7 +622,15 @@
                                 </div>
                                 <button class="btn btn-add" onclick="addPickupProduct(this)" style="margin-top:4px;height:30px;font-size:12px;">＋ 新增产品</button>
 
-                                <div style="margin-top:16px;padding-top:14px;border-top:1px dashed #e2e6ee;">
+                                <div style="margin-top:12px;padding:10px 12px;background:#fff8e6;border-radius:8px;">
+                                    <div style="display:flex;align-items:center;gap:8px;">
+                                        <span style="font-size:13px;color:#e67e22;font-weight:500;">每人最多完成</span>
+                                        <input type="number" class="pickup-personal-max" value="3" style="width:80px;height:34px;border:1px solid #f0dbb0;border-radius:6px;padding:0 8px;font-size:14px;font-weight:600;color:#e67e22;text-align:center;outline:none;">
+                                        <span style="font-size:13px;color:#e67e22;">次</span>
+                                    </div>
+                                </div>
+
+                                <div style="margin-top:12px;padding-top:12px;border-top:1px dashed #e2e6ee;">
                                     <div style="font-size:13px;color:#4e5a6e;margin-bottom:10px;font-weight:500;">奖励配置：</div>
                                     <div class="reward-block">
                                         <div class="reward-line" style="gap:8px;">
@@ -685,6 +697,14 @@ function switchTaskType() {
 }
 
 switchTaskType();
+
+function toggleStopCondition() {
+    var cb = document.getElementById('stopOnReward');
+    var config = document.getElementById('stopConditionConfig');
+    var hint = document.getElementById('stopRewardHint');
+    config.style.display = cb.checked ? '' : 'none';
+    hint.style.display = cb.checked ? '' : 'none';
+}
 
 function syncRewardExtraIn(parent, val) {
     var extras = parent.querySelectorAll('.reward-extra');
@@ -829,7 +849,14 @@ function addPickupRule() {
         '        </div>',
         '    </div>',
         '    <button class="btn btn-add" onclick="addPickupProduct(this)" style="margin-top:4px;height:30px;font-size:12px;">＋ 新增产品</button>',
-        '    <div style="margin-top:16px;padding-top:14px;border-top:1px dashed #e2e6ee;">',
+        '    <div style="margin-top:12px;padding:10px 12px;background:#fff8e6;border-radius:8px;">',
+        '        <div style="display:flex;align-items:center;gap:8px;">',
+        '            <span style="font-size:13px;color:#e67e22;font-weight:500;">每人最多完成</span>',
+        '            <input type="number" class="pickup-personal-max" value="3" style="width:80px;height:34px;border:1px solid #f0dbb0;border-radius:6px;padding:0 8px;font-size:14px;font-weight:600;color:#e67e22;text-align:center;outline:none;">',
+        '            <span style="font-size:13px;color:#e67e22;">次</span>',
+        '        </div>',
+        '    </div>',
+        '    <div style="margin-top:12px;padding-top:12px;border-top:1px dashed #e2e6ee;">',
         '        <div style="font-size:13px;color:#4e5a6e;margin-bottom:10px;font-weight:500;">奖励配置：</div>',
         '        <div class="reward-block">',
         '            <div class="reward-line" style="gap:8px;">',
