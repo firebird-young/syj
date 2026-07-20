@@ -1,0 +1,450 @@
+﻿﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+  <title>钱包管理</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+      background: #f0f2f5;
+      color: #1a1a2e;
+      font-size: 14px;
+    }
+
+    /* 顶部 */
+    .topbar {
+      background: #fff;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      border-bottom: 1px solid #f0f0f0;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .topbar-left { display: flex; align-items: center; gap: 16px; }
+    .menu-btn {
+      width: 32px; height: 32px;
+      border: 1px solid #d0d5dd;
+      border-radius: 4px;
+      background: #fff;
+      color: #6b7588;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+    .menu-btn:hover { background: #f5f5f7; }
+    .breadcrumb { font-size: 13px; color: #6b7588; }
+    .breadcrumb .active { color: #1a1a2e; }
+    .topbar-right {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+    .topbar-right .avatar {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: #f5deb3;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+    }
+    .topbar-right .name { font-size: 13px; }
+    .topbar-right .arrow { color: #9ba6b9; font-size: 12px; }
+
+    /* 内容区 */
+    .container { padding: 16px; }
+
+    /* 内容头部 */
+    .content-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .content-title { font-size: 18px; font-weight: 600; color: #1a1a2e; }
+    .btn {
+      height: 32px;
+      padding: 0 18px;
+      border-radius: 4px;
+      font-size: 13px;
+      cursor: pointer;
+      border: none;
+    }
+    .btn-primary { background: #1a78ff; color: #fff; }
+    .btn-primary:hover { background: #0f6ae8; }
+
+    /* 表格 */
+    .table-card {
+      background: #fff;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .table th {
+      background: #fafbfc;
+      padding: 12px 16px;
+      text-align: left;
+      font-size: 13px;
+      color: #4e5a6e;
+      font-weight: 500;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .table td {
+      padding: 14px 16px;
+      font-size: 13px;
+      color: #1a1a2e;
+      border-bottom: 1px solid #f5f5f7;
+    }
+    .table tr:last-child td { border-bottom: none; }
+    .table .logo-cell { width: 50px; }
+    .table .action-cell { text-align: right; }
+
+    .logo-img {
+      width: 36px; height: 36px;
+      border-radius: 6px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .btn-edit {
+      padding: 4px 12px;
+      background: #e8f5e9;
+      color: #4caf50;
+      border: none;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .btn-edit:hover { background: #c8e6c9; }
+    .btn-view {
+      padding: 4px 12px;
+      background: #fff;
+      color: #666;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .btn-view:hover { background: #f5f5f5; }
+
+    /* 开关 */
+    .toggle-switch {
+      display: inline-block;
+      width: 40px; height: 22px;
+      background: #e0e0e0;
+      border-radius: 11px;
+      position: relative;
+      cursor: pointer;
+      transition: background 0.3s;
+      vertical-align: middle;
+    }
+    .toggle-switch.on { background: #52c41a; }
+    .toggle-switch::after {
+      content: '';
+      position: absolute;
+      width: 18px; height: 18px;
+      background: #fff;
+      border-radius: 50%;
+      top: 2px; left: 2px;
+      transition: left 0.3s;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+    .toggle-switch.on::after { left: 20px; }
+
+    /* 弹窗 */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal-box {
+      background: #fff;
+      border-radius: 6px;
+      width: 90%;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      border-bottom: 1px solid #e8e8e8;
+    }
+    .modal-title { font-size: 16px; font-weight: 600; }
+    .modal-close {
+      font-size: 20px; color: #999;
+      cursor: pointer; padding: 0 8px;
+    }
+    .modal-close:hover { color: #666; }
+    .modal-body { padding: 20px; }
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      padding: 16px 20px;
+      border-top: 1px solid #e8e8e8;
+    }
+
+    .form-group { margin-bottom: 20px; }
+    .form-label { display: block; font-size: 14px; color: #666; margin-bottom: 8px; }
+    .form-input {
+      width: 100%; padding: 10px 12px;
+      border: 1px solid #ddd; border-radius: 4px;
+      font-size: 14px; outline: none;
+    }
+    .form-input:focus { border-color: #1a78ff; }
+
+    .logo-upload {
+      width: 100px; height: 100px;
+      border: 2px dashed #ddd;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .logo-upload:hover { border-color: #1a78ff; }
+    .logo-upload svg { width: 24px; height: 24px; color: #999; margin-bottom: 4px; }
+    .logo-upload span { font-size: 12px; color: #999; }
+    .logo-preview { width: 100px; height: 100px; border-radius: 8px; object-fit: cover; }
+
+    .editor-toolbar {
+      display: flex; gap: 4px; padding: 8px;
+      background: #f8f9fa;
+      border: 1px solid #ddd; border-radius: 4px 4px 0 0;
+      flex-wrap: wrap;
+    }
+    .editor-toolbar button {
+      padding: 4px 8px; border: none; background: #fff;
+      border-radius: 4px; cursor: pointer; font-size: 12px; color: #666;
+    }
+    .editor-toolbar button:hover { background: #e8e8e8; }
+    .editor-content {
+      width: 100%; min-height: 150px;
+      padding: 12px;
+      border: 1px solid #ddd; border-top: none;
+      border-radius: 0 0 4px 4px;
+      font-size: 14px; outline: none;
+    }
+
+    .btn-default {
+      padding: 8px 16px;
+      background: #fff;
+      color: #666;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .btn-default:hover { background: #f5f5f5; }
+    .btn-primary { background: #1a78ff; color: #fff; border: none; padding: 8px 16px; border-radius: 4px; font-size: 14px; cursor: pointer; }
+    .btn-primary:hover { background: #0f6ae8; }
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <button class="menu-btn">≡</button>
+    <div class="breadcrumb">
+      <span>首页</span> /
+      <span>系统管理</span> /
+      <span class="active">钱包管理</span>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <span class="avatar">👤</span>
+    <span class="name">系统参数设置</span>
+    <span class="arrow">▾</span>
+  </div>
+</div>
+
+<div class="container">
+  <div class="content-header">
+    <div class="content-title">钱包管理</div>
+    <button class="btn btn-primary" onclick="openAddModal()">新增钱包</button>
+  </div>
+
+  <div class="table-card">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>序号</th>
+          <th class="logo-cell">logo</th>
+          <th>钱包名称</th>
+          <th>创建时间</th>
+          <th class="action-cell">操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr data-id="1">
+          <td>1</td>
+          <td><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='30' cy='50' r='20' fill='%23ff6b6b'/%3E%3Ccircle cx='50' cy='35' r='15' fill='%234ecdc4'/%3E%3Ccircle cx='70' cy='50' r='18' fill='%23ffe66d'/%3E%3Ccircle cx='45' cy='65' r='12' fill='%2395e1d3'/%3E%3Ccircle cx='65' cy='68' r='10' fill='%23f38181'/%3E%3C/svg%3E" class="logo-img"></td>
+          <td>汇付钱包</td>
+          <td>2025-05-14 15:18:37</td>
+          <td class="action-cell">
+            <button class="btn-edit" onclick="editWallet(1)">修改</button>
+            <button class="btn-view" onclick="viewWallet(1)">查看</button>
+            <div class="toggle-switch on" onclick="toggleWallet(1)"></div>
+          </td>
+        </tr>
+        <tr data-id="2">
+          <td>2</td>
+          <td><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon points='50,10 90,50 50,90 10,50' fill='%23c0392b'/%3E%3Cpolygon points='50,25 75,50 50,75 25,50' fill='%23e74c3c'/%3E%3Cpolygon points='50,40 65,50 50,60 35,50' fill='%23fff'/%3E%3C/svg%3E" class="logo-img"></td>
+          <td>宝付钱包</td>
+          <td>2025-05-14 15:18:37</td>
+          <td class="action-cell">
+            <button class="btn-edit" onclick="editWallet(2)">修改</button>
+            <button class="btn-view" onclick="viewWallet(2)">查看</button>
+            <div class="toggle-switch on" onclick="toggleWallet(2)"></div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- 弹窗 -->
+<div class="modal-overlay" id="walletModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">新增钱包</div>
+      <div class="modal-close" onclick="closeModal()">×</div>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="walletId">
+      <div class="form-group">
+        <label class="form-label">钱包名称</label>
+        <input class="form-input" id="walletName" placeholder="请输入">
+      </div>
+      <div class="form-group">
+        <label class="form-label">钱包平台logo</label>
+        <div id="logoUploadArea" class="logo-upload" onclick="document.getElementById('logoFile').click()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <span>上传</span>
+        </div>
+        <input type="file" id="logoFile" accept="image/*" style="display:none" onchange="handleLogoUpload(this)">
+      </div>
+      <div class="form-group">
+        <label class="form-label">开通说明</label>
+        <div class="editor-toolbar">
+          <button onclick="formatText('bold')"><strong>B</strong></button>
+          <button onclick="formatText('italic')"><em>I</em></button>
+          <button onclick="formatText('underline')"><u>U</u></button>
+          <button onclick="formatText('strikeThrough')"><s>S</s></button>
+          <button onclick="formatText('insertUnorderedList')">☰</button>
+          <button onclick="formatText('insertOrderedList')">☷</button>
+          <button onclick="formatText('justifyLeft')">↵</button>
+          <button onclick="formatText('justifyCenter')">↔</button>
+          <button onclick="formatText('justifyRight')">↪</button>
+        </div>
+        <div class="editor-content" id="openDesc" contenteditable="true"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">限额说明</label>
+        <div class="editor-toolbar">
+          <button onclick="formatText('bold')"><strong>B</strong></button>
+          <button onclick="formatText('italic')"><em>I</em></button>
+          <button onclick="formatText('underline')"><u>U</u></button>
+          <button onclick="formatText('strikeThrough')"><s>S</s></button>
+          <button onclick="formatText('insertUnorderedList')">☰</button>
+          <button onclick="formatText('insertOrderedList')">☷</button>
+          <button onclick="formatText('justifyLeft')">↵</button>
+          <button onclick="formatText('justifyCenter')">↔</button>
+          <button onclick="formatText('justifyRight')">↪</button>
+        </div>
+        <div class="editor-content" id="limitDesc" contenteditable="true"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-default" onclick="closeModal()">取消</button>
+      <button class="btn-primary" onclick="saveWallet()">发放</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function navigateTo(url) { window.location.href = url; }
+  function openAddModal() {
+    document.getElementById('modalTitle').textContent = '新增钱包';
+    document.getElementById('walletId').value = '';
+    document.getElementById('walletName').value = '';
+    document.getElementById('logoUploadArea').innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><span>上传</span>';
+    document.getElementById('logoUploadArea').className = 'logo-upload';
+    document.getElementById('openDesc').innerHTML = '';
+    document.getElementById('limitDesc').innerHTML = '';
+    document.getElementById('walletModal').classList.add('show');
+  }
+  function editWallet(id) {
+    openAddModal();
+    document.getElementById('modalTitle').textContent = '修改钱包';
+    document.getElementById('walletId').value = id;
+    if (id === 1) {
+      document.getElementById('walletName').value = '汇付钱包';
+      document.getElementById('openDesc').innerHTML = '<p>汇付钱包是第三方支付平台，支持多种支付方式。</p>';
+      document.getElementById('limitDesc').innerHTML = '<p>单笔限额：5000元</p><p>每日限额：50000元</p>';
+    } else if (id === 2) {
+      document.getElementById('walletName').value = '宝付钱包';
+      document.getElementById('openDesc').innerHTML = '<p>宝付钱包是金融级支付解决方案。</p>';
+      document.getElementById('limitDesc').innerHTML = '<p>单笔限额：10000元</p><p>每日限额：100000元</p>';
+    }
+  }
+  function viewWallet(id) {
+    editWallet(id);
+    document.getElementById('modalTitle').textContent = '查看钱包';
+    document.getElementById('walletName').disabled = true;
+    document.getElementById('logoUploadArea').style.pointerEvents = 'none';
+    document.getElementById('openDesc').contentEditable = false;
+    document.getElementById('limitDesc').contentEditable = false;
+  }
+  function closeModal() {
+    document.getElementById('walletModal').classList.remove('show');
+    document.getElementById('walletName').disabled = false;
+    document.getElementById('logoUploadArea').style.pointerEvents = '';
+    document.getElementById('openDesc').contentEditable = true;
+    document.getElementById('limitDesc').contentEditable = true;
+  }
+  function handleLogoUpload(input) {
+    var file = input.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var area = document.getElementById('logoUploadArea');
+      area.innerHTML = '<img src="' + e.target.result + '" class="logo-preview">';
+      area.className = '';
+    };
+    reader.readAsDataURL(file);
+  }
+  function formatText(command) { document.execCommand(command, false, null); }
+  function saveWallet() {
+    var name = document.getElementById('walletName').value.trim();
+    if (!name) { alert('请输入钱包名称'); return; }
+    alert('钱包信息已保存');
+    closeModal();
+  }
+  function toggleWallet(id) {
+    var row = document.querySelector('tr[data-id="' + id + '"]');
+    var toggle = row.querySelector('.toggle-switch');
+    toggle.classList.toggle('on');
+  }
+</script>
+
+</body>
+</html>

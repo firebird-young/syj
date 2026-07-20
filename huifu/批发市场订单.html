@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>批发市场订单</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+            background: #f0f2f5;
+            color: #1a1a2e;
+            font-size: 14px;
+        }
+
+        /* 顶部 */
+        .topbar {
+            background: #fff;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            border-bottom: 1px solid #f0f0f0;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .menu-btn {
+            width: 32px;
+            height: 32px;
+            border: 1px solid #d0d5dd;
+            border-radius: 4px;
+            background: #fff;
+            color: #6b7588;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+        .menu-btn:hover { background: #f5f5f7; }
+        .breadcrumb {
+            font-size: 13px;
+            color: #6b7588;
+        }
+        .breadcrumb .active { color: #1a1a2e; }
+        .topbar-right {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        .topbar-right .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #f5deb3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+        .topbar-right .name { font-size: 13px; }
+        .topbar-right .arrow { color: #9ba6b9; font-size: 12px; }
+
+        /* 筛选区 */
+        .filter-bar {
+            background: #fff;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .filter-item {
+            display: flex;
+            align-items: center;
+            margin-right: 16px;
+            margin-bottom: 4px;
+        }
+        .filter-label {
+            font-size: 13px;
+            color: #4e5a6e;
+            margin-right: 8px;
+            white-space: nowrap;
+        }
+        .filter-input {
+            width: 160px;
+            height: 30px;
+            padding: 0 10px;
+            border: 1px solid #d0d5dd;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #1a1a2e;
+            outline: none;
+        }
+        .filter-input:focus { border-color: #1a78ff; }
+        .filter-select {
+            width: 140px;
+            height: 30px;
+            padding: 0 10px;
+            border: 1px solid #d0d5dd;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #1a1a2e;
+            outline: none;
+            background: #fff;
+        }
+        .filter-date-input {
+            width: 130px;
+            height: 30px;
+            padding: 0 10px;
+            border: 1px solid #d0d5dd;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #1a1a2e;
+            outline: none;
+        }
+        .filter-sep {
+            font-size: 13px;
+            color: #9ba6b9;
+            margin: 0 6px;
+        }
+        .filter-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: auto;
+        }
+        .btn-export {
+            background: #f59e0b;
+            color: #fff;
+            border: none;
+            padding: 0 14px;
+            height: 30px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .btn-export:hover { background: #e08d04; }
+        .btn-search {
+            background: #1a78ff;
+            color: #fff;
+            border: none;
+            padding: 0 14px;
+            height: 30px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .btn-search:hover { background: #0f6ae8; }
+        .btn-reset {
+            background: #fff;
+            color: #1a78ff;
+            border: 1px solid #1a78ff;
+            padding: 0 14px;
+            height: 30px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .btn-reset:hover { background: #f5f8ff; }
+
+        /* 表格 */
+        .table-card {
+            background: #fff;
+            margin: 12px;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .table th {
+            background: #fafbfc;
+            padding: 12px 12px;
+            text-align: left;
+            font-size: 13px;
+            color: #4e5a6e;
+            font-weight: 500;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .table td {
+            padding: 14px 12px;
+            font-size: 13px;
+            color: #1a1a2e;
+            border-bottom: 1px solid #f5f5f7;
+        }
+        .table tr:last-child td { border-bottom: none; }
+        .table .seq {
+            color: #6b7588;
+            text-align: center;
+            width: 40px;
+        }
+        .table .order-no { color: #1a78ff; }
+        .table .order-no:hover { text-decoration: underline; cursor: pointer; }
+        .status-tag {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        .status-tag.done {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        .status-tag.canceled {
+            background: #f5f5f5;
+            color: #9ba6b9;
+        }
+        .status-tag.pending {
+            background: #fff0e0;
+            color: #e67e22;
+        }
+        .amount-tag {
+            display: inline-block;
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 2px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        .table .time {
+            color: #6b7588;
+            font-size: 12px;
+        }
+        .table .invalid {
+            color: #9ba6b9;
+            font-style: italic;
+        }
+        .col-sort {
+            display: inline-block;
+            margin-left: 4px;
+            color: #c0c8d4;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<!-- 顶部 -->
+<div class="topbar">
+    <div class="topbar-left">
+        <button class="menu-btn">≡</button>
+        <div class="breadcrumb">
+            <span>首页</span> /
+            <span>交易记录管理</span> /
+            <span class="active">批发市场</span>
+        </div>
+    </div>
+    <div class="topbar-right">
+        <span class="avatar">👤</span>
+        <span class="name">系统参数设置</span>
+        <span class="arrow">▾</span>
+    </div>
+</div>
+
+<!-- 筛选区 -->
+<div class="filter-bar">
+    <div class="filter-item">
+        <span class="filter-label">订单编号</span>
+        <input class="filter-input" placeholder="请输入订单编号">
+    </div>
+    <div class="filter-item">
+        <span class="filter-label">用户账号</span>
+        <input class="filter-input" placeholder="请输入用户账号">
+    </div>
+    <div class="filter-item">
+        <span class="filter-label">支付渠道订单号</span>
+        <input class="filter-input" placeholder="请输入支付渠道订单号">
+    </div>
+    <div class="filter-item">
+        <span class="filter-label">产品名</span>
+        <input class="filter-input" placeholder="请输入产品名">
+    </div>
+    <div class="filter-item">
+        <span class="filter-label">时间</span>
+        <input class="filter-date-input" placeholder="开始日期">
+        <span class="filter-sep">至</span>
+        <input class="filter-date-input" placeholder="结束日期">
+    </div>
+    <div class="filter-item">
+        <span class="filter-label">订单状态</span>
+        <select class="filter-select">
+            <option>请选择订单状态</option>
+            <option>已成交</option>
+            <option>已撤销</option>
+            <option>待支付</option>
+        </select>
+    </div>
+    <div class="filter-item">
+        <span class="filter-label">支付渠道</span>
+        <select class="filter-select">
+            <option>请选择支付渠道</option>
+            <option>宝付钱包</option>
+            <option>汇付钱包</option>
+        </select>
+    </div>
+    <div class="filter-actions">
+        <button class="btn-export">导 出</button>
+        <button class="btn-search">🔍 搜 索</button>
+        <button class="btn-reset">↻ 重 置</button>
+    </div>
+</div>
+
+<!-- 表格 -->
+<div class="table-card">
+    <table class="table">
+        <thead>
+            <tr>
+                <th class="seq">序号</th>
+                <th>订单编号</th>
+                <th>支付渠道订单号</th>
+                <th>产品名称</th>
+                <th>用户账号</th>
+                <th>认购份数</th>
+                <th>单价</th>
+                <th>是否提货</th>
+                <th>手续费</th>
+                <th>订单状态</th>
+                <th>实付金额</th>
+                <th>支付产品</th>
+                <th>支付渠道</th>
+                <th>时间 <span class="col-sort">⇅</span></th>
+                <th>退款时间 <span class="col-sort">⇅</span></th>
+            </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+    </table>
+</div>
+
+<script>
+var data = [
+    { id: 1, orderNo: 'XB-first26071505024701', payNo: '1260715135755043262', product: '中路财童', userNo: '1876829699476860930', copies: 1218, price: 1, isPickup: '仓库暂存', fee: 7.31, status: 'done', amount: 1218.00, payProduct: '银行卡', payChannel: '汇付钱包', time: '2026-07-15 13:...' },
+    { id: 2, orderNo: 'XB-first26071505016701', payNo: '1260715135655147498', product: '中路财童', userNo: '1878638327087280130', copies: 1200, price: 1, isPickup: '仓库暂存', fee: 7.2, status: 'done', amount: 1200.00, payProduct: '银行卡', payChannel: '宝付钱包', time: '2026-07-15 13:...' },
+    { id: 3, orderNo: 'XB-first26071504105201', payNo: '20260715112412010373000118115119', product: '中路财童', userNo: '1881547100063838210', copies: 200, price: 1, isPickup: '仓库暂存', fee: 0, status: 'done', amount: 200.00, payProduct: '余额', payChannel: '宝付钱包', time: '2026-07-15 11:...' },
+    { id: 4, orderNo: 'XB-first26071504094101', payNo: '—', product: '中路财童', userNo: '1878638327087280130', copies: 1, price: 1, isPickup: '仓库暂存', fee: 0, status: 'canceled', amount: 1.00, payProduct: '银行卡', payChannel: '汇付钱包', time: '2026-07-15 11:...' },
+    { id: 5, orderNo: 'XB-first26071504026701', payNo: '1260715111146584958', product: '中路财童', userNo: '206166464120323457', copies: 1, price: 1, isPickup: '仓库暂存', fee: 0.01, status: 'done', amount: 1.00, payProduct: '银行卡', payChannel: '宝付钱包', time: '2026-07-15 11:...' },
+    { id: 6, orderNo: 'XB-first26071504025101', payNo: '1260715111046584513', product: '中路财童', userNo: '206166464120323457', copies: 1, price: 1, isPickup: '仓库暂存', fee: 0.01, status: 'done', amount: 1.00, payProduct: '银行卡', payChannel: '宝付钱包', time: '2026-07-15 11:...' },
+    { id: 7, orderNo: 'XB-first26071504008801', payNo: '12607151108465808645', product: '中路财童', userNo: '1881528763372056578', copies: 1200, price: 1, isPickup: '仓库暂存', fee: 7.2, status: 'done', amount: 1200.00, payProduct: '银行卡', payChannel: '汇付钱包', time: '2026-07-15 11:...' },
+    { id: 8, orderNo: 'XB-first26071503906101', payNo: '1260715105145563571', product: '中路财童', userNo: '1908053633580778841', copies: 500, price: 1, isPickup: '仓库暂存', fee: 3, status: 'done', amount: 500.00, payProduct: '银行卡', payChannel: '宝付钱包', time: '2026-07-15 10:...' },
+    { id: 9, orderNo: 'XB-first26071503905001', payNo: '1260715105045597467', product: '中路财童', userNo: '2064183234658099202', copies: 2, price: 1, isPickup: '仓库暂存', fee: 0.02, status: 'done', amount: 2.00, payProduct: '银行卡', payChannel: '汇付钱包', time: '2026-07-15 10:...' },
+    { id: 10, orderNo: 'XB-first26071503857801', payNo: '2026071510425810337300118102530', product: '中路财童', userNo: '1977229438734100253', copies: 600, price: 1, isPickup: '仓库暂存', fee: 0, status: 'done', amount: 600.00, payProduct: '余额', payChannel: '宝付钱包', time: '2026-07-15 10:...' }
+];
+
+var statusNames = { done: '已成交', canceled: '已撤销', pending: '待支付' };
+
+function renderTable() {
+    var html = '';
+    data.forEach(function(o) {
+        html += [
+            '<tr>',
+            '    <td class="seq">' + o.id + '</td>',
+            '    <td class="order-no">' + o.orderNo + '</td>',
+            '    <td>' + o.payNo + '</td>',
+            '    <td>' + o.product + '</td>',
+            '    <td>' + o.userNo + '</td>',
+            '    <td>' + o.copies + '</td>',
+            '    <td>' + o.price + '</td>',
+            '    <td>' + o.isPickup + '</td>',
+            '    <td>' + o.fee + '</td>',
+            '    <td><span class="status-tag ' + o.status + '">' + statusNames[o.status] + '</span></td>',
+            '    <td><span class="amount-tag">' + o.amount.toFixed(2) + '</span></td>',
+            '    <td>' + o.payProduct + '</td>',
+            '    <td>' + o.payChannel + '</td>',
+            '    <td class="time">' + o.time + '</td>',
+            '    <td class="invalid">Invalid Date</td>',
+            '</tr>'
+        ].join('');
+    });
+    document.getElementById('tableBody').innerHTML = html;
+}
+
+renderTable();
+</script>
+
+</body>
+</html>

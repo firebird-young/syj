@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>批发商账户</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+            background: #f0f2f5;
+            color: #1a1a2e;
+            font-size: 14px;
+        }
+
+        /* 顶部 */
+        .topbar {
+            background: #fff;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            border-bottom: 1px solid #f0f0f0;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .menu-btn {
+            width: 32px;
+            height: 32px;
+            border: 1px solid #d0d5dd;
+            border-radius: 4px;
+            background: #fff;
+            color: #6b7588;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+        .menu-btn:hover { background: #f5f5f7; }
+        .breadcrumb {
+            font-size: 13px;
+            color: #6b7588;
+        }
+        .breadcrumb .active { color: #1a1a2e; }
+        .topbar-right {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        .topbar-right .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #f5deb3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+        .topbar-right .name { font-size: 13px; }
+        .topbar-right .arrow { color: #9ba6b9; font-size: 12px; }
+
+        /* 资金汇总卡片 */
+        .summary-row {
+            display: flex;
+            gap: 12px;
+            padding: 12px 12px 0;
+        }
+        .summary-card {
+            flex: 1;
+            background: #fff;
+            border-radius: 6px;
+            padding: 16px 18px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        }
+        .summary-card .head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .summary-card .label {
+            font-size: 14px;
+            color: #4e5a6e;
+            font-weight: 500;
+        }
+        .summary-card .amount {
+            font-size: 22px;
+            font-weight: 700;
+        }
+        .summary-card .amount.bff { color: #e67e22; }
+        .summary-card .amount.hf { color: #4f7cff; }
+        .summary-card .btn {
+            background: #1a78ff;
+            color: #fff;
+            border: none;
+            padding: 5px 16px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .summary-card .btn:hover { background: #0f6ae8; }
+
+        /* 筛选区 */
+        .filter-bar {
+            background: #fff;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .filter-item {
+            display: flex;
+            align-items: center;
+            margin-right: 16px;
+            margin-bottom: 4px;
+        }
+        .filter-label {
+            font-size: 13px;
+            color: #4e5a6e;
+            margin-right: 8px;
+            white-space: nowrap;
+        }
+        .filter-input {
+            width: 160px;
+            height: 30px;
+            padding: 0 10px;
+            border: 1px solid #d0d5dd;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #1a1a2e;
+            outline: none;
+        }
+        .filter-input:focus { border-color: #1a78ff; }
+        .filter-select {
+            width: 160px;
+            height: 30px;
+            padding: 0 10px;
+            border: 1px solid #d0d5dd;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #1a1a2e;
+            outline: none;
+            background: #fff;
+        }
+        .filter-date-input {
+            width: 130px;
+            height: 30px;
+            padding: 0 10px;
+            border: 1px solid #d0d5dd;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #1a1a2e;
+            outline: none;
+        }
+        .filter-sep {
+            font-size: 13px;
+            color: #9ba6b9;
+            margin: 0 6px;
+        }
+        .filter-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: auto;
+        }
+        .btn-search {
+            background: #1a78ff;
+            color: #fff;
+            border: none;
+            padding: 0 18px;
+            height: 30px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .btn-search:hover { background: #0f6ae8; }
+        .btn-reset {
+            background: #fff;
+            color: #1a78ff;
+            border: 1px solid #1a78ff;
+            padding: 0 14px;
+            height: 30px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .btn-reset:hover { background: #f5f8ff; }
+
+        /* 表格 */
+        .table-card {
+            background: #fff;
+            margin: 12px;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .table th {
+            background: #fafbfc;
+            padding: 12px 16px;
+            text-align: left;
+            font-size: 13px;
+            color: #4e5a6e;
+            font-weight: 500;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .table td {
+            padding: 14px 16px;
+            font-size: 13px;
+            color: #1a1a2e;
+            border-bottom: 1px solid #f5f5f7;
+        }
+        .table tr:last-child td { border-bottom: none; }
+        .table .seq {
+            color: #6b7588;
+            text-align: center;
+            width: 50px;
+        }
+        .table .order-no {
+            color: #1a78ff;
+        }
+        .table .order-no:hover { text-decoration: underline; cursor: pointer; }
+        .table .type.income { color: #4caf50; }
+        .table .type.expense { color: #D62828; }
+        .amount-pos { color: #4caf50; font-weight: 500; }
+        .amount-neg { color: #D62828; font-weight: 500; }
+        .table .time {
+            color: #6b7588;
+            font-size: 12px;
+        }
+        .col-sort {
+            display: inline-block;
+            margin-left: 4px;
+            color: #c0c8d4;
+            cursor: pointer;
+        }
+
+        /* 分页 */
+        .pagination {
+            background: #fff;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 8px;
+            font-size: 13px;
+            color: #4e5a6e;
+        }
+        .pagination .total { margin-right: 16px; }
+        .page-btn {
+            min-width: 28px;
+            height: 28px;
+            padding: 0 8px;
+            background: #fff;
+            border: 1px solid #d0d5dd;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #4e5a6e;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .page-btn:hover { color: #1a78ff; border-color: #1a78ff; }
+        .page-btn.active {
+            background: #1a78ff;
+            color: #fff;
+            border-color: #1a78ff;
+        }
+        .page-jump {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-left: 12px;
+        }
+        .page-jump input {
+            width: 48px;
+            height: 28px;
+            border: 1px solid #d0d5dd;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 13px;
+            outline: none;
+        }
+        .page-jump select {
+            height: 28px;
+            border: 1px solid #d0d5dd;
+            border-radius: 4px;
+            padding: 0 6px;
+            font-size: 13px;
+            outline: none;
+            background: #fff;
+        }
+    </style>
+</head>
+<body>
+
+<!-- 顶部 -->
+<div class="topbar">
+    <div class="topbar-left">
+        <button class="menu-btn">≡</button>
+        <div class="breadcrumb">
+            <span>首页</span> /
+            <span>平台账户管理</span> /
+            <span class="active">批发商账户</span>
+        </div>
+    </div>
+    <div class="topbar-right">
+        <span class="avatar">👤</span>
+        <span class="name">系统参数设置</span>
+        <span class="arrow">▾</span>
+    </div>
+</div>
+
+<!-- 资金汇总卡片 -->
+<div class="summary-row">
+    <div class="summary-card">
+        <div class="head">
+            <span class="label">宝付余额</span>
+            <button class="btn">提现</button>
+        </div>
+        <span class="amount bff">128.00</span>
+    </div>
+    <div class="summary-card">
+        <div class="head">
+            <span class="label">汇付余额</span>
+        </div>
+        <span class="amount hf">3,286.50</span>
+    </div>
+</div>
+
+<!-- 筛选区 -->
+<div class="filter-bar">
+    <div class="filter-item">
+        <span class="filter-label">交易单号</span>
+        <input class="filter-input" placeholder="请输入交易单号">
+    </div>
+    <div class="filter-item">
+        <span class="filter-label">产品名</span>
+        <input class="filter-input" placeholder="请输入产品名">
+    </div>
+    <div class="filter-item">
+        <span class="filter-label">交易来源</span>
+        <select class="filter-select">
+            <option>请选择交易来源</option>
+            <option>批发市场卖出</option>
+            <option>上线服务费</option>
+            <option>平台管理服务费</option>
+            <option>批发商分成</option>
+            <option>委托服务商分成</option>
+        </select>
+    </div>
+    <div class="filter-item">
+        <span class="filter-label">交易类型</span>
+        <select class="filter-select">
+            <option>请选择交易类型</option>
+            <option>收入</option>
+            <option>支出</option>
+        </select>
+    </div>
+    <div class="filter-item">
+        <span class="filter-label">支付渠道</span>
+        <select class="filter-select">
+            <option>请选择支付渠道</option>
+            <option>宝付钱包</option>
+            <option>汇付钱包</option>
+        </select>
+    </div>
+    <div class="filter-item">
+        <span class="filter-label">时间</span>
+        <input class="filter-date-input" placeholder="开始日期">
+        <span class="filter-sep">至</span>
+        <input class="filter-date-input" placeholder="结束日期">
+    </div>
+    <div class="filter-actions">
+        <button class="btn-search">🔍 搜 索</button>
+        <button class="btn-reset">↻ 重 置</button>
+    </div>
+</div>
+
+<!-- 表格 -->
+<div class="table-card">
+    <table class="table">
+        <thead>
+            <tr>
+                <th class="seq">序号</th>
+                <th>交易单号</th>
+                <th>类型</th>
+                <th>交易方</th>
+                <th>金额</th>
+                <th>产品名称</th>
+                <th>来源</th>
+                <th>支付渠道</th>
+                <th>时间 <span class="col-sort">⇅</span></th>
+            </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+    </table>
+
+    <div class="pagination">
+        <span class="total">共 9150 条</span>
+        <button class="page-btn">‹</button>
+        <button class="page-btn active">1</button>
+        <button class="page-btn">2</button>
+        <button class="page-btn">3</button>
+        <button class="page-btn">4</button>
+        <button class="page-btn">5</button>
+        <button class="page-btn">6</button>
+        <span style="color:#9ba6b9;">...</span>
+        <button class="page-btn">915</button>
+        <button class="page-btn">›</button>
+        <div class="page-jump">
+            <input type="text" value="1">
+            <span>10条/页</span>
+            <select>
+                <option>10条/页</option>
+                <option>20条/页</option>
+                <option>50条/页</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<script>
+var data = [
+    { id: 1, tradeNo: 'XB-platformFee26071505626204', type: '支出', party: '平台管理服务费', amount: '-495.20', product: '中路财童', source: '平台管理服务费', channel: '汇付钱包', time: '2026-07-15 15:37:43' },
+    { id: 2, tradeNo: 'XB-serviceFee26071505626202', type: '支出', party: '上线服务费', amount: '-247.60', product: '中路财童', source: '上线服务费', channel: '汇付钱包', time: '2026-07-15 15:37:42' },
+    { id: 3, tradeNo: 'XB-first26071505024701', type: '收入', party: '1876829694476860930', amount: '+1210.69', product: '中路财童', source: '批发市场卖出', channel: '宝付钱包', time: '2026-07-15 13:57:39' },
+    { id: 4, tradeNo: 'XB-first26071505016701', type: '收入', party: '1878638327087280130', amount: '+1192.80', product: '中路财童', source: '批发市场卖出', channel: '宝付钱包', time: '2026-07-15 13:56:24' },
+    { id: 5, tradeNo: 'XB-first26071504105201', type: '收入', party: '1881547100063838210', amount: '+200.00', product: '中路财童', source: '批发市场卖出', channel: '宝付钱包', time: '2026-07-15 11:24:14' },
+    { id: 6, tradeNo: 'XB-first26071504026701', type: '收入', party: '2061664641202323457', amount: '+0.99', product: '中路财童', source: '批发市场卖出', channel: '汇付钱包', time: '2026-07-15 11:11:16' },
+    { id: 7, tradeNo: 'XB-first26071504025101', type: '收入', party: '2061664641202323457', amount: '+0.99', product: '中路财童', source: '批发市场卖出', channel: '汇付钱包', time: '2026-07-15 11:11:01' },
+    { id: 8, tradeNo: 'XB-first26071504008801', type: '收入', party: '1881528763372056578', amount: '+1192.80', product: '中路财童', source: '批发市场卖出', channel: '宝付钱包', time: '2026-07-15 11:08:19' },
+    { id: 9, tradeNo: 'XB-first26071503906101', type: '收入', party: '1908053633580707841', amount: '+497.00', product: '中路财童', source: '批发市场卖出', channel: '汇付钱包', time: '2026-07-15 10:51:12' },
+    { id: 10, tradeNo: 'XB-first26071503905501', type: '收入', party: '2064183234658099202', amount: '+1.98', product: '中路财童', source: '批发市场卖出', channel: '宝付钱包', time: '2026-07-15 10:51:05' }
+];
+
+function renderTable() {
+    var html = '';
+    data.forEach(function(o) {
+        var isIncome = o.type === '收入';
+        var amountClass = isIncome ? 'amount-pos' : 'amount-neg';
+        var typeClass = isIncome ? 'type income' : 'type expense';
+        html += [
+            '<tr>',
+            '    <td class="seq">' + o.id + '</td>',
+            '    <td class="order-no">' + o.tradeNo + '</td>',
+            '    <td class="' + typeClass + '">' + o.type + '</td>',
+            '    <td>' + o.party + '</td>',
+            '    <td class="' + amountClass + '">' + o.amount + '</td>',
+            '    <td>' + o.product + '</td>',
+            '    <td>' + o.source + '</td>',
+            '    <td>' + o.channel + '</td>',
+            '    <td class="time">' + o.time + '</td>',
+            '</tr>'
+        ].join('');
+    });
+    document.getElementById('tableBody').innerHTML = html;
+}
+
+renderTable();
+</script>
+
+</body>
+</html>

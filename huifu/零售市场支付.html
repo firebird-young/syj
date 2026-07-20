@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>零售市场支付</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        html { background: #b0b8c6; min-height:100vh; }
+        .page-wrap {
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .phone-frame {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
+            background: #f5f6fa;
+            max-width: 420px;
+            width: 420px;
+            min-height: 100vh;
+            padding-bottom: 84px;
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.04);
+            flex-shrink: 0;
+            position: relative;
+        }
+        .side-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-left: 10px;
+            margin-top: 60px;
+        }
+        .side-btns label {
+            font-size: 13px;
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(255,255,255,0.15);
+            padding: 5px 12px;
+            border-radius: 6px;
+        }
+
+        /* 头部 */
+        .header {
+            background: #fff;
+            padding: 44px 20px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .back-btn {
+            font-size: 22px;
+            color: #1a1a2e;
+            cursor: pointer;
+            line-height: 1;
+        }
+        .header-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: #1a1a2e;
+        }
+        .header-placeholder { width: 22px; }
+
+        /* 商品卡片 */
+        .product-card {
+            background: #fff;
+            border-radius: 12px;
+            margin: 12px 16px 0;
+            padding: 14px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        }
+        .product-top {
+            display: flex;
+            gap: 12px;
+        }
+        .product-img {
+            width: 76px;
+            height: 76px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #d4a574, #8b6f47);
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 24px;
+        }
+        .product-info { flex: 1; min-width: 0; }
+        .product-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a1a2e;
+        }
+        .product-code {
+            font-size: 12px;
+            color: #9ba6b9;
+            margin-top: 4px;
+        }
+
+        .price-row {
+            display: flex;
+            margin-top: 14px;
+            border-top: 1px solid #f5f5f7;
+            padding-top: 12px;
+        }
+        .price-item {
+            flex: 1;
+            text-align: center;
+            border-right: 1px solid #f0f0f0;
+        }
+        .price-item:last-child { border-right: none; }
+        .price-label {
+            font-size: 12px;
+            color: #6b7588;
+        }
+        .price-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-top: 4px;
+        }
+        .price-value.price-red { color: #D62828; }
+
+        /* 购买设置卡片 */
+        .setting-card {
+            background: #fff;
+            border-radius: 12px;
+            margin: 12px 16px 0;
+            padding: 16px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        }
+        .setting-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 0;
+        }
+        .setting-label {
+            font-size: 14px;
+            color: #4e5a6e;
+        }
+        .qty-control {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .qty-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #f5f5f7;
+            border: none;
+            color: #999;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .qty-btn.primary {
+            background: #D62828;
+            color: #fff;
+        }
+        .qty-num {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a2e;
+            min-width: 24px;
+            text-align: center;
+        }
+
+        /* 提货方式 */
+        .delivery-tabs {
+            display: flex;
+            background: #f5f5f7;
+            border-radius: 999px;
+            padding: 4px;
+            margin-top: 8px;
+        }
+        .delivery-tab {
+            flex: 1;
+            height: 36px;
+            border-radius: 999px;
+            background: transparent;
+            border: none;
+            font-size: 13px;
+            color: #6b7588;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .delivery-tab.active {
+            background: #D62828;
+            color: #fff;
+        }
+
+        /* 服务商卡片 */
+        .service-card {
+            background: #fff;
+            border-radius: 12px;
+            margin: 12px 16px 0;
+            padding: 14px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        }
+        .service-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 0;
+        }
+        .service-label {
+            font-size: 13px;
+            color: #4e5a6e;
+        }
+        .service-value {
+            font-size: 13px;
+            color: #1a1a2e;
+            font-weight: 500;
+        }
+        .agree-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 8px;
+            font-size: 12px;
+            color: #6b7588;
+        }
+        .agree-check {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #D62828;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            flex-shrink: 0;
+        }
+        .agree-link {
+            color: #D62828;
+            cursor: pointer;
+        }
+
+        /* 底部提交按钮 */
+        .submit-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #fff;
+            border-top: 1px solid #edf0f5;
+            padding: 12px 16px 24px;
+            box-shadow: 0 -4px 12px rgba(0,0,0,0.06);
+            z-index: 10;
+        }
+        .btn-submit {
+            width: 100%;
+            height: 48px;
+            background: #D62828;
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-submit:active {
+            background: #c41e1e;
+        }
+
+        /* ===== 弹窗 ===== */
+        .modal-mask {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            z-index: 99;
+        }
+        .modal-mask.show { display: block; }
+
+        .modal-panel {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            transform: translateY(100%);
+            background: #fff;
+            border-radius: 16px 16px 0 0;
+            z-index: 100;
+            transition: transform 0.3s ease;
+            padding-bottom: 24px;
+        }
+        .modal-panel.show { transform: translateY(0); }
+
+        .modal-title {
+            text-align: center;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a2e;
+            border-bottom: 1px solid #f0f0f0;
+            position: relative;
+        }
+        .modal-close {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: #f5f5f7;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .modal-body {
+            padding: 14px 20px;
+        }
+        .modal-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            font-size: 14px;
+        }
+        .modal-row .label { color: #6b7588; }
+        .modal-row .value { color: #1a1a2e; font-weight: 500; }
+        .modal-divider {
+            height: 1px;
+            background: #f0f0f0;
+            margin: 8px 0;
+        }
+        .modal-section-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 8px;
+        }
+        .pay-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 0;
+            border-bottom: 1px solid #f5f5f7;
+        }
+        .pay-option:last-child { border-bottom: none; }
+        .pay-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        .pay-icon.hui { background: linear-gradient(135deg, #f5a623, #e0941e); color: #fff; }
+        .pay-info { flex: 1; }
+        .pay-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #1a1a2e;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .pay-link {
+            color: #D62828;
+            font-size: 12px;
+            cursor: pointer;
+            text-decoration: underline;
+            display: none;
+        }
+        .pay-link.show { display: inline; }
+        .pay-radio {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid #d0d5dd;
+            flex-shrink: 0;
+        }
+        .pay-radio.checked {
+            border-color: #D62828;
+            background: #D62828;
+            position: relative;
+        }
+        .pay-radio.checked::after {
+            content: '';
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #fff;
+        }
+
+        .pay-provider {
+            text-align: center;
+            font-size: 11px;
+            color: #9ba6b9;
+            margin: 12px 0 16px;
+        }
+
+        .modal-confirm-btn {
+            width: calc(100% - 40px);
+            margin: 0 20px;
+            height: 48px;
+            background: #f0a8a8;
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: not-allowed;
+        }
+        .modal-confirm-btn.active {
+            background: #D62828;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-wrap">
+
+<div class="phone-frame">
+
+    <div class="header">
+        <span class="back-btn" onclick="history.back()">‹</span>
+        <span class="header-title">吃水不忘挖井人</span>
+        <span class="header-placeholder"></span>
+    </div>
+
+    <!-- 商品信息 -->
+    <div class="product-card">
+        <div class="product-top">
+            <div class="product-img">🏺</div>
+            <div class="product-info">
+                <div class="product-name">吃水不忘挖井人</div>
+                <div class="product-code">产品编码 XB000005</div>
+            </div>
+        </div>
+        <div class="price-row">
+            <div class="price-item">
+                <div class="price-label">零售商</div>
+                <div class="price-value">*******6925</div>
+            </div>
+            <div class="price-item">
+                <div class="price-label">售价</div>
+                <div class="price-value price-red">¥950.00</div>
+            </div>
+            <div class="price-item">
+                <div class="price-label">数量</div>
+                <div class="price-value" id="priceQty">1</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 购买设置 -->
+    <div class="setting-card">
+        <div class="setting-row">
+            <span class="setting-label">购买数量</span>
+            <div class="qty-control">
+                <button class="qty-btn" onclick="changeQty(-1)">−</button>
+                <span class="qty-num" id="qtyNum">1</span>
+                <button class="qty-btn primary" onclick="changeQty(1)">+</button>
+            </div>
+        </div>
+        <div class="setting-row">
+            <span class="setting-label">提货方式</span>
+        </div>
+        <div class="delivery-tabs">
+            <button class="delivery-tab active" onclick="selectDelivery(this, 0)">仓库暂存</button>
+            <button class="delivery-tab" onclick="selectDelivery(this, 1)">立即提货</button>
+        </div>
+    </div>
+
+    <!-- 服务商 -->
+    <div class="service-card">
+        <div class="service-row">
+            <span class="service-label">委托服务商</span>
+            <span class="service-value">四川华泰博文文化艺术发展有限公司</span>
+        </div>
+        <div class="agree-row">
+            <span class="agree-check">✓</span>
+            <span>我已阅读并同意</span>
+            <span class="agree-link">《风险揭示书》</span>
+            <span class="agree-link">《购买须知、购买协议、委托保管协议及提货须知》</span>
+        </div>
+    </div>
+
+    <!-- 底部提交 -->
+    <div class="submit-bar">
+        <button class="btn-submit" onclick="openConfirm()">提交订单</button>
+    </div>
+
+    <!-- 确认订单弹窗 -->
+    <div class="modal-panel" id="modalPanel">
+        <div class="modal-title">
+            确认订单
+            <button class="modal-close" onclick="closeConfirm()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="modal-row">
+                <span class="label">数量</span>
+                <span class="value" id="modalQty">1</span>
+            </div>
+            <div class="modal-row">
+                <span class="label">单价</span>
+                <span class="value">¥950.00</span>
+            </div>
+            <div class="modal-row">
+                <span class="label">提货方式</span>
+                <span class="value" id="modalDelivery">仓库暂存</span>
+            </div>
+
+            <div class="modal-divider"></div>
+
+            <div class="modal-section-title">选择支付方式</div>
+
+            <div class="pay-option" onclick="selectPay(this)">
+                <div class="pay-icon hui">💰</div>
+                <div class="pay-info">
+                    <div class="pay-name">汇付钱包 <span class="pay-link" id="payLink" onclick="event.stopPropagation();goRecharge()">去充值</span></div>
+                </div>
+                <div class="pay-radio"></div>
+            </div>
+
+            <div class="pay-provider">平台由宝付支付提供支付服务</div>
+
+            <button class="modal-confirm-btn" id="modalConfirmBtn">请选择支付方式</button>
+        </div>
+    </div>
+
+</div><!-- /phone-frame -->
+
+<div class="side-btns">
+    <label>
+        <input type="radio" name="walletStatus" value="opened" checked onchange="setWalletStatus('opened')">
+        已开通
+    </label>
+    <label>
+        <input type="radio" name="walletStatus" value="unopened" onchange="setWalletStatus('unopened')">
+        未开通
+    </label>
+</div>
+
+</div><!-- /page-wrap -->
+
+<!-- 弹窗遮罩 -->
+<div class="modal-mask" id="modalMask" onclick="closeConfirm()"></div>
+
+<script>
+var qty = 1;
+var deliveryType = 0;
+var walletOpened = true;
+
+function changeQty(delta) {
+    qty = Math.max(1, qty + delta);
+    document.getElementById('qtyNum').textContent = qty;
+    document.getElementById('priceQty').textContent = qty;
+}
+
+function selectDelivery(btn, idx) {
+    document.querySelectorAll('.delivery-tab').forEach(function(el) { el.classList.remove('active'); });
+    btn.classList.add('active');
+    deliveryType = idx;
+}
+
+function openConfirm() {
+    document.getElementById('modalQty').textContent = qty;
+    document.getElementById('modalDelivery').textContent = deliveryType === 0 ? '仓库暂存' : '立即提货';
+    document.getElementById('modalMask').classList.add('show');
+    document.getElementById('modalPanel').classList.add('show');
+    updatePayState();
+}
+
+function closeConfirm() {
+    document.getElementById('modalMask').classList.remove('show');
+    document.getElementById('modalPanel').classList.remove('show');
+}
+
+function updatePayState() {
+    var btn = document.getElementById('modalConfirmBtn');
+    var link = document.getElementById('payLink');
+
+    if (walletOpened) {
+        link.textContent = '去充值';
+        link.className = 'pay-link show';
+        btn.classList.remove('active');
+        btn.textContent = '请选择支付方式';
+        btn.onclick = null;
+        var opt = document.querySelector('.pay-option');
+        if (opt) selectPay(opt);
+    } else {
+        link.textContent = '去开户';
+        link.className = 'pay-link show';
+        document.querySelectorAll('.pay-option .pay-radio').forEach(function(el) { el.classList.remove('checked'); });
+        btn.classList.remove('active');
+        btn.textContent = '请先开通汇付钱包';
+        btn.onclick = null;
+    }
+}
+
+function selectPay(opt) {
+    if (!walletOpened) {
+        alert('请先开通汇付钱包');
+        return;
+    }
+    document.querySelectorAll('.pay-option').forEach(function(el) {
+        el.querySelector('.pay-radio').classList.remove('checked');
+    });
+    opt.querySelector('.pay-radio').classList.add('checked');
+    var btn = document.getElementById('modalConfirmBtn');
+    btn.classList.add('active');
+    btn.textContent = '确认支付 ¥' + (950 * qty).toFixed(2);
+    btn.onclick = function() { alert('支付成功！'); };
+}
+
+function goRecharge() {
+    if (walletOpened) {
+        alert('跳转到汇付钱包充值页面');
+    } else {
+        alert('跳转到汇付钱包开户页面');
+    }
+}
+
+function setWalletStatus(status) {
+    walletOpened = (status === 'opened');
+    var mask = document.getElementById('modalMask');
+    if (mask.classList.contains('show')) {
+        updatePayState();
+    }
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>批发订单</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        html { background: #b0b8c6; min-height:100vh; }
+        body { margin:0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
+            background: #f5f6fa;
+            max-width: 420px;
+            width: 420px;
+            margin: 0 auto;
+            min-height: 100vh;
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.04);
+        }
+
+        /* 头部 */
+        .header {
+            background: #fff;
+            padding: 44px 16px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #f0f0f0;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .back-btn {
+            font-size: 22px;
+            color: #1a1a2e;
+            cursor: pointer;
+            line-height: 1;
+        }
+        .header-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: #1a1a2e;
+        }
+        .header-placeholder { width: 22px; }
+
+        /* 状态 Tab */
+        .status-tabs {
+            background: #fff;
+            display: flex;
+            padding: 0 16px;
+            border-bottom: 1px solid #f0f0f0;
+            position: sticky;
+            top: 73px;
+            z-index: 9;
+        }
+        .status-tab {
+            flex: 1;
+            height: 44px;
+            background: transparent;
+            border: none;
+            font-size: 14px;
+            color: #6b7588;
+            cursor: pointer;
+            position: relative;
+            font-weight: 500;
+        }
+        .status-tab.active {
+            color: #1a1a2e;
+            font-weight: 600;
+        }
+        .status-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 24px;
+            height: 3px;
+            background: #D62828;
+            border-radius: 2px;
+        }
+
+        /* 订单列表 */
+        .order-list {
+            padding: 12px 16px;
+        }
+        .order-card {
+            background: #fff;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            padding: 12px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+            position: relative;
+        }
+        .order-card-top {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .order-img {
+            width: 64px;
+            height: 64px;
+            border-radius: 6px;
+            flex-shrink: 0;
+            background: linear-gradient(135deg, #d4a574, #8b6f47);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #fff;
+            overflow: hidden;
+        }
+        .order-img.letter {
+            background: #f5f0e1;
+            color: #8b6f47;
+            font-family: serif;
+            font-size: 18px;
+        }
+        .order-img.lamp {
+            background: linear-gradient(135deg, #d4af37, #8b6914);
+        }
+        .order-img.bottle {
+            background: linear-gradient(135deg, #f0e68c, #b8860b);
+        }
+        .order-info { flex: 1; min-width: 0; }
+        .order-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #1a1a2e;
+            margin-bottom: 2px;
+        }
+        .order-code {
+            font-size: 12px;
+            color: #6b7588;
+        }
+        .order-date {
+            font-size: 11px;
+            color: #9ba6b9;
+            margin-top: 4px;
+        }
+        .order-price {
+            text-align: right;
+            flex-shrink: 0;
+        }
+        .order-price .price {
+            font-size: 16px;
+            font-weight: 600;
+            color: #D62828;
+        }
+        .order-price .qty {
+            font-size: 12px;
+            color: #6b7588;
+            margin-top: 2px;
+        }
+
+        /* 状态标签 */
+        .order-status {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 500;
+            flex-shrink: 0;
+            align-self: flex-start;
+        }
+        .order-status.pending {
+            background: #fff0e0;
+            color: #e67e22;
+        }
+        .order-status.done {
+            background: #e8f5e9;
+            color: #34a853;
+        }
+        .order-status.canceled {
+            background: #f5f5f5;
+            color: #9ba6b9;
+        }
+
+        /* 订单卡片改为相对定位，以容纳绝对定位的状态标签 */
+        .order-card {
+            position: relative;
+        }
+
+        /* 操作按钮 */
+        .order-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #f5f5f7;
+        }
+        .order-actions .action-btn {
+            height: 30px;
+            padding: 0 14px;
+            border-radius: 6px;
+            border: 1px solid #d0d5dd;
+            background: #fff;
+            font-size: 12px;
+            color: #4e5a6e;
+            cursor: pointer;
+        }
+        .order-actions .action-btn:active {
+            background: #f5f5f7;
+        }
+        .order-actions .action-btn.primary {
+            background: #D62828;
+            color: #fff;
+            border-color: #D62828;
+        }
+        .order-actions .action-btn.primary:active {
+            background: #c41e1e;
+        }
+
+        /* 空状态 */
+        .empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: #9ba6b9;
+            font-size: 14px;
+        }
+
+        /* 右侧按钮（测试用） */
+        .side-btn {
+            position: fixed;
+            right: 16px;
+            top: 80px;
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .side-btn a {
+            font-size: 12px;
+            color: #fff;
+            cursor: pointer;
+            background: rgba(0,0,0,0.4);
+            padding: 6px 12px;
+            border-radius: 6px;
+            display: block;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<!-- 手机外按钮（测试用） -->
+<div class="side-btn">
+    <a onclick="toggleStatus('all')">全部</a>
+    <a onclick="toggleStatus('pending')">待支付</a>
+    <a onclick="toggleStatus('done')">已成交</a>
+    <a onclick="toggleStatus('canceled')">已取消</a>
+</div>
+
+<div class="header">
+    <span class="back-btn" onclick="history.back()">‹</span>
+    <span class="header-title">批发订单</span>
+    <span class="header-placeholder"></span>
+</div>
+
+<div class="status-tabs">
+    <button class="status-tab active" data-status="all" onclick="selectTab(this)">全部</button>
+    <button class="status-tab" data-status="pending" onclick="selectTab(this)">待支付</button>
+    <button class="status-tab" data-status="done" onclick="selectTab(this)">已成交</button>
+    <button class="status-tab" data-status="canceled" onclick="selectTab(this)">已取消</button>
+</div>
+
+<div class="order-list" id="orderList"></div>
+
+<script>
+var orders = [
+    { name: '永淳·夏日帖', code: 'XB000004', price: 128.00, qty: 1, date: '2025-10-15 11:57:08', status: 'pending', img: 'letter' },
+    { name: '永淳·夏日帖', code: 'XB000004', price: 128.00, qty: 1, date: '2025-10-15 10:11:43', status: 'pending', img: 'letter' },
+    { name: '永淳·夏日帖', code: 'XB000004', price: 128.00, qty: 1, date: '2025-10-14 14:01:30', status: 'pending', img: 'letter' },
+    { name: '仙鹤莲池', code: 'XB000002', price: 366.00, qty: 1, date: '2025-03-26 09:59:41', status: 'done', img: 'lamp' },
+    { name: '山水空灵', code: 'XB000001', price: 218.00, qty: 1, date: '2025-01-06 11:27:45', status: 'done', img: 'bottle' },
+    { name: '东坡东坡-测试数据', code: 'TS000006', price: 90.24, qty: 48, date: '2024-12-30 11:22:28', status: 'canceled', img: '' }
+];
+
+var currentStatus = 'all';
+
+function renderList() {
+    var list = document.getElementById('orderList');
+    var filtered = currentStatus === 'all' ? orders : orders.filter(function(o) { return o.status === currentStatus; });
+
+    if (filtered.length === 0) {
+        list.innerHTML = '<div class="empty">暂无订单</div>';
+        return;
+    }
+
+    var statusNames = { pending: '待支付', done: '已成交', canceled: '已取消' };
+
+    var html = '';
+    filtered.forEach(function(o) {
+        var actionsHtml = '';
+        if (o.status === 'pending') {
+            actionsHtml = '<div class="order-actions"><button class="action-btn" onclick="cancelOrder(\'' + o.code + '\')">取消</button><button class="action-btn primary" onclick="payOrder(\'' + o.code + '\')">去支付</button></div>';
+        }
+
+        html += [
+            '<div class="order-card">',
+            '    <div class="order-card-top">',
+            '        <div class="order-img ' + o.img + '">' + (o.img ? '' : '🏺') + '</div>',
+            '        <div class="order-info">',
+            '            <div class="order-name">' + o.name + '</div>',
+            '            <div class="order-code">' + o.code + '</div>',
+            '            <div class="order-date">' + o.date + '</div>',
+            '        </div>',
+            '        <div class="order-price">',
+            '            <div class="price">¥' + o.price.toFixed(2) + '</div>',
+            '            <div class="qty">X' + o.qty + '</div>',
+            '            <div class="order-status ' + o.status + '">' + statusNames[o.status] + '</div>',
+            '        </div>',
+            '    </div>',
+            actionsHtml,
+            '</div>'
+        ].join('');
+    });
+    list.innerHTML = html;
+}
+
+function selectTab(btn) {
+    document.querySelectorAll('.status-tab').forEach(function(el) { el.classList.remove('active'); });
+    btn.classList.add('active');
+    currentStatus = btn.dataset.status;
+    renderList();
+}
+
+function toggleStatus(status) {
+    currentStatus = status;
+    var tabs = document.querySelectorAll('.status-tab');
+    tabs.forEach(function(t) {
+        t.classList.toggle('active', t.dataset.status === status);
+    });
+    renderList();
+}
+
+function payOrder(code) {
+    alert('去支付: ' + code);
+}
+
+function cancelOrder(code) {
+    alert('取消订单: ' + code);
+}
+
+renderList();
+</script>
+
+</body>
+</html>
