@@ -298,12 +298,16 @@
                 <th>创建时间</th>
                 <th>首次分账时间</th>
                 <th>批发商分账</th>
+                <th>批发商分账比例</th>
                 <th>服务商分账</th>
+                <th>服务商分账比例</th>
                 <th>平台分账</th>
+                <th>平台分账比例</th>
                 <th>零售市场分账总次数</th>
                 <th>零售市场分账总数量</th>
                 <th>零售市场分账总金额</th>
                 <th>剩余金额</th>
+                <th>最后分账时间</th>
                 <th>零售市场最后分账时间</th>
             </tr>
         </thead>
@@ -329,13 +333,13 @@
     <h4>列表字段</h4>
     <ul>
       <li>订单编号、产品名称、用户账号、购买数量、单价、总价、第三方支付手续费、创建时间、首次分账时间</li>
-      <li>批发商分账、服务商分账、平台分账、零售市场分账总次数、零售市场分账总数量、零售市场分账总金额、剩余金额、零售市场最后分账时间</li>
+      <li>批发商分账、批发商分账比例、服务商分账、服务商分账比例、平台分账、平台分账比例、零售市场分账总次数、零售市场分账总数量、零售市场分账总金额、剩余金额、最后分账时间、零售市场最后分账时间</li>
     </ul>
     <h4>首次分账逻辑</h4>
     <ul>
       <li>平台分账：<b>15% + 0.6%</b></li>
       <li>服务商分账：<b>20%</b></li>
-      <li>零售商分账：<b>20% - 0.6%</b></li>
+      <li>批发商分账：<b>25% - 0.6%</b></li>
     </ul>
     <h4>分账计算规则</h4>
     <ul>
@@ -348,12 +352,12 @@
 
 <script>
 var data = [
-    { id: 1, orderNo: 'XB-first26071505024701', product: '中路财童', userNo: '1876829699476860930', qty: 5, price: 128.00, total: 640.00, fee: 3.84, createTime: '2026-07-15 13:57:39', firstTime: '2026-07-15 14:00:01', wsShare: 128.00, svShare: 128.00, pfShare: 99.84, rCount: 3, rQty: 3, rAmount: 170.50, remain: 113.66, rLastTime: '2026-07-18 10:12:33' },
-    { id: 2, orderNo: 'XB-first26071505016701', product: '中路财童', userNo: '1878638327087280130', qty: 8, price: 260.00, total: 2080.00, fee: 12.48, createTime: '2026-07-15 13:56:24', firstTime: '2026-07-15 13:58:02', wsShare: 416.00, svShare: 416.00, pfShare: 324.48, rCount: 5, rQty: 5, rAmount: 577.20, remain: 346.32, rLastTime: '2026-07-16 09:20:11' },
-    { id: 3, orderNo: 'XB-first26071504105201', product: '中路财童', userNo: '1881547100063838210', qty: 12, price: 320.00, total: 3840.00, fee: 23.04, createTime: '2026-07-15 11:24:14', firstTime: '2026-07-15 11:26:45', wsShare: 768.00, svShare: 768.00, pfShare: 599.04, rCount: 0, rQty: 0, rAmount: 0.00, remain: 1704.96, rLastTime: '-' },
-    { id: 4, orderNo: 'XB-first26071504026701', product: '中路财童', userNo: '2061664641202323457', qty: 3, price: 100.00, total: 300.00, fee: 1.80, createTime: '2026-07-15 11:11:16', firstTime: '2026-07-15 11:12:30', wsShare: 60.00, svShare: 60.00, pfShare: 46.80, rCount: 2, rQty: 2, rAmount: 88.80, remain: 44.40, rLastTime: '2026-07-15 11:12:31' },
-    { id: 5, orderNo: 'XB-first26071504008801', product: '中路财童', userNo: '1881528763372056578', qty: 6, price: 420.00, total: 2520.00, fee: 15.12, createTime: '2026-07-15 11:08:19', firstTime: '2026-07-15 11:10:05', wsShare: 504.00, svShare: 504.00, pfShare: 393.12, rCount: 4, rQty: 4, rAmount: 745.92, remain: 372.96, rLastTime: '2026-07-19 15:42:58' },
-    { id: 6, orderNo: 'XB-first26071503857801', product: '中路财童', userNo: '1977229438734100253', qty: 9, price: 180.00, total: 1620.00, fee: 9.72, createTime: '2026-07-15 10:42:58', firstTime: '2026-07-15 10:45:12', wsShare: 324.00, svShare: 324.00, pfShare: 252.72, rCount: 6, rQty: 6, rAmount: 479.52, remain: 239.76, rLastTime: '2026-07-16 14:05:20' }
+    { id: 1, orderNo: 'XB-first26071505024701', product: '中路财童', userNo: '1876829699476860930', qty: 5, price: 128.00, total: 640.00, fee: 3.84, createTime: '2026-07-15 13:57:39', firstTime: '2026-07-15 14:00:01', wsShare: 156.16, wsRate: '25%-0.6%', svShare: 128.00, svRate: '20%', pfShare: 99.84, pfRate: '15%+0.6%', rCount: 3, rQty: 3, rAmount: 153.60, remain: 102.40, lastTime: '2026-07-18 09:00:00', rLastTime: '2026-07-18 10:12:33' },
+    { id: 2, orderNo: 'XB-first26071505016701', product: '中路财童', userNo: '1878638327087280130', qty: 8, price: 260.00, total: 2080.00, fee: 12.48, createTime: '2026-07-15 13:56:24', firstTime: '2026-07-15 13:58:02', wsShare: 507.52, wsRate: '25%-0.6%', svShare: 416.00, svRate: '20%', pfShare: 324.48, pfRate: '15%+0.6%', rCount: 5, rQty: 5, rAmount: 520.00, remain: 312.00, lastTime: '2026-07-16 09:00:00', rLastTime: '2026-07-16 09:20:11' },
+    { id: 3, orderNo: 'XB-first26071504105201', product: '中路财童', userNo: '1881547100063838210', qty: 12, price: 320.00, total: 3840.00, fee: 23.04, createTime: '2026-07-15 11:24:14', firstTime: '2026-07-15 11:26:45', wsShare: 936.96, wsRate: '25%-0.6%', svShare: 768.00, svRate: '20%', pfShare: 599.04, pfRate: '15%+0.6%', rCount: 0, rQty: 0, rAmount: 0.00, remain: 1536.00, lastTime: '-', rLastTime: '-' },
+    { id: 4, orderNo: 'XB-first26071504026701', product: '中路财童', userNo: '2061664641202323457', qty: 3, price: 100.00, total: 300.00, fee: 1.80, createTime: '2026-07-15 11:11:16', firstTime: '2026-07-15 11:12:30', wsShare: 73.20, wsRate: '25%-0.6%', svShare: 60.00, svRate: '20%', pfShare: 46.80, pfRate: '15%+0.6%', rCount: 2, rQty: 2, rAmount: 80.00, remain: 40.00, lastTime: '2026-07-15 11:10:00', rLastTime: '2026-07-15 11:12:31' },
+    { id: 5, orderNo: 'XB-first26071504008801', product: '中路财童', userNo: '1881528763372056578', qty: 6, price: 420.00, total: 2520.00, fee: 15.12, createTime: '2026-07-15 11:08:19', firstTime: '2026-07-15 11:10:05', wsShare: 614.88, wsRate: '25%-0.6%', svShare: 504.00, svRate: '20%', pfShare: 393.12, pfRate: '15%+0.6%', rCount: 4, rQty: 4, rAmount: 672.00, remain: 336.00, lastTime: '2026-07-19 15:00:00', rLastTime: '2026-07-19 15:42:58' },
+    { id: 6, orderNo: 'XB-first26071503857801', product: '中路财童', userNo: '1977229438734100253', qty: 9, price: 180.00, total: 1620.00, fee: 9.72, createTime: '2026-07-15 10:42:58', firstTime: '2026-07-15 10:45:12', wsShare: 395.28, wsRate: '25%-0.6%', svShare: 324.00, svRate: '20%', pfShare: 252.72, pfRate: '15%+0.6%', rCount: 6, rQty: 6, rAmount: 432.00, remain: 216.00, lastTime: '2026-07-16 14:00:00', rLastTime: '2026-07-16 14:05:20' }
 ];
 
 function renderTable() {
@@ -372,12 +376,16 @@ function renderTable() {
             '    <td>' + o.createTime + '</td>',
             '    <td>' + o.firstTime + '</td>',
             '    <td>' + o.wsShare.toFixed(2) + '</td>',
+            '    <td>' + o.wsRate + '</td>',
             '    <td>' + o.svShare.toFixed(2) + '</td>',
+            '    <td>' + o.svRate + '</td>',
             '    <td>' + o.pfShare.toFixed(2) + '</td>',
+            '    <td>' + o.pfRate + '</td>',
             '    <td>' + o.rCount + '</td>',
             '    <td>' + o.rQty + '</td>',
             '    <td>' + o.rAmount.toFixed(2) + '</td>',
             '    <td>' + o.remain.toFixed(2) + '</td>',
+            '    <td>' + (o.lastTime || '-') + '</td>',
             '    <td>' + o.rLastTime + '</td>',
             '</tr>'
         ].join('');

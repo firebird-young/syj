@@ -440,12 +440,22 @@
             </div>
 
             <div class="form-row">
-                <div class="form-label">批发商分成比例(%)</div>
+                <div class="form-label">批发商分成比例(%)<span class="badge" style="margin-left:4px;">3</span></div>
                 <div class="form-control">
                     <div class="number-stepper">
                         <button>−</button>
                         <input type="number" value="25">
                         <button>+</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-label">平台运营管理服务费(%)<span class="badge" style="margin-left:4px;">2</span></div>
+                <div class="form-control">
+                    <div class="inline-group" style="display:flex;align-items:center;gap:8px;">
+                        <input type="number" id="opFee" min="0" max="10" step="1" placeholder="0-10" value="" style="width:120px;height:32px;padding:0 10px;border:1px solid #d0d5dd;border-radius:4px;font-size:13px;outline:none;">
+                        <span style="color:#86909c;font-size:13px;">%（范围 0-10）</span>
                     </div>
                 </div>
             </div>
@@ -506,6 +516,18 @@
       <li><b>提交校验</b>：提交时需判断批发商和委托服务商是否<b>同时开通</b>了选择的支付渠道</li>
       <li>不满足时需<b>提示</b>，并且<b>不能提交</b>表单</li>
       <li><b>批发市场交易</b>时展示的支付渠道，是该处设置的渠道</li>
+    </ul>
+    <h4><span class="badge">2</span> <span style="vertical-align:middle;">平台运营管理服务费</span></h4>
+    <ul>
+      <li>平台运营管理服务费<b>动态输入</b>（范围 0-10%），输入后<b>不能修改</b></li>
+      <li><b>多出的钱分给批发商</b></li>
+    </ul>
+    <p style="margin:12px 0 0;color:#e74c5e;font-weight:600;line-height:1.7;">
+      运营需要确定跟<b>所里沟通</b>实施。
+    </p>
+    <h4><span class="badge">3</span> <span style="vertical-align:middle;">批发商分成比例</span></h4>
+    <ul>
+      <li>去掉<b>批发商分成比例</b>设置</li>
     </ul>
   </div>
 </div>

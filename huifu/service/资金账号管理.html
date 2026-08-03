@@ -279,6 +279,138 @@
             outline: none;
         }
 
+        /* 提现浮层 */
+        .wd-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        .wd-overlay.show { display: flex; }
+        .wd-modal {
+            background: #fff;
+            border-radius: 8px;
+            width: 440px;
+            max-width: 94vw;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .wd-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .wd-title { font-size: 16px; font-weight: 600; color: #1a1a2e; }
+        .wd-close { font-size: 22px; color: #86909c; cursor: pointer; line-height: 1; }
+        .wd-body { padding: 20px; overflow-y: auto; flex: 1; }
+        .wd-row { margin-bottom: 16px; }
+        .wd-label { font-size: 13px; color: #1a1a2e; margin-bottom: 6px; }
+        .wd-input {
+            width: 100%;
+            height: 36px;
+            padding: 0 12px;
+            border: 1px solid #d0d5dd;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #1a1a2e;
+            outline: none;
+        }
+        .wd-input:focus { border-color: #1a78ff; }
+        .wd-link {
+            font-size: 13px;
+            color: #1a78ff;
+            cursor: pointer;
+            margin-top: 4px;
+            display: inline-block;
+        }
+        .wd-link:hover { text-decoration: underline; }
+        .wd-footer {
+            padding: 12px 20px;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+        .wd-btn-default {
+            background: #fff;
+            border: 1px solid #d0d5dd;
+            color: #4e5a6e;
+            padding: 7px 20px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .wd-btn-primary {
+            background: #1a78ff;
+            border: none;
+            color: #fff;
+            padding: 7px 20px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        /* 提现申请记录 */
+        .rec-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2001;
+        }
+        .rec-overlay.show { display: flex; }
+        .rec-modal {
+            background: #fff;
+            border-radius: 8px;
+            width: 560px;
+            max-width: 94vw;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .rec-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .rec-title { font-size: 16px; font-weight: 600; color: #1a1a2e; }
+        .rec-close { font-size: 22px; color: #86909c; cursor: pointer; line-height: 1; }
+        .rec-body { padding: 16px 20px; overflow-y: auto; flex: 1; }
+        .rec-table { width: 100%; border-collapse: collapse; }
+        .rec-table th {
+            background: #fafbfc;
+            padding: 10px;
+            text-align: left;
+            font-size: 13px;
+            color: #4e5a6e;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .rec-table td {
+            padding: 10px;
+            font-size: 13px;
+            color: #1a1a2e;
+            border-bottom: 1px solid #f5f5f7;
+        }
+        .rec-status {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        .rec-status.pending { background: #fff4e6; color: #e67e22; }
+        .rec-status.approved { background: #e6f4ff; color: #1a78ff; }
+        .rec-status.done { background: #e6f7eb; color: #1aab67; }
+
         /* Tab 切换 */
         .tabs-bar {
             background: #fff;
@@ -363,7 +495,7 @@
                 <div class="label">宝付钱包余额</div>
                 <div class="amount bff">128.00</div>
             </div>
-            <button class="btn">提现</button>
+            <button class="btn" onclick="openWithdrawModal()">提现</button>
         </div>
         <div class="sc-actions">
             <div class="sc-action">冻结释放记录</div>
@@ -376,6 +508,7 @@
                 <div class="label">汇付钱包余额</div>
                 <div class="amount hf">3,286.50</div>
             </div>
+            <button class="btn" onclick="openWithdrawModal()">提现</button>
         </div>
         <div class="sc-actions">
             <div class="sc-action">冻结释放记录</div>
@@ -407,6 +540,7 @@
             <option>批发佣金支出</option>
             <option>运营服务费</option>
             <option>零售佣金支出</option>
+            <option>提现</option>
         </select>
     </div>
     <div class="filter-item">
@@ -477,6 +611,13 @@
     <h4><span class="badge">3</span> <span style="vertical-align:middle;">类型沿用</span></h4>
     <ul>
       <li>继续沿用之前的<b>类型</b>分类</li>
+    </ul>
+    <h4><span class="badge">4</span> <span style="vertical-align:middle;">提现</span></h4>
+    <ul>
+      <li>宝付钱包、汇付钱包卡片增加<b>提现</b>按钮</li>
+      <li>提现浮层展示<b>当前可提余额</b>，填写<b>提现金额</b>和<b>原因</b>后申请</li>
+      <li>浮层提供<b>提现申请记录</b>链接，展示所有渠道的提现记录（状态：待审核、已通过、已提现）</li>
+      <li>交易类型中也增加<b>提现</b></li>
     </ul>
   </div>
 </div>
@@ -556,6 +697,115 @@ function toggleFuncModal() {
   function onDragTouch(e) { if (!dragging) return; var t = e.touches[0]; modal.style.left = (t.clientX - offX) + 'px'; modal.style.top = (t.clientY - offY) + 'px'; }
   function endDrag() { dragging = false; if (titleBar) titleBar.style.cursor = 'grab'; }
 })();
+</script>
+
+<!-- 提现浮层 -->
+<div class="wd-overlay" id="wdOverlay" onclick="if(event.target===this)closeWithdrawModal()">
+    <div class="wd-modal">
+        <div class="wd-header">
+            <span class="wd-title">申请提现</span>
+            <span class="wd-close" onclick="closeWithdrawModal()">×</span>
+        </div>
+        <div class="wd-body">
+            <div class="wd-row">
+                <div class="wd-label">当前可提余额</div>
+                <div style="font-size:20px;font-weight:700;color:#1a78ff;">3,414.50</div>
+            </div>
+            <div class="wd-row">
+                <div class="wd-label">提现金额</div>
+                <input type="number" class="wd-input" id="wdAmount" placeholder="请输入提现金额">
+            </div>
+            <div class="wd-row">
+                <div class="wd-label">填写原因</div>
+                <input type="text" class="wd-input" id="wdReason" placeholder="请输入提现原因">
+            </div>
+            <div class="wd-row">
+                <span class="wd-link" onclick="openRecords()">提现申请记录 ›</span>
+            </div>
+        </div>
+        <div class="wd-footer">
+            <button class="wd-btn-default" onclick="closeWithdrawModal()">取消</button>
+            <button class="wd-btn-primary" onclick="applyWithdraw()">申请</button>
+        </div>
+    </div>
+</div>
+
+<!-- 提现申请记录 -->
+<div class="rec-overlay" id="recOverlay" onclick="if(event.target===this)closeRecords()">
+    <div class="rec-modal">
+        <div class="rec-header">
+            <span class="rec-title">提现申请记录</span>
+            <span class="rec-close" onclick="closeRecords()">×</span>
+        </div>
+        <div class="rec-body">
+            <table class="rec-table">
+                <thead>
+                    <tr>
+                        <th>申请时间</th>
+                        <th>支付渠道</th>
+                        <th>提现金额</th>
+                        <th>原因</th>
+                        <th>状态</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>2026-07-20 10:30:00</td>
+                        <td>汇付钱包</td>
+                        <td>500.00</td>
+                        <td>日常提现</td>
+                        <td><span class="rec-status done">已提现</span></td>
+                    </tr>
+                    <tr>
+                        <td>2026-07-15 09:12:00</td>
+                        <td>宝付钱包</td>
+                        <td>200.00</td>
+                        <td>结算提取</td>
+                        <td><span class="rec-status approved">已通过</span></td>
+                    </tr>
+                    <tr>
+                        <td>2026-07-10 15:40:00</td>
+                        <td>汇付钱包</td>
+                        <td>1000.00</td>
+                        <td>资金周转</td>
+                        <td><span class="rec-status pending">待审核</span></td>
+                    </tr>
+                    <tr>
+                        <td>2026-07-01 14:20:00</td>
+                        <td>宝付钱包</td>
+                        <td>300.00</td>
+                        <td>运营资金</td>
+                        <td><span class="rec-status done">已提现</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+function openWithdrawModal() {
+    document.getElementById('wdOverlay').classList.add('show');
+}
+function closeWithdrawModal() {
+    document.getElementById('wdOverlay').classList.remove('show');
+}
+function applyWithdraw() {
+    var amount = document.getElementById('wdAmount').value;
+    var reason = document.getElementById('wdReason').value;
+    if (!amount || !reason) {
+        alert('请填写提现金额和原因');
+        return;
+    }
+    alert('提现申请已提交\n金额：' + amount + '\n原因：' + reason);
+    closeWithdrawModal();
+}
+function openRecords() {
+    document.getElementById('recOverlay').classList.add('show');
+}
+function closeRecords() {
+    document.getElementById('recOverlay').classList.remove('show');
+}
 </script>
 
 </body>
