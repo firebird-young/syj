@@ -278,12 +278,25 @@
             text-align: center; margin-top: 4px;
             line-height: 1.4;
         }
+
+        /* ── 功能说明浮窗 ── */
+        .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 430px; max-width: 94vw; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 99999; padding: 22px; display: none; }
+        .f-modal.show { display: block; }
+        .f-modal .fm-title { font-size: 15px; font-weight: 600; color: #1a1a2e; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
+        .f-modal .fm-title:active { cursor: grabbing; }
+        .f-modal .fm-close { width: 26px; height: 26px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 13px; color: #666; border: none; flex-shrink: 0; }
+        .f-modal .fm-close:hover { background: #e8e8e8; }
+        .f-modal .fm-body { font-size: 13px; color: #555; line-height: 1.8; }
+        .f-modal .fm-body h4 { font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 14px 0 6px; }
+        .f-modal .fm-body h4:first-child { margin-top: 0; }
+        .f-modal .fm-body ul { padding-left: 18px; margin: 0 0 8px; }
+        .f-modal .fm-body li { margin-bottom: 4px; }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <span class="back">&larr;</span>
+    <span class="back" onclick="window.location.href='任务详情.html'" style="cursor:pointer;">&larr;</span>
     提货
     <span class="rule-count">共 <strong id="totalRulesCount">3</strong> 条规则</span>
 </div>
@@ -495,5 +508,76 @@ renderHoldings();
 renderRules();
 updateSummary();
 </script>
+
+<!-- 浮动说明按钮 -->
+<button onclick="toggleFuncModal()" style="position:fixed;top:12px;right:16px;z-index:99999;background:#fff;color:#666;padding:7px 16px;border-radius:20px;border:1px solid #ddd;font-size:13px;font-weight:500;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.08);font-family:inherit;display:inline-flex;align-items:center;gap:4px;">📖 说明</button>
+
+<!-- ====== 功能说明浮窗 ====== -->
+<div class="f-modal" id="funcModal">
+  <div class="fm-title">
+    <span>📖 功能说明</span>
+    <button class="fm-close" onclick="toggleFuncModal()">✕</button>
+  </div>
+  <div class="fm-body">
+    <h4>一、我的持有</h4>
+    <ul>
+      <li>展示当前用户拥有的各数字资产（产品）数量</li>
+      <li>每个产品一个格子，显示<b>名称 + 持有数量</b></li>
+    </ul>
+    <h4>二、任务规则（核心逻辑）</h4>
+    <ul>
+      <li>每条规则一张卡片，全部展开不可折叠，结构如下：</li>
+      <li><b>卡片头部</b>：规则名称（如"规则 1"）、奖励标签（如"新品优先权 × 3"）</li>
+      <li><b>任务要求区域</b>：列出该规则中每个产品的每份需求量（件/份），例如：仙鹤莲池 10 件/份，进宝 5 件/份。一条规则内的多个产品是且（AND）关系，必须同时满足</li>
+      <li><b>提取份数输入</b>：每个规则底部有一个数字输入框，范围 0 ~ taskMax（该规则上限），用户输入数字即参与计算</li>
+    </ul>
+    <h4>三、消耗汇总（底部固定，实时计算）</h4>
+    <ul>
+      <li><b>计算逻辑</b>：遍历所有规则，取 规则份数 × 各产品每份需求量，累加所有规则中相同产品的消耗。例如：规则 1 填 2 份（仙鹤 10×2=20）、规则 2 填 1 份（仙鹤 8×1=8）→ 仙鹤莲池总消耗 = 28 件</li>
+      <li><b>展示</b>：每个产品一行，格式：消耗量 / 持有量。消耗 ≤ 持有 → 正常显示；消耗 &gt; 持有 → 数字标红 + 显示「超出 X 件」提示</li>
+      <li><b>提交按钮状态</b>：所有产品消耗 ≤ 持有 → 按钮可点击，文案「确定提取」；任一产品超出 → 按钮禁用，文案「持有不足，无法提取」</li>
+    </ul>
+    <h4>四、收货地址</h4>
+    <ul>
+      <li>展示当前默认收货地址（姓名、电话、地址）</li>
+      <li>点击「更换」弹出地址选择</li>
+    </ul>
+    <h4>五、交互细节</h4>
+    <ul>
+      <li>输入框 onchange 触发：校验范围（0 ~ taskMax），立即重新计算消耗汇总</li>
+      <li>提交前二次校验，若有超出则 alert 提示具体产品名</li>
+      <li>提交后 alert 展示选中的规则 × 份数 + 总消耗明细</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+function toggleFuncModal() {
+  var el = document.getElementById('funcModal');
+  el.classList.toggle('show');
+  if (el.classList.contains('show') && !el.dataset.dragged) {
+    el.style.left = '50%'; el.style.top = '50%'; el.style.transform = 'translate(-50%,-50%)';
+  }
+}
+(function() {
+  var modal, titleBar, offX, offY, dragging = false;
+  document.addEventListener('DOMContentLoaded', function() {
+    modal = document.getElementById('funcModal');
+    titleBar = modal.querySelector('.fm-title');
+    titleBar.addEventListener('mousedown', startDrag);
+    titleBar.addEventListener('touchstart', startDragTouch, {passive:true});
+    document.addEventListener('mousemove', onDrag);
+    document.addEventListener('mouseup', endDrag);
+    document.addEventListener('touchmove', onDragTouch, {passive:true});
+    document.addEventListener('touchend', endDrag);
+  });
+  function startDrag(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = e.clientX - rect.left; offY = e.clientY - rect.top; dragging = true; titleBar.style.cursor = 'grabbing'; }
+  function startDragTouch(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; var t = e.touches[0]; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = t.clientX - rect.left; offY = t.clientY - rect.top; dragging = true; }
+  function onDrag(e) { if (!dragging) return; modal.style.left = (e.clientX - offX) + 'px'; modal.style.top = (e.clientY - offY) + 'px'; }
+  function onDragTouch(e) { if (!dragging) return; var t = e.touches[0]; modal.style.left = (t.clientX - offX) + 'px'; modal.style.top = (t.clientY - offY) + 'px'; }
+  function endDrag() { dragging = false; if (titleBar) titleBar.style.cursor = 'grab'; }
+})();
+</script>
+
 </body>
 </html>

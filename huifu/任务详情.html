@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>任务详情</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+            background: #f0f2f5;
+            color: #1a1a2e;
+            font-size: 14px;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            max-width: 430px;
+            margin: 0 auto;
+            background: #f5f5f5;
+            min-height: 100vh;
+            position: relative;
+            padding-bottom: 90px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.06);
+        }
+
+        /* 顶部导航 */
+        .header {
+            background: #ffd9d6;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            font-size: 16px;
+            font-weight: 500;
+            color: #1a1a2e;
+        }
+        .header .back {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+            color: #1a1a2e;
+            cursor: pointer;
+            padding: 4px 8px;
+        }
+
+        /* 任务卡片 */
+        .task-card {
+            background: #fff;
+            margin: 12px 12px 0;
+            border-radius: 10px;
+            padding: 16px;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+        .task-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 8px;
+            background: #ffe9b8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            flex-shrink: 0;
+        }
+        .task-info { flex: 1; }
+        .task-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 6px;
+        }
+        .task-desc {
+            font-size: 13px;
+            color: #4e5a6e;
+            line-height: 1.5;
+            margin-bottom: 6px;
+        }
+        .task-company {
+            font-size: 12px;
+            color: #86909c;
+        }
+
+        /* 活动时间 */
+        .time-row {
+            background: #fff;
+            margin: 0 12px;
+            padding: 12px 16px;
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+            font-size: 13px;
+        }
+        .time-row .label {
+            color: #e74c5e;
+            font-weight: 500;
+            margin-right: 8px;
+        }
+        .time-row .value { color: #e74c5e; }
+
+        /* 完成进度 */
+        .progress-row {
+            background: #fff;
+            margin: 0 12px;
+            padding: 12px 16px 14px;
+            border-radius: 0 0 10px 10px;
+            display: flex;
+            align-items: center;
+            font-size: 13px;
+        }
+        .progress-row .label {
+            color: #e74c5e;
+            font-weight: 500;
+            margin-right: 8px;
+            flex-shrink: 0;
+        }
+        .progress-wrap {
+            flex: 1;
+            position: relative;
+        }
+        .progress-bar {
+            height: 8px;
+            background: #ffe2e0;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+        .progress-fill {
+            height: 100%;
+            background: #e74c5e;
+            border-radius: 4px;
+        }
+        .progress-text {
+            font-size: 12px;
+            color: #e74c5e;
+            margin-top: 4px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 14px;
+        }
+        .progress-text .now {
+            font-weight: 600;
+        }
+
+        /* 标注圆点 */
+        .badge {
+            display: inline-block;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 5px;
+            border-radius: 50%;
+            background: #ff2d55;
+            color: #fff;
+            font-size: 12px;
+            line-height: 18px;
+            text-align: center;
+            font-weight: 600;
+            box-shadow: 0 1px 3px rgba(255,45,85,0.3);
+        }
+        .badge.sm {
+            min-width: 16px;
+            height: 16px;
+            font-size: 11px;
+            line-height: 16px;
+        }
+
+        /* 我的奖励 */
+        .reward-card {
+            background: #fff;
+            margin: 12px 12px 0;
+            border-radius: 10px;
+            padding: 14px 16px;
+        }
+        .reward-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .reward-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a1a2e;
+        }
+        .reward-link {
+            font-size: 12px;
+            color: #86909c;
+            cursor: pointer;
+        }
+        .reward-link::after {
+            content: ' ›';
+            color: #c0c8d4;
+        }
+        .reward-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+        }
+        .reward-item {
+            text-align: center;
+            position: relative;
+            padding: 6px 0;
+        }
+        .reward-amount {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 4px;
+        }
+        .reward-amount .unit {
+            font-size: 13px;
+            font-weight: 500;
+            margin-left: 1px;
+        }
+        .reward-label {
+            font-size: 12px;
+            color: #86909c;
+        }
+
+        /* 任务规则 */
+        .rule-card {
+            background: #fff;
+            margin: 12px 12px 0;
+            border-radius: 10px;
+            padding: 14px 16px;
+            min-height: 140px;
+        }
+        .rule-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 10px;
+        }
+        .rule-empty {
+            color: #c0c8d4;
+            font-size: 13px;
+            text-align: center;
+            padding: 30px 0;
+        }
+
+        /* 底部固定栏 */
+        .bottom-fixed {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 430px;
+            background: #fff;
+            padding: 10px 16px 16px;
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.04);
+            z-index: 10;
+        }
+        .agree-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 12px;
+            color: #86909c;
+            margin-bottom: 8px;
+        }
+        .agree-row input[type="checkbox"] {
+            width: 14px;
+            height: 14px;
+            accent-color: #e74c5e;
+            cursor: pointer;
+        }
+        .agree-row .agree-text {
+            color: #1a78ff;
+            cursor: pointer;
+        }
+        .btn-pickup {
+            width: 100%;
+            height: 44px;
+            background: #e74c5e;
+            color: #fff;
+            border: none;
+            border-radius: 22px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-pickup:disabled {
+            background: #ffb8c0;
+            cursor: not-allowed;
+        }
+
+        /* ── 功能说明浮窗 ── */
+        .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 420px; max-width: 92vw; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 99999; padding: 22px; display: none; }
+        .f-modal.show { display: block; }
+        .f-modal .fm-title { font-size: 15px; font-weight: 600; color: #1a1a2e; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
+        .f-modal .fm-title:active { cursor: grabbing; }
+        .f-modal .fm-close { width: 26px; height: 26px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 13px; color: #666; border: none; flex-shrink: 0; }
+        .f-modal .fm-close:hover { background: #e8e8e8; }
+        .f-modal .fm-body { font-size: 13px; color: #555; line-height: 1.8; }
+        .f-modal .fm-body h4 { font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 14px 0 6px; }
+        .f-modal .fm-body h4:first-child { margin-top: 0; }
+        .f-modal .fm-body ul { padding-left: 18px; margin: 0 0 8px; }
+        .f-modal .fm-body li { margin-bottom: 4px; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+
+    <div class="header">
+        <span class="back">‹</span>
+        任务详情
+    </div>
+
+    <!-- 任务卡片 -->
+    <div class="task-card">
+        <div class="task-icon">🎁</div>
+        <div class="task-info">
+            <div class="task-name">提货</div>
+            <div class="task-desc">提2份仙鹤莲池和1份洪宝</div>
+            <div class="task-company">四川华泰博文文化传播有限公司</div>
+        </div>
+    </div>
+
+    <!-- 活动时间 -->
+    <div class="time-row">
+        <span class="label">活动时间：</span>
+        <span class="value">2025-05-06</span>
+        <span class="value" style="margin:0 6px;">——</span>
+        <span class="value">2025-05-31</span>
+    </div>
+
+    <!-- 完成进度 -->
+    <div class="progress-row">
+        <span class="label">完成进度：</span>
+        <div class="progress-wrap">
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 90%;"></div>
+            </div>
+            <div class="progress-text">
+                <span class="now">135</span>
+                <span class="badge" style="margin-left:-6px;">2</span>
+                <span>150</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 我的奖励 -->
+    <div class="reward-card">
+        <div class="reward-header">
+            <span class="reward-title">我的奖励</span>
+            <span class="reward-link" onclick="window.location.href='奖励列表.html'" style="cursor:pointer;">查看详情</span>
+        </div>
+        <div class="reward-grid">
+            <div class="reward-item">
+                <div class="reward-amount">50.00</div>
+                <div class="reward-label">现金奖励</div>
+            </div>
+            <div class="reward-item">
+                <div class="reward-amount">16</div>
+                <div class="reward-label">产品奖励</div>
+            </div>
+            <div class="reward-item">
+                <div class="reward-amount">2</div>
+                <div class="reward-label">新品优先权</div>
+                <span class="badge sm" style="position:absolute;top:-2px;right:24px;">1</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 任务规则 -->
+    <div class="rule-card">
+        <div class="rule-title">任务规则</div>
+        <div class="rule-empty">暂无规则内容</div>
+    </div>
+
+</div>
+
+<!-- 底部固定栏 -->
+<div class="bottom-fixed">
+    <div class="agree-row">
+        <input type="checkbox" id="agreeCheckbox">
+        <label for="agreeCheckbox">我已阅读知晓该活动规则</label>
+        <span class="agree-text" onclick="toggleAgree()">并同意参与</span>
+    </div>
+    <button class="btn-pickup" id="pickupBtn" disabled onclick="goPickup()">我要提货</button>
+</div>
+
+<script>
+function toggleAgree() {
+    var cb = document.getElementById('agreeCheckbox');
+    cb.checked = !cb.checked;
+    document.getElementById('pickupBtn').disabled = !cb.checked;
+}
+document.getElementById('agreeCheckbox').addEventListener('change', function() {
+    document.getElementById('pickupBtn').disabled = !this.checked;
+});
+function goPickup() {
+    window.location.href = '提货页面.html';
+}
+</script>
+
+<!-- 浮动说明按钮（手机框外） -->
+<button onclick="toggleFuncModal()" style="position:fixed;top:12px;right:16px;z-index:99999;background:#fff;color:#666;padding:7px 16px;border-radius:20px;border:1px solid #ddd;font-size:13px;font-weight:500;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.08);font-family:inherit;display:inline-flex;align-items:center;gap:4px;">📖 说明</button>
+
+<!-- ====== 功能说明浮窗 ====== -->
+<div class="f-modal" id="funcModal">
+  <div class="fm-title">
+    <span>📖 功能说明</span>
+    <button class="fm-close" onclick="toggleFuncModal()">✕</button>
+  </div>
+  <div class="fm-body">
+    <h4><span class="badge">1</span> <span style="vertical-align:middle;">新品优先权</span></h4>
+    <ul>
+      <li>之前的优惠券奖励没有使用，去掉，变成<b>新品优先权</b></li>
+    </ul>
+    <h4><span class="badge">2</span> <span style="vertical-align:middle;">完成进度</span></h4>
+    <ul>
+      <li>显示设置的<b>最大完成次数</b>，和当前<b>已经完成的次数</b></li>
+    </ul>
+  </div>
+</div>
+
+<script>
+function toggleFuncModal() {
+  var el = document.getElementById('funcModal');
+  el.classList.toggle('show');
+  if (el.classList.contains('show') && !el.dataset.dragged) {
+    el.style.left = '50%'; el.style.top = '50%'; el.style.transform = 'translate(-50%,-50%)';
+  }
+}
+(function() {
+  var modal, titleBar, offX, offY, dragging = false;
+  document.addEventListener('DOMContentLoaded', function() {
+    modal = document.getElementById('funcModal');
+    titleBar = modal.querySelector('.fm-title');
+    titleBar.addEventListener('mousedown', startDrag);
+    titleBar.addEventListener('touchstart', startDragTouch, {passive:true});
+    document.addEventListener('mousemove', onDrag);
+    document.addEventListener('mouseup', endDrag);
+    document.addEventListener('touchmove', onDragTouch, {passive:true});
+    document.addEventListener('touchend', endDrag);
+  });
+  function startDrag(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = e.clientX - rect.left; offY = e.clientY - rect.top; dragging = true; titleBar.style.cursor = 'grabbing'; }
+  function startDragTouch(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; var t = e.touches[0]; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = t.clientX - rect.left; offY = t.clientY - rect.top; dragging = true; }
+  function onDrag(e) { if (!dragging) return; modal.style.left = (e.clientX - offX) + 'px'; modal.style.top = (e.clientY - offY) + 'px'; }
+  function onDragTouch(e) { if (!dragging) return; var t = e.touches[0]; modal.style.left = (t.clientX - offX) + 'px'; modal.style.top = (t.clientY - offY) + 'px'; }
+  function endDrag() { dragging = false; if (titleBar) titleBar.style.cursor = 'grab'; }
+})();
+</script>
+
+</body>
+</html>

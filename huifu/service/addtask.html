@@ -382,9 +382,24 @@
             -webkit-appearance: none;
             padding-right: 32px;
         }
+
+        /* ── 功能说明浮窗 ── */
+        .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 620px; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 9999; padding: 24px; display: none; }
+        .f-modal.show { display: block; }
+        .f-modal .fm-title { font-size: 16px; font-weight: 600; color: #1a1a2e; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
+        .f-modal .fm-title:active { cursor: grabbing; }
+        .f-modal .fm-close { width: 28px; height: 28px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; color: #666; border: none; flex-shrink: 0; }
+        .f-modal .fm-close:hover { background: #e8e8e8; }
+        .f-modal .fm-body { font-size: 13px; color: #555; line-height: 1.8; }
+        .f-modal .fm-body h4 { font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 16px 0 8px; }
+        .f-modal .fm-body h4:first-child { margin-top: 0; }
+        .f-modal .fm-body ul { padding-left: 18px; margin: 0 0 12px; }
+        .f-modal .fm-body li { margin-bottom: 4px; }
+        .f-modal .fm-body .sub { margin-left: 18px; }
     </style>
 </head>
 <body>
+<button onclick="toggleFuncModal()" style="position:fixed;top:12px;right:16px;z-index:99999;background:#fff;color:#333;padding:7px 16px;border-radius:20px;border:1px solid #ddd;font-size:13px;font-weight:500;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.08);font-family:inherit;display:inline-flex;align-items:center;gap:4px;">📖 说明</button>
 <div class="container">
     <div class="page-title">新增任务</div>
 
@@ -958,5 +973,75 @@ function reindexPickupProducts(container) {
     });
 }
 </script>
+
+<!-- ====== 功能说明浮窗 ====== -->
+<div class="f-modal" id="funcModal">
+  <div class="fm-title">
+    <span>📖 功能说明</span>
+    <button class="fm-close" onclick="toggleFuncModal()">✕</button>
+  </div>
+  <div style="font-size:13px;font-weight:600;color:#e74c5e;margin:-6px 0 12px;">服务商后台</div>
+  <div class="fm-body">
+    <h4>任务配置区 - 任务类型选择</h4>
+    <ul>
+      <li>页面进入时任务类型默认为空，下方不展示任何内容。用户从下拉框选择类型后，展示对应的配置面板</li>
+    </ul>
+
+    <h4>一、分享邀请好友（原功能无需修改）</h4>
+    <ul>
+      <li><b>上传分享图</b>：上传分享邀请卡片图片</li>
+      <li><b>任务规则</b>：支持动态新增/删除多条规则，每条规则包含规则选择 + 独立奖励配置</li>
+      <li><b>规则选项</b>：邀请绑卡、邀请完成一笔交易</li>
+      <li>每条规则的奖励配置包括：<b>奖励对象选择、奖励类型选择、奖励类型联动字段</b></li>
+    </ul>
+
+    <h4>二、提货（本次新增功能）</h4>
+    <p style="color:#666;">页面位置：新增任务 > 任务类型选择"提货"后展示</p>
+    <ul>
+      <li><b>任务规则（可多条）</b>：点击"＋ 新增规则"可创建多条规则，每条规则包含：</li>
+      <li class="sub"><b>产品条件（且关系）</b>：每条规则内可添加多个产品，产品之间是且（AND）关系，用户必须同时提取规则内指定的所有产品才算满足条件。每个产品需设置：选择产品名称 + 所需数量（件）。点击"＋ 新增产品"添加更多产品条件，每个产品右侧有"删除"按钮可移除</li>
+      <li class="sub"><b>每人最多完成次数</b>：每条规则独立设置，默认值 3，表示该规则每个用户最多可完成次数上限，黄色背景醒目显示</li>
+      <li class="sub"><b>奖励配置</b>：每条规则独立配置奖励。奖励对象：本期只有<b>"任务方"</b>；奖励类型：<span style="color:#e74c5e;">本期只实现"新品优先权"（设置数量件）</span>。选择不同奖励类型时，下方自动切换显示对应的配置项</li>
+      <li><b>任务终止条件</b>：勾选"当奖励内容到达数量后自动结束任务"后，可设置奖励内容累计发放达到指定数量（本期为新品优先权累计数量，默认 100 件）时自动结束任务。系统统计所有规则中已发放的对应奖励总数，达到设定值后任务自动终止</li>
+    </ul>
+    <p style="color:#666;"><b>交互操作：</b></p>
+    <ul>
+      <li><b>新增规则</b>：点击"＋ 新增规则"在列表末尾添加一条新规则</li>
+      <li><b>删除规则</b>：点击规则头部的"删除本规则"移除整条规则</li>
+      <li><b>新增产品</b>：在每条规则内点击"＋ 新增产品"添加产品条件</li>
+      <li><b>删除产品</b>：点击产品右侧的"删除"移除该产品条件</li>
+      <li>规则序号自动重新编排（删除后）</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+function toggleFuncModal() {
+  var el = document.getElementById('funcModal');
+  el.classList.toggle('show');
+  if (el.classList.contains('show') && !el.dataset.dragged) {
+    el.style.left = '50%'; el.style.top = '50%'; el.style.transform = 'translate(-50%,-50%)';
+  }
+}
+(function() {
+  var modal, titleBar, offX, offY, dragging = false;
+  document.addEventListener('DOMContentLoaded', function() {
+    modal = document.getElementById('funcModal');
+    titleBar = modal.querySelector('.fm-title');
+    titleBar.addEventListener('mousedown', startDrag);
+    titleBar.addEventListener('touchstart', startDragTouch, {passive:true});
+    document.addEventListener('mousemove', onDrag);
+    document.addEventListener('mouseup', endDrag);
+    document.addEventListener('touchmove', onDragTouch, {passive:true});
+    document.addEventListener('touchend', endDrag);
+  });
+  function startDrag(e) { modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = e.clientX - rect.left; offY = e.clientY - rect.top; dragging = true; titleBar.style.cursor = 'grabbing'; }
+  function startDragTouch(e) { var t = e.touches[0]; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = t.clientX - rect.left; offY = t.clientY - rect.top; dragging = true; }
+  function onDrag(e) { if (!dragging) return; modal.style.left = (e.clientX - offX) + 'px'; modal.style.top = (e.clientY - offY) + 'px'; }
+  function onDragTouch(e) { if (!dragging) return; var t = e.touches[0]; modal.style.left = (t.clientX - offX) + 'px'; modal.style.top = (t.clientY - offY) + 'px'; }
+  function endDrag() { dragging = false; if (titleBar) titleBar.style.cursor = 'grab'; }
+})();
+</script>
+
 </body>
 </html>

@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>所有奖励</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+            background: #f0f2f5;
+            color: #1a1a2e;
+            font-size: 14px;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            max-width: 430px;
+            margin: 0 auto;
+            background: #f5f5f5;
+            min-height: 100vh;
+            position: relative;
+            padding-bottom: 40px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.06);
+        }
+
+        /* 顶部导航 */
+        .header {
+            background: #ffd9d6;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            font-size: 16px;
+            font-weight: 500;
+            color: #1a1a2e;
+        }
+        .header .back {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+            color: #1a1a2e;
+            cursor: pointer;
+            padding: 4px 8px;
+        }
+
+        /* 我的奖励 */
+        .reward-card {
+            background: #fff;
+            margin: 12px 12px 0;
+            border-radius: 10px;
+            padding: 16px 16px;
+        }
+        .reward-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 14px;
+        }
+        .reward-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+        }
+        .reward-item {
+            text-align: center;
+        }
+        .reward-amount {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 4px;
+        }
+        .reward-label {
+            font-size: 12px;
+            color: #86909c;
+        }
+
+        /* 收益明细 */
+        .detail-card {
+            background: #fff;
+            margin: 12px 12px 0;
+            border-radius: 10px;
+            padding: 16px;
+        }
+        .detail-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 14px;
+        }
+        .detail-list .detail-item {
+            position: relative;
+            padding: 12px 0;
+            border-bottom: 1px solid #f5f5f7;
+        }
+        .detail-list .detail-item:last-child { border-bottom: none; }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+        .detail-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #1a1a2e;
+        }
+        .detail-amount {
+            font-size: 14px;
+            font-weight: 600;
+            color: #e67e22;
+        }
+        .detail-amount .coin {
+            color: #e67e22;
+            margin-right: 4px;
+        }
+        .detail-sub {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #86909c;
+        }
+        .detail-time { color: #86909c; }
+        .detail-status {
+            color: #1aab67;
+            font-size: 12px;
+        }
+
+        /* 标注圆点 */
+        .badge {
+            display: inline-block;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 5px;
+            border-radius: 50%;
+            background: #ff2d55;
+            color: #fff;
+            font-size: 12px;
+            line-height: 18px;
+            text-align: center;
+            font-weight: 600;
+            box-shadow: 0 1px 3px rgba(255,45,85,0.3);
+        }
+        .badge.sm {
+            min-width: 16px;
+            height: 16px;
+            font-size: 11px;
+            line-height: 16px;
+        }
+
+        /* ── 功能说明浮窗 ── */
+        .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 430px; max-width: 94vw; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 99999; padding: 22px; display: none; }
+        .f-modal.show { display: block; }
+        .f-modal .fm-title { font-size: 15px; font-weight: 600; color: #1a1a2e; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
+        .f-modal .fm-title:active { cursor: grabbing; }
+        .f-modal .fm-close { width: 26px; height: 26px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 13px; color: #666; border: none; flex-shrink: 0; }
+        .f-modal .fm-close:hover { background: #e8e8e8; }
+        .f-modal .fm-body { font-size: 13px; color: #555; line-height: 1.8; }
+        .f-modal .fm-body h4 { font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 14px 0 6px; }
+        .f-modal .fm-body h4:first-child { margin-top: 0; }
+        .f-modal .fm-body ul { padding-left: 18px; margin: 0 0 8px; }
+        .f-modal .fm-body li { margin-bottom: 4px; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+
+    <div class="header">
+        <span class="back">‹</span>
+        所有奖励
+    </div>
+
+    <!-- 我的奖励 -->
+    <div class="reward-card">
+        <div class="reward-title">我的奖励</div>
+        <div class="reward-grid">
+            <div class="reward-item">
+                <div class="reward-amount">50.00</div>
+                <div class="reward-label">现金奖励</div>
+            </div>
+            <div class="reward-item">
+                <div class="reward-amount">16</div>
+                <div class="reward-label">产品奖励</div>
+            </div>
+            <div class="reward-item">
+                <div class="reward-amount">2</div>
+                <div class="reward-label">新品优先权</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 收益明细 -->
+    <div class="detail-card">
+        <div class="detail-title">收益明细</div>
+        <div class="detail-list">
+            <div class="detail-item">
+                <div class="detail-row">
+                    <span class="detail-name">邀请绑卡</span>
+                    <span class="detail-amount"><span class="coin">¥</span>+2</span>
+                </div>
+                <div class="detail-sub">
+                    <span class="detail-time">获得时间：2025-04-25</span>
+                    <span class="detail-status">已到账</span>
+                </div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-row">
+                    <span class="detail-name">邀请完成交易</span>
+                    <span class="detail-amount">+产品奖励</span>
+                </div>
+                <div class="detail-sub">
+                    <span class="detail-time">获得时间：2025-04-25</span>
+                    <span class="detail-status">已到账</span>
+                </div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-row">
+                    <span class="detail-name">提货</span>
+                    <span class="detail-amount" style="position:relative;">新品优先权 +2<span class="badge sm" style="margin-left:6px;">1</span></span>
+                </div>
+                <div class="detail-sub">
+                    <span class="detail-time">获得时间：2025-04-25</span>
+                    <span class="detail-status">已到账</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- 浮动说明按钮（手机框外） -->
+<button onclick="toggleFuncModal()" style="position:fixed;top:12px;right:16px;z-index:99999;background:#fff;color:#666;padding:7px 16px;border-radius:20px;border:1px solid #ddd;font-size:13px;font-weight:500;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.08);font-family:inherit;display:inline-flex;align-items:center;gap:4px;">📖 说明</button>
+
+<!-- ====== 功能说明浮窗 ====== -->
+<div class="f-modal" id="funcModal">
+  <div class="fm-title">
+    <span>📖 功能说明</span>
+    <button class="fm-close" onclick="toggleFuncModal()">✕</button>
+  </div>
+  <div class="fm-body">
+    <h4>1</h4>
+    <ul>
+      <li>每成功提货一次，奖励发放成功后，<b>新品优先权 = 次数 × 单次新品数量</b></li>
+      <li>一个任务用户只要没有达到最大奖励次数，是可以反复参加的，<b>每提一次发一次奖励</b>，这里就会存在多条记录</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+function toggleFuncModal() {
+  var el = document.getElementById('funcModal');
+  el.classList.toggle('show');
+  if (el.classList.contains('show') && !el.dataset.dragged) {
+    el.style.left = '50%'; el.style.top = '50%'; el.style.transform = 'translate(-50%,-50%)';
+  }
+}
+(function() {
+  var modal, titleBar, offX, offY, dragging = false;
+  document.addEventListener('DOMContentLoaded', function() {
+    modal = document.getElementById('funcModal');
+    titleBar = modal.querySelector('.fm-title');
+    titleBar.addEventListener('mousedown', startDrag);
+    titleBar.addEventListener('touchstart', startDragTouch, {passive:true});
+    document.addEventListener('mousemove', onDrag);
+    document.addEventListener('mouseup', endDrag);
+    document.addEventListener('touchmove', onDragTouch, {passive:true});
+    document.addEventListener('touchend', endDrag);
+  });
+  function startDrag(e) { modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = e.clientX - rect.left; offY = e.clientY - rect.top; dragging = true; titleBar.style.cursor = 'grabbing'; }
+  function startDragTouch(e) { var t = e.touches[0]; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = t.clientX - rect.left; offY = t.clientY - rect.top; dragging = true; }
+  function onDrag(e) { if (!dragging) return; modal.style.left = (e.clientX - offX) + 'px'; modal.style.top = (e.clientY - offY) + 'px'; }
+  function onDragTouch(e) { if (!dragging) return; var t = e.touches[0]; modal.style.left = (t.clientX - offX) + 'px'; modal.style.top = (t.clientY - offY) + 'px'; }
+  function endDrag() { dragging = false; if (titleBar) titleBar.style.cursor = 'grab'; }
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>零售市场列表</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+            background: #f0f2f5;
+            color: #1a1a2e;
+            font-size: 14px;
+            min-height: 100vh;
+        }
+        .app-container {
+            max-width: 430px;
+            margin: 0 auto;
+            background: #f5f5f5;
+            min-height: 100vh;
+            position: relative;
+            padding-bottom: 70px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.06);
+        }
+
+        /* 顶部 */
+        .top-bar {
+            background: linear-gradient(180deg, #ffe5e2 0%, #ffd2cc 100%);
+            padding: 16px 14px 12px;
+        }
+        .page-title {
+            text-align: center;
+            font-size: 16px;
+            font-weight: 600;
+            color: #c0392b;
+            margin-bottom: 12px;
+        }
+        .search-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .search-input-wrap {
+            flex: 1;
+            background: #fff;
+            border-radius: 20px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            padding: 0 14px;
+            gap: 8px;
+        }
+        .search-icon { color: #86909c; font-size: 14px; }
+        .search-input-wrap input {
+            flex: 1;
+            border: none;
+            outline: none;
+            background: transparent;
+            font-size: 14px;
+            color: #1a1a2e;
+            font-family: inherit;
+        }
+        .search-input-wrap input::placeholder { color: #c0c8d4; }
+        .btn-search-go {
+            background: #c0392b;
+            color: #fff;
+            border: none;
+            padding: 0 18px;
+            height: 36px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        /* 标签栏 */
+        .tabs-bar {
+            background: #fff;
+            padding: 0 16px;
+            display: flex;
+            gap: 18px;
+            border-bottom: 1px solid #f0f0f0;
+            overflow-x: auto;
+        }
+        .tab {
+            padding: 12px 0;
+            font-size: 14px;
+            color: #4e5a6e;
+            cursor: pointer;
+            position: relative;
+            white-space: nowrap;
+        }
+        .tab.active { color: #c0392b; font-weight: 600; }
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 2px;
+            background: #c0392b;
+            border-radius: 2px;
+        }
+
+        /* 产品列表 */
+        .product-list { padding: 0; }
+        .product-item {
+            background: #fff;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            border-bottom: 1px solid #f5f5f7;
+            cursor: pointer;
+        }
+        .product-img {
+            width: 70px;
+            height: 70px;
+            border-radius: 8px;
+            background: #f5f6f8;
+            flex-shrink: 0;
+            background-image: linear-gradient(135deg, #f0e8d8 0%, #c9b88e 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            color: #fff;
+        }
+        .product-img.img2 {
+            background-image: linear-gradient(135deg, #f5e8b8 0%, #c9a04a 100%);
+        }
+        .product-img.img3 {
+            background-image: linear-gradient(135deg, #e6dccd 0%, #b8a47e 100%);
+        }
+        .product-img.img4 {
+            background-image: linear-gradient(135deg, #d8d2c5 0%, #a89778 100%);
+        }
+        .product-img.img5 {
+            background-image: linear-gradient(135deg, #e8c8a0 0%, #c08850 100%);
+        }
+        .product-img.img6 {
+            background-image: linear-gradient(135deg, #f7e8e0 0%, #d8a89a 100%);
+        }
+        .product-center {
+            flex: 1;
+            min-width: 0;
+        }
+        .product-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 6px;
+        }
+        .product-code {
+            font-size: 12px;
+            color: #86909c;
+        }
+        .product-right {
+            text-align: right;
+            flex-shrink: 0;
+        }
+        .product-tag {
+            font-size: 13px;
+            color: #86909c;
+            margin-bottom: 6px;
+        }
+        .product-price {
+            font-size: 13px;
+            color: #c0392b;
+            font-weight: 500;
+        }
+        .product-price b {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        /* tabbar */
+        .tabbar {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 430px;
+            background: #fff;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            z-index: 10;
+        }
+        .tabbar-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 0;
+            font-size: 11px;
+            color: #6b7588;
+            cursor: pointer;
+        }
+        .tabbar-item .icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            background: #f5f6f8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: #6b7588;
+        }
+        .tabbar-item.active { color: #c0392b; }
+        .tabbar-item.active .icon {
+            background: #c0392b;
+            color: #fff;
+        }
+
+        /* 功能说明浮窗 */
+        .badge {
+            display: inline-block;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 5px;
+            border-radius: 50%;
+            background: #ff2d55;
+            color: #fff;
+            font-size: 12px;
+            line-height: 18px;
+            text-align: center;
+            font-weight: 600;
+            box-shadow: 0 1px 3px rgba(255,45,85,0.3);
+        }
+        .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 430px; max-width: 94vw; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 99999; padding: 22px; display: none; }
+        .f-modal.show { display: block; }
+        .f-modal .fm-title { font-size: 15px; font-weight: 600; color: #1a1a2e; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
+        .f-modal .fm-title:active { cursor: grabbing; }
+        .f-modal .fm-close { width: 26px; height: 26px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 13px; color: #666; border: none; flex-shrink: 0; }
+        .f-modal .fm-close:hover { background: #e8e8e8; }
+        .f-modal .fm-body { font-size: 13px; color: #555; line-height: 1.8; }
+        .f-modal .fm-body h4 { font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 14px 0 6px; }
+        .f-modal .fm-body ul { padding-left: 18px; margin: 0 0 8px; }
+        .f-modal .fm-body li { margin-bottom: 4px; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+
+    <div class="top-bar">
+        <div class="page-title">数字艺术品共享超市</div>
+        <div class="search-row">
+            <div class="search-input-wrap">
+                <span class="search-icon">🔍</span>
+                <input type="text" placeholder="搜索">
+            </div>
+            <button class="btn-search-go">搜索</button>
+        </div>
+    </div>
+
+    <!-- 标签栏 -->
+    <div class="tabs-bar">
+        <div class="tab" onclick="switchTab(this)">推荐</div>
+        <div class="tab" onclick="switchTab(this)">自选</div>
+        <div class="tab active" onclick="switchTab(this)">全部</div>
+        <div class="tab" onclick="switchTab(this)">鉴赏</div>
+        <div class="tab" onclick="switchTab(this)">活动</div>
+        <div class="tab" onclick="switchTab(this)">期待</div>
+        <div class="tab" onclick="switchTab(this)">典</div>
+        <div class="tab" onclick="switchTab(this)">▲价格</div>
+    </div>
+
+    <!-- 产品列表 -->
+    <div class="product-list">
+        <div class="product-item">
+            <div class="product-img">山水空灵</div>
+            <div class="product-center">
+                <div class="product-name">山水空灵</div>
+                <div class="product-code">产品编码 XB000001</div>
+            </div>
+            <div class="product-right">
+                <div class="product-tag">暂无寄售</div>
+            </div>
+        </div>
+        <div class="product-item">
+            <div class="product-img img2">仙鹤</div>
+            <div class="product-center">
+                <div class="product-name">仙鹤莲池</div>
+                <div class="product-code">产品编码 XB000002</div>
+            </div>
+            <div class="product-right">
+                <div class="product-tag">暂无寄售</div>
+            </div>
+        </div>
+        <div class="product-item">
+            <div class="product-img img3">浮休</div>
+            <div class="product-center">
+                <div class="product-name">浮休东坡</div>
+                <div class="product-code">产品编码 XB000003</div>
+            </div>
+            <div class="product-right">
+                <div class="product-tag">暂无寄售</div>
+            </div>
+        </div>
+        <div class="product-item">
+            <div class="product-img img4">永淳</div>
+            <div class="product-center">
+                <div class="product-name">永淳·夏日帖</div>
+                <div class="product-code">产品编码 XB000004</div>
+            </div>
+            <div class="product-right">
+                <div class="product-tag">当前最低价</div>
+                <div class="product-price">¥<b>130.00</b></div>
+            </div>
+        </div>
+        <div class="product-item">
+            <div class="product-img img5">吃水</div>
+            <div class="product-center">
+                <div class="product-name">吃水不忘挖井人</div>
+                <div class="product-code">产品编码 XB000005</div>
+            </div>
+            <div class="product-right">
+                <div class="product-tag">当前最低价</div>
+                <div class="product-price">¥<b>699.00</b></div>
+            </div>
+        </div>
+        <div class="product-item">
+            <div class="product-img img6">榜样</div>
+            <div class="product-center">
+                <div class="product-name">榜样</div>
+                <div class="product-code">产品编码</div>
+            </div>
+            <div class="product-right">
+                <div class="product-tag">当前最低价</div>
+                <div class="product-price">¥<b>25.00</b></div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- tabbar -->
+<div class="tabbar">
+    <div class="tabbar-item">
+        <div class="icon">📦</div>
+        <div>批发市场</div>
+    </div>
+    <div class="tabbar-item active">
+        <div class="icon">🛒</div>
+        <div>共享超市</div>
+    </div>
+    <div class="tabbar-item">
+        <div class="icon">👤</div>
+        <div>我的</div>
+    </div>
+</div>
+
+<!-- 浮动说明按钮 -->
+<button onclick="toggleFuncModal()" style="position:fixed;top:12px;right:16px;z-index:99999;background:#fff;color:#666;padding:7px 16px;border-radius:20px;border:1px solid #ddd;font-size:13px;font-weight:500;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.08);font-family:inherit;display:inline-flex;align-items:center;gap:4px;">📖 说明</button>
+
+<!-- ====== 功能说明浮窗 ====== -->
+<div class="f-modal" id="funcModal">
+  <div class="fm-title">
+    <span>📖 功能说明</span>
+    <button class="fm-close" onclick="toggleFuncModal()">✕</button>
+  </div>
+  <div class="fm-body">
+    <h4><span class="badge">1</span> <span style="vertical-align:middle;">自选</span></h4>
+    <ul>
+      <li>在「推荐」前增加「<b>自选</b>」标签列，展示用户加为自选的产品列表</li>
+      <li>用户可在产品详情页点击「加为自选」按钮，将产品加入自选列表，方便快速查看与再次购买</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+function switchTab(el) {
+    document.querySelectorAll('.tabs-bar .tab').forEach(function(t){ t.classList.remove('active'); });
+    el.classList.add('active');
+}
+function toggleFuncModal() {
+  var el = document.getElementById('funcModal');
+  el.classList.toggle('show');
+  if (el.classList.contains('show') && !el.dataset.dragged) {
+    el.style.left = '50%'; el.style.top = '50%'; el.style.transform = 'translate(-50%,-50%)';
+  }
+}
+(function() {
+  var modal, titleBar, offX, offY, dragging = false;
+  document.addEventListener('DOMContentLoaded', function() {
+    modal = document.getElementById('funcModal');
+    titleBar = modal.querySelector('.fm-title');
+    titleBar.addEventListener('mousedown', startDrag);
+    titleBar.addEventListener('touchstart', startDragTouch, {passive:true});
+    document.addEventListener('mousemove', onDrag);
+    document.addEventListener('mouseup', endDrag);
+    document.addEventListener('touchmove', onDragTouch, {passive:true});
+    document.addEventListener('touchend', endDrag);
+  });
+  function startDrag(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = e.clientX - rect.left; offY = e.clientY - rect.top; dragging = true; titleBar.style.cursor = 'grabbing'; }
+  function startDragTouch(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; var t = e.touches[0]; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = t.clientX - rect.left; offY = t.clientY - rect.top; dragging = true; }
+  function onDrag(e) { if (!dragging) return; modal.style.left = (e.clientX - offX) + 'px'; modal.style.top = (e.clientY - offY) + 'px'; }
+  function onDragTouch(e) { if (!dragging) return; var t = e.touches[0]; modal.style.left = (t.clientX - offX) + 'px'; modal.style.top = (t.clientY - offY) + 'px'; }
+  function endDrag() { dragging = false; if (titleBar) titleBar.style.cursor = 'grab'; }
+})();
+</script>
+
+</body>
+</html>

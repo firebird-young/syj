@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>发货管理</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+            background: #f0f2f5;
+            color: #1a1a2e;
+            font-size: 14px;
+        }
+
+        .topbar {
+            background: #fff;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .topbar-left { display: flex; align-items: center; gap: 16px; }
+        .menu-btn {
+            width: 32px; height: 32px;
+            border: 1px solid #d0d5dd;
+            border-radius: 4px;
+            background: #fff;
+            color: #6b7588;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+        .menu-btn:hover { background: #f5f5f7; }
+        .breadcrumb { font-size: 13px; color: #6b7588; }
+        .breadcrumb .active { color: #1a1a2e; }
+        .topbar-right {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        .topbar-right .avatar {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            background: #f5deb3;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px;
+        }
+        .topbar-right .name { font-size: 13px; }
+        .topbar-right .arrow { color: #9ba6b9; font-size: 12px; }
+
+        /* 筛选区 */
+        .filter-bar {
+            background: #fff;
+            margin: 12px 12px 0;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            border-radius: 6px;
+        }
+        .filter-item {
+            display: flex;
+            align-items: center;
+            margin-right: 16px;
+            margin-bottom: 4px;
+        }
+        .filter-label {
+            font-size: 13px;
+            color: #4e5a6e;
+            margin-right: 8px;
+            white-space: nowrap;
+        }
+        .filter-input {
+            width: 160px;
+            height: 30px;
+            padding: 0 10px;
+            border: 1px solid #d0d5dd;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #1a1a2e;
+            outline: none;
+        }
+        .filter-input:focus { border-color: #1a78ff; }
+        .filter-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: auto;
+        }
+        .btn-search {
+            background: #1a78ff;
+            color: #fff;
+            border: none;
+            padding: 0 14px;
+            height: 30px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .btn-search:hover { background: #0f6ae8; }
+        .btn-reset {
+            background: #f59e0b;
+            color: #fff;
+            border: none;
+            padding: 0 14px;
+            height: 30px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .btn-reset:hover { background: #e08d04; }
+        .btn-export {
+            background: #f59e0b;
+            color: #fff;
+            border: none;
+            padding: 0 14px;
+            height: 30px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .btn-export:hover { background: #e08d04; }
+
+        /* 标签页 */
+        .tabs-bar {
+            background: #fff;
+            margin: 12px 12px 0;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            border-radius: 6px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .tab {
+            padding: 14px 0;
+            font-size: 14px;
+            color: #4e5a6e;
+            cursor: pointer;
+            position: relative;
+        }
+        .tab.active { color: #1a78ff; font-weight: 500; }
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: -1px;
+            height: 2px;
+            background: #1a78ff;
+        }
+
+        /* 表格 */
+        .table-card {
+            background: #fff;
+            margin: 12px;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .table th {
+            background: #fafbfc;
+            padding: 14px 12px;
+            text-align: left;
+            font-size: 13px;
+            color: #4e5a6e;
+            font-weight: 500;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .table td {
+            padding: 14px 12px;
+            font-size: 13px;
+            color: #1a1a2e;
+            border-bottom: 1px solid #f5f5f7;
+        }
+        .table tr:last-child td { border-bottom: none; }
+        .col-sort {
+            display: inline-block;
+            margin-left: 4px;
+            color: #c0c8d4;
+            cursor: pointer;
+        }
+
+        .seq { color: #9ba6b9; width: 60px; }
+        .product-img {
+            width: 80px;
+            height: 80px;
+            border-radius: 4px;
+            background: #f5f6f8;
+            object-fit: cover;
+            display: block;
+        }
+        .status-tag {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+        .status-tag.pending {
+            background: #fff4e6;
+            color: #e67e22;
+        }
+        .status-tag.shipped {
+            background: #e6f4ff;
+            color: #1a78ff;
+        }
+        .actions a {
+            color: #1a78ff;
+            margin-right: 8px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .actions a.danger { color: #e74c5e; }
+        .actions a:last-child { margin-right: 0; }
+        .actions a:hover { text-decoration: underline; }
+
+        /* 分页 */
+        .pagination {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 8px;
+            font-size: 13px;
+            color: #4e5a6e;
+        }
+        .pagination .total { margin-right: 16px; }
+        .page-btn {
+            min-width: 28px;
+            height: 28px;
+            padding: 0 8px;
+            border: 1px solid #d0d5dd;
+            border-radius: 4px;
+            background: #fff;
+            color: #4e5a6e;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .page-btn:hover { border-color: #1a78ff; color: #1a78ff; }
+        .page-btn.active {
+            background: #1a78ff;
+            border-color: #1a78ff;
+            color: #fff;
+        }
+
+        /* ── 功能说明浮窗 ── */
+        .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 520px; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 9999; padding: 24px; display: none; }
+        .f-modal.show { display: block; }
+        .f-modal .fm-title { font-size: 16px; font-weight: 600; color: #1a1a2e; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
+        .f-modal .fm-title:active { cursor: grabbing; }
+        .f-modal .fm-close { width: 28px; height: 28px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; color: #666; border: none; flex-shrink: 0; }
+        .f-modal .fm-close:hover { background: #e8e8e8; }
+        .f-modal .fm-body { font-size: 13px; color: #555; line-height: 1.8; }
+        .f-modal .fm-body h4 { font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 16px 0 8px; }
+        .f-modal .fm-body h4:first-child { margin-top: 0; }
+        .f-modal .fm-body ul { padding-left: 18px; margin: 0 0 12px; }
+        .f-modal .fm-body li { margin-bottom: 4px; }
+    </style>
+</head>
+<body>
+
+<div class="topbar">
+    <div class="topbar-left">
+        <button class="menu-btn">≡</button>
+        <div class="breadcrumb">
+            <span>首页</span> /
+            <span>仓库管理</span> /
+            <span class="active">发货管理</span>
+        </div>
+    </div>
+    <div class="topbar-right">
+        <button onclick="toggleFuncModal()" style="margin-right:12px;padding:6px 14px;border-radius:6px;background:#f5f7fa;color:#333;border:1px solid #e0e4ea;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:4px;">📖 功能说明</button>
+        <span class="avatar">👤</span>
+        <span class="name">系统参数设置</span>
+        <span class="arrow">▾</span>
+    </div>
+</div>
+
+<!-- 筛选区 -->
+<div class="filter-bar">
+    <div class="filter-item">
+        <span class="filter-label">提货单编号</span>
+        <input type="text" class="filter-input" placeholder="请输入提货单编号">
+    </div>
+    <div class="filter-item">
+        <span class="filter-label">产品名称</span>
+        <input type="text" class="filter-input" placeholder="请输入产品名称">
+    </div>
+    <div class="filter-actions">
+        <button class="btn-search">🔍 搜 索</button>
+        <button class="btn-reset">↻ 重 置</button>
+        <button class="btn-export">⇣ 导出</button>
+    </div>
+</div>
+
+<!-- 标签页 -->
+<div class="tabs-bar">
+    <div class="tab active" onclick="switchTab(this, 'all')">全部</div>
+    <div class="tab" onclick="switchTab(this, 'pending')">待发货</div>
+    <div class="tab" onclick="switchTab(this, 'shipped')">已发货</div>
+</div>
+
+<!-- 表格 -->
+<div class="table-card">
+    <table class="table">
+        <thead>
+            <tr>
+                <th class="seq">序号</th>
+                <th style="width:100px;">图片</th>
+                <th>产品名</th>
+                <th>所属企业</th>
+                <th>提货单号</th>
+                <th>所属仓库</th>
+                <th>用户账号</th>
+                <th>用户编号</th>
+                <th>提货时产品金额</th>
+                <th>提货阶段</th>
+                <th>状态</th>
+                <th>创建时间 <span class="col-sort">⇅</span></th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr data-status="pending">
+                <td class="seq">1</td>
+                <td><img class="product-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Crect width='80' height='80' fill='%23d4af37'/%3E%3Ctext x='40' y='44' font-size='10' text-anchor='middle' fill='%23fff'%3E青莲·舒展%3C/text%3E%3C/svg%3E"></td>
+                <td>青莲-舒展</td>
+                <td>成都市天府新区明昌博物馆</td>
+                <td>3245917488617277</td>
+                <td>四川华鑫博文文化艺术发展有限公司</td>
+                <td>13841319029</td>
+                <td>1860316373387378689</td>
+                <td>20000</td>
+                <td>批发市场</td>
+                <td><span class="status-tag pending">待发货</span></td>
+                <td>2026-07-21 14:49:19</td>
+                <td class="actions"><a>处理</a><a>查看详情</a><a class="danger">现货撤销</a></td>
+            </tr>
+            <tr data-status="shipped">
+                <td class="seq">2</td>
+                <td><img class="product-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Crect width='80' height='80' fill='%23d4af37'/%3E%3Ctext x='40' y='44' font-size='10' text-anchor='middle' fill='%23fff'%3E青莲·舒展%3C/text%3E%3C/svg%3E"></td>
+                <td>青莲-舒展</td>
+                <td>成都市天府新区明昌博物馆</td>
+                <td>7854336430886062</td>
+                <td>四川华鑫博文文化艺术发展有限公司</td>
+                <td>19382153852</td>
+                <td>1860316373387378689</td>
+                <td>10000</td>
+                <td>零售市场</td>
+                <td><span class="status-tag shipped">已发货</span></td>
+                <td>2026-07-21 14:37:31</td>
+                <td class="actions"><a>查看详情</a></td>
+            </tr>
+            <tr data-status="shipped">
+                <td class="seq">3</td>
+                <td><img class="product-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Crect width='80' height='80' fill='%23d4af37'/%3E%3Ctext x='40' y='44' font-size='10' text-anchor='middle' fill='%23fff'%3E青莲·舒展%3C/text%3E%3C/svg%3E"></td>
+                <td>青莲-舒展</td>
+                <td>成都市天府新区明昌博物馆</td>
+                <td>197377991264931</td>
+                <td>四川华鑫博文文化艺术发展有限公司</td>
+                <td>19113541040</td>
+                <td>1860316373387378689</td>
+                <td>8000</td>
+                <td>批发市场</td>
+                <td><span class="status-tag shipped">已发货</span></td>
+                <td>2026-07-21 14:36:17</td>
+                <td class="actions"><a>查看详情</a></td>
+            </tr>
+            <tr data-status="shipped">
+                <td class="seq">4</td>
+                <td><img class="product-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Crect width='80' height='80' fill='%23d4af37'/%3E%3Ctext x='40' y='44' font-size='10' text-anchor='middle' fill='%23fff'%3E青莲·舒展%3C/text%3E%3C/svg%3E"></td>
+                <td>青莲-舒展</td>
+                <td>成都市天府新区明昌博物馆</td>
+                <td>7482868364783633</td>
+                <td>四川华鑫博文文化艺术发展有限公司</td>
+                <td>19938062254</td>
+                <td>1860316373387378689</td>
+                <td>5000</td>
+                <td>零售市场</td>
+                <td><span class="status-tag shipped">已发货</span></td>
+                <td>2026-07-21 14:35:00</td>
+                <td class="actions"><a>查看详情</a></td>
+            </tr>
+            <tr data-status="shipped">
+                <td class="seq">5</td>
+                <td><img class="product-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Crect width='80' height='80' fill='%23d4af37'/%3E%3Ctext x='40' y='44' font-size='10' text-anchor='middle' fill='%23fff'%3E青莲·舒展%3C/text%3E%3C/svg%3E"></td>
+                <td>青莲-舒展</td>
+                <td>成都市天府新区明昌博物馆</td>
+                <td>9065460812978898</td>
+                <td>四川华鑫博文文化艺术发展有限公司</td>
+                <td>19130634113</td>
+                <td>1860316373387378689</td>
+                <td>12000</td>
+                <td>批发市场</td>
+                <td><span class="status-tag shipped">已发货</span></td>
+                <td>2026-07-21 14:33:58</td>
+                <td class="actions"><a>查看详情</a></td>
+            </tr>
+            <tr data-status="shipped">
+                <td class="seq">6</td>
+                <td><img class="product-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Crect width='80' height='80' fill='%23d4af37'/%3E%3Ctext x='40' y='44' font-size='10' text-anchor='middle' fill='%23fff'%3E青莲·舒展%3C/text%3E%3C/svg%3E"></td>
+                <td>青莲-舒展</td>
+                <td>成都市天府新区明昌博物馆</td>
+                <td>9975703152356489</td>
+                <td>四川华鑫博文文化艺术发展有限公司</td>
+                <td>13908193164</td>
+                <td>1860316373387378689</td>
+                <td>6000</td>
+                <td>零售市场</td>
+                <td><span class="status-tag shipped">已发货</span></td>
+                <td>2026-07-21 14:33:55</td>
+                <td class="actions"><a>查看详情</a></td>
+            </tr>
+            <tr data-status="shipped">
+                <td class="seq">7</td>
+                <td><img class="product-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Crect width='80' height='80' fill='%23d4af37'/%3E%3Ctext x='40' y='44' font-size='10' text-anchor='middle' fill='%23fff'%3E青莲·舒展%3C/text%3E%3C/svg%3E"></td>
+                <td>青莲-舒展</td>
+                <td>成都市天府新区明昌博物馆</td>
+                <td>0191839233733074</td>
+                <td>四川华鑫博文文化艺术发展有限公司</td>
+                <td>15982144114</td>
+                <td>1860316373387378689</td>
+                <td>15000</td>
+                <td>批发市场</td>
+                <td><span class="status-tag shipped">已发货</span></td>
+                <td>2026-07-21 14:28:09</td>
+                <td class="actions"><a>查看详情</a></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="pagination">
+        <span class="total">共 7 条</span>
+        <button class="page-btn">‹</button>
+        <button class="page-btn active">1</button>
+        <button class="page-btn">›</button>
+    </div>
+</div>
+
+<script>
+function switchTab(el, key) {
+    document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
+    el.classList.add('active');
+    var rows = document.querySelectorAll('tbody tr');
+    rows.forEach(function(row) {
+        var s = row.getAttribute('data-status');
+        if (key === 'all') { row.style.display = ''; }
+        else if (key === 'pending') { row.style.display = (s === 'pending') ? '' : 'none'; }
+        else if (key === 'shipped') { row.style.display = (s === 'shipped') ? '' : 'none'; }
+    });
+}
+</script>
+
+<!-- ====== 功能说明浮窗 ====== -->
+<div class="f-modal" id="funcModal">
+  <div class="fm-title">
+    <span>📖 功能说明</span>
+    <button class="fm-close" onclick="toggleFuncModal()">✕</button>
+  </div>
+  <div style="font-size:13px;font-weight:600;color:#e74c5e;margin:-6px 0 12px;">服务商后台</div>
+  <div class="fm-body">
+    <p style="margin:0 0 12px;color:#666">发货管理页面优化：增加用户编号、提货时产品金额、提货阶段分类显示，并增加表格导出功能。</p>
+    <h4>一、新增显示字段</h4>
+    <ul>
+      <li><b>用户编号</b>：表格新增展示用户的唯一编号</li>
+      <li><b>提货时产品金额</b>：展示用户提货时该产品的金额</li>
+      <li><b>提货阶段分类显示</b>：展示提货阶段（批发市场 / 零售市场）</li>
+    </ul>
+    <h4>二、增加表格导出功能</h4>
+    <ul>
+      <li>筛选区新增<b>「导出」按钮</b>，可导出当前列表数据</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+function toggleFuncModal() {
+  var el = document.getElementById('funcModal');
+  el.classList.toggle('show');
+  if (el.classList.contains('show') && !el.dataset.dragged) {
+    el.style.left = '50%'; el.style.top = '50%'; el.style.transform = 'translate(-50%,-50%)';
+  }
+}
+(function() {
+  var modal, titleBar, offX, offY, dragging = false;
+  document.addEventListener('DOMContentLoaded', function() {
+    modal = document.getElementById('funcModal');
+    titleBar = modal.querySelector('.fm-title');
+    titleBar.addEventListener('mousedown', startDrag);
+    titleBar.addEventListener('touchstart', startDragTouch, {passive:true});
+    document.addEventListener('mousemove', onDrag);
+    document.addEventListener('mouseup', endDrag);
+    document.addEventListener('touchmove', onDragTouch, {passive:true});
+    document.addEventListener('touchend', endDrag);
+  });
+  function startDrag(e) { modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = e.clientX - rect.left; offY = e.clientY - rect.top; dragging = true; titleBar.style.cursor = 'grabbing'; }
+  function startDragTouch(e) { var t = e.touches[0]; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = t.clientX - rect.left; offY = t.clientY - rect.top; dragging = true; }
+  function onDrag(e) { if (!dragging) return; modal.style.left = (e.clientX - offX) + 'px'; modal.style.top = (e.clientY - offY) + 'px'; }
+  function onDragTouch(e) { if (!dragging) return; var t = e.touches[0]; modal.style.left = (t.clientX - offX) + 'px'; modal.style.top = (t.clientY - offY) + 'px'; }
+  function endDrag() { dragging = false; if (titleBar) titleBar.style.cursor = 'grab'; }
+})();
+</script>
+
+</body>
+</html>

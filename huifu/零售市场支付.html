@@ -427,6 +427,40 @@
             background: #D62828;
             cursor: pointer;
         }
+
+        /* 标注圆点 */
+        .badge {
+            display: inline-block;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 5px;
+            border-radius: 50%;
+            background: #ff2d55;
+            color: #fff;
+            font-size: 12px;
+            line-height: 18px;
+            text-align: center;
+            font-weight: 600;
+            box-shadow: 0 1px 3px rgba(255,45,85,0.3);
+        }
+        .badge.sm {
+            min-width: 16px;
+            height: 16px;
+            font-size: 11px;
+            line-height: 16px;
+        }
+
+        /* ── 功能说明浮窗 ── */
+        .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 430px; max-width: 94vw; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 99999; padding: 22px; display: none; }
+        .f-modal.show { display: block; }
+        .f-modal .fm-title { font-size: 15px; font-weight: 600; color: #1a1a2e; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
+        .f-modal .fm-title:active { cursor: grabbing; }
+        .f-modal .fm-close { width: 26px; height: 26px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 13px; color: #666; border: none; flex-shrink: 0; }
+        .f-modal .fm-close:hover { background: #e8e8e8; }
+        .f-modal .fm-body { font-size: 13px; color: #555; line-height: 1.8; }
+        .f-modal .fm-body h4 { font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 14px 0 6px; }
+        .f-modal .fm-body ul { padding-left: 18px; margin: 0 0 8px; }
+        .f-modal .fm-body li { margin-bottom: 4px; }
     </style>
 </head>
 <body>
@@ -532,11 +566,10 @@
                 <div class="pay-icon hui">💰</div>
                 <div class="pay-info">
                     <div class="pay-name">汇付钱包 <span class="pay-link" id="payLink" onclick="event.stopPropagation();goRecharge()">去充值</span></div>
+                    <div style="font-size:11px;color:#e74c5e;margin-top:2px;">汇付平台收取0.6%的交易手续费</div>
                 </div>
                 <div class="pay-radio"></div>
             </div>
-
-            <div class="pay-provider">平台由宝付支付提供支付服务</div>
 
             <button class="modal-confirm-btn" id="modalConfirmBtn">请选择支付方式</button>
         </div>
@@ -623,7 +656,9 @@ function selectPay(opt) {
     opt.querySelector('.pay-radio').classList.add('checked');
     var btn = document.getElementById('modalConfirmBtn');
     btn.classList.add('active');
-    btn.textContent = '确认支付 ¥' + (950 * qty).toFixed(2);
+    var amount = 950 * qty;
+    var fee = amount * 0.006;
+    btn.innerHTML = '去支付 ¥' + amount.toFixed(2) + '+¥' + fee.toFixed(2) + '<span style="font-size:11px;opacity:0.85;">（第三方支付手续费）</span>';
     btn.onclick = function() { alert('支付成功！'); };
 }
 
@@ -642,6 +677,58 @@ function setWalletStatus(status) {
         updatePayState();
     }
 }
+</script>
+
+<!-- 浮动说明按钮（手机框外） -->
+<button onclick="toggleFuncModal()" style="position:fixed;top:12px;right:16px;z-index:99999;background:#fff;color:#666;padding:7px 16px;border-radius:20px;border:1px solid #ddd;font-size:13px;font-weight:500;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.08);font-family:inherit;display:inline-flex;align-items:center;gap:4px;">📖 说明</button>
+
+<!-- ====== 功能说明浮窗 ====== -->
+<div class="f-modal" id="funcModal">
+  <div class="fm-title">
+    <span>📖 功能说明</span>
+    <button class="fm-close" onclick="toggleFuncModal()">✕</button>
+  </div>
+  <div class="fm-body">
+    <h4><span class="badge">1</span> <span style="vertical-align:middle;">去掉宝付支付</span></h4>
+    <ul>
+      <li>去掉<b>宝付支付</b>，支付仅保留汇付钱包</li>
+    </ul>
+    <h4><span class="badge">2</span> <span style="vertical-align:middle;">零售市场分账逻辑</span></h4>
+    <div style="text-align:center;margin-top:6px;">
+      <a href="../asset/零售市场分账逻辑.png" target="_blank" title="点击查看原图">
+        <img src="../asset/零售市场分账逻辑.png" alt="零售市场分账逻辑" style="max-width:100%;border-radius:8px;border:1px solid #f0f0f0;cursor:zoom-in;" onclick="event.stopPropagation();">
+      </a>
+      <div style="font-size:12px;color:#86909c;margin-top:6px;">点击图片查看原图</div>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleFuncModal() {
+  var el = document.getElementById('funcModal');
+  el.classList.toggle('show');
+  if (el.classList.contains('show') && !el.dataset.dragged) {
+    el.style.left = '50%'; el.style.top = '50%'; el.style.transform = 'translate(-50%,-50%)';
+  }
+}
+(function() {
+  var modal, titleBar, offX, offY, dragging = false;
+  document.addEventListener('DOMContentLoaded', function() {
+    modal = document.getElementById('funcModal');
+    titleBar = modal.querySelector('.fm-title');
+    titleBar.addEventListener('mousedown', startDrag);
+    titleBar.addEventListener('touchstart', startDragTouch, {passive:true});
+    document.addEventListener('mousemove', onDrag);
+    document.addEventListener('mouseup', endDrag);
+    document.addEventListener('touchmove', onDragTouch, {passive:true});
+    document.addEventListener('touchend', endDrag);
+  });
+  function startDrag(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = e.clientX - rect.left; offY = e.clientY - rect.top; dragging = true; titleBar.style.cursor = 'grabbing'; }
+  function startDragTouch(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; var t = e.touches[0]; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = t.clientX - rect.left; offY = t.clientY - rect.top; dragging = true; }
+  function onDrag(e) { if (!dragging) return; modal.style.left = (e.clientX - offX) + 'px'; modal.style.top = (e.clientY - offY) + 'px'; }
+  function onDragTouch(e) { if (!dragging) return; var t = e.touches[0]; modal.style.left = (t.clientX - offX) + 'px'; modal.style.top = (t.clientY - offY) + 'px'; }
+  function endDrag() { dragging = false; if (titleBar) titleBar.style.cursor = 'grab'; }
+})();
 </script>
 
 </body>

@@ -256,6 +256,41 @@
     .btn-default:hover { background: #f5f5f5; }
     .btn-primary { background: #1a78ff; color: #fff; border: none; padding: 8px 16px; border-radius: 4px; font-size: 14px; cursor: pointer; }
     .btn-primary:hover { background: #0f6ae8; }
+
+    /* 标注圆点 */
+    .badge {
+      display: inline-block;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 5px;
+      border-radius: 50%;
+      background: #ff2d55;
+      color: #fff;
+      font-size: 12px;
+      line-height: 18px;
+      text-align: center;
+      font-weight: 600;
+      box-shadow: 0 1px 3px rgba(255,45,85,0.3);
+    }
+    .badge.sm {
+      min-width: 16px;
+      height: 16px;
+      font-size: 11px;
+      line-height: 16px;
+    }
+
+    /* ── 功能说明浮窗 ── */
+    .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 520px; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 9999; padding: 24px; display: none; }
+    .f-modal.show { display: block; }
+    .f-modal .fm-title { font-size: 16px; font-weight: 600; color: #1a1a2e; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
+    .f-modal .fm-title:active { cursor: grabbing; }
+    .f-modal .fm-close { width: 28px; height: 28px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; color: #666; border: none; flex-shrink: 0; }
+    .f-modal .fm-close:hover { background: #e8e8e8; }
+    .f-modal .fm-body { font-size: 13px; color: #555; line-height: 1.8; }
+    .f-modal .fm-body h4 { font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 16px 0 8px; }
+    .f-modal .fm-body h4:first-child { margin-top: 0; }
+    .f-modal .fm-body ul { padding-left: 18px; margin: 0 0 12px; }
+    .f-modal .fm-body li { margin-bottom: 4px; }
   </style>
 </head>
 <body>
@@ -270,6 +305,7 @@
     </div>
   </div>
   <div class="topbar-right">
+    <button onclick="toggleFuncModal()" style="margin-right:12px;padding:6px 14px;border-radius:6px;background:#f5f7fa;color:#333;border:1px solid #e0e4ea;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:4px;">📖 功能说明</button>
     <span class="avatar">👤</span>
     <span class="name">系统参数设置</span>
     <span class="arrow">▾</span>
@@ -357,21 +393,6 @@
         </div>
         <div class="editor-content" id="openDesc" contenteditable="true"></div>
       </div>
-      <div class="form-group">
-        <label class="form-label">限额说明</label>
-        <div class="editor-toolbar">
-          <button onclick="formatText('bold')"><strong>B</strong></button>
-          <button onclick="formatText('italic')"><em>I</em></button>
-          <button onclick="formatText('underline')"><u>U</u></button>
-          <button onclick="formatText('strikeThrough')"><s>S</s></button>
-          <button onclick="formatText('insertUnorderedList')">☰</button>
-          <button onclick="formatText('insertOrderedList')">☷</button>
-          <button onclick="formatText('justifyLeft')">↵</button>
-          <button onclick="formatText('justifyCenter')">↔</button>
-          <button onclick="formatText('justifyRight')">↪</button>
-        </div>
-        <div class="editor-content" id="limitDesc" contenteditable="true"></div>
-      </div>
     </div>
     <div class="modal-footer">
       <button class="btn-default" onclick="closeModal()">取消</button>
@@ -389,7 +410,6 @@
     document.getElementById('logoUploadArea').innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><span>上传</span>';
     document.getElementById('logoUploadArea').className = 'logo-upload';
     document.getElementById('openDesc').innerHTML = '';
-    document.getElementById('limitDesc').innerHTML = '';
     document.getElementById('walletModal').classList.add('show');
   }
   function editWallet(id) {
@@ -399,11 +419,9 @@
     if (id === 1) {
       document.getElementById('walletName').value = '汇付钱包';
       document.getElementById('openDesc').innerHTML = '<p>汇付钱包是第三方支付平台，支持多种支付方式。</p>';
-      document.getElementById('limitDesc').innerHTML = '<p>单笔限额：5000元</p><p>每日限额：50000元</p>';
     } else if (id === 2) {
       document.getElementById('walletName').value = '宝付钱包';
       document.getElementById('openDesc').innerHTML = '<p>宝付钱包是金融级支付解决方案。</p>';
-      document.getElementById('limitDesc').innerHTML = '<p>单笔限额：10000元</p><p>每日限额：100000元</p>';
     }
   }
   function viewWallet(id) {
@@ -412,14 +430,12 @@
     document.getElementById('walletName').disabled = true;
     document.getElementById('logoUploadArea').style.pointerEvents = 'none';
     document.getElementById('openDesc').contentEditable = false;
-    document.getElementById('limitDesc').contentEditable = false;
   }
   function closeModal() {
     document.getElementById('walletModal').classList.remove('show');
     document.getElementById('walletName').disabled = false;
     document.getElementById('logoUploadArea').style.pointerEvents = '';
     document.getElementById('openDesc').contentEditable = true;
-    document.getElementById('limitDesc').contentEditable = true;
   }
   function handleLogoUpload(input) {
     var file = input.files[0];
@@ -444,6 +460,56 @@
     var toggle = row.querySelector('.toggle-switch');
     toggle.classList.toggle('on');
   }
+</script>
+
+<!-- ====== 功能说明浮窗 ====== -->
+<div class="f-modal" id="funcModal">
+  <div class="fm-title">
+    <span>📖 功能说明</span>
+    <button class="fm-close" onclick="toggleFuncModal()">✕</button>
+  </div>
+  <div style="font-size:13px;font-weight:600;color:#e74c5e;margin:-6px 0 12px;">平台</div>
+  <div class="fm-body">
+    <p style="margin:0 0 12px;color:#666">钱包管理：用于平台维护第三方支付钱包信息（汇付钱包、宝付钱包等）。</p>
+    <h4>一、钱包列表</h4>
+    <ul>
+      <li>展示钱包的<b>logo、钱包名称、创建时间</b></li>
+      <li>每条记录支持<b>修改、查看</b>，并可<b>启用/停用</b>（开关切换）</li>
+    </ul>
+    <h4>二、新增/修改钱包</h4>
+    <ul>
+      <li>点击「新增钱包」或「修改」打开弹窗</li>
+      <li>填写<b>钱包名称</b>、上传<b>logo</b>、编辑<b>开通说明</b>（富文本）</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+function toggleFuncModal() {
+  var el = document.getElementById('funcModal');
+  el.classList.toggle('show');
+  if (el.classList.contains('show') && !el.dataset.dragged) {
+    el.style.left = '50%'; el.style.top = '50%'; el.style.transform = 'translate(-50%,-50%)';
+  }
+}
+(function() {
+  var modal, titleBar, offX, offY, dragging = false;
+  document.addEventListener('DOMContentLoaded', function() {
+    modal = document.getElementById('funcModal');
+    titleBar = modal.querySelector('.fm-title');
+    titleBar.addEventListener('mousedown', startDrag);
+    titleBar.addEventListener('touchstart', startDragTouch, {passive:true});
+    document.addEventListener('mousemove', onDrag);
+    document.addEventListener('mouseup', endDrag);
+    document.addEventListener('touchmove', onDragTouch, {passive:true});
+    document.addEventListener('touchend', endDrag);
+  });
+  function startDrag(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = e.clientX - rect.left; offY = e.clientY - rect.top; dragging = true; titleBar.style.cursor = 'grabbing'; }
+  function startDragTouch(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; var t = e.touches[0]; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = t.clientX - rect.left; offY = t.clientY - rect.top; dragging = true; }
+  function onDrag(e) { if (!dragging) return; modal.style.left = (e.clientX - offX) + 'px'; modal.style.top = (e.clientY - offY) + 'px'; }
+  function onDragTouch(e) { if (!dragging) return; var t = e.touches[0]; modal.style.left = (t.clientX - offX) + 'px'; modal.style.top = (t.clientY - offY) + 'px'; }
+  function endDrag() { dragging = false; if (titleBar) titleBar.style.cursor = 'grab'; }
+})();
 </script>
 
 </body>

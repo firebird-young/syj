@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>资金账号管理</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+            background: #f0f2f5;
+            color: #1a1a2e;
+            font-size: 14px;
+        }
+
+        .topbar {
+            background: #fff;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .topbar-left { display: flex; align-items: center; gap: 16px; }
+        .menu-btn {
+            width: 32px; height: 32px;
+            border: 1px solid #d0d5dd;
+            border-radius: 4px;
+            background: #fff;
+            color: #6b7588;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+        .menu-btn:hover { background: #f5f5f7; }
+        .breadcrumb { font-size: 13px; color: #6b7588; }
+        .breadcrumb .active { color: #1a1a2e; }
+        .topbar-right {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        .topbar-right .avatar {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            background: #f5deb3;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px;
+        }
+        .topbar-right .name { font-size: 13px; }
+        .topbar-right .arrow { color: #9ba6b9; font-size: 12px; }
+
+        /* 资金汇总卡片 */
+        .summary-row {
+            display: flex;
+            gap: 12px;
+            padding: 12px;
+        }
+        .summary-card {
+            flex: 1;
+            background: #fff;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        }
+        .sc-head {
+            padding: 16px 18px 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        .sc-head .label {
+            font-size: 14px;
+            color: #4e5a6e;
+            font-weight: 500;
+        }
+        .sc-head .amount {
+            font-size: 22px;
+            font-weight: 700;
+            margin-top: 6px;
+        }
+        .sc-head .amount.bff { color: #e67e22; }
+        .sc-head .amount.hf { color: #4f7cff; }
+        .sc-head .btn {
+            background: #1a78ff;
+            color: #fff;
+            border: none;
+            padding: 5px 16px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .sc-head .btn:hover { background: #0f6ae8; }
+        .sc-actions {
+            display: flex;
+            border-top: 1px solid #f5f5f7;
+        }
+        .sc-action {
+            flex: 1;
+            padding: 12px 10px;
+            text-align: center;
+            font-size: 13px;
+            color: #1a78ff;
+            cursor: pointer;
+            border-right: 1px solid #f5f5f7;
+        }
+        .sc-action:last-child { border-right: none; }
+        .sc-action:hover { background: #f5f8ff; }
+
+        /* 筛选区 */
+        .filter-bar {
+            background: #fff;
+            margin: 0 12px 12px;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            border-radius: 6px;
+        }
+        .filter-item {
+            display: flex;
+            align-items: center;
+            margin-right: 16px;
+            margin-bottom: 4px;
+        }
+        .filter-label {
+            font-size: 13px;
+            color: #4e5a6e;
+            margin-right: 8px;
+            white-space: nowrap;
+        }
+        .filter-input {
+            width: 160px;
+            height: 30px;
+            padding: 0 10px;
+            border: 1px solid #d0d5dd;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #1a1a2e;
+            outline: none;
+        }
+        .filter-input:focus { border-color: #1a78ff; }
+        .filter-select {
+            width: 160px;
+            height: 30px;
+            padding: 0 10px;
+            border: 1px solid #d0d5dd;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #1a1a2e;
+            outline: none;
+            background: #fff;
+        }
+        .filter-date-input {
+            width: 130px;
+            height: 30px;
+            padding: 0 10px;
+            border: 1px solid #d0d5dd;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #1a1a2e;
+            outline: none;
+        }
+        .filter-sep {
+            font-size: 13px;
+            color: #9ba6b9;
+            margin: 0 6px;
+        }
+        .filter-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: auto;
+        }
+        .btn-search {
+            background: #1a78ff;
+            color: #fff;
+            border: none;
+            padding: 0 14px;
+            height: 30px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .btn-search:hover { background: #0f6ae8; }
+        .btn-reset {
+            background: #f59e0b;
+            color: #fff;
+            border: none;
+            padding: 0 14px;
+            height: 30px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .btn-reset:hover { background: #e08d04; }
+
+        /* 表格 */
+        .table-card {
+            background: #fff;
+            margin: 0 12px 12px;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .table th {
+            background: #fafbfc;
+            padding: 14px 16px;
+            text-align: left;
+            font-size: 13px;
+            color: #4e5a6e;
+            font-weight: 500;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .table td {
+            padding: 14px 16px;
+            font-size: 13px;
+            color: #1a1a2e;
+            border-bottom: 1px solid #f5f5f7;
+        }
+        .table tr:last-child td { border-bottom: none; }
+        .col-sort {
+            display: inline-block;
+            margin-left: 4px;
+            color: #c0c8d4;
+            cursor: pointer;
+        }
+
+        .pagination {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 8px;
+            font-size: 13px;
+            color: #4e5a6e;
+        }
+        .pagination .total { margin-right: 16px; }
+        .page-btn {
+            min-width: 28px;
+            height: 28px;
+            padding: 0 8px;
+            background: #fff;
+            border: 1px solid #d0d5dd;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #4e5a6e;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .page-btn:hover { color: #1a78ff; border-color: #1a78ff; }
+        .page-btn.active {
+            background: #1a78ff;
+            color: #fff;
+            border-color: #1a78ff;
+        }
+        .page-jump {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-left: 12px;
+        }
+        .page-jump input {
+            width: 48px;
+            height: 28px;
+            border: 1px solid #d0d5dd;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 13px;
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="topbar">
+    <div class="topbar-left">
+        <button class="menu-btn">≡</button>
+        <div class="breadcrumb">
+            <span>首页</span> /
+            <span class="active">资金账号管理</span>
+        </div>
+    </div>
+    <div class="topbar-right">
+        <span class="avatar">👤</span>
+        <span class="name">系统参数设置</span>
+        <span class="arrow">▾</span>
+    </div>
+</div>
+
+<!-- 资金汇总卡片 -->
+<div class="summary-row">
+    <div class="summary-card">
+        <div class="sc-head">
+            <div>
+                <div class="label">宝付钱包余额</div>
+                <div class="amount bff">128.00</div>
+            </div>
+            <button class="btn">提现</button>
+        </div>
+        <div class="sc-actions">
+            <div class="sc-action">冻结释放记录</div>
+            <div class="sc-action">产品交易金划转</div>
+        </div>
+    </div>
+    <div class="summary-card">
+        <div class="sc-head">
+            <div>
+                <div class="label">汇付钱包余额</div>
+                <div class="amount hf">3,286.50</div>
+            </div>
+        </div>
+        <div class="sc-actions">
+            <div class="sc-action">冻结释放记录</div>
+        </div>
+    </div>
+</div>
+
+<!-- 筛选区 -->
+<div class="filter-bar">
+    <div class="filter-item">
+        <span class="filter-label">用途</span>
+        <input class="filter-input" placeholder="请输入用途">
+    </div>
+    <div class="filter-item">
+        <span class="filter-label">类型</span>
+        <select class="filter-select">
+            <option>请选择类型</option>
+            <option>现金奖励</option>
+            <option>服务商推广服务费</option>
+            <option>产品奖励</option>
+            <option>交易买入</option>
+            <option>交易卖出</option>
+            <option>批发佣金支出</option>
+            <option>运营服务费</option>
+            <option>零售佣金支出</option>
+        </select>
+    </div>
+    <div class="filter-item">
+        <span class="filter-label">时间</span>
+        <input class="filter-date-input" placeholder="开始日期">
+        <span class="filter-sep">至</span>
+        <input class="filter-date-input" placeholder="结束日期">
+    </div>
+    <div class="filter-actions">
+        <button class="btn-search">🔍 搜 索</button>
+        <button class="btn-reset">重 置</button>
+    </div>
+</div>
+
+<!-- 表格 -->
+<div class="table-card">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>支付渠道单号</th>
+                <th>类型</th>
+                <th>总金额</th>
+                <th>实付金额</th>
+                <th>平台手续费</th>
+                <th>用途</th>
+                <th>支付渠道</th>
+                <th>创建时间 <span class="col-sort">⇅</span></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>20260525144513010373000001190727</td><td>批发佣金支出</td><td>1.86</td><td>1.86</td><td>0</td><td>提前结案-批发分佣</td><td>宝付钱包</td><td>2026-05-25 14:45:14</td></tr>
+            <tr><td>20260525144512010373000001190726</td><td>服务商推广服务费</td><td>12.4</td><td>12.4</td><td>0</td><td>提前结案-服务商推广服务费</td><td>汇付钱包</td><td>2026-05-25 14:45:13</td></tr>
+            <tr><td>20260409000000010373000001187002</td><td>零售佣金支出</td><td>0.24</td><td>0.24</td><td>0</td><td>印度阿三-零售分佣</td><td>宝付钱包</td><td>2026-04-09 00:00:01</td></tr>
+            <tr><td>20260408160404010373000001186994</td><td>批发佣金支出</td><td>0.06</td><td>0.06</td><td>0</td><td>45发首发-批发分佣</td><td>汇付钱包</td><td>2026-04-08 16:04:05</td></tr>
+            <tr><td>20260408160404010373000001186993</td><td>批发佣金支出</td><td>0.15</td><td>0.15</td><td>0</td><td>45发首发-批发分佣</td><td>宝付钱包</td><td>2026-04-08 16:04:04</td></tr>
+            <tr><td>20260408160403010373000001186992</td><td>批发佣金支出</td><td>0.03</td><td>0.03</td><td>0</td><td>45发首发-批发分佣</td><td>汇付钱包</td><td>2026-04-08 16:04:04</td></tr>
+            <tr><td>20260408160403010373000001186991</td><td>批发佣金支出</td><td>0.01</td><td>0.01</td><td>0</td><td>45发首发-批发分佣</td><td>宝付钱包</td><td>2026-04-08 16:04:03</td></tr>
+            <tr><td>20260408160402010373000001186990</td><td>批发佣金支出</td><td>0.01</td><td>0.01</td><td>0</td><td>45发首发-批发分佣</td><td>汇付钱包</td><td>2026-04-08 16:04:03</td></tr>
+            <tr><td>20260408160401010373000001186989</td><td>批发佣金支出</td><td>0.01</td><td>0.01</td><td>0</td><td>45发首发-批发分佣</td><td>宝付钱包</td><td>2026-04-08 16:04:02</td></tr>
+            <tr><td>20260408160401010373000001186988</td><td>批发佣金支出</td><td>0.01</td><td>0.01</td><td>0</td><td>45发首发-批发分佣</td><td>汇付钱包</td><td>2026-04-08 16:04:02</td></tr>
+        </tbody>
+    </table>
+
+    <div class="pagination">
+        <span class="total">共 15660 条</span>
+        <button class="page-btn">‹</button>
+        <button class="page-btn active">1</button>
+        <button class="page-btn">2</button>
+        <button class="page-btn">3</button>
+        <button class="page-btn">4</button>
+        <button class="page-btn">5</button>
+        <span style="color:#9ba6b9;">...</span>
+        <button class="page-btn">1566</button>
+        <button class="page-btn">›</button>
+        <div class="page-jump">10条/页</div>
+    </div>
+</div>
+
+</body>
+</html>
