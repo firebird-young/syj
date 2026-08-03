@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>购买详情</title>
+    <title>订单详情</title>
     <style>
         * { margin:0; padding:0; box-sizing:border-box; }
         body {
@@ -60,22 +60,60 @@
             margin-bottom: 14px;
         }
         .product-img {
-            width: 60px;
-            height: 60px;
+            width: 72px;
+            height: 72px;
             border-radius: 6px;
-            background-image: linear-gradient(135deg, #d8d2c5 0%, #a89778 100%);
+            background-image: linear-gradient(135deg, #e6dccd 0%, #b8a47e 100%);
             flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: #fff;
+            border: 1px solid #e6e6e6;
         }
-        .product-detail { flex: 1; min-width: 0; padding-top: 2px; }
+        .product-detail {
+            flex: 1;
+            min-width: 0;
+            padding-top: 2px;
+            position: relative;
+        }
         .product-name {
-            font-size: 14px;
-            font-weight: 500;
+            font-size: 15px;
+            font-weight: 600;
             color: #1a1a2e;
             margin-bottom: 4px;
         }
         .product-code {
             font-size: 12px;
             color: #86909c;
+        }
+        .product-x {
+            font-size: 12px;
+            color: #86909c;
+            margin-top: 4px;
+        }
+        .status-tag {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: #e6f7eb;
+            color: #1aab67;
+            font-size: 12px;
+            padding: 3px 10px;
+            border-radius: 4px;
+        }
+        .product-price {
+            text-align: right;
+            font-size: 16px;
+            font-weight: 600;
+            color: #e74c5e;
+            margin-top: 4px;
+        }
+        .divider {
+            height: 1px;
+            background: #f0f0f0;
+            margin: 4px 0;
         }
         .info-row {
             display: flex;
@@ -98,11 +136,6 @@
         .info-value .link {
             color: #1a78ff;
             cursor: pointer;
-        }
-        .divider {
-            height: 1px;
-            background: #f0f0f0;
-            margin: 4px 0;
         }
 
         /* 标注圆点 */
@@ -140,55 +173,67 @@
 
     <div class="header">
         <span class="back">‹</span>
-        购买详情
+        订单详情
     </div>
 
     <!-- 订单信息卡片 -->
     <div class="order-card">
         <div class="product-info">
-            <div class="product-img"></div>
+            <div class="product-img">浮休东坡</div>
             <div class="product-detail">
-                <div class="product-name">永淳·夏日帖</div>
-                <div class="product-code">XB000004</div>
+                <div class="product-name">东坡东坡</div>
+                <div class="product-code">TS000006</div>
+                <div class="product-x">x2</div>
+                <span class="status-tag">已成交</span>
+                <div class="product-price">¥4.10</div>
             </div>
         </div>
 
         <div class="divider"></div>
 
         <div class="info-row">
-            <span class="info-label">单价</span>
-            <span class="info-value">¥128.00</span>
+            <span class="info-label">成交总价</span>
+            <span class="info-value price-red">¥4.18</span>
         </div>
         <div class="info-row">
-            <span class="info-label">数量</span>
-            <span class="info-value">4</span>
+            <span class="info-label">购买数量</span>
+            <span class="info-value">2</span>
         </div>
         <div class="info-row">
-            <span class="info-label">实付款</span>
-            <span class="info-value price-red">¥512.00</span>
+            <span class="info-label">手续费</span>
+            <span class="info-value">¥0.04+0.04（第三方付）</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">交易方</span>
+            <span class="info-value">••••••7349</span>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="info-row">
+            <span class="info-label">创建时间</span>
+            <span class="info-value">2024-12-30 14:08:28</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">支付时间</span>
+            <span class="info-value">2024-12-30 14:10:04</span>
         </div>
         <div class="info-row">
             <span class="info-label">支付渠道</span>
-            <span class="info-value">汇付</span>
+            <span class="info-value">
+                <select id="payChannel" style="border:1px solid #d0d5dd;border-radius:4px;padding:4px 8px;font-size:13px;color:#1a1a2e;background:#fff;font-family:inherit;">
+                    <option value="汇付">汇付</option>
+                    <option value="宝付">宝付</option>
+                </select>
+            </span>
         </div>
 
         <div class="divider"></div>
 
         <div class="info-row">
             <span class="info-label">订单编号</span>
-            <span class="info-value">XB-first25101504302601</span>
+            <span class="info-value">XB-tcbuy24123005090801</span>
         </div>
-        <div class="info-row">
-            <span class="info-label">创建时间</span>
-            <span class="info-value">2025-10-15 11:57:08</span>
-        </div>
-        <div class="info-row">
-            <span class="info-label">支付时间</span>
-            <span class="info-value">2025-10-15 11:57:30</span>
-        </div>
-
-        <div class="divider"></div>
-
         <div class="info-row">
             <span class="info-label">产品交割单</span>
             <span class="info-value"><span class="link">查看</span></span>
@@ -198,7 +243,7 @@
 
         <div class="info-row">
             <span class="info-label">产品编号</span>
-            <span class="info-value">#002 &nbsp;#003 &nbsp;#004 &nbsp;#006</span>
+            <span class="info-value">#008 &nbsp;#009</span>
         </div>
     </div>
 
@@ -214,22 +259,13 @@
     <button class="fm-close" onclick="toggleFuncModal()">✕</button>
   </div>
   <div class="fm-body">
-    <h4><span class="badge">1</span> <span style="vertical-align:middle;">新增支付渠道</span></h4>
+    <h4><span class="badge">1</span> <span style="vertical-align:middle;">增加支付渠道</span></h4>
     <ul>
-      <li>新增<b>支付渠道</b>字段（汇付/宝付）</li>
-      <li>兼容老数据：没记录渠道的显示为<b>「宝付」</b></li>
+      <li>订单详情增加<b>支付渠道</b>信息</li>
     </ul>
-    <h4><span class="badge">2</span> <span style="vertical-align:middle;">新增订单时间字段</span></h4>
+    <h4><span class="badge">2</span> <span style="vertical-align:middle;">添加产品编号</span></h4>
     <ul>
-      <li><b>创建时间</b>：所有订单状态都有</li>
-      <li><b>支付时间</b>：已支付的订单才有</li>
-      <li><b>取消时间</b>：已取消的订单才有</li>
-      <li>去掉原「购买时间」字段</li>
-    </ul>
-    <h4><span class="badge">3</span> <span style="vertical-align:middle;">数量与产品编号</span></h4>
-    <ul>
-      <li>订单购买<b>数量</b>展示（此处示例为 4）</li>
-      <li>最下方展示该订单对应的<b>产品编号</b>（如 #002 #003 #004 #006）</li>
+      <li>底部展示该订单对应的<b>产品编号</b>（如 #008 #009）</li>
     </ul>
   </div>
 </div>

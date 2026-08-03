@@ -216,6 +216,108 @@
             font-size: 13px;
             outline: none;
         }
+
+        /* 筛选区 */
+        .filter-bar {
+            background: #fff;
+            margin: 12px 0 0;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            border-radius: 6px;
+        }
+        .filter-item {
+            display: flex;
+            align-items: center;
+            margin-right: 12px;
+            margin-bottom: 4px;
+        }
+        .filter-input {
+            width: 150px;
+            height: 30px;
+            padding: 0 10px;
+            border: 1px solid #d0d5dd;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #1a1a2e;
+            outline: none;
+        }
+        .filter-input:focus { border-color: #1a78ff; }
+        .filter-select {
+            width: 130px;
+            height: 30px;
+            padding: 0 10px;
+            border: 1px solid #d0d5dd;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #1a1a2e;
+            outline: none;
+            background: #fff;
+        }
+        .filter-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: auto;
+        }
+        .btn-search {
+            background: #1a78ff;
+            color: #fff;
+            border: none;
+            padding: 0 14px;
+            height: 30px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .btn-search:hover { background: #0f6ae8; }
+        .btn-reset {
+            background: #f59e0b;
+            color: #fff;
+            border: none;
+            padding: 0 14px;
+            height: 30px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .btn-reset:hover { background: #e08d04; }
+
+        /* 标注圆点 */
+        .badge {
+            display: inline-block;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 5px;
+            border-radius: 50%;
+            background: #ff2d55;
+            color: #fff;
+            font-size: 12px;
+            line-height: 18px;
+            text-align: center;
+            font-weight: 600;
+            box-shadow: 0 1px 3px rgba(255,45,85,0.3);
+        }
+        .badge.sm {
+            min-width: 16px;
+            height: 16px;
+            font-size: 11px;
+            line-height: 16px;
+        }
+
+        /* ── 功能说明浮窗 ── */
+        .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 580px; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 9999; padding: 24px; display: none; }
+        .f-modal.show { display: block; }
+        .f-modal .fm-title { font-size: 16px; font-weight: 600; color: #1a1a2e; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
+        .f-modal .fm-title:active { cursor: grabbing; }
+        .f-modal .fm-close { width: 28px; height: 28px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; color: #666; border: none; flex-shrink: 0; }
+        .f-modal .fm-close:hover { background: #e8e8e8; }
+        .f-modal .fm-body { font-size: 13px; color: #555; line-height: 1.8; }
+        .f-modal .fm-body h4 { font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 16px 0 8px; }
+        .f-modal .fm-body h4:first-child { margin-top: 0; }
+        .f-modal .fm-body ul { padding-left: 18px; margin: 0 0 12px; }
+        .f-modal .fm-body li { margin-bottom: 4px; }
     </style>
 </head>
 <body>
@@ -229,6 +331,7 @@
         </div>
     </div>
     <div class="topbar-right">
+        <button onclick="toggleFuncModal()" style="margin-right:12px;padding:6px 14px;border-radius:6px;background:#f5f7fa;color:#333;border:1px solid #e0e4ea;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:4px;">📖 功能说明</button>
         <span class="avatar">👤</span>
         <span class="name">系统参数设置</span>
         <span class="arrow">▾</span>
@@ -262,6 +365,34 @@
         <div class="tab" data-tab="expense" onclick="selectTab(this)">支出明细</div>
     </div>
 
+    <!-- 筛选区 -->
+    <div class="filter-bar">
+        <div class="filter-item">
+            <input type="text" class="filter-input" id="fProduct" placeholder="产品名称">
+        </div>
+        <div class="filter-item">
+            <select class="filter-select" id="fStage">
+                <option value="">阶段</option>
+                <option>批发市场</option>
+                <option>零售市场</option>
+            </select>
+        </div>
+        <div class="filter-item">
+            <input type="text" class="filter-input" id="fOrderNo" placeholder="订单编号">
+        </div>
+        <div class="filter-item">
+            <select class="filter-select" id="fChannel">
+                <option value="">支付渠道</option>
+                <option>宝付钱包</option>
+                <option>汇付钱包</option>
+            </select>
+        </div>
+        <div class="filter-actions">
+            <button class="btn-search" onclick="applyFilter()">🔍 搜索</button>
+            <button class="btn-reset" onclick="resetFilter()">↻ 重置</button>
+        </div>
+    </div>
+
     <!-- 表格 -->
     <div class="table-card">
         <table class="table" id="tableEl">
@@ -287,16 +418,19 @@
 
 <script>
 var incomeData = [
-    { product: '中路财童', stage: '零售市场', createTime: '2026-01-22 14:49:31', updateTime: '2026-01-22 14:49:31', amount: '+1157.79', channel: '宝付钱包' },
-    { product: '榜样-统一', stage: '零售市场', createTime: '2026-01-22 16:54:45', updateTime: '2026-01-22 16:54:45', amount: '+1.95', channel: '汇付钱包' },
-    { product: '青莲-舒展', stage: '零售市场', createTime: '2026-01-22 17:43:26', updateTime: '2026-01-22 17:43:26', amount: '+442.45', channel: '宝付钱包' },
-    { product: '东坡-惜春', stage: '零售市场', createTime: '2026-01-23 10:44:30', updateTime: '2026-01-23 10:44:30', amount: '+4909.68', channel: '汇付钱包' },
-    { product: '东坡-虚静', stage: '零售市场', createTime: '2026-01-26 15:06:58', updateTime: '2026-01-26 15:06:58', amount: '+2408.00', channel: '宝付钱包' },
-    { product: '东坡-神气', stage: '零售市场', createTime: '2026-01-27 11:44:03', updateTime: '2026-01-27 11:44:03', amount: '+3.20', channel: '宝付钱包' },
-    { product: '东坡-安心', stage: '零售市场', createTime: '2026-04-02 14:59:51', updateTime: '2026-04-02 14:59:51', amount: '+250.00', channel: '汇付钱包' },
+    { product: '中路财童', stage: '零售市场', orderNo: 'XB-zc2608010001', tradeAmount: '1000.00', fee: '0.00', createTime: '2026-08-01 10:05:00', updateTime: '2026-08-01 10:05:00', amount: '+150.00', channel: '汇付钱包' },
+    { product: '中路财童', stage: '零售市场', orderNo: 'XB-zc2608010001', tradeAmount: '1000.00', fee: '0.00', createTime: '2026-08-01 10:06:00', updateTime: '2026-08-01 10:06:00', amount: '+250.00', channel: '汇付钱包' },
+    { product: '中路财童', stage: '批发市场', orderNo: 'XB-zc2608010001', tradeAmount: '1000.00', fee: '6.00', createTime: '2026-08-01 9:30:00', updateTime: '2026-08-01 9:30:00', amount: '+244.00', channel: '汇付钱包' },
+    { product: '东坡-君子', stage: '零售市场', createTime: '2026-05-25 14:45:12', updateTime: '2026-05-25 14:45:12', amount: '+15.50', channel: '宝付钱包' },
+    { product: '东坡-万里', stage: '零售市场', createTime: '2026-04-08 16:04:00', updateTime: '2026-04-08 16:04:00', amount: '+2.41', channel: '宝付钱包' },
     { product: '东坡-大顺', stage: '零售市场', createTime: '2026-04-03 15:09:41', updateTime: '2026-04-03 15:09:41', amount: '+2.30', channel: '宝付钱包' },
-    { product: '东坡-万里', stage: '零售市场', createTime: '2026-04-08 16:04:00', updateTime: '2026-04-08 16:04:00', amount: '+2.41', channel: '汇付钱包' },
-    { product: '东坡-君子', stage: '零售市场', createTime: '2026-05-25 14:45:12', updateTime: '2026-05-25 14:45:12', amount: '+15.50', channel: '宝付钱包' }
+    { product: '东坡-安心', stage: '零售市场', createTime: '2026-04-02 14:59:51', updateTime: '2026-04-02 14:59:51', amount: '+250.00', channel: '宝付钱包' },
+    { product: '东坡-神气', stage: '零售市场', createTime: '2026-01-27 11:44:03', updateTime: '2026-01-27 11:44:03', amount: '+3.20', channel: '宝付钱包' },
+    { product: '东坡-虚静', stage: '零售市场', createTime: '2026-01-26 15:06:58', updateTime: '2026-01-26 15:06:58', amount: '+2408.00', channel: '宝付钱包' },
+    { product: '东坡-惜春', stage: '零售市场', createTime: '2026-01-23 10:44:30', updateTime: '2026-01-23 10:44:30', amount: '+4909.68', channel: '宝付钱包' },
+    { product: '青莲-舒展', stage: '零售市场', createTime: '2026-01-22 17:43:26', updateTime: '2026-01-22 17:43:26', amount: '+442.45', channel: '宝付钱包' },
+    { product: '榜样-统一', stage: '零售市场', createTime: '2026-01-22 16:54:45', updateTime: '2026-01-22 16:54:45', amount: '+1.95', channel: '宝付钱包' },
+    { product: '中路财童', stage: '零售市场', createTime: '2026-01-22 14:49:31', updateTime: '2026-01-22 14:49:31', amount: '+1157.79', channel: '宝付钱包' }
 ];
 
 var expenseData = [
@@ -310,6 +444,9 @@ function renderHead() {
         '<tr>',
         '    <th>产品名称</th>',
         '    <th>阶段</th>',
+        '    <th>订单编号</th>',
+        '    <th>交易金额</th>',
+        '    <th>手续费</th>',
         '    <th>创建时间 <span class="col-sort">⇅</span></th>',
         '    <th>修改时间 <span class="col-sort">⇅</span></th>',
         '    <th>支付渠道</th>',
@@ -318,9 +455,24 @@ function renderHead() {
     ].join('');
 }
 
+function getFilteredData() {
+    var data = currentTab === 'income' ? incomeData : expenseData;
+    var fProduct = document.getElementById('fProduct').value.trim();
+    var fStage = document.getElementById('fStage').value;
+    var fOrderNo = document.getElementById('fOrderNo').value.trim();
+    var fChannel = document.getElementById('fChannel').value;
+    return data.filter(function(o) {
+        if (fProduct && o.product.indexOf(fProduct) < 0) return false;
+        if (fStage && o.stage !== fStage) return false;
+        if (fOrderNo && (o.orderNo || '').indexOf(fOrderNo) < 0) return false;
+        if (fChannel && o.channel !== fChannel) return false;
+        return true;
+    });
+}
+
 function renderTable() {
     renderHead();
-    var data = currentTab === 'income' ? incomeData : expenseData;
+    var data = getFilteredData();
     var html = '';
     data.forEach(function(o) {
         var amountClass = o.amount.charAt(0) === '+' ? 'amount-pos' : 'amount-neg';
@@ -328,6 +480,9 @@ function renderTable() {
             '<tr>',
             '    <td>' + o.product + '</td>',
             '    <td>' + o.stage + '</td>',
+            '    <td>' + (o.orderNo || '-') + '</td>',
+            '    <td>' + (o.tradeAmount || '-') + '</td>',
+            '    <td>' + (o.fee || '-') + '</td>',
             '    <td>' + o.createTime + '</td>',
             '    <td>' + o.updateTime + '</td>',
             '    <td>' + o.channel + '</td>',
@@ -346,7 +501,75 @@ function selectTab(el) {
     renderTable();
 }
 
+function applyFilter() {
+    renderTable();
+}
+
+function resetFilter() {
+    document.getElementById('fProduct').value = '';
+    document.getElementById('fStage').value = '';
+    document.getElementById('fOrderNo').value = '';
+    document.getElementById('fChannel').value = '';
+    renderTable();
+}
+
 renderTable();
+</script>
+
+<!-- ====== 功能说明浮窗 ====== -->
+<div class="f-modal" id="funcModal">
+  <div class="fm-title">
+    <span>📖 功能说明</span>
+    <button class="fm-close" onclick="toggleFuncModal()">✕</button>
+  </div>
+  <div style="font-size:13px;font-weight:600;color:#e74c5e;margin:-6px 0 12px;">批发商后台</div>
+  <div class="fm-body">
+    <h4><span class="badge">1</span> <span style="vertical-align:middle;color:#e74c5e;font-weight:600;">第三方支付开户统一汇总</span></h4>
+    <ul>
+      <li>原认证流程里<b>去掉输入信息自动调用第三方支付平台开户的流程</b>，全部统一汇总到<b>我的资产</b>页面</li>
+      <li>顶部展示已经接入的<b>第三方支付</b></li>
+      <li>未开通的展示<b>开通按钮</b>，调用第三方支付平台进行开户</li>
+      <li>开通后展示<b>余额</b>和<b>提现按钮</b></li>
+    </ul>
+    <h4><span class="badge">2</span> <span style="vertical-align:middle;">增加筛选项</span></h4>
+    <ul>
+      <li>增加按<b>产品名称、阶段、订单编号、支付渠道</b>的筛选</li>
+      <li>支持搜索与重置</li>
+    </ul>
+    <h4><span class="badge">3</span> <span style="vertical-align:middle;">增加列</span></h4>
+    <ul>
+      <li>列表增加<b>订单编号、交易金额、手续费</b>三列</li>
+      <li>老数据这三项为空，展示「-」</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+function toggleFuncModal() {
+  var el = document.getElementById('funcModal');
+  el.classList.toggle('show');
+  if (el.classList.contains('show') && !el.dataset.dragged) {
+    el.style.left = '50%'; el.style.top = '50%'; el.style.transform = 'translate(-50%,-50%)';
+  }
+}
+(function() {
+  var modal, titleBar, offX, offY, dragging = false;
+  document.addEventListener('DOMContentLoaded', function() {
+    modal = document.getElementById('funcModal');
+    titleBar = modal.querySelector('.fm-title');
+    titleBar.addEventListener('mousedown', startDrag);
+    titleBar.addEventListener('touchstart', startDragTouch, {passive:true});
+    document.addEventListener('mousemove', onDrag);
+    document.addEventListener('mouseup', endDrag);
+    document.addEventListener('touchmove', onDragTouch, {passive:true});
+    document.addEventListener('touchend', endDrag);
+  });
+  function startDrag(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = e.clientX - rect.left; offY = e.clientY - rect.top; dragging = true; titleBar.style.cursor = 'grabbing'; }
+  function startDragTouch(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; var t = e.touches[0]; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = t.clientX - rect.left; offY = t.clientY - rect.top; dragging = true; }
+  function onDrag(e) { if (!dragging) return; modal.style.left = (e.clientX - offX) + 'px'; modal.style.top = (e.clientY - offY) + 'px'; }
+  function onDragTouch(e) { if (!dragging) return; var t = e.touches[0]; modal.style.left = (t.clientX - offX) + 'px'; modal.style.top = (t.clientY - offY) + 'px'; }
+  function endDrag() { dragging = false; if (titleBar) titleBar.style.cursor = 'grab'; }
+})();
 </script>
 
 </body>

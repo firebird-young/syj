@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>产品上线设置</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+            background: #f0f2f5;
+            color: #1a1a2e;
+            font-size: 14px;
+            min-height: 100vh;
+        }
+
+        .topbar {
+            background: #fff;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .topbar-left { display: flex; align-items: center; gap: 16px; }
+        .menu-btn {
+            width: 32px; height: 32px;
+            border: 1px solid #d0d5dd;
+            border-radius: 4px;
+            background: #fff;
+            color: #6b7588;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+        .breadcrumb { font-size: 13px; color: #6b7588; }
+        .breadcrumb .active { color: #1a1a2e; }
+        .topbar-right {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        .topbar-right .avatar {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            background: #f5deb3;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px;
+        }
+        .topbar-right .name { font-size: 13px; }
+        .topbar-right .arrow { color: #9ba6b9; font-size: 12px; }
+
+        /* 浮层遮罩 */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        /* 浮层 */
+        .modal {
+            background: #fff;
+            border-radius: 8px;
+            width: 720px;
+            max-width: 95vw;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .modal-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .modal-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a2e;
+        }
+        .modal-close {
+            font-size: 22px;
+            color: #86909c;
+            cursor: pointer;
+            padding: 0 4px;
+            line-height: 1;
+        }
+        .modal-body {
+            padding: 20px 24px;
+            overflow-y: auto;
+            flex: 1;
+        }
+        .modal-footer {
+            padding: 12px 24px;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .form-row {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 18px;
+        }
+        .form-label {
+            width: 130px;
+            flex-shrink: 0;
+            font-size: 13px;
+            color: #1a1a2e;
+            padding-top: 8px;
+            text-align: right;
+            padding-right: 12px;
+        }
+        .form-control { flex: 1; }
+        .form-tip {
+            font-size: 12px;
+            color: #86909c;
+            margin-top: 6px;
+        }
+
+        .cover-box {
+            width: 100px;
+            height: 100px;
+            border-radius: 4px;
+            background-image: linear-gradient(135deg, #d8e0e8 0%, #98a8c4 100%);
+            border: 1px solid #e0e0e0;
+        }
+        .upload-box {
+            width: 88px;
+            height: 88px;
+            border: 1px dashed #d0d5dd;
+            border-radius: 4px;
+            background: #fafbfc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: #c0c8d4;
+            cursor: pointer;
+        }
+        .upload-box:hover { border-color: #1a78ff; color: #1a78ff; }
+        .upload-btn {
+            display: inline-block;
+            background: #1a78ff;
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .editor-toolbar {
+            background: #f5f6f8;
+            border: 1px solid #d0d5dd;
+            border-bottom: none;
+            border-radius: 4px 4px 0 0;
+            padding: 6px 10px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .editor-toolbar button {
+            background: #fff;
+            border: 1px solid #d0d5dd;
+            padding: 2px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 13px;
+            color: #4e5a6e;
+            min-width: 28px;
+        }
+        .editor-toolbar select {
+            border: 1px solid #d0d5dd;
+            border-radius: 3px;
+            padding: 2px 6px;
+            font-size: 13px;
+            color: #4e5a6e;
+            background: #fff;
+        }
+        .editor-content {
+            border: 1px solid #d0d5dd;
+            border-radius: 0 0 4px 4px;
+            min-height: 200px;
+            padding: 12px;
+            background-image: linear-gradient(135deg, #f0e8d8 0%, #c9b88e 100%);
+            background-size: cover;
+            color: #fff;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .form-input {
+            width: 220px;
+            height: 32px;
+            padding: 0 10px;
+            border: 1px solid #d0d5dd;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #1a1a2e;
+            outline: none;
+        }
+        .form-input:focus { border-color: #1a78ff; }
+        .form-select {
+            width: 220px;
+            height: 32px;
+            padding: 0 10px;
+            border: 1px solid #d0d5dd;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #1a1a2e;
+            outline: none;
+            background: #fff;
+        }
+        .number-stepper {
+            display: inline-flex;
+            align-items: center;
+            gap: 0;
+        }
+        .number-stepper button {
+            width: 28px;
+            height: 32px;
+            border: 1px solid #d0d5dd;
+            background: #fafbfc;
+            font-size: 16px;
+            color: #4e5a6e;
+            cursor: pointer;
+        }
+        .number-stepper button:first-child { border-radius: 4px 0 0 4px; border-right: none; }
+        .number-stepper button:last-child { border-radius: 0 4px 4px 0; border-left: none; }
+        .number-stepper input {
+            width: 70px;
+            height: 32px;
+            border: 1px solid #d0d5dd;
+            border-left: none;
+            border-right: none;
+            text-align: center;
+            font-size: 13px;
+            outline: none;
+        }
+        .range-input {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .range-input input {
+            width: 70px;
+            height: 32px;
+            border: 1px solid #d0d5dd;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .btn-default {
+            background: #fff;
+            border: 1px solid #d0d5dd;
+            color: #4e5a6e;
+            padding: 7px 22px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .btn-default:hover { background: #f5f5f5; }
+        .btn-primary {
+            background: #1a78ff;
+            border: none;
+            color: #fff;
+            padding: 7px 22px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .btn-primary:hover { background: #0f6ae8; }
+
+        /* 标注圆点 */
+        .badge {
+            display: inline-block;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 5px;
+            border-radius: 50%;
+            background: #ff2d55;
+            color: #fff;
+            font-size: 12px;
+            line-height: 18px;
+            text-align: center;
+            font-weight: 600;
+            box-shadow: 0 1px 3px rgba(255,45,85,0.3);
+        }
+
+        /* ── 功能说明浮窗 ── */
+        .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 560px; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 99999; padding: 24px; display: none; }
+        .f-modal.show { display: block; }
+        .f-modal .fm-title { font-size: 16px; font-weight: 600; color: #1a1a2e; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
+        .f-modal .fm-title:active { cursor: grabbing; }
+        .f-modal .fm-close { width: 28px; height: 28px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; color: #666; border: none; flex-shrink: 0; }
+        .f-modal .fm-close:hover { background: #e8e8e8; }
+        .f-modal .fm-body { font-size: 13px; color: #555; line-height: 1.8; }
+        .f-modal .fm-body h4 { font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 16px 0 8px; }
+        .f-modal .fm-body ul { padding-left: 18px; margin: 0 0 12px; }
+        .f-modal .fm-body li { margin-bottom: 4px; }
+    </style>
+</head>
+<body>
+
+<div class="topbar">
+    <div class="topbar-left">
+        <button class="menu-btn">≡</button>
+        <div class="breadcrumb">
+            <span>首页</span> /
+            <span class="active">产品上线设置</span>
+        </div>
+    </div>
+    <div class="topbar-right">
+        <button onclick="toggleFuncModal()" style="position:relative;z-index:99999;margin-right:12px;padding:6px 14px;border-radius:6px;background:#f5f7fa;color:#333;border:1px solid #e0e4ea;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:4px;">📖 功能说明</button>
+        <span class="avatar">👤</span>
+        <span class="name">系统参数设置</span>
+        <span class="arrow">▾</span>
+    </div>
+</div>
+
+<!-- 浮层 -->
+<div class="modal-overlay">
+    <div class="modal">
+        <div class="modal-header">
+            <span class="modal-title">参数设置</span>
+            <span class="modal-close">×</span>
+        </div>
+        <div class="modal-body">
+
+            <div class="form-row">
+                <div class="form-label">封面图</div>
+                <div class="form-control">
+                    <div class="cover-box"></div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-label">产品描述</div>
+                <div class="form-control">
+                    <div class="editor-toolbar">
+                        <button><strong>B</strong></button>
+                        <button><em>I</em></button>
+                        <button><u>U</u></button>
+                        <button><s>S</s></button>
+                        <button>"</button>
+                        <button>&lt;</button>
+                        <button>&gt;</button>
+                        <button>↔</button>
+                        <button>↔</button>
+                        <button>三</button>
+                        <button>≡</button>
+                        <select>
+                            <option>14px</option>
+                            <option>12px</option>
+                            <option>16px</option>
+                        </select>
+                        <select>
+                            <option>文本</option>
+                            <option>数字</option>
+                        </select>
+                        <button>A</button>
+                        <button>□</button>
+                        <button>≡</button>
+                        <button>Z</button>
+                        <button>Q</button>
+                        <button>📷</button>
+                        <button>▶</button>
+                    </div>
+                    <div class="editor-content">知心</div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-label">上传背景图</div>
+                <div class="form-control">
+                    <div class="upload-box">+</div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-label">上传视频</div>
+                <div class="form-control">
+                    <label class="upload-btn">
+                        点击上传
+                        <input type="file" accept="video/mp4,video/avi,video/mov,video/wmv" style="display:none;">
+                    </label>
+                    <div class="form-tip">只能上传视频文件(MP4,AVI,MOV,WMV),且只能上传一个文件</div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-label">3D模型上传</div>
+                <div class="form-control">
+                    <label class="upload-btn">
+                        点击上传
+                        <input type="file" accept="model/*" style="display:none;">
+                    </label>
+                    <div class="form-tip">只能上传模型和图片文件</div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-label">类型</div>
+                <div class="form-control">
+                    <select class="form-select">
+                        <option>鉴赏</option>
+                        <option>活动</option>
+                        <option>期待</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-label">支付渠道<span class="badge" style="margin-left:4px;">1</span></div>
+                <div class="form-control">
+                    <select class="form-select">
+                        <option>汇付</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-label">零售市场委托服务商</div>
+                <div class="form-control">
+                    <select class="form-select">
+                        <option>四川华泰博文文化艺术发展有限公司</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-label">批发商分成比例(%)</div>
+                <div class="form-control">
+                    <div class="number-stepper">
+                        <button>−</button>
+                        <input type="number" value="25">
+                        <button>+</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-label">零售市场价值浮动区间(%)</div>
+                <div class="form-control">
+                    <div class="range-input">
+                        <input type="number" value="5">
+                        <span>-</span>
+                        <input type="number" value="5">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-label">最小购买数量</div>
+                <div class="form-control">
+                    <div class="number-stepper">
+                        <button>−</button>
+                        <input type="number" value="1">
+                        <button>+</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-label">最大购买数量</div>
+                <div class="form-control">
+                    <div class="number-stepper">
+                        <button>−</button>
+                        <input type="number" value="1">
+                        <button>+</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="modal-footer">
+            <button class="btn-default">取消</button>
+            <button class="btn-primary">确定</button>
+        </div>
+    </div>
+</div>
+
+<!-- ====== 功能说明浮窗 ====== -->
+<div class="f-modal" id="funcModal">
+  <div class="fm-title">
+    <span>📖 功能说明</span>
+    <button class="fm-close" onclick="toggleFuncModal()">✕</button>
+  </div>
+  <div style="font-size:13px;font-weight:600;color:#e74c5e;margin:-6px 0 12px;">平台</div>
+  <div class="fm-body">
+    <h4><span class="badge">1</span> <span style="vertical-align:middle;">支付渠道</span></h4>
+    <ul>
+      <li>新增<b>支付渠道</b>选择，当前只有<b>汇付</b>可选</li>
+      <li>以后如果接入多渠道，再扩展为<b>多选</b></li>
+      <li><b>提交校验</b>：提交时需判断批发商和委托服务商是否<b>同时开通</b>了选择的支付渠道</li>
+      <li>不满足时需<b>提示</b>，并且<b>不能提交</b>表单</li>
+      <li><b>批发市场交易</b>时展示的支付渠道，是该处设置的渠道</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+function toggleFuncModal() {
+  var el = document.getElementById('funcModal');
+  el.classList.toggle('show');
+  if (el.classList.contains('show') && !el.dataset.dragged) {
+    el.style.left = '50%'; el.style.top = '50%'; el.style.transform = 'translate(-50%,-50%)';
+  }
+}
+(function() {
+  var modal, titleBar, offX, offY, dragging = false;
+  document.addEventListener('DOMContentLoaded', function() {
+    modal = document.getElementById('funcModal');
+    titleBar = modal.querySelector('.fm-title');
+    titleBar.addEventListener('mousedown', startDrag);
+    titleBar.addEventListener('touchstart', startDragTouch, {passive:true});
+    document.addEventListener('mousemove', onDrag);
+    document.addEventListener('mouseup', endDrag);
+    document.addEventListener('touchmove', onDragTouch, {passive:true});
+    document.addEventListener('touchend', endDrag);
+  });
+  function startDrag(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = e.clientX - rect.left; offY = e.clientY - rect.top; dragging = true; titleBar.style.cursor = 'grabbing'; }
+  function startDragTouch(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; var t = e.touches[0]; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = t.clientX - rect.left; offY = t.clientY - rect.top; dragging = true; }
+  function onDrag(e) { if (!dragging) return; modal.style.left = (e.clientX - offX) + 'px'; modal.style.top = (e.clientY - offY) + 'px'; }
+  function onDragTouch(e) { if (!dragging) return; var t = e.touches[0]; modal.style.left = (t.clientX - offX) + 'px'; modal.style.top = (t.clientY - offY) + 'px'; }
+  function endDrag() { dragging = false; if (titleBar) titleBar.style.cursor = 'grab'; }
+})();
+</script>
+
+</body>
+</html>

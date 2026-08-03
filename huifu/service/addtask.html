@@ -433,11 +433,17 @@
         </div>
 
         <div class="form-row">
-            <div class="form-label"><span class="required">*</span>奖金池</div>
+            <div class="form-label">奖金池（非必填）</div>
             <div class="form-control">
                 <div class="inline-group">
-                    <input type="number" placeholder="奖金池金额" value="5000" style="width:160px;">
+                    <input type="number" id="bonusPool" placeholder="奖金池金额" style="width:160px;" oninput="togglePayChannel()">
                     <span style="color:#86909c;font-size:13px;">元</span>
+                </div>
+                <div class="inline-group" id="bonusChannelWrap" style="margin-top:8px;display:none;">
+                    <span style="color:#4e5a6e;font-size:13px;">支付渠道：</span>
+                    <select id="bonusChannel" class="form-select" style="width:200px;height:32px;border:1px solid #d0d5dd;border-radius:4px;font-size:13px;background:#fff;">
+                        <option value="汇付">汇付</option>
+                    </select>
                 </div>
             </div>
         </div>
@@ -540,7 +546,6 @@
                                         <span class="label-text">奖励类型：</span>
                                         <select class="share-reward-type" onchange="syncShareReward(this)">
                                             <option value="cash">现金</option>
-                                            <option value="product">产品</option>
                                         </select>
                                     </div>
                                     <div class="reward-line">
@@ -734,6 +739,12 @@ function toggleShareReward(sel) {
     config.style.display = sel.value ? '' : 'none';
 }
 
+function togglePayChannel() {
+    var input = document.getElementById('bonusPool');
+    var wrap = document.getElementById('bonusChannelWrap');
+    wrap.style.display = (input.value && parseFloat(input.value) > 0) ? 'block' : 'none';
+}
+
 function syncShareReward(sel) {
     var group = sel.closest('.rule-group');
     syncRewardExtraIn(group, sel.value);
@@ -784,7 +795,6 @@ function addShareRule() {
         '            <span class="label-text">奖励类型：</span>',
         '            <select class="share-reward-type" onchange="syncShareReward(this)">',
         '                <option value="cash">现金</option>',
-        '                <option value="product">产品</option>',
         '            </select>',
         '        </div>',
         '        <div class="reward-line">',
@@ -1012,6 +1022,9 @@ function reindexPickupProducts(container) {
       <li><b>删除产品</b>：点击产品右侧的"删除"移除该产品条件</li>
       <li>规则序号自动重新编排（删除后）</li>
     </ul>
+    <p style="margin:12px 0 0;color:#e74c5e;font-weight:600;line-height:1.7;">
+      去掉分享邀请好友的<b>产品奖励</b>，只保留<b>现金</b>（需要去汇付申请开通<b>营销支付</b>，运营评估是否本期实现）
+    </p>
   </div>
 </div>
 

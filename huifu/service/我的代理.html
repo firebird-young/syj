@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的代理</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+            background: #f0f2f5;
+            color: #1a1a2e;
+            font-size: 14px;
+        }
+
+        .topbar {
+            background: #fff;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .topbar-left { display: flex; align-items: center; gap: 16px; }
+        .menu-btn {
+            width: 32px; height: 32px;
+            border: 1px solid #d0d5dd;
+            border-radius: 4px;
+            background: #fff;
+            color: #6b7588;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+        .menu-btn:hover { background: #f5f5f7; }
+        .breadcrumb { font-size: 13px; color: #6b7588; }
+        .breadcrumb .active { color: #1a1a2e; }
+        .topbar-right {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        .topbar-right .avatar {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            background: #f5deb3;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px;
+        }
+        .topbar-right .name { font-size: 13px; }
+        .topbar-right .arrow { color: #9ba6b9; font-size: 12px; }
+
+        /* 搜索栏 */
+        .search-bar {
+            background: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 20px;
+            margin-top: 12px;
+            border-radius: 6px;
+        }
+        .search-input {
+            width: 240px;
+            height: 32px;
+            padding: 0 12px;
+            border: 1px solid #d0d5dd;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #1a1a2e;
+            outline: none;
+        }
+        .search-input:focus { border-color: #1a78ff; }
+        .btn-search {
+            background: #1a78ff;
+            color: #fff;
+            border: none;
+            padding: 0 18px;
+            height: 32px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .btn-search:hover { background: #0f6ae8; }
+
+        /* 表格 */
+        .table-card {
+            background: #fff;
+            margin: 12px;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .table th {
+            background: #fafbfc;
+            padding: 14px 12px;
+            text-align: left;
+            font-size: 13px;
+            color: #4e5a6e;
+            font-weight: 500;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .table td {
+            padding: 14px 12px;
+            font-size: 13px;
+            color: #1a1a2e;
+            border-bottom: 1px solid #f5f5f7;
+            vertical-align: top;
+        }
+        .table tr:last-child td { border-bottom: none; }
+        .table tr:nth-child(odd) { background: #fafbfc; }
+
+        .product-img {
+            width: 60px;
+            height: 60px;
+            border-radius: 4px;
+            background-image: linear-gradient(135deg, #d8e0e8 0%, #98a8c4 100%);
+        }
+        .product-img.img2 { background-image: linear-gradient(135deg, #f5e8b8 0%, #c9a04a 100%); }
+        .product-img.img3 { background-image: linear-gradient(135deg, #e8d8a0 0%, #c08830 100%); }
+        .product-img.img4 { background-image: linear-gradient(135deg, #d8b8a0 0%, #a87850 100%); }
+        .product-img.img5 { background-image: linear-gradient(135deg, #d4d8d4 0%, #98a098 100%); }
+        .product-img.img6 { background-image: linear-gradient(135deg, #f7e8d4 0%, #c8a888 100%); }
+
+        .actions {
+            display: flex;
+            gap: 14px;
+        }
+        .action-col {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .action-col a {
+            color: #1a78ff;
+            text-decoration: none;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .action-col a:hover { text-decoration: underline; }
+
+        /* 标注圆点 */
+        .badge {
+            display: inline-block;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 5px;
+            border-radius: 50%;
+            background: #ff2d55;
+            color: #fff;
+            font-size: 12px;
+            line-height: 18px;
+            text-align: center;
+            font-weight: 600;
+            box-shadow: 0 1px 3px rgba(255,45,85,0.3);
+        }
+
+        /* ── 功能说明浮窗 ── */
+        .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 560px; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 9999; padding: 24px; display: none; }
+        .f-modal.show { display: block; }
+        .f-modal .fm-title { font-size: 16px; font-weight: 600; color: #1a1a2e; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
+        .f-modal .fm-title:active { cursor: grabbing; }
+        .f-modal .fm-close { width: 28px; height: 28px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; color: #666; border: none; flex-shrink: 0; }
+        .f-modal .fm-close:hover { background: #e8e8e8; }
+        .f-modal .fm-body { font-size: 13px; color: #555; line-height: 1.8; }
+        .f-modal .fm-body h4 { font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 16px 0 8px; }
+        .f-modal .fm-body h4:first-child { margin-top: 0; }
+        .f-modal .fm-body ul { padding-left: 18px; margin: 0 0 12px; }
+        .f-modal .fm-body li { margin-bottom: 4px; }
+    </style>
+</head>
+<body>
+
+<div class="topbar">
+    <div class="topbar-left">
+        <button class="menu-btn">≡</button>
+        <div class="breadcrumb">
+            <span>首页</span> /
+            <span class="active">我的代理</span>
+        </div>
+    </div>
+    <div class="topbar-right">
+        <button onclick="toggleFuncModal()" style="margin-right:12px;padding:6px 14px;border-radius:6px;background:#f5f7fa;color:#333;border:1px solid #e0e4ea;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:4px;">📖 功能说明</button>
+        <span class="avatar">👤</span>
+        <span class="name">服务商</span>
+        <span class="arrow">▾</span>
+    </div>
+</div>
+
+<!-- 搜索栏 -->
+<div class="search-bar">
+    <input type="text" class="search-input" id="searchInput" placeholder="按产品名称搜索">
+    <button class="btn-search" onclick="applySearch()">搜索</button>
+</div>
+
+<!-- 表格 -->
+<div class="table-card">
+    <table class="table">
+        <thead>
+            <tr>
+                <th style="width:80px;">图片</th>
+                <th>产品名称</th>
+                <th>批发商</th>
+                <th>批发模式</th>
+                <th>当前阶段</th>
+                <th>创建时间</th>
+                <th>修改时间</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+    </table>
+</div>
+
+<script>
+var data = [
+    { product: '青莲-初心', ws: '成都市天府新区明昌博物馆', mode: '优先购', stage: '批发完成', img: 'img1', ctime: '2026-07-29 13:56:46', mtime: '2026-07-30 15:38:13' },
+    { product: '西路财童', ws: '成都市天府新区明昌博物馆', mode: '优先购', stage: '零售市场', img: 'img2', ctime: '2026-07-21 09:51:02', mtime: '2026-07-22 15:30:19' },
+    { product: '中路财童', ws: '成都市天府新区明昌博物馆', mode: '优先购', stage: '零售市场', img: 'img3', ctime: '2026-07-14 09:22:25', mtime: '2026-07-31 08:00:01' },
+    { product: '榜样-统一', ws: '成都市天府新区明昌博物馆', mode: '优先购', stage: '零售市场', img: 'img4', ctime: '2026-07-01 15:49:11', mtime: '2026-07-13 15:29:54' },
+    { product: '青莲-舒展', ws: '成都市天府新区明昌博物馆', mode: '优先购', stage: '零售市场', img: 'img5', ctime: '2026-06-30 14:19:34', mtime: '2026-07-22 09:39:56' },
+    { product: '东坡-惜春', ws: '成都市天府新区明昌博物馆', mode: '优先购', stage: '零售市场', img: 'img6', ctime: '2026-07-31 08:00:01', mtime: '2026-07-31 08:00:01' }
+];
+
+var opLinks = ['批发管理', '交易流水', '产品交易金管理', '任务管理', '任务订单', '任务挂单', '文本价值要素标注', '文本价值要素数据集'];
+
+function buildActions() {
+    var html = '<div class="action-col">';
+    opLinks.forEach(function(l) {
+        html += '<a>' + l + '</a>';
+    });
+    html += '</div>';
+    return html;
+}
+
+function renderTable() {
+    var keyword = document.getElementById('searchInput').value.trim();
+    var filtered = keyword ? data.filter(function(o) { return o.product.indexOf(keyword) >= 0; }) : data;
+    var html = '';
+    filtered.forEach(function(o) {
+        html += [
+            '<tr>',
+            '    <td><img class="product-img ' + o.img + '" src=""></td>',
+            '    <td>' + o.product + '</td>',
+            '    <td>' + o.ws + '</td>',
+            '    <td>' + o.mode + '</td>',
+            '    <td>' + o.stage + '</td>',
+            '    <td>' + o.ctime + '</td>',
+            '    <td>' + o.mtime + '</td>',
+            '    <td>' + buildActions() + '</td>',
+            '</tr>'
+        ].join('');
+    });
+    document.getElementById('tableBody').innerHTML = html;
+}
+
+function applySearch() {
+    renderTable();
+}
+
+renderTable();
+</script>
+
+<!-- ====== 功能说明浮窗 ====== -->
+<div class="f-modal" id="funcModal">
+  <div class="fm-title">
+    <span>📖 功能说明</span>
+    <button class="fm-close" onclick="toggleFuncModal()">✕</button>
+  </div>
+  <div style="font-size:13px;font-weight:600;color:#e74c5e;margin:-6px 0 12px;">服务商后台</div>
+  <div class="fm-body">
+    <h4><span class="badge">1</span> <span style="vertical-align:middle;">产品名称搜索</span></h4>
+    <ul>
+      <li>增加按照<b>产品名称</b>搜索</li>
+    </ul>
+    <h4><span class="badge">2</span> <span style="vertical-align:middle;">废弃功能</span></h4>
+    <ul>
+      <li><b>产品交易金管理、任务管理、任务订单、任务挂单</b>属于<b>废弃功能</b></li>
+      <li>开通了<b>宝付</b>的服务商现在可以看到，但<b>交易相关的功能操作会出错</b></li>
+      <li>新的服务商<b>看不到</b></li>
+    </ul>
+  </div>
+</div>
+
+<script>
+function toggleFuncModal() {
+  var el = document.getElementById('funcModal');
+  el.classList.toggle('show');
+  if (el.classList.contains('show') && !el.dataset.dragged) {
+    el.style.left = '50%'; el.style.top = '50%'; el.style.transform = 'translate(-50%,-50%)';
+  }
+}
+(function() {
+  var modal, titleBar, offX, offY, dragging = false;
+  document.addEventListener('DOMContentLoaded', function() {
+    modal = document.getElementById('funcModal');
+    titleBar = modal.querySelector('.fm-title');
+    titleBar.addEventListener('mousedown', startDrag);
+    titleBar.addEventListener('touchstart', startDragTouch, {passive:true});
+    document.addEventListener('mousemove', onDrag);
+    document.addEventListener('mouseup', endDrag);
+    document.addEventListener('touchmove', onDragTouch, {passive:true});
+    document.addEventListener('touchend', endDrag);
+  });
+  function startDrag(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = e.clientX - rect.left; offY = e.clientY - rect.top; dragging = true; titleBar.style.cursor = 'grabbing'; }
+  function startDragTouch(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; var t = e.touches[0]; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = t.clientX - rect.left; offY = t.clientY - rect.top; dragging = true; }
+  function onDrag(e) { if (!dragging) return; modal.style.left = (e.clientX - offX) + 'px'; modal.style.top = (e.clientY - offY) + 'px'; }
+  function onDragTouch(e) { if (!dragging) return; var t = e.touches[0]; modal.style.left = (t.clientX - offX) + 'px'; modal.style.top = (t.clientY - offY) + 'px'; }
+  function endDrag() { dragging = false; if (titleBar) titleBar.style.cursor = 'grab'; }
+})();
+</script>
+
+</body>
+</html>

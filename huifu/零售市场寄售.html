@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>零售市场寄售</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+            background: #f0f2f5;
+            color: #1a1a2e;
+            font-size: 14px;
+            min-height: 100vh;
+        }
+        .app-container {
+            max-width: 430px;
+            margin: 0 auto;
+            background: #f5f5f5;
+            min-height: 100vh;
+            position: relative;
+            padding-bottom: 90px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.06);
+        }
+
+        /* 顶部 */
+        .header {
+            background: #fff;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            font-size: 16px;
+            font-weight: 500;
+            color: #1a1a2e;
+        }
+        .header .back {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+            color: #1a1a2e;
+            cursor: pointer;
+            padding: 4px 8px;
+        }
+
+        /* 产品信息卡 */
+        .product-card {
+            background: #fff;
+            margin: 10px 12px 0;
+            border-radius: 10px;
+            padding: 14px;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+        .product-img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-image: linear-gradient(135deg, #e8d8a0 0%, #c08830 100%);
+            flex-shrink: 0;
+        }
+        .product-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .product-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 4px;
+        }
+        .product-code {
+            font-size: 12px;
+            color: #86909c;
+        }
+        .price-tip {
+            font-size: 12px;
+            color: #86909c;
+            margin-top: 4px;
+        }
+        .product-price {
+            color: #e74c5e;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        /* 数量/价格区块 */
+        .field-card {
+            background: #fff;
+            margin: 10px 12px 0;
+            border-radius: 10px;
+            padding: 14px 16px;
+        }
+        .field-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
+        }
+        .field-row + .field-row {
+            border-top: 1px solid #f5f5f7;
+        }
+        .field-label {
+            font-size: 14px;
+            color: #1a1a2e;
+        }
+        .field-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .stepper {
+            display: inline-flex;
+            align-items: center;
+        }
+        .stepper button {
+            width: 32px;
+            height: 32px;
+            border: 1px solid #d0d5dd;
+            background: #fff;
+            font-size: 18px;
+            color: #4e5a6e;
+            cursor: pointer;
+        }
+        .stepper button:first-child { border-radius: 50%; border-right: none; }
+        .stepper button:last-child { border-radius: 50%; border-left: none; }
+        .stepper input {
+            width: 60px;
+            height: 32px;
+            border: 1px solid #d0d5dd;
+            border-left: none;
+            border-right: none;
+            text-align: center;
+            font-size: 14px;
+            outline: none;
+            background: #fff;
+        }
+        .stepper button.minus { color: #c0c8d4; }
+        .stepper button.plus {
+            background: #e74c5e;
+            border-color: #e74c5e;
+            color: #fff;
+        }
+        .price-input {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex: 1;
+            justify-content: flex-end;
+        }
+        .price-input .yen {
+            color: #e74c5e;
+            font-size: 14px;
+        }
+        .price-input input {
+            flex: 1;
+            max-width: 180px;
+            height: 32px;
+            padding: 0 10px;
+            border: 1px solid #d0d5dd;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #1a1a2e;
+            outline: none;
+            background: #fff;
+        }
+
+        /* 提示框 */
+        .tips-card {
+            background: #fff4e6;
+            margin: 10px 12px 0;
+            border-radius: 10px;
+            padding: 12px 14px;
+            font-size: 12px;
+            color: #e67e22;
+            line-height: 1.6;
+        }
+
+        /* 委托服务商 */
+        .service-row {
+            background: #fff;
+            margin: 10px 12px 0;
+            border-radius: 10px;
+            padding: 14px 16px;
+            font-size: 13px;
+            color: #6b7588;
+        }
+        .service-row .service-name {
+            color: #1a78ff;
+            margin-left: 12px;
+        }
+
+        /* 支付渠道 */
+        .channel-card {
+            background: #fff;
+            margin: 10px 12px 0;
+            border-radius: 10px;
+            padding: 14px 16px;
+        }
+        .channel-title {
+            font-size: 14px;
+            color: #1a1a2e;
+            margin-bottom: 10px;
+        }
+        .channel-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 0;
+        }
+        .channel-item + .channel-item {
+            border-top: 1px solid #f5f5f7;
+        }
+        .channel-item input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: #e74c5e;
+            cursor: pointer;
+        }
+        .channel-name {
+            font-size: 14px;
+            color: #1a1a2e;
+        }
+        .channel-status {
+            margin-left: auto;
+            font-size: 13px;
+            color: #e74c5e;
+            cursor: pointer;
+        }
+        .channel-status.opened {
+            color: #1aab67;
+            cursor: default;
+        }
+        .channel-note {
+            font-size: 11px;
+            color: #86909c;
+            margin-left: 4px;
+        }
+
+        /* 同意单选 */
+        .agree-row {
+            background: #fff;
+            margin: 10px 12px 0;
+            border-radius: 10px;
+            padding: 14px 16px;
+            font-size: 13px;
+            color: #4e5a6e;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+        .agree-row input[type="radio"] {
+            margin-top: 2px;
+            accent-color: #e74c5e;
+            cursor: pointer;
+        }
+        .agree-row .agree-text {
+            line-height: 1.6;
+        }
+        .agree-row .link-red {
+            color: #e74c5e;
+            cursor: pointer;
+        }
+
+        /* 底部固定 */
+        .bottom-fixed {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 430px;
+            background: #fff;
+            padding: 12px 16px 16px;
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.04);
+            z-index: 10;
+        }
+        .btn-submit {
+            width: 100%;
+            height: 46px;
+            background: #e74c5e;
+            color: #fff;
+            border: none;
+            border-radius: 23px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-submit:disabled {
+            background: #ffb8c0;
+            cursor: not-allowed;
+        }
+
+        /* 标注圆点 */
+        .badge {
+            display: inline-block;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 5px;
+            border-radius: 50%;
+            background: #ff2d55;
+            color: #fff;
+            font-size: 12px;
+            line-height: 18px;
+            text-align: center;
+            font-weight: 600;
+            box-shadow: 0 1px 3px rgba(255,45,85,0.3);
+        }
+
+        /* ── 功能说明浮窗 ── */
+        .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 430px; max-width: 94vw; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 99999; padding: 22px; display: none; }
+        .f-modal.show { display: block; }
+        .f-modal .fm-title { font-size: 15px; font-weight: 600; color: #1a1a2e; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
+        .f-modal .fm-title:active { cursor: grabbing; }
+        .f-modal .fm-close { width: 26px; height: 26px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 13px; color: #666; border: none; flex-shrink: 0; }
+        .f-modal .fm-close:hover { background: #e8e8e8; }
+        .f-modal .fm-body { font-size: 13px; color: #555; line-height: 1.8; }
+        .f-modal .fm-body h4 { font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 14px 0 6px; }
+        .f-modal .fm-body ul { padding-left: 18px; margin: 0 0 8px; }
+        .f-modal .fm-body li { margin-bottom: 4px; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+
+    <div class="header">
+        <span class="back">‹</span>
+        山水空灵
+    </div>
+
+    <!-- 产品信息 -->
+    <div class="product-card">
+        <div class="product-img"></div>
+        <div class="product-info">
+            <div class="product-name">山水空灵</div>
+            <div class="product-code">产品编码 XB000001</div>
+            <div class="price-tip">当前指导价</div>
+        </div>
+        <div class="product-price">¥378</div>
+    </div>
+
+    <!-- 寄售数量 / 单价 -->
+    <div class="field-card">
+        <div class="field-row">
+            <span class="field-label">寄售数量</span>
+            <div class="field-right">
+                <div class="stepper">
+                    <button class="minus">−</button>
+                    <input type="number" value="1">
+                    <button class="plus">+</button>
+                </div>
+            </div>
+        </div>
+        <div class="field-row">
+            <span class="field-label">可售数量</span>
+            <span class="field-right" style="color:#1a1a2e;font-weight:500;">0</span>
+        </div>
+        <div class="field-row">
+            <span class="field-label">寄售单价</span>
+            <div class="price-input">
+                <span class="yen">¥</span>
+                <input type="number" placeholder="请输入售卖单价">
+            </div>
+        </div>
+    </div>
+
+    <!-- 提示框 -->
+    <div class="tips-card">
+        当前价格浮动区间为359.10~396.90<br>
+        交易成功后除手续费0.3%
+    </div>
+
+    <!-- 委托服务商 -->
+    <div class="service-row">
+        委托服务商<span class="service-name">四川华泰博文文化艺术发展有限公司</span>
+    </div>
+
+    <!-- 支付渠道 -->
+    <div class="channel-card">
+        <div class="channel-title">支付渠道</div>
+        <div class="channel-item">
+            <input type="checkbox" id="channelHf" onchange="updateSubmitState()">
+            <span class="channel-name">汇付钱包</span>
+            <span class="channel-status" id="channelHfStatus" onclick="toggleChannelOpen()">去开户</span>
+        </div>
+    </div>
+
+    <!-- 同意单选 -->
+    <div class="agree-row">
+        <input type="radio" id="agreeRadio" name="agree">
+        <label for="agreeRadio" class="agree-text">
+            我已阅读并同意《<span class="link-red">委托寄售协议</span>》及《<span class="link-red">委托保管协议</span>》
+        </label>
+    </div>
+
+</div>
+
+<!-- 底部固定 -->
+<div class="bottom-fixed">
+    <button class="btn-submit" id="submitBtn" disabled onclick="submitForm()">上架零售市场（委托售卖）</button>
+</div>
+
+<script>
+var channelOpened = false; // 汇付钱包是否已开通
+
+document.getElementById('agreeRadio').addEventListener('change', updateSubmitState);
+document.getElementById('channelHf').addEventListener('change', updateSubmitState);
+
+function toggleChannelOpen() {
+    channelOpened = !channelOpened;
+    var statusEl = document.getElementById('channelHfStatus');
+    if (channelOpened) {
+        statusEl.textContent = '已开通';
+        statusEl.classList.add('opened');
+        document.getElementById('channelHf').checked = true;
+        document.getElementById('channelHf').disabled = false;
+    } else {
+        statusEl.textContent = '去开户';
+        statusEl.classList.remove('opened');
+        document.getElementById('channelHf').checked = false;
+        document.getElementById('channelHf').disabled = true;
+    }
+    updateSubmitState();
+}
+
+function updateSubmitState() {
+    var agree = document.getElementById('agreeRadio').checked;
+    var hfChecked = document.getElementById('channelHf').checked;
+    var btn = document.getElementById('submitBtn');
+    // 未开通时汇付不可勾选
+    document.getElementById('channelHf').disabled = !channelOpened;
+    btn.disabled = !(agree && channelOpened && hfChecked);
+}
+
+function submitForm() {
+    alert('上架成功');
+}
+</script>
+
+<!-- 浮动说明按钮（手机框外） -->
+<button onclick="toggleFuncModal()" style="position:fixed;top:12px;right:16px;z-index:99999;background:#fff;color:#666;padding:7px 16px;border-radius:20px;border:1px solid #ddd;font-size:13px;font-weight:500;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.08);font-family:inherit;display:inline-flex;align-items:center;gap:4px;">📖 说明</button>
+
+<!-- ====== 功能说明浮窗 ====== -->
+<div class="f-modal" id="funcModal">
+  <div class="fm-title">
+    <span>📖 功能说明</span>
+    <button class="fm-close" onclick="toggleFuncModal()">✕</button>
+  </div>
+  <div class="fm-body">
+    <h4><span class="badge">1</span> <span style="vertical-align:middle;">支付渠道选择</span></h4>
+    <ul>
+      <li>寄售时选择<b>支付渠道</b>，支持<b>多选</b></li>
+      <li>当前只有<b>汇付</b></li>
+      <li>未开通时<b>引导卖家去开户</b>，开户成功后方可选择</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+function toggleFuncModal() {
+  var el = document.getElementById('funcModal');
+  el.classList.toggle('show');
+  if (el.classList.contains('show') && !el.dataset.dragged) {
+    el.style.left = '50%'; el.style.top = '50%'; el.style.transform = 'translate(-50%,-50%)';
+  }
+}
+(function() {
+  var modal, titleBar, offX, offY, dragging = false;
+  document.addEventListener('DOMContentLoaded', function() {
+    modal = document.getElementById('funcModal');
+    titleBar = modal.querySelector('.fm-title');
+    titleBar.addEventListener('mousedown', startDrag);
+    titleBar.addEventListener('touchstart', startDragTouch, {passive:true});
+    document.addEventListener('mousemove', onDrag);
+    document.addEventListener('mouseup', endDrag);
+    document.addEventListener('touchmove', onDragTouch, {passive:true});
+    document.addEventListener('touchend', endDrag);
+  });
+  function startDrag(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = e.clientX - rect.left; offY = e.clientY - rect.top; dragging = true; titleBar.style.cursor = 'grabbing'; }
+  function startDragTouch(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; var t = e.touches[0]; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = t.clientX - rect.left; offY = t.clientY - rect.top; dragging = true; }
+  function onDrag(e) { if (!dragging) return; modal.style.left = (e.clientX - offX) + 'px'; modal.style.top = (e.clientY - offY) + 'px'; }
+  function onDragTouch(e) { if (!dragging) return; var t = e.touches[0]; modal.style.left = (t.clientX - offX) + 'px'; modal.style.top = (t.clientY - offY) + 'px'; }
+  function endDrag() { dragging = false; if (titleBar) titleBar.style.cursor = 'grab'; }
+})();
+</script>
+
+</body>
+</html>

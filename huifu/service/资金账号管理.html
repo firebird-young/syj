@@ -278,6 +278,63 @@
             font-size: 13px;
             outline: none;
         }
+
+        /* Tab 切换 */
+        .tabs-bar {
+            background: #fff;
+            margin: 12px 12px 0;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            border-radius: 6px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .tab {
+            padding: 12px 0;
+            font-size: 14px;
+            color: #4e5a6e;
+            cursor: pointer;
+            position: relative;
+        }
+        .tab.active { color: #1a78ff; font-weight: 500; }
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: -1px;
+            height: 2px;
+            background: #1a78ff;
+        }
+
+        /* 标注圆点 */
+        .badge {
+            display: inline-block;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 5px;
+            border-radius: 50%;
+            background: #ff2d55;
+            color: #fff;
+            font-size: 12px;
+            line-height: 18px;
+            text-align: center;
+            font-weight: 600;
+            box-shadow: 0 1px 3px rgba(255,45,85,0.3);
+        }
+
+        /* ── 功能说明浮窗 ── */
+        .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 560px; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 9999; padding: 24px; display: none; }
+        .f-modal.show { display: block; }
+        .f-modal .fm-title { font-size: 16px; font-weight: 600; color: #1a1a2e; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
+        .f-modal .fm-title:active { cursor: grabbing; }
+        .f-modal .fm-close { width: 28px; height: 28px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; color: #666; border: none; flex-shrink: 0; }
+        .f-modal .fm-close:hover { background: #e8e8e8; }
+        .f-modal .fm-body { font-size: 13px; color: #555; line-height: 1.8; }
+        .f-modal .fm-body h4 { font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 16px 0 8px; }
+        .f-modal .fm-body ul { padding-left: 18px; margin: 0 0 12px; }
+        .f-modal .fm-body li { margin-bottom: 4px; }
     </style>
 </head>
 <body>
@@ -291,6 +348,7 @@
         </div>
     </div>
     <div class="topbar-right">
+        <button onclick="toggleFuncModal()" style="margin-right:12px;padding:6px 14px;border-radius:6px;background:#f5f7fa;color:#333;border:1px solid #e0e4ea;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:4px;">📖 功能说明</button>
         <span class="avatar">👤</span>
         <span class="name">系统参数设置</span>
         <span class="arrow">▾</span>
@@ -323,6 +381,12 @@
             <div class="sc-action">冻结释放记录</div>
         </div>
     </div>
+</div>
+
+<!-- Tab 切换 -->
+<div class="tabs-bar">
+    <div class="tab active" data-tab="income" onclick="selectTab(this)">收入明细</div>
+    <div class="tab" data-tab="expense" onclick="selectTab(this)">支出明细</div>
 </div>
 
 <!-- 筛选区 -->
@@ -362,28 +426,18 @@
     <table class="table">
         <thead>
             <tr>
+                <th>交易订单编号</th>
                 <th>支付渠道单号</th>
                 <th>类型</th>
                 <th>总金额</th>
-                <th>实付金额</th>
+                <th>实际金额</th>
                 <th>平台手续费</th>
                 <th>用途</th>
                 <th>支付渠道</th>
                 <th>创建时间 <span class="col-sort">⇅</span></th>
             </tr>
         </thead>
-        <tbody>
-            <tr><td>20260525144513010373000001190727</td><td>批发佣金支出</td><td>1.86</td><td>1.86</td><td>0</td><td>提前结案-批发分佣</td><td>宝付钱包</td><td>2026-05-25 14:45:14</td></tr>
-            <tr><td>20260525144512010373000001190726</td><td>服务商推广服务费</td><td>12.4</td><td>12.4</td><td>0</td><td>提前结案-服务商推广服务费</td><td>汇付钱包</td><td>2026-05-25 14:45:13</td></tr>
-            <tr><td>20260409000000010373000001187002</td><td>零售佣金支出</td><td>0.24</td><td>0.24</td><td>0</td><td>印度阿三-零售分佣</td><td>宝付钱包</td><td>2026-04-09 00:00:01</td></tr>
-            <tr><td>20260408160404010373000001186994</td><td>批发佣金支出</td><td>0.06</td><td>0.06</td><td>0</td><td>45发首发-批发分佣</td><td>汇付钱包</td><td>2026-04-08 16:04:05</td></tr>
-            <tr><td>20260408160404010373000001186993</td><td>批发佣金支出</td><td>0.15</td><td>0.15</td><td>0</td><td>45发首发-批发分佣</td><td>宝付钱包</td><td>2026-04-08 16:04:04</td></tr>
-            <tr><td>20260408160403010373000001186992</td><td>批发佣金支出</td><td>0.03</td><td>0.03</td><td>0</td><td>45发首发-批发分佣</td><td>汇付钱包</td><td>2026-04-08 16:04:04</td></tr>
-            <tr><td>20260408160403010373000001186991</td><td>批发佣金支出</td><td>0.01</td><td>0.01</td><td>0</td><td>45发首发-批发分佣</td><td>宝付钱包</td><td>2026-04-08 16:04:03</td></tr>
-            <tr><td>20260408160402010373000001186990</td><td>批发佣金支出</td><td>0.01</td><td>0.01</td><td>0</td><td>45发首发-批发分佣</td><td>汇付钱包</td><td>2026-04-08 16:04:03</td></tr>
-            <tr><td>20260408160401010373000001186989</td><td>批发佣金支出</td><td>0.01</td><td>0.01</td><td>0</td><td>45发首发-批发分佣</td><td>宝付钱包</td><td>2026-04-08 16:04:02</td></tr>
-            <tr><td>20260408160401010373000001186988</td><td>批发佣金支出</td><td>0.01</td><td>0.01</td><td>0</td><td>45发首发-批发分佣</td><td>汇付钱包</td><td>2026-04-08 16:04:02</td></tr>
-        </tbody>
+        <tbody id="tableBody"></tbody>
     </table>
 
     <div class="pagination">
@@ -400,6 +454,109 @@
         <div class="page-jump">10条/页</div>
     </div>
 </div>
+
+<!-- ====== 功能说明浮窗 ====== -->
+<div class="f-modal" id="funcModal">
+  <div class="fm-title">
+    <span>📖 功能说明</span>
+    <button class="fm-close" onclick="toggleFuncModal()">✕</button>
+  </div>
+  <div style="font-size:13px;font-weight:600;color:#e74c5e;margin:-6px 0 12px;">服务商后台</div>
+  <div class="fm-body">
+    <h4><span class="badge">1</span> <span style="vertical-align:middle;">第三方支付开户统一</span></h4>
+    <ul>
+      <li>原第三方支付的<b>开户流程</b>统一到这里</li>
+      <li>未开户的提示<b>「开户」</b>，已开户的显示<b>余额</b></li>
+      <li><b>宝付</b>只针对<b>老服务商</b>展示，新服务商没有</li>
+    </ul>
+    <h4><span class="badge">2</span> <span style="vertical-align:middle;">收支分开</span></h4>
+    <ul>
+      <li>列表里<b>支出</b>和<b>收入</b>分开展示（Tab 切换）</li>
+      <li>增加<b>交易订单编号</b>、<b>支付渠道</b>字段</li>
+    </ul>
+    <h4><span class="badge">3</span> <span style="vertical-align:middle;">类型沿用</span></h4>
+    <ul>
+      <li>继续沿用之前的<b>类型</b>分类</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+var currentTab = 'income';
+
+var incomeData = [
+    { tradeNo: 'XB-sell260525144513001', payNo: '20260525144512010373000001190726', type: '服务商推广服务费', total: '12.40', paid: '12.40', pfee: '0', purpose: '提前结案-服务商推广服务费', channel: '汇付钱包', time: '2026-05-25 14:45:13' },
+    { tradeNo: 'XB-sell260504160405002', payNo: '20260504160405010373000001190101', type: '交易卖出', total: '128.00', paid: '128.00', pfee: '0.77', purpose: '交易卖出-永淳·夏日帖', channel: '汇付钱包', time: '2026-05-04 16:04:05' },
+    { tradeNo: 'XB-sell260428140302003', payNo: '20260428140302010373000001189888', type: '批发佣金支出', total: '0.15', paid: '0.15', pfee: '0', purpose: '45发首发-批发分佣', channel: '宝付钱包', time: '2026-04-28 14:03:02' },
+    { tradeNo: 'XB-sell260420100201004', payNo: '20260420100201010373000001189000', type: '运营服务费', total: '2.05', paid: '2.05', pfee: '0', purpose: '运营服务费-平台分成', channel: '汇付钱包', time: '2026-04-20 10:02:01' },
+    { tradeNo: 'XB-sell260415090800005', payNo: '20260415090800010373000001188666', type: '服务商推广服务费', total: '8.50', paid: '8.50', pfee: '0', purpose: '零售推广-服务商推广服务费', channel: '宝付钱包', time: '2026-04-15 09:08:00' }
+];
+
+var expenseData = [
+    { tradeNo: 'XB-buy260525144514001', payNo: '20260525144513010373000001190727', type: '批发佣金支出', total: '1.86', paid: '1.86', pfee: '0', purpose: '提前结案-批发分佣', channel: '宝付钱包', time: '2026-05-25 14:45:14' },
+    { tradeNo: 'XB-buy260504160404002', payNo: '20260504160404010373000001190100', type: '现金奖励', total: '50.00', paid: '50.00', pfee: '0', purpose: '提货任务-现金奖励', channel: '汇付钱包', time: '2026-05-04 16:04:04' },
+    { tradeNo: 'XB-buy260428140301003', payNo: '20260428140301010373000001189887', type: '产品奖励', total: '16', paid: '16', pfee: '0', purpose: '提货任务-产品奖励', channel: '宝付钱包', time: '2026-04-28 14:03:01' },
+    { tradeNo: 'XB-buy260420100200004', payNo: '20260420100200010373000001188999', type: '交易买入', total: '100.00', paid: '100.00', pfee: '0.60', purpose: '交易买入-永淳·夏日帖', channel: '汇付钱包', time: '2026-04-20 10:02:00' },
+    { tradeNo: 'XB-buy260415090759005', payNo: '20260415090759010373000001188665', type: '零售佣金支出', total: '0.24', paid: '0.24', pfee: '0', purpose: '印度阿三-零售分佣', channel: '宝付钱包', time: '2026-04-15 09:07:59' }
+];
+
+function renderTable() {
+    var data = currentTab === 'income' ? incomeData : expenseData;
+    var html = '';
+    data.forEach(function(o) {
+        html += [
+            '<tr>',
+            '    <td>' + o.tradeNo + '</td>',
+            '    <td>' + o.payNo + '</td>',
+            '    <td>' + o.type + '</td>',
+            '    <td>' + o.total + '</td>',
+            '    <td>' + o.paid + '</td>',
+            '    <td>' + o.pfee + '</td>',
+            '    <td>' + o.purpose + '</td>',
+            '    <td>' + o.channel + '</td>',
+            '    <td>' + o.time + '</td>',
+            '</tr>'
+        ].join('');
+    });
+    document.getElementById('tableBody').innerHTML = html;
+    document.querySelector('.pagination .total').textContent = '共 ' + data.length + ' 条';
+}
+
+function selectTab(el) {
+    document.querySelectorAll('.tabs-bar .tab').forEach(function(t) { t.classList.remove('active'); });
+    el.classList.add('active');
+    currentTab = el.dataset.tab;
+    renderTable();
+}
+
+renderTable();
+
+function toggleFuncModal() {
+  var el = document.getElementById('funcModal');
+  el.classList.toggle('show');
+  if (el.classList.contains('show') && !el.dataset.dragged) {
+    el.style.left = '50%'; el.style.top = '50%'; el.style.transform = 'translate(-50%,-50%)';
+  }
+}
+(function() {
+  var modal, titleBar, offX, offY, dragging = false;
+  document.addEventListener('DOMContentLoaded', function() {
+    modal = document.getElementById('funcModal');
+    titleBar = modal.querySelector('.fm-title');
+    titleBar.addEventListener('mousedown', startDrag);
+    titleBar.addEventListener('touchstart', startDragTouch, {passive:true});
+    document.addEventListener('mousemove', onDrag);
+    document.addEventListener('mouseup', endDrag);
+    document.addEventListener('touchmove', onDragTouch, {passive:true});
+    document.addEventListener('touchend', endDrag);
+  });
+  function startDrag(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = e.clientX - rect.left; offY = e.clientY - rect.top; dragging = true; titleBar.style.cursor = 'grabbing'; }
+  function startDragTouch(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; var t = e.touches[0]; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = t.clientX - rect.left; offY = t.clientY - rect.top; dragging = true; }
+  function onDrag(e) { if (!dragging) return; modal.style.left = (e.clientX - offX) + 'px'; modal.style.top = (e.clientY - offY) + 'px'; }
+  function onDragTouch(e) { if (!dragging) return; var t = e.touches[0]; modal.style.left = (t.clientX - offX) + 'px'; modal.style.top = (t.clientY - offY) + 'px'; }
+  function endDrag() { dragging = false; if (titleBar) titleBar.style.cursor = 'grab'; }
+})();
+</script>
 
 </body>
 </html>
