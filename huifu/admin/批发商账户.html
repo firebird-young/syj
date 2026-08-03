@@ -310,6 +310,41 @@
             outline: none;
             background: #fff;
         }
+
+        /* 标注圆点 */
+        .badge {
+            display: inline-block;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 5px;
+            border-radius: 50%;
+            background: #ff2d55;
+            color: #fff;
+            font-size: 12px;
+            line-height: 18px;
+            text-align: center;
+            font-weight: 600;
+            box-shadow: 0 1px 3px rgba(255,45,85,0.3);
+        }
+        .badge.sm {
+            min-width: 16px;
+            height: 16px;
+            font-size: 11px;
+            line-height: 16px;
+        }
+
+        /* ── 功能说明浮窗 ── */
+        .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 560px; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 9999; padding: 24px; display: none; }
+        .f-modal.show { display: block; }
+        .f-modal .fm-title { font-size: 16px; font-weight: 600; color: #1a1a2e; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
+        .f-modal .fm-title:active { cursor: grabbing; }
+        .f-modal .fm-close { width: 28px; height: 28px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; color: #666; border: none; flex-shrink: 0; }
+        .f-modal .fm-close:hover { background: #e8e8e8; }
+        .f-modal .fm-body { font-size: 13px; color: #555; line-height: 1.8; }
+        .f-modal .fm-body h4 { font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 16px 0 8px; }
+        .f-modal .fm-body h4:first-child { margin-top: 0; }
+        .f-modal .fm-body ul { padding-left: 18px; margin: 0 0 12px; }
+        .f-modal .fm-body li { margin-bottom: 4px; }
     </style>
 </head>
 <body>
@@ -325,6 +360,7 @@
         </div>
     </div>
     <div class="topbar-right">
+        <button onclick="toggleFuncModal()" style="margin-right:12px;padding:6px 14px;border-radius:6px;background:#f5f7fa;color:#333;border:1px solid #e0e4ea;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:4px;">📖 功能说明</button>
         <span class="avatar">👤</span>
         <span class="name">系统参数设置</span>
         <span class="arrow">▾</span>
@@ -336,15 +372,9 @@
     <div class="summary-card">
         <div class="head">
             <span class="label">宝付余额</span>
-            <button class="btn">提现</button>
+            <button class="btn" onclick="withdraw()">提现</button>
         </div>
         <span class="amount bff">128.00</span>
-    </div>
-    <div class="summary-card">
-        <div class="head">
-            <span class="label">汇付余额</span>
-        </div>
-        <span class="amount hf">3,286.50</span>
     </div>
 </div>
 
@@ -378,14 +408,6 @@
         </select>
     </div>
     <div class="filter-item">
-        <span class="filter-label">支付渠道</span>
-        <select class="filter-select">
-            <option>请选择支付渠道</option>
-            <option>宝付钱包</option>
-            <option>汇付钱包</option>
-        </select>
-    </div>
-    <div class="filter-item">
         <span class="filter-label">时间</span>
         <input class="filter-date-input" placeholder="开始日期">
         <span class="filter-sep">至</span>
@@ -409,7 +431,6 @@
                 <th>金额</th>
                 <th>产品名称</th>
                 <th>来源</th>
-                <th>支付渠道</th>
                 <th>时间 <span class="col-sort">⇅</span></th>
             </tr>
         </thead>
@@ -469,7 +490,6 @@ function renderTable() {
             '    <td class="' + amountClass + '">' + o.amount + '</td>',
             '    <td>' + o.product + '</td>',
             '    <td>' + o.source + '</td>',
-            '    <td>' + o.channel + '</td>',
             '    <td class="time">' + o.time + '</td>',
             '</tr>'
         ].join('');
@@ -478,6 +498,59 @@ function renderTable() {
 }
 
 renderTable();
+
+function withdraw() {
+    alert('发起提现');
+}
+</script>
+
+<!-- ====== 功能说明浮窗 ====== -->
+<div class="f-modal" id="funcModal">
+  <div class="fm-title">
+    <span>📖 功能说明</span>
+    <button class="fm-close" onclick="toggleFuncModal()">✕</button>
+  </div>
+  <div style="font-size:13px;font-weight:600;color:#e74c5e;margin:-6px 0 12px;">平台</div>
+  <div class="fm-body">
+    <p style="margin:0 0 12px;color:#666">批发商账户：展示批发商相关资金流水（宝付支付业务）。</p>
+    <h4>说明</h4>
+    <ul>
+      <li>批发商账户属于<b>宝付支付的业务</b>，以后<b>不再使用</b></li>
+      <li>但<b>数据和功能保留</b>，作为<b>追溯</b>用</li>
+    </ul>
+    <h4>提现</h4>
+    <ul>
+      <li>支持发起<b>提现</b>操作</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+function toggleFuncModal() {
+  var el = document.getElementById('funcModal');
+  el.classList.toggle('show');
+  if (el.classList.contains('show') && !el.dataset.dragged) {
+    el.style.left = '50%'; el.style.top = '50%'; el.style.transform = 'translate(-50%,-50%)';
+  }
+}
+(function() {
+  var modal, titleBar, offX, offY, dragging = false;
+  document.addEventListener('DOMContentLoaded', function() {
+    modal = document.getElementById('funcModal');
+    titleBar = modal.querySelector('.fm-title');
+    titleBar.addEventListener('mousedown', startDrag);
+    titleBar.addEventListener('touchstart', startDragTouch, {passive:true});
+    document.addEventListener('mousemove', onDrag);
+    document.addEventListener('mouseup', endDrag);
+    document.addEventListener('touchmove', onDragTouch, {passive:true});
+    document.addEventListener('touchend', endDrag);
+  });
+  function startDrag(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = e.clientX - rect.left; offY = e.clientY - rect.top; dragging = true; titleBar.style.cursor = 'grabbing'; }
+  function startDragTouch(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; var t = e.touches[0]; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = t.clientX - rect.left; offY = t.clientY - rect.top; dragging = true; }
+  function onDrag(e) { if (!dragging) return; modal.style.left = (e.clientX - offX) + 'px'; modal.style.top = (e.clientY - offY) + 'px'; }
+  function onDragTouch(e) { if (!dragging) return; var t = e.touches[0]; modal.style.left = (t.clientX - offX) + 'px'; modal.style.top = (t.clientY - offY) + 'px'; }
+  function endDrag() { dragging = false; if (titleBar) titleBar.style.cursor = 'grab'; }
+})();
 </script>
 
 </body>
