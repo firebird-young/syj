@@ -418,8 +418,10 @@
 
 <script>
 var incomeData = [
-    { product: '中路财童', stage: '零售市场', orderNo: 'XB-zc2608010001', tradeAmount: '1000.00', fee: '0.00', createTime: '2026-08-01 10:05:00', updateTime: '2026-08-01 10:05:00', amount: '+150.00', channel: '汇付钱包' },
-    { product: '中路财童', stage: '零售市场', orderNo: 'XB-zc2608010001', tradeAmount: '1000.00', fee: '0.00', createTime: '2026-08-01 10:06:00', updateTime: '2026-08-01 10:06:00', amount: '+250.00', channel: '汇付钱包' },
+    { product: '中路财童', stage: '零售市场', orderNo: 'XB-zc2608010001', tradeAmount: '1000.00', fee: '6.00', createTime: '2026-08-01 10:10:00', updateTime: '2026-08-01 10:10:00', amount: '+100.00', channel: '汇付钱包' },
+    { product: '中路财童', stage: '零售市场', orderNo: 'XB-zc2608010001', tradeAmount: '1000.00', fee: '6.00', createTime: '2026-08-01 10:12:00', updateTime: '2026-08-01 10:12:00', amount: '+100.00', channel: '汇付钱包' },
+    { product: '中路财童', stage: '零售市场', orderNo: 'XB-zc2608010001', tradeAmount: '1000.00', fee: '6.00', createTime: '2026-08-01 10:05:00', updateTime: '2026-08-01 10:05:00', amount: '+100.00', channel: '汇付钱包' },
+    { product: '中路财童', stage: '零售市场', orderNo: 'XB-zc2608010001', tradeAmount: '1000.00', fee: '6.00', createTime: '2026-08-01 10:06:00', updateTime: '2026-08-01 10:06:00', amount: '+100.00', channel: '汇付钱包' },
     { product: '中路财童', stage: '批发市场', orderNo: 'XB-zc2608010001', tradeAmount: '1000.00', fee: '6.00', createTime: '2026-08-01 9:30:00', updateTime: '2026-08-01 9:30:00', amount: '+244.00', channel: '汇付钱包' },
     { product: '东坡-君子', stage: '零售市场', createTime: '2026-05-25 14:45:12', updateTime: '2026-05-25 14:45:12', amount: '+15.50', channel: '宝付钱包' },
     { product: '东坡-万里', stage: '零售市场', createTime: '2026-04-08 16:04:00', updateTime: '2026-04-08 16:04:00', amount: '+2.41', channel: '宝付钱包' },
@@ -530,6 +532,7 @@ renderTable();
       <li>顶部展示已经接入的<b>第三方支付</b></li>
       <li>未开通的展示<b>开通按钮</b>，调用第三方支付平台进行开户</li>
       <li>开通后展示<b>余额</b>和<b>提现按钮</b></li>
+      <li><b>注意宝付只对已经开通的服务商展示，新服务商不展示，且只有提现按钮</b></li>
     </ul>
     <h4><span class="badge">2</span> <span style="vertical-align:middle;">增加筛选项</span></h4>
     <ul>
