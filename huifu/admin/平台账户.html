@@ -441,9 +441,10 @@
         <span class="filter-label">交易来源</span>
         <select class="filter-select">
             <option>请选择交易来源</option>
-            <option>第三方支付手续费</option>
-            <option>平台交易手续费</option>
+            <option>宝付手续费</option>
             <option>上线服务费</option>
+            <option>平台管理服务费</option>
+            <option>平台交易手续费</option>
             <option>批发市场服务费</option>
             <option>提现</option>
         </select>
@@ -515,16 +516,18 @@
 
 <script>
 var data = [
-    { id: 1, tradeNo: 'XB-txbuy26072004046001', payNo: '12607201114450853227', stage: '零售市场', type: '收入', source: '第三方支付手续费', channel: '宝付钱包', amount: '+0.06', product: '东坡万里', time: '2026-07-20 11:14:37' },
-    { id: 2, tradeNo: 'XB-txbuy26072004046001', payNo: '12607201114450853227', stage: '零售市场', type: '收入', source: '平台交易手续费', channel: '汇付钱包', amount: '+0.18', product: '东坡万里', time: '2026-07-20 11:14:37' },
-    { id: 3, tradeNo: 'XB-txbuy26072004034301', payNo: '1260720111244892128', stage: '批发市场', type: '收入', source: '第三方支付手续费', channel: '宝付钱包', amount: '+0.07', product: '诺亚宝', time: '2026-07-20 11:12:41' },
-    { id: 4, tradeNo: 'XB-txbuy26072004034301', payNo: '1260720111244892128', stage: '批发市场', type: '收入', source: '平台交易手续费', channel: '汇付钱包', amount: '+0.21', product: '诺亚宝', time: '2026-07-20 11:12:41' },
-    { id: 5, tradeNo: 'XB-txbuy26071704007801', payNo: '1260717110765289498', stage: '零售市场', type: '收入', source: '第三方支付手续费', channel: '宝付钱包', amount: '+0.18', product: '招财财', time: '2026-07-17 11:08:14' },
-    { id: 6, tradeNo: 'XB-txbuy26071704007801', payNo: '1260717110765289498', stage: '零售市场', type: '收入', source: '平台交易手续费', channel: '汇付钱包', amount: '+0.54', product: '招财财', time: '2026-07-17 11:08:14' },
-    { id: 7, tradeNo: 'XB-txbuy26071703998401', payNo: '1260717110665197510', stage: '批发市场', type: '收入', source: '第三方支付手续费', channel: '宝付钱包', amount: '+0.05', product: '东坡佛春', time: '2026-07-17 11:06:43' },
-    { id: 8, tradeNo: 'XB-txbuy26071703998401', payNo: '1260717110665197510', stage: '批发市场', type: '收入', source: '平台交易手续费', channel: '汇付钱包', amount: '+0.13', product: '东坡佛春', time: '2026-07-17 11:06:43' },
-    { id: 9, tradeNo: 'XB-txbuy26071703982401', payNo: '1260717110064894877', stage: '零售市场', type: '收入', source: '第三方支付手续费', channel: '宝付钱包', amount: '+0.35', product: '招财财', time: '2026-07-17 11:00:44' },
-    { id: 10, tradeNo: 'XB-txbuy26071703982401', payNo: '1260717110064894877', stage: '零售市场', type: '收入', source: '平台交易手续费', channel: '汇付钱包', amount: '+1.05', product: '招财财', time: '2026-07-17 11:00:44' }
+    { id: 1, tradeNo: 'XB-pf2608011000001', payNo: '126080110000000001', stage: '批发市场', type: '收入', source: '批发市场服务费', channel: '汇付钱包', amount: '+144.00', product: '中路财童', time: '2026-08-01 10:00:00' },
+    { id: 2, tradeNo: 'XB-ls2608011000002', payNo: '126080110000000002', stage: '零售市场', type: '收入', source: '平台交易手续费', channel: '汇付钱包', amount: '+18.00', product: '中路财童', time: '2026-08-01 10:30:00' },
+    { id: 3, tradeNo: 'XB-txbuy26072004046001', payNo: '12607201114450853227', stage: '零售市场', type: '收入', source: '第三方支付手续费', channel: '宝付钱包', amount: '+0.06', product: '东坡万里', time: '2026-07-20 11:14:37' },
+    { id: 4, tradeNo: 'XB-txbuy26072004046001', payNo: '12607201114450853227', stage: '零售市场', type: '收入', source: '平台交易手续费', channel: '宝付钱包', amount: '+0.18', product: '东坡万里', time: '2026-07-20 11:14:37' },
+    { id: 5, tradeNo: 'XB-txbuy26072004034301', payNo: '1260720111244892128', stage: '批发市场', type: '收入', source: '第三方支付手续费', channel: '宝付钱包', amount: '+0.07', product: '诺亚宝', time: '2026-07-20 11:12:41' },
+    { id: 6, tradeNo: 'XB-txbuy26072004034301', payNo: '1260720111244892128', stage: '批发市场', type: '收入', source: '平台交易手续费', channel: '宝付钱包', amount: '+0.21', product: '诺亚宝', time: '2026-07-20 11:12:41' },
+    { id: 7, tradeNo: 'XB-txbuy26071704007801', payNo: '1260717110765289498', stage: '零售市场', type: '收入', source: '第三方支付手续费', channel: '宝付钱包', amount: '+0.18', product: '招财财', time: '2026-07-17 11:08:14' },
+    { id: 8, tradeNo: 'XB-txbuy26071704007801', payNo: '1260717110765289498', stage: '零售市场', type: '收入', source: '平台交易手续费', channel: '宝付钱包', amount: '+0.54', product: '招财财', time: '2026-07-17 11:08:14' },
+    { id: 9, tradeNo: 'XB-txbuy26071703998401', payNo: '1260717110665197510', stage: '批发市场', type: '收入', source: '第三方支付手续费', channel: '宝付钱包', amount: '+0.05', product: '东坡佛春', time: '2026-07-17 11:06:43' },
+    { id: 10, tradeNo: 'XB-txbuy26071703998401', payNo: '1260717110665197510', stage: '批发市场', type: '收入', source: '平台交易手续费', channel: '宝付钱包', amount: '+0.13', product: '东坡佛春', time: '2026-07-17 11:06:43' },
+    { id: 11, tradeNo: 'XB-txbuy26071703982401', payNo: '1260717110064894877', stage: '零售市场', type: '收入', source: '第三方支付手续费', channel: '宝付钱包', amount: '+0.35', product: '招财财', time: '2026-07-17 11:00:44' },
+    { id: 12, tradeNo: 'XB-txbuy26071703982401', payNo: '1260717110064894877', stage: '零售市场', type: '收入', source: '平台交易手续费', channel: '宝付钱包', amount: '+1.05', product: '招财财', time: '2026-07-17 11:00:44' }
 ];
 
 function renderTable() {
@@ -572,11 +575,12 @@ renderTable();
     <h4><span class="badge">3</span> <span style="vertical-align:middle;">交易来源查询</span></h4>
     <ul>
       <li>交易来源作为查询条件，包括：</li>
-      <li><b>第三方支付手续费</b>（兼容之前的宝付手续费，统称该名，后续通过支付渠道区分）</li>
-      <li><b>平台交易手续费</b></li>
+      <li><b>宝付手续费</b>（老，补外扣的宝付手续费，新的支付渠道部补外扣全部归入批发市场服务费）</li>
       <li><b>上线服务费</b>（老）</li>
-      <li><b>批发市场服务费</b>（即 15%+0.6%）</li>
-      <li><b>提现</b></li>
+      <li><b>平台管理服务费</b>（老）</li>
+      <li><font color="#e74c5e"><b>批发市场服务费</b>（即 15%+0.6%,原上线服务费+平台管理服务费+支付手续费的合并）</font></li>
+      <li><font color="#e74c5e"><b>平台交易手续费</font></b></li>
+      <li><font color="#e74c5e"><b>提现</font></b></li>
     </ul>
     <h4><span class="badge">4</span> <span style="vertical-align:middle;">支付渠道</span></h4>
     <ul>
