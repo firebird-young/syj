@@ -164,10 +164,136 @@
 <div class="container">
     <div class="page-title">深艺交系统升级功能说明</div>
 
-    <!-- 支付系统更换 -->
+    <!-- 产品退市功能 -->
     <div class="req-section open">
         <div class="req-header">
             <span class="num">1</span>
+            产品退市功能
+            <span class="arrow">▾</span>
+        </div>
+        <div class="req-body">
+            <ul class="req-list">
+                <li>产品提货完后进入退市，零售市场不可见，批发市场可见<a href="admin/数字艺术品管理.html" target="_blank" style="margin-left:8px;color:#1a78ff;text-decoration:underline;">查看</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 委托服务商功能优化 -->
+    <div class="req-section open">
+        <div class="req-header">
+            <span class="num">2</span>
+            委托服务商功能优化
+            <span class="arrow">▾</span>
+        </div>
+        <div class="req-body">
+            <ul class="req-list">
+                <li>交易手续费及批发市场分佣比例由各委托服务商自行决定分成比例。分成比例设置界面更换到委托服务商后台<a href="service/业务参数配置.html" target="_blank" style="margin-left:8px;color:#1a78ff;text-decoration:underline;">查看</a></li>
+                <li>后台提货信息优化，增加用户ID、提货时产品金额、提货阶段分类显示、增加表格导出功能<a href="service/发货管理.html" target="_blank" style="margin-left:8px;color:#1a78ff;text-decoration:underline;">查看</a></li>
+                <li>白名单导入格式（增加用户ID，手机号；二选一录入均可以）</li>
+                <li>增加提货任务功能：指定提货产品（一个或多个）
+                    <div style="margin-top:6px;line-height:1.9;">
+                        <div><a href="service/addtask.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">任务设置（后台）</a></div>
+                        <div><a href="service/任务奖励.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">任务奖励列表（后台）</a></div>
+                        <div><a href="任务详情.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">任务详情（APP）</a></div>
+                        <div><a href="提货页面.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">提货详情（APP）</a></div>
+                        <div><a href="奖励列表.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">奖励列表（APP）</a></div>
+                    </div>
+                </li>
+                <li>增加委托服务商提现功能，提现需要审核</li>
+                    <div style="margin-top:6px;line-height:1.9;">
+                        <div><a href="service/资金账号管理.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">服务商申请提现</a></div>
+                        <div><a href="服务商提现审核.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">平台审核提现</a></div>
+                    </div>
+                <li>我的代理进去，增加搜索功能：按照产品名称模糊搜索</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 用户端显示优化 -->
+    <div class="req-section open">
+        <div class="req-header">
+            <span class="num">3</span>
+            用户端显示优化
+            <span class="arrow">▾</span>
+        </div>
+        <div class="req-body">
+            <ul class="req-list">
+                <li>在客户端显示优化：我的个人信息显示增加用户在平台的唯一ID号（ID账号用户可复制）<a href="我的页面.html" target="_blank" style="margin-left:8px;color:#1a78ff;text-decoration:underline;">查看</a></li></li>
+                <li>产品上传的图片及视频尺寸要自适应手机屏幕</li>
+                <li>我的自选功能</li>
+                    <div style="margin-top:6px;line-height:1.9;">
+                        <div><a href="零售市场详情.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">添加自选（APP）</a></div>
+                        <div><a href="零售市场列表.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">自选列表（APP）</a></div>
+                    </div>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 分账比例优化 -->
+    <div class="req-section open">
+        <div class="req-header">
+            <span class="num">5</span>
+            分账比例优化
+            <span class="arrow">▾</span>
+        </div>
+        <div class="req-body">
+            <table class="fee-table">
+                <tr>
+                    <td class="label-cell">上线服务费</td>
+                    <td colspan="2">批发商总货款的 5%</td>
+                </tr>
+                <tr>
+                    <td class="label-cell">平台运营管理服务费</td>
+                    <td colspan="2">0~10%</td>
+                </tr>
+                <tr>
+                    <td class="label-cell">单品批发总价 0~500万</td>
+                    <td>服务费 10%</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td class="label-cell">单品批发总价 501~800万</td>
+                    <td>服务费 8%</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td class="label-cell">单品批发总价 801~1000万</td>
+                    <td>服务费 7%</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td class="label-cell">单品批发总价 大于1000万</td>
+                    <td>服务费 6%</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td class="label-cell">委托服务商销售推广费</td>
+                    <td colspan="2">20%</td>
+                </tr>
+                <tr>
+                    <td class="label-cell">固定保证金</td>
+                    <td colspan="2">40%</td>
+                </tr>
+                <tr>
+                    <td class="label-cell">批发商售卖分账</td>
+                    <td colspan="2">25%</td>
+                </tr>
+            </table>
+            <div class="note">注：分账比例调整为可输入</div>
+        </div>
+        <div class="req-body">
+            <div style="margin-top:6px;line-height:1.9;">
+                <div><a href="admin/产品上线设置.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">平台管理服务费配置</a></div>
+                <div><a href="admin/批发市场分账管理.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">批发市场分账管理</a></div>
+            </div>
+        </div>
+            
+    </div>
+
+    <!-- 支付系统更换 -->
+    <div class="req-section open">
+        <div class="req-header">
+            <span class="num">6</span>
             支付系统更换成汇付
             <span class="arrow">▾</span>
         </div>
@@ -221,6 +347,20 @@
                         </div>
                     </div>
                 </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 历史遗留问题 -->
+    <div class="req-section open">
+        <div class="req-header">
+            <span class="num">7</span>
+            <span class="req-title">历史遗留问题</span>
+            <span class="req-arrow">▾</span>
+        </div>
+        <div class="req-body">
+            <ul class="req-list">
+                <li>零售市场指导价算法</li>
             </ul>
         </div>
     </div>
