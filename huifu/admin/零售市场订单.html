@@ -366,9 +366,8 @@
                 <th>卖家所得金额</th>
                 <th>订单状态</th>
                 <th>是否提货</th>
-                <th>平台手续费</th>
-                <th>服务商手续费</th>
-                <th>推荐人分佣</th>
+                <th>平台交易手续费</th>
+                <th>服务商运营服务费</th>
                 <th>服务商</th>
                 <th>支付产品</th>
                 <th>支付渠道</th>
@@ -381,12 +380,12 @@
 
 <script>
 var data = [
-    { id: 1, orderNo: 'XB-txbuy26072004046001', payNo: '1260720111445095227', product: '东坡万里', buyer: '153019...', seller: '153563...', qty: 1, price: 9.9, buyerPay: 9.96, buyerFee: 0.3, sellerFee: 0.96, sellerIncome: 9.6, status: 'done', isPickup: '仓库暂存', platformFee: 0.18, serviceFee: 0.08, recommendFee: 0.04, service: '四川华泰博文文化艺术发展有限公司', payProduct: '银行卡', payChannel: '宝付钱包', time: '2026-07-20 11:14:37' },
-    { id: 2, orderNo: 'XB-txbuy26072004034301', payNo: '1260720111244892128', product: '诺亚宝', buyer: '153019...', seller: '132952...', qty: 3, price: 3.78, buyerPay: 11.41, buyerFee: 0.35, sellerFee: 10.99, sellerIncome: 0, status: 'done', isPickup: '仓库暂存', platformFee: 0.21, serviceFee: 0.10, recommendFee: 0.04, service: '四川华泰博文文化艺术发展有限公司', payProduct: '银行卡', payChannel: '汇付钱包', time: '2026-07-20 11:12:41' },
-    { id: 3, orderNo: 'XB-txbuy26072003711901', payNo: '—', product: '诺亚宝', buyer: '153019...', seller: '132952...', qty: 3, price: 3.78, buyerPay: 0, buyerFee: 0, sellerFee: 0, sellerIncome: 0, status: 'canceled', isPickup: '仓库暂存', platformFee: 0.21, serviceFee: 0.10, recommendFee: 0.04, service: '四川华泰博文文化艺术发展有限公司', payProduct: '/', payChannel: '/', time: '2026-07-20 09:32:15' },
-    { id: 4, orderNo: 'XB-txbuy26071704007801', payNo: '1260717110765289498', product: '招财财', buyer: '153019...', seller: '131356...', qty: 1, price: 30, buyerPay: 30.18, buyerFee: 0.9, sellerFee: 29.1, sellerIncome: 0, status: 'done', isPickup: '仓库暂存', platformFee: 0.54, serviceFee: 0.24, recommendFee: 0.12, service: '四川华泰博文文化艺术发展有限公司', payProduct: '银行卡', payChannel: '宝付钱包', time: '2026-07-17 11:08:14' },
-    { id: 5, orderNo: 'XB-txbuy26071703998401', payNo: '1260717110665197510', product: '东坡佛春', buyer: '153019...', seller: '138413...', qty: 1, price: 6.75, buyerPay: 6.8, buyerFee: 0.21, sellerFee: 6.54, sellerIncome: 0, status: 'done', isPickup: '仓库暂存', platformFee: 0.13, serviceFee: 0.06, recommendFee: 0.02, service: '四川华泰博文文化艺术发展有限公司', payProduct: '银行卡', payChannel: '汇付钱包', time: '2026-07-17 11:06:43' },
-    { id: 6, orderNo: 'XB-txbuy26071703962401', payNo: '1260717110064894877', product: '招财财', buyer: '153019...', seller: '187321...', qty: 2, price: 29, buyerPay: 58.35, buyerFee: 1.74, sellerFee: 56.26, sellerIncome: 0, status: 'done', isPickup: '仓库暂存', platformFee: 1.05, serviceFee: 0.46, recommendFee: 0.23, service: '四川华泰博文文化艺术发展有限公司', payProduct: '银行卡', payChannel: '宝付钱包', time: '2026-07-17 11:00:44' }
+    { id: 1, orderNo: 'XB-txbuy26072004046001', payNo: '1260720111445095227', product: '东坡万里', buyer: '153019...', seller: '153563...', qty: 1, price: 9.9, buyerPay: 9.96, buyerFee: 0.3, sellerFee: 0.96, sellerIncome: 9.6, status: 'done', isPickup: '仓库暂存', platformFee: 0.18, serviceFee: 0.12, service: '四川华泰博文文化艺术发展有限公司', payProduct: '银行卡', payChannel: '宝付钱包', time: '2026-07-20 11:14:37' },
+    { id: 2, orderNo: 'XB-txbuy26072004034301', payNo: '1260720111244892128', product: '诺亚宝', buyer: '153019...', seller: '132952...', qty: 3, price: 3.78, buyerPay: 11.41, buyerFee: 0.35, sellerFee: 10.99, sellerIncome: 0, status: 'done', isPickup: '仓库暂存', platformFee: 0.21, serviceFee: 0.14, service: '四川华泰博文文化艺术发展有限公司', payProduct: '银行卡', payChannel: '汇付钱包', time: '2026-07-20 11:12:41' },
+    { id: 3, orderNo: 'XB-txbuy26072003711901', payNo: '—', product: '诺亚宝', buyer: '153019...', seller: '132952...', qty: 3, price: 3.78, buyerPay: 0, buyerFee: 0, sellerFee: 0, sellerIncome: 0, status: 'canceled', isPickup: '仓库暂存', platformFee: 0.21, serviceFee: 0.14, service: '四川华泰博文文化艺术发展有限公司', payProduct: '/', payChannel: '/', time: '2026-07-20 09:32:15' },
+    { id: 4, orderNo: 'XB-txbuy26071704007801', payNo: '1260717110765289498', product: '招财财', buyer: '153019...', seller: '131356...', qty: 1, price: 30, buyerPay: 30.18, buyerFee: 0.9, sellerFee: 29.1, sellerIncome: 0, status: 'done', isPickup: '仓库暂存', platformFee: 0.54, serviceFee: 0.36, service: '四川华泰博文文化艺术发展有限公司', payProduct: '银行卡', payChannel: '宝付钱包', time: '2026-07-17 11:08:14' },
+    { id: 5, orderNo: 'XB-txbuy26071703998401', payNo: '1260717110665197510', product: '东坡佛春', buyer: '153019...', seller: '138413...', qty: 1, price: 6.75, buyerPay: 6.8, buyerFee: 0.21, sellerFee: 6.54, sellerIncome: 0, status: 'done', isPickup: '仓库暂存', platformFee: 0.13, serviceFee: 0.08, service: '四川华泰博文文化艺术发展有限公司', payProduct: '银行卡', payChannel: '汇付钱包', time: '2026-07-17 11:06:43' },
+    { id: 6, orderNo: 'XB-txbuy26071703962401', payNo: '1260717110064894877', product: '招财财', buyer: '153019...', seller: '187321...', qty: 2, price: 29, buyerPay: 58.35, buyerFee: 1.74, sellerFee: 56.26, sellerIncome: 0, status: 'done', isPickup: '仓库暂存', platformFee: 1.05, serviceFee: 0.69, service: '四川华泰博文文化艺术发展有限公司', payProduct: '银行卡', payChannel: '宝付钱包', time: '2026-07-17 11:00:44' }
 ];
 
 var statusNames = { done: '已成交', canceled: '已撤销' };
@@ -411,7 +410,6 @@ function renderTable() {
             '    <td>' + o.isPickup + '</td>',
             '    <td>' + o.platformFee + '</td>',
             '    <td>' + o.serviceFee + '</td>',
-            '    <td>' + o.recommendFee + '</td>',
             '    <td>' + o.service + '</td>',
             '    <td>' + o.payProduct + '</td>',
             '    <td>' + o.payChannel + '</td>',
@@ -442,10 +440,10 @@ renderTable();
       <li>原<b>支付渠道</b>改为<b>支付产品</b>（银行卡 / 余额）</li>
       <li>作为筛选条件并在列表中展示</li>
     </ul>
-    <h4><span class="badge">3</span> <span style="vertical-align:middle;">推荐人分佣</span></h4>
+    <h4><span class="badge">3</span> <span style="vertical-align:middle;">服务商运营服务费</span></h4>
     <ul>
-      <li>增加<b>推荐人分佣</b>作为列表项（位于「服务商手续费」后）</li>
-      <li>原先的「服务商手续费」拆分为<b>服务商手续费</b>和<b>推荐人分佣</b></li>
+      <li>去掉单独的「推荐人分佣」列表项</li>
+      <li>原「服务商手续费」与「推荐人分佣」合并为<b>服务商运营服务费</b>（推荐人分佣金额并入服务商手续费）</li>
       <li>在一次交易中完成分账</li>
     </ul>
   </div>
