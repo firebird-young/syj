@@ -382,12 +382,6 @@
                 <span class="addr-text">0x55d6...0baa</span>
                 <span class="copy-icon" onclick="copyText('0x55d6...0baa')" style="cursor:pointer;">⧉</span>
             </div>
-            <div class="user-id">
-                <span>ID</span>
-                <span class="id-text">1860316373387378689</span>
-                <span class="copy-icon" onclick="copyText('1860316373387378689')" style="cursor:pointer;">⧉</span>
-                <span class="badge sm">1</span>
-            </div>
             <div class="user-login">上次登录 2026-07-20 09:32:36</div>
         </div>
         <div class="user-arrow">›</div>
@@ -410,10 +404,10 @@
     </div>
 
     <!-- 我的钱包 -->
-    <div class="balance-card" onclick="location.href='我的钱包.html'">
+    <div class="balance-card" onclick="location.href='我的钱包_v2.html'">
         <div class="balance-header">
             <div class="balance-title">
-                💰 我的钱包<span class="badge sm" style="margin-left:6px;">2</span>
+                💰 我的钱包<span class="badge sm" style="margin-left:6px;">1</span>
             </div>
             <span style="font-size:18px;opacity:0.7;">›</span>
         </div>
@@ -469,7 +463,7 @@
     <div class="grid-4">
         <div class="grid-item">
             <div class="grid-icon">🛡</div>
-            <div class="grid-label">我的认证<span class="badge sm" style="margin-left:4px;">3</span></div>
+            <div class="grid-label">我的认证<span class="badge sm" style="margin-left:4px;">2</span></div>
         </div>
         <div class="grid-item">
             <div class="grid-icon">📋</div>
@@ -534,15 +528,11 @@ function copyText(text) {
     <button class="fm-close" onclick="toggleFuncModal()">✕</button>
   </div>
   <div class="fm-body">
-    <h4><span class="badge">1</span> <span style="vertical-align:middle;">增加系统ID展示</span></h4>
-    <ul>
-      <li>个人信息增加展示用户在平台的唯一 ID 账号，且支持点击复制</li>
-    </ul>
-    <h4><span class="badge">2</span> <span style="vertical-align:middle;">我的钱包</span></h4>
+    <h4><span class="badge">1</span> <span style="vertical-align:middle;">我的钱包</span></h4>
     <ul>
       <li>去掉原账户信息展示，替换成「我的钱包」入口</li>
     </ul>
-    <h4><span class="badge">3</span> <span style="vertical-align:middle;">我的认证</span></h4>
+    <h4><span class="badge">2</span> <span style="vertical-align:middle;">我的认证</span></h4>
     <ul>
       <li>去掉原「我的银行卡」功能</li>
     </ul>

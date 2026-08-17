@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>我的钱包</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        html { background: #b0b8c6; min-height:100vh; }
+        body { margin:0; }
+        .phone-frame {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
+            background: #f5f6fa;
+            max-width: 420px;
+            width: 420px;
+            min-height: 100vh;
+            padding-bottom: 100px;
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.04);
+            margin: 0 auto;
+        }
+        .side-btn {
+            position: fixed;
+            left: calc(50% + 220px);
+            top: 60px;
+            z-index: 999;
+        }
+        .side-btn a {
+            font-size: 12px;
+            color: #333;
+            cursor: pointer;
+            text-decoration: underline;
+            background: rgba(255,255,255,0.15);
+            padding: 5px 12px;
+            border-radius: 6px;
+            display: inline-block;
+            white-space: nowrap;
+        }
+
+        /* 头部 */
+        .header {
+            background: linear-gradient(180deg, #f8d4d8 0%, #fce5e8 40%, #f5f6fa 100%);
+            padding: 44px 20px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .back-btn {
+            font-size: 24px;
+            color: #1a1a2e;
+            cursor: pointer;
+            line-height: 1;
+        }
+        .header-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: #1a1a2e;
+        }
+
+        /* ===== 钱包卡片 ===== */
+        .wallet-card {
+            background: #fff;
+            border-radius: 14px;
+            margin: 12px 16px;
+            box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+            overflow: hidden;
+        }
+
+        /* 卡片头部 */
+        .wc-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            border-bottom: 1px solid #f5f5f7;
+        }
+        .wc-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .wc-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #fff;
+        }
+        .wc-logo.hfpay {
+            background: linear-gradient(135deg, #f5a623, #e0941e);
+        }
+        .wc-logo.bffpay {
+            background: linear-gradient(135deg, #c0392b, #e74c3c);
+        }
+        .wc-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a1a2e;
+        }
+        .wc-arrow {
+            font-size: 18px;
+            color: #999;
+            cursor: pointer;
+            display: none;
+        }
+        .wallet-card.opened .wc-arrow {
+            display: block;
+        }
+        .wc-btn {
+            height: 32px;
+            padding: 0 20px;
+            border-radius: 16px;
+            background: #D62828;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+        .wc-btn:active {
+            opacity: 0.85;
+            transform: scale(0.97);
+        }
+        .wallet-card.opened .wc-btn {
+            display: none;
+        }
+
+        /* 未开通状态 */
+        .wc-unopened {
+            padding: 0 16px 16px;
+        }
+        .wc-unopened .wc-desc {
+            font-size: 12px;
+            color: #999;
+        }
+        .wallet-card.opened .wc-unopened {
+            display: none;
+        }
+
+        /* 已开通状态 */
+        .wc-opened {
+            display: none;
+            padding: 16px;
+        }
+        .wallet-card.opened .wc-opened {
+            display: block;
+        }
+        .wc-balance-row {
+            display: flex;
+            justify-content: space-around;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #f5f5f7;
+        }
+        .wb-item {
+            text-align: center;
+        }
+        .wb-label {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 6px;
+        }
+        .wb-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+
+        /* 操作按钮 */
+        .wc-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+        .wc-action-btn {
+            flex: 1;
+            height: 40px;
+            border-radius: 20px;
+            border: 1px solid #e0e0e0;
+            background: #fff;
+            font-size: 13px;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .wc-action-btn:active {
+            background: #f5f5f7;
+        }
+        .wc-action-btn.primary {
+            background: #D62828;
+            color: #fff;
+            border-color: #D62828;
+        }
+        .wc-action-btn.primary:active {
+            background: #c41e1e;
+        }
+
+        /* 宝付钱包提示 */
+        .bff-hint {
+            font-size: 11px;
+            color: #e74c5e;
+            margin-top: 6px;
+            text-align: center;
+        }
+
+        /* 开户须知弹窗 */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+        }
+        .modal-overlay.show {
+            display: flex;
+        }
+        .modal-box {
+            background: #fff;
+            border-radius: 16px;
+            width: 86%;
+            max-width: 340px;
+            overflow: hidden;
+        }
+        .modal-header {
+            padding: 18px 20px 12px;
+            text-align: center;
+            font-size: 17px;
+            font-weight: 600;
+            color: #1a1a2e;
+        }
+        .modal-body {
+            padding: 0 20px 16px;
+            font-size: 13px;
+            color: #555;
+            line-height: 1.7;
+            max-height: 260px;
+            overflow-y: auto;
+        }
+        .modal-body ul {
+            padding-left: 18px;
+            margin: 4px 0;
+        }
+        .modal-body ul li {
+            margin-bottom: 4px;
+        }
+        .modal-footer {
+            display: flex;
+            border-top: 1px solid #f0f0f0;
+        }
+        .modal-footer button {
+            flex: 1;
+            height: 48px;
+            border: none;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            background: #fff;
+            color: #666;
+            transition: background 0.15s;
+        }
+        .modal-footer button:active {
+            background: #f5f5f7;
+        }
+        .modal-footer button.primary {
+            color: #D62828;
+            font-weight: 600;
+        }
+        .modal-footer button + button {
+            border-left: 1px solid #f0f0f0;
+        }
+
+        /* 加载弹窗 */
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+        }
+        .loading-overlay.show {
+            display: flex;
+        }
+        .loading-content {
+            background: #fff;
+            border-radius: 16px;
+            padding: 24px 32px;
+            text-align: center;
+        }
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #f0f0f0;
+            border-top-color: #D62828;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 12px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-text {
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* TabBar */
+        .tabbar {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 420px;
+            background: #fff;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            padding: 8px 0 12px;
+            z-index: 10;
+        }
+        .tab-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            font-size: 11px;
+            color: #6b7588;
+            cursor: pointer;
+        }
+        .tab-item.active { color: #e74c5e; }
+        .tab-icon { font-size: 22px; line-height: 1; }
+
+        /* 标注圆点 */
+        .badge {
+            display: inline-block;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 5px;
+            border-radius: 50%;
+            background: #ff2d55;
+            color: #fff;
+            font-size: 12px;
+            line-height: 18px;
+            text-align: center;
+            font-weight: 600;
+            box-shadow: 0 1px 3px rgba(255,45,85,0.3);
+        }
+        .badge.sm {
+            min-width: 16px;
+            height: 16px;
+            font-size: 11px;
+            line-height: 16px;
+        }
+
+        /* ── 功能说明浮窗 ── */
+        .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 430px; max-width: 94vw; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 99999; padding: 22px; display: none; }
+        .f-modal.show { display: block; }
+        .f-modal .fm-title { font-size: 15px; font-weight: 600; color: #1a1a2e; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
+        .f-modal .fm-title:active { cursor: grabbing; }
+        .f-modal .fm-close { width: 26px; height: 26px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 13px; color: #666; border: none; flex-shrink: 0; }
+        .f-modal .fm-close:hover { background: #e8e8e8; }
+        .f-modal .fm-body { font-size: 13px; color: #555; line-height: 1.8; }
+        .f-modal .fm-body h4 { font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 14px 0 6px; }
+        .f-modal .fm-body ul { padding-left: 18px; margin: 0 0 8px; }
+        .f-modal .fm-body li { margin-bottom: 4px; }
+    </style>
+</head>
+<body>
+<div class="phone-frame">
+
+<div class="header">
+    <span class="back-btn" onclick="goBack()">‹</span>
+    <span class="header-title">我的钱包</span>
+</div>
+
+<!-- 汇付钱包 -->
+<div class="wallet-card" id="huiWallet">
+    <div class="wc-header">
+        <div class="wc-header-left">
+            <div class="wc-logo hfpay">💰</div>
+            <span class="wc-name">汇付钱包<span class="badge sm" style="margin-left:6px;">1</span></span>
+        </div>
+        <span class="wc-arrow" onclick="viewWalletDetail('hui')">›</span>
+        <button class="wc-btn" onclick="openWallet('hui')">去开通</button>
+    </div>
+    <div class="wc-unopened">
+        <div class="wc-desc">免费开通 快捷支付</div>
+    </div>
+    <div class="wc-opened">
+        <div class="wc-balance-row">
+            <div class="wb-item">
+                <div class="wb-label">账户余额</div>
+                <div class="wb-value">¥3,286.50</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div style="text-align:center;margin:12px auto;max-width:420px;">
+<!-- 开户须知弹窗 -->
+<div class="modal-overlay" id="modalOverlay">
+    <div class="modal-box">
+        <div class="modal-header">开户须知</div>
+        <div class="modal-body">
+            <p>尊敬的用户，在开通汇付钱包前，请仔细阅读以下条款：</p>
+            <ul>
+                <li>开通钱包需绑定本人实名银行卡</li>
+                <li>每个身份证号仅限开通一个钱包账户</li>
+                <li>钱包余额提现需 1-3 个工作日到账</li>
+                <li>单笔提现金额上限为 50,000 元</li>
+                <li>每日提现次数上限为 3 次</li>
+                <li>请妥善保管账户密码及验证码</li>
+            </ul>
+            <p style="margin-top:6px;">点击「确认开通」即表示您已阅读并同意以上条款。</p>
+        </div>
+        <div class="modal-footer">
+            <button onclick="closeModal()">取消</button>
+            <button class="primary" onclick="confirmOpen()">去开通</button>
+        </div>
+    </div>
+</div>
+
+<!-- 加载弹窗 -->
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-content">
+        <div class="loading-spinner"></div>
+        <div class="loading-text" id="loadingText">正在开通...</div>
+    </div>
+</div>
+
+<!-- TabBar -->
+<div class="tabbar">
+    <div class="tab-item">
+        <div class="tab-icon">🏪</div>
+        <div>批发市场</div>
+    </div>
+    <div class="tab-item">
+        <div class="tab-icon">🛒</div>
+        <div>共享超市</div>
+    </div>
+    <div class="tab-item active">
+        <div class="tab-icon">👤</div>
+        <div>我的</div>
+    </div>
+</div>
+
+<script>
+// 检查本地存储中钱包的开通状态
+document.addEventListener('DOMContentLoaded', function() {
+    var huiOpened = localStorage.getItem('huiWalletOpened') === 'true';
+
+    if (huiOpened) {
+        document.getElementById('huiWallet').classList.add('opened');
+    }
+});
+
+function goBack() {
+    window.location.href = '我的页面.html';
+}
+
+function openWallet(type) {
+    // 显示开户须知弹窗
+    document.getElementById('modalOverlay').classList.add('show');
+}
+
+function closeModal() {
+    document.getElementById('modalOverlay').classList.remove('show');
+}
+
+function confirmOpen() {
+    closeModal();
+    var overlay = document.getElementById('loadingOverlay');
+    var text = document.getElementById('loadingText');
+
+    text.textContent = '正在开通...';
+    overlay.classList.add('show');
+
+    setTimeout(function() { text.textContent = '验证身份...'; }, 800);
+    setTimeout(function() { text.textContent = '开通成功!'; }, 1600);
+    setTimeout(function() {
+        overlay.classList.remove('show');
+        document.getElementById('huiWallet').classList.add('opened');
+        localStorage.setItem('huiWalletOpened', 'true');
+    }, 2400);
+}
+
+function resetAll() {
+    localStorage.removeItem('huiWalletOpened');
+    alert('已清空开通状态，页面将刷新');
+    window.location.reload();
+}
+
+function manageWallet(type) {
+    alert('管理钱包: 汇付支付');
+}
+
+function viewDetail(type) {
+    alert('查看明细: 汇付支付');
+}
+
+function manageCard(type) {
+    alert('管理银行卡: 汇付支付');
+}
+
+function viewWalletDetail(type) {
+    alert('查看钱包详情: 汇付支付');
+}
+
+function recharge(type) {
+    alert('充值功能: 汇付支付');
+}
+
+function withdraw(type) {
+    alert('提现功能: 汇付支付');
+}
+</script>
+
+</div><!-- /phone-frame -->
+<div class="side-btn">
+    <a onclick="resetAll()">清理开通状态</a>
+</div>
+
+<!-- 浮动说明按钮（手机框外） -->
+<button onclick="toggleFuncModal()" style="position:fixed;top:12px;right:16px;z-index:99999;background:#fff;color:#666;padding:7px 16px;border-radius:20px;border:1px solid #ddd;font-size:13px;font-weight:500;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.08);font-family:inherit;display:inline-flex;align-items:center;gap:4px;">📖 说明</button>
+
+<!-- ====== 功能说明浮窗 ====== -->
+<div class="f-modal" id="funcModal">
+  <div class="fm-title">
+    <span>📖 功能说明</span>
+    <button class="fm-close" onclick="toggleFuncModal()">✕</button>
+  </div>
+  <div class="fm-body">
+    <h4><span class="badge">1</span> <span style="vertical-align:middle;">新增汇付钱包</span></h4>
+    <ul>
+      <li>新增<b>汇付钱包</b>板块，支持开通汇付钱包</li>
+      <li>开户须知来自<b>后台配置的文案</b></li>
+      <li>点击<b>「去开通」</b>跳转到汇付钱包页面</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+function toggleFuncModal() {
+  var el = document.getElementById('funcModal');
+  el.classList.toggle('show');
+  if (el.classList.contains('show') && !el.dataset.dragged) {
+    el.style.left = '50%'; el.style.top = '50%'; el.style.transform = 'translate(-50%,-50%)';
+  }
+}
+(function() {
+  var modal, titleBar, offX, offY, dragging = false;
+  document.addEventListener('DOMContentLoaded', function() {
+    modal = document.getElementById('funcModal');
+    titleBar = modal.querySelector('.fm-title');
+    titleBar.addEventListener('mousedown', startDrag);
+    titleBar.addEventListener('touchstart', startDragTouch, {passive:true});
+    document.addEventListener('mousemove', onDrag);
+    document.addEventListener('mouseup', endDrag);
+    document.addEventListener('touchmove', onDragTouch, {passive:true});
+    document.addEventListener('touchend', endDrag);
+  });
+  function startDrag(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = e.clientX - rect.left; offY = e.clientY - rect.top; dragging = true; titleBar.style.cursor = 'grabbing'; }
+  function startDragTouch(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; var t = e.touches[0]; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = t.clientX - rect.left; offY = t.clientY - rect.top; dragging = true; }
+  function onDrag(e) { if (!dragging) return; modal.style.left = (e.clientX - offX) + 'px'; modal.style.top = (e.clientY - offY) + 'px'; }
+  function onDragTouch(e) { if (!dragging) return; var t = e.touches[0]; modal.style.left = (t.clientX - offX) + 'px'; modal.style.top = (t.clientY - offY) + 'px'; }
+  function endDrag() { dragging = false; if (titleBar) titleBar.style.cursor = 'grab'; }
+})();
+</script>
+
+</body>
+</html>

@@ -341,17 +341,6 @@
             <div class="toggle-switch on" onclick="toggleWallet(1)"></div>
           </td>
         </tr>
-        <tr data-id="2">
-          <td>2</td>
-          <td><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon points='50,10 90,50 50,90 10,50' fill='%23c0392b'/%3E%3Cpolygon points='50,25 75,50 50,75 25,50' fill='%23e74c3c'/%3E%3Cpolygon points='50,40 65,50 50,60 35,50' fill='%23fff'/%3E%3C/svg%3E" class="logo-img"></td>
-          <td>宝付钱包</td>
-          <td>2025-05-14 15:18:37</td>
-          <td class="action-cell">
-            <button class="btn-edit" onclick="editWallet(2)">修改</button>
-            <button class="btn-view" onclick="viewWallet(2)">查看</button>
-            <div class="toggle-switch on" onclick="toggleWallet(2)"></div>
-          </td>
-        </tr>
       </tbody>
     </table>
   </div>
@@ -419,9 +408,6 @@
     if (id === 1) {
       document.getElementById('walletName').value = '汇付钱包';
       document.getElementById('openDesc').innerHTML = '<p>汇付钱包是第三方支付平台，支持多种支付方式。</p>';
-    } else if (id === 2) {
-      document.getElementById('walletName').value = '宝付钱包';
-      document.getElementById('openDesc').innerHTML = '<p>宝付钱包是金融级支付解决方案。</p>';
     }
   }
   function viewWallet(id) {
@@ -470,7 +456,7 @@
   </div>
   <div style="font-size:13px;font-weight:600;color:#e74c5e;margin:-6px 0 12px;">平台</div>
   <div class="fm-body">
-    <p style="margin:0 0 12px;color:#666">钱包管理：用于平台维护第三方支付钱包信息（汇付钱包、宝付钱包等）。</p>
+    <p style="margin:0 0 12px;color:#666">钱包管理：用于平台维护第三方支付钱包信息（汇付钱包）。</p>
     <h4>一、钱包列表</h4>
     <ul>
       <li>展示钱包的<b>logo、钱包名称、创建时间</b></li>
