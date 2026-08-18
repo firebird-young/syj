@@ -166,8 +166,9 @@
             color: #c0c8d4;
             cursor: pointer;
         }
-        .amount-pos { color: #4caf50; font-weight: 500; }
-        .amount-neg { color: #D62828; font-weight: 500; }
+        /* 收支列标色：收入红、支出绿（其他列保持默认黑色） */
+        .table td.amount-pos { color: #d92d20; font-weight: 700; }
+        .table td.amount-neg { color: #0b9a4f; font-weight: 700; }
 
         .pagination {
             background: #fff;
@@ -306,6 +307,138 @@
             line-height: 16px;
         }
 
+        /* ── 提现浮层 ── */
+        .wd-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        .wd-overlay.show { display: flex; }
+        .wd-modal {
+            background: #fff;
+            border-radius: 8px;
+            width: 440px;
+            max-width: 94vw;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .wd-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .wd-title { font-size: 16px; font-weight: 600; color: #1a1a2e; }
+        .wd-close { font-size: 22px; color: #86909c; cursor: pointer; line-height: 1; }
+        .wd-body { padding: 20px; overflow-y: auto; flex: 1; }
+        .wd-row { margin-bottom: 16px; }
+        .wd-label { font-size: 13px; color: #1a1a2e; margin-bottom: 6px; }
+        .wd-input {
+            width: 100%;
+            height: 36px;
+            padding: 0 12px;
+            border: 1px solid #d0d5dd;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #1a1a2e;
+            outline: none;
+        }
+        .wd-input:focus { border-color: #1a78ff; }
+        .wd-link {
+            font-size: 13px;
+            color: #1a78ff;
+            cursor: pointer;
+            margin-top: 4px;
+            display: inline-block;
+        }
+        .wd-link:hover { text-decoration: underline; }
+        .wd-footer {
+            padding: 12px 20px;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+        .wd-btn-default {
+            background: #fff;
+            border: 1px solid #d0d5dd;
+            color: #4e5a6e;
+            padding: 7px 20px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .wd-btn-primary {
+            background: #1a78ff;
+            border: none;
+            color: #fff;
+            padding: 7px 20px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        /* 提现申请记录 */
+        .rec-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2001;
+        }
+        .rec-overlay.show { display: flex; }
+        .rec-modal {
+            background: #fff;
+            border-radius: 8px;
+            width: 560px;
+            max-width: 94vw;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .rec-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .rec-title { font-size: 16px; font-weight: 600; color: #1a1a2e; }
+        .rec-close { font-size: 22px; color: #86909c; cursor: pointer; line-height: 1; }
+        .rec-body { padding: 16px 20px; overflow-y: auto; flex: 1; }
+        .rec-table { width: 100%; border-collapse: collapse; }
+        .rec-table th {
+            background: #fafbfc;
+            padding: 10px;
+            text-align: left;
+            font-size: 13px;
+            color: #4e5a6e;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .rec-table td {
+            padding: 10px;
+            font-size: 13px;
+            color: #1a1a2e;
+            border-bottom: 1px solid #f5f5f7;
+        }
+        .rec-status {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        .rec-status.pending { background: #fff4e6; color: #e67e22; }
+        .rec-status.approved { background: #e6f4ff; color: #1a78ff; }
+        .rec-status.done { background: #e6f7eb; color: #1aab67; }
+
         /* ── 功能说明浮窗 ── */
         .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 580px; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 9999; padding: 24px; display: none; }
         .f-modal.show { display: block; }
@@ -346,14 +479,14 @@
         <div class="summary-card">
             <div class="head">
                 <span class="label">宝付钱包余额</span>
-                <button class="btn">提现</button>
+                <button class="btn" onclick="openWithdrawModal()">提现</button>
             </div>
             <span class="amount bff">128.00</span>
         </div>
         <div class="summary-card">
             <div class="head">
                 <span class="label">汇付钱包余额</span>
-                <button class="btn">提现</button>
+                <button class="btn" onclick="openWithdrawModal()">提现</button>
             </div>
             <span class="amount hf">3,286.50</span>
         </div>
@@ -361,7 +494,8 @@
 
     <!-- Tab -->
     <div class="tabs">
-        <div class="tab active" data-tab="income" onclick="selectTab(this)">收入明细</div>
+        <div class="tab active" data-tab="all" onclick="selectTab(this)">全部</div>
+        <div class="tab" data-tab="income" onclick="selectTab(this)">收入明细</div>
         <div class="tab" data-tab="expense" onclick="selectTab(this)">支出明细</div>
     </div>
 
@@ -416,6 +550,90 @@
     </div>
 </div>
 
+<!-- 提现浮层 -->
+<div class="wd-overlay" id="wdOverlay" onclick="if(event.target===this)closeWithdrawModal()">
+    <div class="wd-modal">
+        <div class="wd-header">
+            <span class="wd-title">申请提现</span>
+            <span class="wd-close" onclick="closeWithdrawModal()">×</span>
+        </div>
+        <div class="wd-body">
+            <div class="wd-row">
+                <div class="wd-label">当前可提余额</div>
+                <div style="font-size:20px;font-weight:700;color:#1a78ff;">3,414.50</div>
+            </div>
+            <div class="wd-row">
+                <div class="wd-label">提现金额</div>
+                <input type="number" class="wd-input" id="wdAmount" placeholder="请输入提现金额">
+            </div>
+            <div class="wd-row">
+                <div class="wd-label">填写原因</div>
+                <input type="text" class="wd-input" id="wdReason" placeholder="请输入提现原因">
+            </div>
+            <div class="wd-row">
+                <span class="wd-link" onclick="openRecords()">提现申请记录 ›</span>
+            </div>
+        </div>
+        <div class="wd-footer">
+            <button class="wd-btn-default" onclick="closeWithdrawModal()">取消</button>
+            <button class="wd-btn-primary" onclick="applyWithdraw()">申请</button>
+        </div>
+    </div>
+</div>
+
+<!-- 提现申请记录 -->
+<div class="rec-overlay" id="recOverlay" onclick="if(event.target===this)closeRecords()">
+    <div class="rec-modal">
+        <div class="rec-header">
+            <span class="rec-title">提现申请记录</span>
+            <span class="rec-close" onclick="closeRecords()">×</span>
+        </div>
+        <div class="rec-body">
+            <table class="rec-table">
+                <thead>
+                    <tr>
+                        <th>申请时间</th>
+                        <th>支付渠道</th>
+                        <th>提现金额</th>
+                        <th>原因</th>
+                        <th>状态</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>2026-08-10 10:30:00</td>
+                        <td>汇付钱包</td>
+                        <td>2,000.00</td>
+                        <td>日常提现</td>
+                        <td><span class="rec-status pending">待审核</span></td>
+                    </tr>
+                    <tr>
+                        <td>2026-07-20 14:30:00</td>
+                        <td>宝付钱包</td>
+                        <td>500.00</td>
+                        <td>日常提现</td>
+                        <td><span class="rec-status done">已提现</span></td>
+                    </tr>
+                    <tr>
+                        <td>2026-07-15 09:12:00</td>
+                        <td>宝付钱包</td>
+                        <td>200.00</td>
+                        <td>结算提取</td>
+                        <td><span class="rec-status approved">已通过</span></td>
+                    </tr>
+                    <tr>
+                        <td>2026-07-01 14:20:00</td>
+                        <td>汇付钱包</td>
+                        <td>300.00</td>
+                        <td>运营资金</td>
+                        <td><span class="rec-status done">已提现</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
 <script>
 var incomeData = [
     { product: '中路财童', stage: '零售市场', orderNo: 'XB-zc2608010001', tradeAmount: '1000.00', fee: '6.00', createTime: '2026-08-01 10:10:00', updateTime: '2026-08-01 10:10:00', amount: '+100.00', channel: '汇付钱包' },
@@ -439,7 +657,7 @@ var expenseData = [
     { product: '提现', stage: '提现', createTime: '2026-07-20 14:30:00', updateTime: '2026-07-20 14:30:00', amount: '-500.00', channel: '宝付钱包' }
 ];
 
-var currentTab = 'income';
+var currentTab = 'all';
 
 function renderHead() {
     document.getElementById('tableHead').innerHTML = [
@@ -458,7 +676,9 @@ function renderHead() {
 }
 
 function getFilteredData() {
-    var data = currentTab === 'income' ? incomeData : expenseData;
+    var data = currentTab === 'all'
+        ? incomeData.concat(expenseData)
+        : (currentTab === 'income' ? incomeData : expenseData);
     var fProduct = document.getElementById('fProduct').value.trim();
     var fStage = document.getElementById('fStage').value;
     var fOrderNo = document.getElementById('fOrderNo').value.trim();
@@ -477,9 +697,11 @@ function renderTable() {
     var data = getFilteredData();
     var html = '';
     data.forEach(function(o) {
-        var amountClass = o.amount.charAt(0) === '+' ? 'amount-pos' : 'amount-neg';
+        var isIncome = o.amount.charAt(0) === '+';
+        var rowClass = isIncome ? 'row-income' : 'row-expense';
+        var amountClass = isIncome ? 'amount-pos' : 'amount-neg';
         html += [
-            '<tr>',
+            '<tr class="' + rowClass + '">',
             '    <td>' + o.product + '</td>',
             '    <td>' + o.stage + '</td>',
             '    <td>' + (o.orderNo || '-') + '</td>',
@@ -516,6 +738,30 @@ function resetFilter() {
 }
 
 renderTable();
+
+/* ── 提现提交审核流程 ── */
+function openWithdrawModal() {
+    document.getElementById('wdOverlay').classList.add('show');
+}
+function closeWithdrawModal() {
+    document.getElementById('wdOverlay').classList.remove('show');
+}
+function applyWithdraw() {
+    var amount = document.getElementById('wdAmount').value;
+    var reason = document.getElementById('wdReason').value;
+    if (!amount || !reason) {
+        alert('请填写提现金额和原因');
+        return;
+    }
+    alert('提现申请已提交，等待平台审核\n金额：' + amount + '\n原因：' + reason);
+    closeWithdrawModal();
+}
+function openRecords() {
+    document.getElementById('recOverlay').classList.add('show');
+}
+function closeRecords() {
+    document.getElementById('recOverlay').classList.remove('show');
+}
 </script>
 
 <!-- ====== 功能说明浮窗 ====== -->
@@ -543,6 +789,15 @@ renderTable();
     <ul>
       <li>列表增加<b>订单编号、交易金额、手续费</b>三列</li>
       <li>老数据这三项为空，展示「-」</li>
+      <li>Tab 提供<b>全部</b>、<b>收入明细</b>、<b>支出明细</b>三种视图</li>
+      <li><b>收支（¥）</b>列标色：收入<b style="color:#d92d20;">红</b>、支出<b style="color:#0b9a4f;">绿</b>，其他列保持黑色</li>
+    </ul>
+    <h4><span class="badge">4</span> <span style="vertical-align:middle;">提现提交审核流程</span></h4>
+    <ul>
+      <li>点击<b>提现按钮</b>弹出<b>申请提现</b>浮层</li>
+      <li>填写<b>提现金额</b>和<b>提现原因</b>后提交，等待平台审核</li>
+      <li>提现申请提交后进入<b>待审核</b>状态，由平台在<b>批发商提现审核</b>页面处理</li>
+      <li>点击<b>提现申请记录</b>可查看历史申请的<b>状态</b>（待审核 / 已通过 / 已提现）</li>
     </ul>
   </div>
 </div>

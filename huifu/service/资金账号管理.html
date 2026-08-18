@@ -456,6 +456,10 @@
             box-shadow: 0 1px 3px rgba(255,45,85,0.3);
         }
 
+        /* 实际金额标色：收入红、支出绿 */
+        .table td.amt-income { color: #d92d20; font-weight: 700; }
+        .table td.amt-expense { color: #0b9a4f; font-weight: 700; }
+
         /* ── 功能说明浮窗 ── */
         .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 560px; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 9999; padding: 24px; display: none; }
         .f-modal.show { display: block; }
@@ -493,7 +497,7 @@
         <div class="sc-head">
             <div>
                 <div class="label">宝付钱包余额</div>
-                <div class="amount bff">128.00</div>
+                <div class="amount bff">1,280.00</div>
             </div>
             <button class="btn" onclick="openWithdrawModal()">提现</button>
         </div>
@@ -506,7 +510,7 @@
         <div class="sc-head">
             <div>
                 <div class="label">汇付钱包余额</div>
-                <div class="amount hf">3,286.50</div>
+                <div class="amount hf">32,865.00</div>
             </div>
             <button class="btn" onclick="openWithdrawModal()">提现</button>
         </div>
@@ -518,7 +522,8 @@
 
 <!-- Tab 切换 -->
 <div class="tabs-bar">
-    <div class="tab active" data-tab="income" onclick="selectTab(this)">收入明细</div>
+    <div class="tab active" data-tab="all" onclick="selectTab(this)">全部</div>
+    <div class="tab" data-tab="income" onclick="selectTab(this)">收入明细</div>
     <div class="tab" data-tab="expense" onclick="selectTab(this)">支出明细</div>
 </div>
 
@@ -562,10 +567,12 @@
             <tr>
                 <th>交易订单编号</th>
                 <th>支付渠道单号</th>
+                <th>收支</th>
                 <th>类型</th>
                 <th>总金额</th>
                 <th>实际金额</th>
                 <th>平台手续费</th>
+                <th>第三方支付手续费</th>
                 <th>用途</th>
                 <th>支付渠道</th>
                 <th>创建时间 <span class="col-sort">⇅</span></th>
@@ -605,14 +612,23 @@
     </ul>
     <h4><span class="badge">2</span> <span style="vertical-align:middle;">收支分开</span></h4>
     <ul>
-      <li>列表里<b>支出</b>和<b>收入</b>分开展示（Tab 切换）</li>
+      <li>Tab 提供<b>全部</b>、<b>收入明细</b>、<b>支出明细</b>三种视图</li>
+      <li>表格增加<b>收支</b>列，标识每条记录是<b>收入</b>还是<b>支出</b></li>
+      <li><b>实际金额</b>列：收入标<b style="color:#e74c3c;">红</b>、支出标<b style="color:#1aab67;">绿</b></li>
       <li>增加<b>交易订单编号</b>、<b>支付渠道</b>字段</li>
     </ul>
-    <h4><span class="badge">3</span> <span style="vertical-align:middle;">类型沿用</span></h4>
+    <h4><span class="badge">3</span> <span style="vertical-align:middle;">第三方支付手续费</span></h4>
+    <ul>
+      <li>表格新增<b>第三方支付手续费</b>列（位于<b>平台手续费</b>之后）</li>
+      <li><b>批发佣金支出</b>、<b>零售佣金支出</b>、<b>现金奖励</b>有数据：手续费 = 总金额 × 2%</li>
+      <li><b>批发佣金支出</b>、<b>零售佣金支出</b>、<b>现金奖励</b>的<b>实际金额</b> = 总金额 − 第三方支付手续费</li>
+      <li>其他类型该列显示 "-"</li>
+    </ul>
+    <h4><span class="badge">4</span> <span style="vertical-align:middle;">类型沿用</span></h4>
     <ul>
       <li>继续沿用之前的<b>类型</b>分类</li>
     </ul>
-    <h4><span class="badge">4</span> <span style="vertical-align:middle;">提现</span></h4>
+    <h4><span class="badge">5</span> <span style="vertical-align:middle;">提现</span></h4>
     <ul>
       <li>宝付钱包、汇付钱包卡片增加<b>提现</b>按钮</li>
       <li>提现浮层展示<b>当前可提余额</b>，填写<b>提现金额</b>和<b>原因</b>后申请</li>
@@ -623,36 +639,47 @@
 </div>
 
 <script>
-var currentTab = 'income';
+var currentTab = 'all';
 
 var incomeData = [
-    { tradeNo: 'XB-sell260525144513001', payNo: '20260525144512010373000001190726', type: '服务商推广服务费', total: '12.40', paid: '12.40', pfee: '0', purpose: '提前结案-服务商推广服务费', channel: '汇付钱包', time: '2026-05-25 14:45:13' },
-    { tradeNo: 'XB-sell260504160405002', payNo: '20260504160405010373000001190101', type: '交易卖出', total: '128.00', paid: '128.00', pfee: '0.77', purpose: '交易卖出-永淳·夏日帖', channel: '汇付钱包', time: '2026-05-04 16:04:05' },
-    { tradeNo: 'XB-sell260428140302003', payNo: '20260428140302010373000001189888', type: '批发佣金支出', total: '0.15', paid: '0.15', pfee: '0', purpose: '45发首发-批发分佣', channel: '宝付钱包', time: '2026-04-28 14:03:02' },
-    { tradeNo: 'XB-sell260420100201004', payNo: '20260420100201010373000001189000', type: '运营服务费', total: '2.05', paid: '2.05', pfee: '0', purpose: '运营服务费-平台分成', channel: '汇付钱包', time: '2026-04-20 10:02:01' },
-    { tradeNo: 'XB-sell260415090800005', payNo: '20260415090800010373000001188666', type: '服务商推广服务费', total: '8.50', paid: '8.50', pfee: '0', purpose: '零售推广-服务商推广服务费', channel: '宝付钱包', time: '2026-04-15 09:08:00' }
+    { tradeNo: 'XB-sell260525144513001', payNo: '20260525144512010373000001190726', dir: '收入', type: '服务商推广服务费', total: '124.00', paid: '124.00', pfee: '0', tpfee: '-', purpose: '提前结案-服务商推广服务费', channel: '汇付钱包', time: '2026-05-25 14:45:13' },
+    { tradeNo: 'XB-sell260504160405002', payNo: '20260504160405010373000001190101', dir: '收入', type: '交易卖出', total: '128.00', paid: '128.00', pfee: '0.77', tpfee: '-', purpose: '交易卖出-永淳·夏日帖', channel: '汇付钱包', time: '2026-05-04 16:04:05' },
+    { tradeNo: 'XB-sell260420100201004', payNo: '20260420100201010373000001189000', dir: '收入', type: '运营服务费', total: '20.50', paid: '20.50', pfee: '0', tpfee: '-', purpose: '运营服务费-平台分成', channel: '汇付钱包', time: '2026-04-20 10:02:01' }
 ];
 
 var expenseData = [
-    { tradeNo: 'XB-buy260525144514001', payNo: '20260525144513010373000001190727', type: '批发佣金支出', total: '1.86', paid: '1.86', pfee: '0', purpose: '提前结案-批发分佣', channel: '宝付钱包', time: '2026-05-25 14:45:14' },
-    { tradeNo: 'XB-buy260504160404002', payNo: '20260504160404010373000001190100', type: '现金奖励', total: '50.00', paid: '50.00', pfee: '0', purpose: '提货任务-现金奖励', channel: '汇付钱包', time: '2026-05-04 16:04:04' },
-    { tradeNo: 'XB-buy260428140301003', payNo: '20260428140301010373000001189887', type: '产品奖励', total: '16', paid: '16', pfee: '0', purpose: '提货任务-产品奖励', channel: '宝付钱包', time: '2026-04-28 14:03:01' },
-    { tradeNo: 'XB-buy260420100200004', payNo: '20260420100200010373000001188999', type: '交易买入', total: '100.00', paid: '100.00', pfee: '0.60', purpose: '交易买入-永淳·夏日帖', channel: '汇付钱包', time: '2026-04-20 10:02:00' },
-    { tradeNo: 'XB-buy260415090759005', payNo: '20260415090759010373000001188665', type: '零售佣金支出', total: '0.24', paid: '0.24', pfee: '0', purpose: '印度阿三-零售分佣', channel: '宝付钱包', time: '2026-04-15 09:07:59' }
+    { tradeNo: 'XB-buy260525144514001', payNo: '20260525144513010373000001190727', dir: '支出', type: '批发佣金支出', total: '186.00', paid: '186.00', pfee: '0', tpfee: '3.72', purpose: '提前结案-批发分佣', channel: '宝付钱包', time: '2026-05-25 14:45:14' },
+    { tradeNo: 'XB-buy260504160404002', payNo: '20260504160404010373000001190100', dir: '支出', type: '现金奖励', total: '500.00', paid: '500.00', pfee: '0', tpfee: '10.00', purpose: '提货任务-现金奖励', channel: '汇付钱包', time: '2026-05-04 16:04:04' },
+    { tradeNo: 'XB-buy260428140301003', payNo: '20260428140301010373000001189887', dir: '支出', type: '产品奖励', total: '160', paid: '160', pfee: '0', tpfee: '-', purpose: '提货任务-产品奖励', channel: '宝付钱包', time: '2026-04-28 14:03:01' },
+    { tradeNo: 'XB-buy260420100200004', payNo: '20260420100200010373000001188999', dir: '支出', type: '交易买入', total: '1000.00', paid: '1000.00', pfee: '6.00', tpfee: '-', purpose: '交易买入-永淳·夏日帖', channel: '汇付钱包', time: '2026-04-20 10:02:00' },
+    { tradeNo: 'XB-buy260415090759005', payNo: '20260415090759010373000001188665', dir: '支出', type: '零售佣金支出', total: '24.00', paid: '24.00', pfee: '0', tpfee: '0.48', purpose: '印度阿三-零售分佣', channel: '宝付钱包', time: '2026-04-15 09:07:59' },
+    { tradeNo: 'XB-with260702093001', payNo: '20260702093001010373000001190222', dir: '支出', type: '提现', total: '2000.00', paid: '2000.00', pfee: '0', tpfee: '-', purpose: '日常提现-汇付钱包', channel: '汇付钱包', time: '2026-07-02 09:30:01' }
 ];
 
 function renderTable() {
-    var data = currentTab === 'income' ? incomeData : expenseData;
+    var data;
+    if (currentTab === 'all') {
+        data = incomeData.concat(expenseData);
+    } else {
+        data = currentTab === 'income' ? incomeData : expenseData;
+    }
     var html = '';
     data.forEach(function(o) {
+        var paidVal = o.paid;
+        if ((o.type === '批发佣金支出' || o.type === '零售佣金支出' || o.type === '现金奖励') && o.tpfee !== '-') {
+            paidVal = (parseFloat(o.total) - parseFloat(o.tpfee)).toFixed(2);
+        }
+        var amtCls = o.dir === '收入' ? 'amt-income' : 'amt-expense';
         html += [
             '<tr>',
             '    <td>' + o.tradeNo + '</td>',
             '    <td>' + o.payNo + '</td>',
+            '    <td>' + o.dir + '</td>',
             '    <td>' + o.type + '</td>',
             '    <td>' + o.total + '</td>',
-            '    <td>' + o.paid + '</td>',
+            '    <td class="' + amtCls + '">' + paidVal + '</td>',
             '    <td>' + o.pfee + '</td>',
+            '    <td>' + o.tpfee + '</td>',
             '    <td>' + o.purpose + '</td>',
             '    <td>' + o.channel + '</td>',
             '    <td>' + o.time + '</td>',
@@ -709,7 +736,7 @@ function toggleFuncModal() {
         <div class="wd-body">
             <div class="wd-row">
                 <div class="wd-label">当前可提余额</div>
-                <div style="font-size:20px;font-weight:700;color:#1a78ff;">3,414.50</div>
+                <div style="font-size:20px;font-weight:700;color:#1a78ff;">34,145.00</div>
             </div>
             <div class="wd-row">
                 <div class="wd-label">提现金额</div>
