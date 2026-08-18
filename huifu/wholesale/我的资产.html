@@ -350,6 +350,24 @@
             outline: none;
         }
         .wd-input:focus { border-color: #1a78ff; }
+        .wd-upload-box {
+            height: 110px;
+            border: 1px dashed #d0d5dd;
+            border-radius: 6px;
+            background: #fafbfc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            text-align: center;
+            transition: border-color .2s;
+        }
+        .wd-upload-box:hover { border-color: #1a78ff; }
+        .wd-upload-icon { font-size: 26px; color: #c0c8d4; line-height: 1; }
+        .wd-upload-text { font-size: 13px; color: #4e5a6e; }
+        .wd-upload-tip { font-size: 12px; color: #86909c; margin-top: 6px; }
         .wd-link {
             font-size: 13px;
             color: #1a78ff;
@@ -486,9 +504,9 @@
         <div class="summary-card">
             <div class="head">
                 <span class="label">汇付钱包余额</span>
-                <button class="btn" onclick="openWithdrawModal()">提现</button>
+                <button class="btn" id="hfBtn" onclick="openAccModal()">开户</button>
             </div>
-            <span class="amount hf">3,286.50</span>
+            <span class="amount hf" id="hfAmount">0.00</span>
         </div>
     </div>
 
@@ -560,7 +578,7 @@
         <div class="wd-body">
             <div class="wd-row">
                 <div class="wd-label">当前可提余额</div>
-                <div style="font-size:20px;font-weight:700;color:#1a78ff;">3,414.50</div>
+                <div style="font-size:20px;font-weight:700;color:#1a78ff;" id="wdBalance">128.00</div>
             </div>
             <div class="wd-row">
                 <div class="wd-label">提现金额</div>
@@ -577,6 +595,75 @@
         <div class="wd-footer">
             <button class="wd-btn-default" onclick="closeWithdrawModal()">取消</button>
             <button class="wd-btn-primary" onclick="applyWithdraw()">申请</button>
+        </div>
+    </div>
+</div>
+
+<!-- 汇付钱包开户浮层 -->
+<div class="wd-overlay" id="accOverlay" onclick="if(event.target===this)closeAccModal()">
+    <div class="wd-modal" style="width:520px;">
+        <div class="wd-header">
+            <span class="wd-title">汇付钱包开户</span>
+            <span class="wd-close" onclick="closeAccModal()">×</span>
+        </div>
+        <div class="wd-body">
+            <div class="wd-row">
+                <div class="wd-label">开户银行账户名</div>
+                <input type="text" class="wd-input" id="accName" placeholder="请输入开户银行账户名">
+            </div>
+            <div class="wd-row">
+                <div class="wd-label">开户银行账号</div>
+                <input type="text" class="wd-input" id="accNo" placeholder="请输入开户银行账号">
+            </div>
+            <div class="wd-row">
+                <div class="wd-label">开户银行省份</div>
+                <select class="wd-input" id="accProvince" onchange="updateAccCity()">
+                    <option value="">请选择省份</option>
+                    <option value="广东">广东</option>
+                    <option value="北京">北京</option>
+                    <option value="上海">上海</option>
+                    <option value="四川">四川</option>
+                    <option value="浙江">浙江</option>
+                    <option value="江苏">江苏</option>
+                </select>
+            </div>
+            <div class="wd-row">
+                <div class="wd-label">开户银行地区</div>
+                <select class="wd-input" id="accCity">
+                    <option value="">请选择地区</option>
+                </select>
+            </div>
+            <div class="wd-row">
+                <div class="wd-label">开户银行</div>
+                <select class="wd-input" id="accBank">
+                    <option value="">请选择开户银行</option>
+                    <option value="中国工商银行">中国工商银行</option>
+                    <option value="中国农业银行">中国农业银行</option>
+                    <option value="中国银行">中国银行</option>
+                    <option value="中国建设银行">中国建设银行</option>
+                    <option value="交通银行">交通银行</option>
+                    <option value="招商银行">招商银行</option>
+                    <option value="平安银行">平安银行</option>
+                    <option value="广东发展银行">广东发展银行</option>
+                    <option value="浦发银行">浦发银行</option>
+                    <option value="兴业银行">兴业银行</option>
+                </select>
+            </div>
+            <div class="wd-row">
+                <div class="wd-label">开户银行许可证信息</div>
+                <div class="wd-upload">
+                    <input type="file" id="accLic" accept="image/png,image/jpeg,application/pdf" style="display:none;">
+                    <div class="wd-upload-box" onclick="document.getElementById('accLic').click()">
+                        <span class="wd-upload-icon">⬆</span>
+                        <span class="wd-upload-text">将文件拖到此处，或<span style="color:#1a78ff;">点击上传</span></span>
+                    </div>
+                    <div class="wd-upload-tip">只能上传png/jpg/pdf文件，且不超过5MB</div>
+                </div>
+            </div>
+        </div>
+        <div class="wd-footer">
+            <button class="wd-btn-default" onclick="closeAccModal()">取消</button>
+            <button class="wd-btn-primary" onclick="applyAccount()">提交开户</button>
         </div>
     </div>
 </div>
@@ -739,8 +826,65 @@ function resetFilter() {
 
 renderTable();
 
+/* ── 汇付钱包开户流程 ── */
+var cityMap = {
+    '广东': ['深圳市','广州市','珠海市'],
+    '北京': ['北京市'],
+    '上海': ['上海市'],
+    '四川': ['成都市','绵阳市'],
+    '浙江': ['杭州市','宁波市'],
+    '江苏': ['南京市','苏州市']
+};
+function openAccModal() {
+    document.getElementById('accOverlay').classList.add('show');
+}
+document.addEventListener('change', function(e) {
+    if (e.target && e.target.id === 'accLic' && e.target.files.length) {
+        var fileName = e.target.files[0].name;
+        var box = e.target.parentElement.querySelector('.wd-upload-box');
+        box.querySelector('.wd-upload-text').innerHTML = '已选择文件：<b style="color:#1a78ff;">' + fileName + '</b>';
+        box.style.borderColor = '#1a78ff';
+    }
+});
+function closeAccModal() {
+    document.getElementById('accOverlay').classList.remove('show');
+}
+function updateAccCity() {
+    var p = document.getElementById('accProvince').value;
+    var sel = document.getElementById('accCity');
+    sel.innerHTML = '<option value="">请选择地区</option>';
+    (cityMap[p] || []).forEach(function(c) {
+        var opt = document.createElement('option');
+        opt.value = c;
+        opt.textContent = c;
+        sel.appendChild(opt);
+    });
+}
+function applyAccount() {
+    var name = document.getElementById('accName').value.trim();
+    var no = document.getElementById('accNo').value.trim();
+    var province = document.getElementById('accProvince').value;
+    var city = document.getElementById('accCity').value;
+    var bank = document.getElementById('accBank').value;
+    var lic = document.getElementById('accLic').files.length;
+    if (!name || !no || !province || !city || !bank || !lic) {
+        alert('请填写完整的开户信息');
+        return;
+    }
+    // 模拟开户成功：切换为提现按钮并展示余额
+    closeAccModal();
+    var btn = document.getElementById('hfBtn');
+    btn.textContent = '提现';
+    btn.onclick = openWithdrawModal;
+    document.getElementById('hfAmount').textContent = '3,286.50';
+    alert('开户成功！汇付钱包已开通，当前余额 3,286.50');
+}
+
 /* ── 提现提交审核流程 ── */
 function openWithdrawModal() {
+    var hf = (document.getElementById('hfAmount').textContent || '0').replace(/,/g, '');
+    var total = 128 + parseFloat(hf || 0);
+    document.getElementById('wdBalance').textContent = total.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
     document.getElementById('wdOverlay').classList.add('show');
 }
 function closeWithdrawModal() {
@@ -798,6 +942,12 @@ function closeRecords() {
       <li>填写<b>提现金额</b>和<b>提现原因</b>后提交，等待平台审核</li>
       <li>提现申请提交后进入<b>待审核</b>状态，由平台在<b>批发商提现审核</b>页面处理</li>
       <li>点击<b>提现申请记录</b>可查看历史申请的<b>状态</b>（待审核 / 已通过 / 已提现）</li>
+    </ul>
+    <h4><span class="badge">5</span> <span style="vertical-align:middle;">汇付钱包开户流程</span></h4>
+    <ul>
+      <li>汇付钱包未开户时默认展示<b>开户</b>按钮，余额为<b>0.00</b></li>
+      <li>点击<b>开户</b>弹出浮层，填写<b>开户银行账户名、开户银行账号、开户银行省份、开户银行地区、开户银行</b>，并<b>上传开户银行许可证信息附件</b>后提交</li>
+      <li>提交后模拟<b>开户成功</b>，汇付钱包切换为<b>提现</b>按钮并展示<b>余额</b></li>
     </ul>
   </div>
 </div>

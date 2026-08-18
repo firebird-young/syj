@@ -59,40 +59,6 @@
             padding: 20px;
         }
 
-        /* 步骤条 */
-        .steps {
-            background: #f0f7ff;
-            border-radius: 6px;
-            padding: 16px 20px;
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 16px;
-        }
-        .step {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            font-size: 14px;
-            color: #9ba6b9;
-        }
-        .step .num {
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            background: #c8d0d8;
-            color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 13px;
-            font-weight: 600;
-        }
-        .step.active .num { background: #1a78ff; }
-        .step.active { color: #1a78ff; font-weight: 500; }
-        .step-arrow { color: #c8d0d8; }
-
         /* 表单卡片 */
         .form-card {
             background: #fff;
@@ -112,6 +78,7 @@
             text-align: right;
             padding-right: 12px;
             position: relative;
+            flex-shrink: 0;
         }
         .form-label .required {
             color: #e74c5e;
@@ -132,6 +99,10 @@
             outline: none;
         }
         .form-input:focus { border-color: #1a78ff; }
+        .form-input[readonly] {
+            background: #f5f7fa;
+            color: #1a78ff;
+        }
         .form-select {
             width: 100%;
             height: 34px;
@@ -142,10 +113,6 @@
             color: #1a1a2e;
             outline: none;
             background: #fff;
-        }
-        .form-input[readonly] {
-            background: #f5f7fa;
-            color: #1a78ff;
         }
 
         /* 上传区 */
@@ -183,34 +150,26 @@
         .form-footer {
             display: flex;
             justify-content: center;
-            gap: 16px;
             margin-top: 28px;
         }
-        .btn-prev {
-            background: #fff;
-            border: 1px solid #d0d5dd;
-            color: #4e5a6e;
-            padding: 10px 50px;
-            border-radius: 4px;
-            font-size: 14px;
-            cursor: pointer;
-        }
-        .btn-prev:hover { background: #f5f5f5; }
         .btn-submit {
             background: #1a78ff;
             border: none;
             color: #fff;
-            padding: 10px 50px;
+            padding: 10px 0;
+            width: 50%;
+            max-width: 560px;
             border-radius: 4px;
             font-size: 14px;
             cursor: pointer;
         }
         .btn-submit:hover { background: #0f6ae8; }
 
+        /* 日期输入（年/月/日） */
         .date-wrap {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
         .date-input {
             height: 34px;
@@ -221,8 +180,12 @@
             color: #1a1a2e;
             outline: none;
             background: #fff;
+            text-align: center;
         }
         .date-input:focus { border-color: #1a78ff; }
+        .date-input.year { width: 80px; }
+        .date-input.md   { width: 60px; }
+        .date-sep { color: #9ba6b9; font-size: 14px; }
         .permanent-label {
             display: flex;
             align-items: center;
@@ -230,6 +193,7 @@
             font-size: 13px;
             color: #4e5a6e;
             cursor: pointer;
+            margin-left: 8px;
         }
         .permanent-label input[type="checkbox"] {
             accent-color: #1a78ff;
@@ -250,12 +214,6 @@
             text-align: center;
             font-weight: 600;
             box-shadow: 0 1px 3px rgba(255,45,85,0.3);
-        }
-        .badge.sm {
-            min-width: 16px;
-            height: 16px;
-            font-size: 11px;
-            line-height: 16px;
         }
 
         /* ── 功能说明浮窗 ── */
@@ -289,31 +247,16 @@
 </div>
 
 <div class="main">
-    <!-- 步骤条 -->
-    <div class="steps">
-        <div class="step">
-            <span class="num">✓</span>
-            填写基本信息
-        </div>
-        <span class="step-arrow">›</span>
-        <div class="step active">
-            <span class="num">2</span>
-            对公账号验证
-        </div>
-        <span class="step-arrow">›</span>
-        <div class="step">
-            <span class="num">3</span>
-            经营认证信息
-        </div>
-        <span class="step-arrow">›</span>
-        <div class="step">
-            <span class="num">4</span>
-            认证完成
-        </div>
-    </div>
-
     <!-- 表单 -->
     <div class="form-card">
+
+        <div class="form-row">
+            <div class="form-label"><span class="required">*</span>账户编号</div>
+            <div class="form-control">
+                <input type="text" class="form-input" value="20864851498499055" readonly>
+            </div>
+        </div>
+
         <div class="form-row">
             <div class="form-label"><span class="required">*</span>企业全称</div>
             <div class="form-control">
@@ -321,52 +264,78 @@
             </div>
         </div>
 
+        <div class="form-row upload-row">
+            <div class="form-label"><span class="required">*</span>企业LOGO</div>
+            <div class="form-control">
+                <div class="upload-box">
+                    <div class="upload-icon">⬆</div>
+                    <div class="upload-text">将文件拖到此处，或<span class="link">点击上传</span></div>
+                    <div class="upload-tip">只能上传png/jpg文件，且不超过500kb</div>
+                    <input type="file" class="upload-input" accept="image/png,image/jpeg">
+                </div>
+            </div>
+        </div>
+
         <div class="form-row">
-            <div class="form-label"><span class="required">*</span>企业银行卡账号</div>
+            <div class="form-label">手机号</div>
+            <div class="form-control">
+                <input type="text" class="form-input" value="13800172866" readonly>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-label"><span class="required">*</span>电子邮箱</div>
             <div class="form-control">
                 <input type="text" class="form-input" placeholder="">
             </div>
         </div>
 
         <div class="form-row">
-            <div class="form-label"><span class="required">*</span>开户银行</div>
-            <div class="form-control">
-                <select class="form-select">
-                    <option>请选择开户银行</option>
-                    <option>中国工商银行</option>
-                    <option>中国农业银行</option>
-                    <option>中国银行</option>
-                    <option>中国建设银行</option>
-                    <option>招商银行</option>
-                    <option>交通银行</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="form-row">
-            <div class="form-label"><span class="required">*</span>银行所在地</div>
-            <div class="form-control">
-                <select class="form-select">
-                    <option>请选择</option>
-                    <option>北京</option>
-                    <option>上海</option>
-                    <option>广东</option>
-                    <option>四川</option>
-                    <option>浙江</option>
-                    <option>江苏</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="form-row">
-            <div class="form-label"><span class="required">*</span>开户支行名</div>
+            <div class="form-label"><span class="required">*</span>联系人</div>
             <div class="form-control">
                 <input type="text" class="form-input" placeholder="">
             </div>
         </div>
 
         <div class="form-row">
-            <div class="form-label"><span class="required">*</span>法定代表人姓名</div>
+            <div class="form-label"><span class="required">*</span>联系人手机号</div>
+            <div class="form-control">
+                <input type="text" class="form-input" placeholder="">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-label"><span class="required">*</span>企业证件类型</div>
+            <div class="form-control">
+                <select class="form-select">
+                    <option>企业三证合二</option>
+                    <option>营业执照</option>
+                    <option>组织机构代码证</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-label"><span class="required">*</span>统一社会信用代码</div>
+            <div class="form-control">
+                <input type="text" class="form-input" placeholder="">
+            </div>
+        </div>
+
+        <div class="form-row upload-row">
+            <div class="form-label"><span class="required">*</span>上传证</div>
+            <div class="form-control">
+                <div class="upload-box">
+                    <div class="upload-icon">⬆</div>
+                    <div class="upload-text">将文件拖到此处，或<span class="link">点击上传</span></div>
+                    <div class="upload-tip">只能上传png/jpg文件，且不超过500kb</div>
+                    <input type="file" class="upload-input" accept="image/png,image/jpeg">
+                </div>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-label"><span class="required">*</span>企业法人姓名</div>
             <div class="form-control">
                 <input type="text" class="form-input" placeholder="">
             </div>
@@ -407,7 +376,11 @@
             <div class="form-label"><span class="required">*</span>法人证件起始日期<span class="badge" style="margin-left:4px;">1</span></div>
             <div class="form-control">
                 <div class="date-wrap">
-                    <input type="date" class="date-input">
+                    <input type="text" class="date-input year" placeholder="年" maxlength="4">
+                    <span class="date-sep">/</span>
+                    <input type="text" class="date-input md" placeholder="月" maxlength="2">
+                    <span class="date-sep">/</span>
+                    <input type="text" class="date-input md" placeholder="日" maxlength="2">
                 </div>
             </div>
         </div>
@@ -415,8 +388,12 @@
         <div class="form-row">
             <div class="form-label"><span class="required">*</span>法人证件截止日期</div>
             <div class="form-control">
-                <div class="date-wrap">
-                    <input type="date" class="date-input" id="expireDate">
+                <div class="date-wrap" id="expireDateWrap">
+                    <input type="text" class="date-input year" placeholder="年" maxlength="4">
+                    <span class="date-sep">/</span>
+                    <input type="text" class="date-input md" placeholder="月" maxlength="2">
+                    <span class="date-sep">/</span>
+                    <input type="text" class="date-input md" placeholder="日" maxlength="2">
                     <label class="permanent-label">
                         <input type="checkbox" id="permanentChk" onchange="togglePermanent(this)">
                         永久
@@ -426,7 +403,6 @@
         </div>
 
         <div class="form-footer">
-            <button class="btn-prev">上一步</button>
             <button class="btn-submit">提交认证</button>
         </div>
     </div>
@@ -434,15 +410,12 @@
 
 <script>
 function togglePermanent(chk) {
-    var dateInput = document.getElementById('expireDate');
+    var wrap = document.getElementById('expireDateWrap');
+    var inputs = wrap.querySelectorAll('input[type="text"]');
     if (chk.checked) {
-        dateInput.value = '永久';
-        dateInput.readOnly = true;
-        dateInput.style.color = '#1a78ff';
+        inputs.forEach(function(inp) { inp.value = '永久'; inp.readOnly = true; inp.style.color = '#1a78ff'; });
     } else {
-        dateInput.value = '';
-        dateInput.readOnly = false;
-        dateInput.style.color = '#1a1a2e';
+        inputs.forEach(function(inp) { inp.value = ''; inp.readOnly = false; inp.style.color = '#1a1a2e'; });
     }
 }
 </script>
@@ -453,7 +426,7 @@ function togglePermanent(chk) {
     <span>📖 功能说明</span>
     <button class="fm-close" onclick="toggleFuncModal()">✕</button>
   </div>
-  <div style="font-size:13px;font-weight:600;color:#e74c5e;margin:-6px 0 12px;">批发商后台</div>
+  <div style="font-size:13px;font-weight:600;color:#e74c5e;margin:-6px 0 12px;">批发商、服务商后台</div>
   <div class="fm-body">
     <h4><span class="badge">1</span> <span style="vertical-align:middle;">OCR 识别身份证日期</span></h4>
     <ul>
@@ -464,9 +437,10 @@ function togglePermanent(chk) {
       <li>后台审核认证后，<b>不主动给用户开户</b></li>
       <li>需要用户在<b>资金管理</b>去开户</li>
     </ul>
-    <h4><span class="badge">3</span> <span style="vertical-align:middle;">服务商认证流程</span></h4>
-    <ul>
-      <li>服务商认证流程也加上<b>银行卡</b>这一步（方便以后<b>多支付渠道</b>可以复用）</li>
+     <ul>
+      <li>去掉下一步填写银行相关信息的步骤，提交企业资料后直接等待审核</b></li>
+      <li>认证通过后统一在在<b>资金管理</b>去开户</li>
+      <li>服务商按照相同的逻辑修改</li>
     </ul>
   </div>
 </div>
