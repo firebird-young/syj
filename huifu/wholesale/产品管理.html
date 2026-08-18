@@ -140,6 +140,8 @@
             cursor: pointer;
             text-decoration: none;
         }
+        .actions a.disabled { color: #9ba6b9; cursor: default; }
+        .actions a.disabled:hover { text-decoration: none; }
         .actions a:last-child { margin-right: 0; }
         .actions a:hover { text-decoration: underline; }
 
@@ -220,7 +222,7 @@
                     <td>2026-07-29 13:56:46</td>
                     <td>2026-07-30 15:38:13</td>
                     <td><span class="status-tag">已上架</span></td>
-                    <td class="actions"><a>产品详情</a><a>货款提取</a></td>
+                    <td class="actions"><a>产品详情</a><a class="disabled">货款提取（已废弃）</a><a onclick="location.href='批发市场分账申请.html?name='+encodeURIComponent('青莲-初心')+'&price=1562.50&qty=8&sold=6&img=img1'">批发分账申请</a><a onclick="location.href='批发冻结金分账管理.html'">批发冻结金分账申请</a></td>
                 </tr>
                 <tr>
                     <td><img class="product-img img2" src=""></td>
@@ -229,7 +231,7 @@
                     <td>2026-07-21 09:51:04</td>
                     <td>2026-07-22 15:30:19</td>
                     <td><span class="status-tag">已上架</span></td>
-                    <td class="actions"><a>产品详情</a><a>货款提取</a></td>
+                    <td class="actions"><a>产品详情</a><a class="disabled">货款提取（已废弃）</a><a onclick="location.href='批发市场分账申请.html?name='+encodeURIComponent('西路财童')+'&price=2500&qty=5&sold=5&img=img2'">批发分账申请</a><a onclick="location.href='批发冻结金分账管理.html'">批发冻结金分账申请</a></td>
                 </tr>
                 <tr>
                     <td><img class="product-img img3" src=""></td>
@@ -238,7 +240,7 @@
                     <td>2026-07-14 09:22:25</td>
                     <td>2026-07-31 08:00:01</td>
                     <td><span class="status-tag">已上架</span></td>
-                    <td class="actions"><a>产品详情</a><a>货款提取</a></td>
+                    <td class="actions"><a>产品详情</a><a class="disabled">货款提取（已废弃）</a><a onclick="location.href='批发市场分账申请.html?name='+encodeURIComponent('中路财童')+'&price=250&qty=50&sold=40&img=img3'">批发分账申请</a><a onclick="location.href='批发冻结金分账管理.html'">批发冻结金分账申请</a></td>
                 </tr>
                 <tr>
                     <td><img class="product-img img4" src=""></td>
@@ -247,7 +249,7 @@
                     <td>2026-07-01 15:49:11</td>
                     <td>2026-07-13 15:29:54</td>
                     <td><span class="status-tag">已上架</span></td>
-                    <td class="actions"><a>产品详情</a><a>货款提取</a></td>
+                    <td class="actions"><a>产品详情</a><a class="disabled">货款提取（已废弃）</a><a onclick="location.href='批发市场分账申请.html?name='+encodeURIComponent('榜样-统一')+'&price=1200&qty=20&sold=12&img=img4'">批发分账申请</a><a onclick="location.href='批发冻结金分账管理.html'">批发冻结金分账申请</a></td>
                 </tr>
                 <tr>
                     <td><img class="product-img img5" src=""></td>
@@ -256,7 +258,7 @@
                     <td>2026-06-30 14:19:34</td>
                     <td>2026-07-22 09:39:56</td>
                     <td><span class="status-tag">已上架</span></td>
-                    <td class="actions"><a>产品详情</a><a>货款提取</a></td>
+                    <td class="actions"><a>产品详情</a><a class="disabled">货款提取（已废弃）</a><a onclick="location.href='批发市场分账申请.html?name='+encodeURIComponent('青莲-舒展')+'&price=800&qty=30&sold=25&img=img5'">批发分账申请</a><a onclick="location.href='批发冻结金分账管理.html'">批发冻结金分账申请</a></td>
                 </tr>
                 <tr>
                     <td><img class="product-img img6" src=""></td>
@@ -265,7 +267,7 @@
                     <td>2026-06-12 13:39:55</td>
                     <td>2026-07-31 08:00:01</td>
                     <td><span class="status-tag">已上架</span></td>
-                    <td class="actions"><a>产品详情</a><a>货款提取</a></td>
+                    <td class="actions"><a>产品详情</a><a class="disabled">货款提取（已废弃）</a><a onclick="location.href='批发市场分账申请.html?name='+encodeURIComponent('东坡-惜春')+'&price=3000&qty=10&sold=8&img=img6'">批发分账申请</a><a onclick="location.href='批发冻结金分账管理.html'">批发冻结金分账申请</a></td>
                 </tr>
             </tbody>
         </table>
@@ -281,10 +283,11 @@
   </div>
   <div style="font-size:13px;font-weight:600;color:#e74c5e;margin:-6px 0 12px;">批发商后台</div>
   <div class="fm-body">
-    <h4><span class="badge">1</span> <span style="vertical-align:middle;">货款提取按钮</span></h4>
+    <h4><span class="badge">1</span> <span style="vertical-align:middle;">操作按钮</span></h4>
     <ul>
-      <li>只有<b>开通了宝付</b>（老商户）才有「<b>货款提取</b>」按钮</li>
-      <li>新商户<b>不展示</b>该按钮</li>
+      <li>「<b>货款提取（已废弃）</b>」：老入口已停用，灰色展示、不再开放</li>
+      <li>「<b>批发分账申请</b>」：发起批发货款分账申请</li>
+      <li>「<b>批发冻结金分账申请</b>」：进入<b>批发冻结金分账管理</b>，发起冻结金释放申请</li>
     </ul>
   </div>
 </div>

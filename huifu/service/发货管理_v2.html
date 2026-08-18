@@ -218,6 +218,9 @@
         .actions a:last-child { margin-right: 0; }
         .actions a:hover { text-decoration: underline; }
 
+        /* 提货时间：未发货为灰色占位 */
+        .pick-time.none { color: #9ba6b9; }
+
         /* 分页 */
         .pagination {
             padding: 12px 20px;
@@ -378,6 +381,7 @@
                 <th>用户账号</th>
                 <th>状态</th>
                 <th>创建时间 <span class="col-sort">⇅</span></th>
+                <th>提货时间</th>
                 <th>操作</th>
             </tr>
         </thead>
@@ -393,6 +397,7 @@
                 <td>13841319029</td>
                 <td><span class="status-tag pending">待发货</span></td>
                 <td>2026-07-21 14:49:19</td>
+                <td class="pick-time none">—</td>
                 <td class="actions"><a>处理</a><a>查看详情</a><a class="danger">撤销</a></td>
             </tr>
             <tr data-status="shipped">
@@ -406,6 +411,7 @@
                 <td>19382153852</td>
                 <td><span class="status-tag shipped">已发货</span></td>
                 <td>2026-07-21 14:37:31</td>
+                <td>2026-07-22 10:12:05</td>
                 <td class="actions"><a>查看详情</a></td>
             </tr>
             <tr data-status="shipped">
@@ -419,6 +425,7 @@
                 <td>19113541040</td>
                 <td><span class="status-tag shipped">已发货</span></td>
                 <td>2026-07-21 14:36:17</td>
+                <td>2026-07-22 09:48:33</td>
                 <td class="actions"><a>查看详情</a></td>
             </tr>
             <tr data-status="shipped">
@@ -432,6 +439,7 @@
                 <td>19938062254</td>
                 <td><span class="status-tag shipped">已发货</span></td>
                 <td>2026-07-21 14:35:00</td>
+                <td>2026-07-23 09:15:20</td>
                 <td class="actions"><a>查看详情</a></td>
             </tr>
             <tr data-status="shipped">
@@ -445,6 +453,7 @@
                 <td>19130634113</td>
                 <td><span class="status-tag shipped">已发货</span></td>
                 <td>2026-07-21 14:33:58</td>
+                <td>2026-07-22 17:26:41</td>
                 <td class="actions"><a>查看详情</a></td>
             </tr>
             <tr data-status="shipped">
@@ -458,6 +467,7 @@
                 <td>13908193164</td>
                 <td><span class="status-tag shipped">已发货</span></td>
                 <td>2026-07-21 14:33:55</td>
+                <td>2026-07-23 16:54:12</td>
                 <td class="actions"><a>查看详情</a></td>
             </tr>
             <tr data-status="shipped">
@@ -471,6 +481,7 @@
                 <td>15982144114</td>
                 <td><span class="status-tag shipped">已发货</span></td>
                 <td>2026-07-21 14:28:09</td>
+                <td>2026-07-23 16:08:47</td>
                 <td class="actions"><a>查看详情</a></td>
             </tr>
             <tr data-status="shipped">
@@ -484,6 +495,7 @@
                 <td>13981422295</td>
                 <td><span class="status-tag shipped">已发货</span></td>
                 <td>2026-07-21 14:27:02</td>
+                <td>2026-07-23 15:37:29</td>
                 <td class="actions"><a>查看详情</a></td>
             </tr>
         </tbody>

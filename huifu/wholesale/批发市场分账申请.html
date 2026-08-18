@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>批发市场分账申请</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+        background: #f2f3f7;
+        color: #1a1a2e;
+    }
+
+    /* 顶栏 */
+    .topbar {
+        height: 56px;
+        background: #1a1a2e;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 20px;
+        color: #fff;
+    }
+    .topbar-left { display: flex; align-items: center; gap: 16px; }
+    .topbar-left .logo { font-size: 16px; font-weight: 600; }
+    .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #9ba6b9; }
+    .breadcrumb .sep { color: #5a6276; }
+    .breadcrumb .cur { color: #fff; }
+    .topbar-right { display: flex; align-items: center; gap: 10px; }
+    .avatar {
+        width: 30px; height: 30px; border-radius: 50%;
+        background: #2f3550; display: flex; align-items: center; justify-content: center;
+        font-size: 14px;
+    }
+    .name { font-size: 13px; }
+    .arrow { color: #9ba6b9; font-size: 12px; }
+
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px 24px 40px; }
+
+    /* 产品信息卡片 */
+    .card {
+        background: #fff;
+        border-radius: 8px;
+        padding: 20px;
+    }
+    .card-head {
+        font-size: 15px;
+        font-weight: 600;
+        color: #1a1a2e;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .card-head .dot { width: 4px; height: 14px; border-radius: 2px; background: #1a78ff; }
+    .prod-main { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+    .product-img {
+        width: 52px; height: 52px; border-radius: 8px; flex-shrink: 0;
+        display: flex; align-items: center; justify-content: center;
+        color: #fff; font-size: 24px; font-weight: 600;
+    }
+    .product-img.img1 { background: linear-gradient(135deg, #7b5ea7, #b8a1d9); }
+    .product-img.img2 { background: linear-gradient(135deg, #3f7e9c, #8ec8e0); }
+    .product-img.img3 { background: linear-gradient(135deg, #6b8f4e, #b5cf8f); }
+    .product-img.img4 { background: linear-gradient(135deg, #a3603b, #d8a884); }
+    .product-img.img5 { background: linear-gradient(135deg, #5c7a4e, #a3c28f); }
+    .product-img.img6 { background: linear-gradient(135deg, #8e5a4e, #d8a79c); }
+    .prod-name { font-size: 18px; font-weight: 600; }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 12px;
+        background: #f7f8fa;
+        border-radius: 8px;
+        padding: 16px 20px;
+    }
+    .info-item .label { font-size: 12px; color: #86909c; margin-bottom: 8px; }
+    .info-item .val { font-size: 16px; font-weight: 600; color: #1a1a2e; }
+    .info-item .val.total { color: #e67e22; }
+    .info-item .val.fee { color: #e74c5e; }
+    .info-item .calc { font-size: 12px; color: #9ba6b9; font-weight: 400; margin-top: 4px; }
+
+    /* 分账金额 */
+    .split-card { display: flex; gap: 16px; margin-top: 16px; }
+    .split-box {
+        flex: 1;
+        background: #fff;
+        border-radius: 8px;
+        padding: 20px;
+        border-top: 3px solid #1a78ff;
+    }
+    .split-box.service { border-top-color: #e67e22; }
+    .split-label { font-size: 13px; color: #4e5a6e; }
+    .split-val { font-size: 26px; font-weight: 700; margin: 10px 0 6px; }
+    .split-box.wholesale .split-val { color: #1a78ff; }
+    .split-box.service .split-val { color: #e67e22; }
+    .split-calc { font-size: 12px; color: #9ba6b9; }
+
+    .split-action {
+        width: 220px;
+        background: #fff;
+        border-radius: 8px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+    .btn-submit {
+        background: #1a78ff;
+        color: #fff;
+        border: none;
+        height: 40px;
+        padding: 0 32px;
+        border-radius: 6px;
+        font-size: 14px;
+        cursor: pointer;
+    }
+    .btn-submit:hover { background: #0f6ae8; }
+    .split-action .hint { font-size: 12px; color: #9ba6b9; text-align: center; line-height: 1.5; }
+
+    /* 申请记录 */
+    .table-card { background: #fff; border-radius: 8px; margin-top: 16px; overflow: hidden; }
+    .table-title {
+        padding: 16px 20px;
+        font-size: 15px;
+        font-weight: 600;
+        border-bottom: 1px solid #f0f0f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .table-title .count { font-size: 12px; font-weight: 400; color: #86909c; }
+    table { width: 100%; border-collapse: collapse; }
+    th {
+        background: #fafbfc;
+        text-align: left;
+        padding: 11px 14px;
+        font-size: 12px;
+        color: #4e5a6e;
+        font-weight: 500;
+        border-bottom: 1px solid #f0f0f0;
+        white-space: nowrap;
+    }
+    td {
+        padding: 13px 14px;
+        font-size: 13px;
+        color: #1a1a2e;
+        border-bottom: 1px solid #f5f5f7;
+    }
+    tr:last-child td { border-bottom: none; }
+    .money { font-weight: 600; }
+    .money.ws { color: #1a78ff; }
+    .money.sv { color: #e67e22; }
+
+    .status-tag {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 4px;
+        font-size: 12px;
+        line-height: 1.4;
+    }
+    .status-tag.pending { background: #e6f4ff; color: #1a78ff; }
+    .status-tag.approved { background: #e6f7eb; color: #1aab67; }
+
+    .empty { text-align: center; color: #9ba6b9; padding: 40px 0; font-size: 13px; }
+
+    /* 提示浮层 */
+    .toast {
+        position: fixed;
+        top: 80px;
+        left: 50%;
+        transform: translateX(-50%) translateY(-16px);
+        background: #1a1a2e;
+        color: #fff;
+        padding: 10px 22px;
+        border-radius: 6px;
+        font-size: 13px;
+        opacity: 0;
+        pointer-events: none;
+        transition: all .25s;
+        z-index: 9998;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* 功能说明浮窗 */
+    .badge { display: inline-block; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 50%; background: #ff2d55; color: #fff; font-size: 12px; line-height: 18px; text-align: center; font-weight: 600; box-shadow: 0 1px 3px rgba(255,45,85,0.3); }
+    .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 540px; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 9999; padding: 24px; display: none; }
+    .f-modal.show { display: block; }
+    .f-modal .fm-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
+    .f-modal .fm-title:active { cursor: grabbing; }
+    .f-modal .fm-close { width: 28px; height: 28px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; color: #666; border: none; flex-shrink: 0; }
+    .f-modal .fm-body { font-size: 13px; color: #555; line-height: 1.8; }
+    .f-modal .fm-body h4 { font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 16px 0 8px; }
+    .f-modal .fm-body h4:first-child { margin-top: 0; }
+    .f-modal .fm-body ul { padding-left: 18px; margin: 0 0 12px; }
+    .f-modal .fm-body li { margin-bottom: 4px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+    <div class="topbar-left">
+        <span class="logo">⬡ 深艺交 · 批发商工作台</span>
+        <div class="breadcrumb">
+            <span>首页</span><span class="sep">/</span>
+            <span>产品管理</span><span class="sep">/</span>
+            <span class="cur">批发市场分账申请</span>
+        </div>
+    </div>
+    <div class="topbar-right">
+        <button onclick="toggleFuncModal()" style="margin-right:12px;padding:6px 14px;border-radius:6px;background:#f5f7fa;color:#333;border:1px solid #e0e4ea;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:4px;">📖 功能说明</button>
+        <span class="avatar">👤</span>
+        <span class="name">批发商：李文轩</span>
+        <span class="arrow">▾</span>
+    </div>
+</div>
+
+<div class="container">
+
+    <!-- 本次分账申请 -->
+    <div class="card">
+        <div class="card-head"><span class="dot"></span>本次分账申请</div>
+        <div class="prod-main">
+            <div class="product-img" id="prodImg">品</div>
+            <div>
+                <div class="prod-name" id="prodName">-</div>
+                <div style="font-size:12px;color:#86909c;margin-top:4px;">来源：产品管理「批发分账申请」</div>
+            </div>
+        </div>
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="label">批发单价</div>
+                <div class="val" id="unitPrice">-</div>
+            </div>
+            <div class="info-item">
+                <div class="label">批发总数量</div>
+                <div class="val" id="totalQty">-</div>
+            </div>
+            <div class="info-item">
+                <div class="label">批发实际销售数量</div>
+                <div class="val" id="soldQty">-</div>
+            </div>
+            <div class="info-item">
+                <div class="label">批发总金额</div>
+                <div class="val total" id="totalAmt">-</div>
+                <div class="calc">批发单价 × 批发实际销售数量</div>
+            </div>
+            <div class="info-item">
+                <div class="label">第三方支付手续费</div>
+                <div class="val fee" id="feeAmt">-</div>
+                <div class="calc">批发总金额 × 0.6%</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 分账金额计算 -->
+    <div class="split-card">
+        <div class="split-box wholesale">
+            <div class="split-label">批发商金额</div>
+            <div class="split-val" id="wsAmt">-</div>
+            <div class="split-calc">= 批发总金额 × 25% − 第三方支付手续费</div>
+        </div>
+        <div class="split-box service">
+            <div class="split-label">服务商金额</div>
+            <div class="split-val" id="svAmt">-</div>
+            <div class="split-calc">= 批发总金额 × 20%</div>
+        </div>
+        <div class="split-action">
+            <button class="btn-submit" onclick="submitApply()">提交申请</button>
+            <div class="hint">提交后进入「待审核」<br>由平台审核通过后完成分账</div>
+        </div>
+    </div>
+
+    <!-- 申请记录 -->
+    <div class="table-card">
+        <div class="table-title">
+            <span>申请记录</span>
+            <span class="count" id="recCount">共 3 条</span>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>申请单号</th>
+                    <th>产品名称</th>
+                    <th>批发总金额</th>
+                    <th>第三方支付手续费</th>
+                    <th>批发商金额</th>
+                    <th>服务商金额</th>
+                    <th>申请时间</th>
+                    <th>状态</th>
+                </tr>
+            </thead>
+            <tbody id="recTbody"></tbody>
+        </table>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ====== 功能说明浮窗 ====== -->
+<div class="f-modal" id="funcModal">
+  <div class="fm-title">
+    <span>📖 功能说明</span>
+    <button class="fm-close" onclick="toggleFuncModal()">✕</button>
+  </div>
+  <div style="font-size:13px;font-weight:600;color:#e67e22;margin:-6px 0 12px;">批发商</div>
+  <div class="fm-body">
+    <h4><span class="badge">1</span> <span style="vertical-align:middle;">分账申请入口</span></h4>
+    <ul>
+      <li>在「产品管理」点击<b>批发分账申请</b>进入本页，自动带入对应产品的<b>产品名称、批发单价、批发总数量、批发实际销售数量</b></li>
+    </ul>
+    <h4><span class="badge">2</span> <span style="vertical-align:middle;">金额计算规则</span></h4>
+    <ul>
+      <li><b>批发总金额</b> = 批发单价 × 批发实际销售数量</li>
+      <li><b>第三方支付手续费</b> = 批发总金额 × 0.6%</li>
+      <li><b>批发商金额</b> = 批发总金额 × 25% − 第三方支付手续费</li>
+      <li><b>服务商金额</b> = 批发总金额 × 20%</li>
+    </ul>
+    <h4><span class="badge">3</span> <span style="vertical-align:middle;">提交申请</span></h4>
+    <ul>
+      <li>核对金额无误后点击<b>提交申请</b>，生成申请单并进入<b>待审核</b>状态</li>
+    </ul>
+    <h4><span class="badge">4</span> <span style="vertical-align:middle;">申请记录</span></h4>
+    <ul>
+      <li>下方展示历史申请记录：<b>待审核</b>（蓝）与<b>已通过</b>（绿）</li>
+      <li>平台审核通过后，批发商与服务商按申请金额完成分账</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+(function() {
+    // ===== 读取 URL 参数（从产品管理带过来）=====
+    function getParam(name) {
+        var m = location.search.match(new RegExp('[?&]' + name + '=([^&]*)'));
+        return m ? decodeURIComponent(m[1]) : '';
+    }
+    var name = getParam('name') || '青莲-初心';
+    var price = parseFloat(getParam('price')) || 1562.50;
+    var qty = parseInt(getParam('qty')) || 8;
+    var sold = parseInt(getParam('sold')) || 6;
+    var img = getParam('img') || 'img1';
+
+    // ===== 金额计算 =====
+    var total = price * sold;               // 批发总金额
+    var fee = total * 0.006;                // 第三方支付手续费 = 总金额 × 0.6%
+    var wsAmt = total * 0.25 - fee;         // 批发商金额 = 总金额 × 25% − 手续费
+    var svAmt = total * 0.20;               // 服务商金额 = 总金额 × 20%
+
+    function fmt(n) {
+        return '¥' + n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    }
+
+    // ===== 渲染产品信息 =====
+    var imgEl = document.getElementById('prodImg');
+    imgEl.className = 'product-img ' + (['img1','img2','img3','img4','img5','img6'].indexOf(img) > -1 ? img : 'img1');
+    imgEl.textContent = name.charAt(0);
+    document.getElementById('prodName').textContent = name;
+    document.getElementById('unitPrice').textContent = fmt(price);
+    document.getElementById('totalQty').textContent = qty + ' 件';
+    document.getElementById('soldQty').textContent = sold + ' 件';
+    document.getElementById('totalAmt').textContent = fmt(total);
+    document.getElementById('feeAmt').textContent = fmt(fee);
+    document.getElementById('wsAmt').textContent = fmt(wsAmt);
+    document.getElementById('svAmt').textContent = fmt(svAmt);
+
+    // ===== 模拟申请记录（三种不同状态：待审核 × 2、已通过 × 1）=====
+    var records = [
+        { no: 'PF202608051001', prod: '西路财童', total: '¥12,500.00', fee: '¥75.00', ws: '¥3,050.00', sv: '¥2,500.00', time: '2026-08-05 16:40:52', status: 'pending' },
+        { no: 'PF202608031001', prod: '青莲-舒展', total: '¥20,000.00', fee: '¥120.00', ws: '¥4,880.00', sv: '¥4,000.00', time: '2026-08-03 10:22:15', status: 'pending' },
+        { no: 'PF202607281001', prod: '青莲-初心', total: '¥9,375.00', fee: '¥56.25', ws: '¥2,287.50', sv: '¥1,875.00', time: '2026-07-28 09:15:33', status: 'approved' }
+    ];
+
+    function statusHtml(status) {
+        if (status === 'approved') return '<span class="status-tag approved">已通过</span>';
+        return '<span class="status-tag pending">待审核</span>';
+    }
+
+    function renderRecords() {
+        var html = '';
+        records.forEach(function(r) {
+            html += '<tr>' +
+                '<td>' + r.no + '</td>' +
+                '<td>' + r.prod + '</td>' +
+                '<td class="money">' + r.total + '</td>' +
+                '<td class="money" style="color:#e74c5e;">' + r.fee + '</td>' +
+                '<td class="money ws">' + r.ws + '</td>' +
+                '<td class="money sv">' + r.sv + '</td>' +
+                '<td>' + r.time + '</td>' +
+                '<td>' + statusHtml(r.status) + '</td>' +
+            '</tr>';
+        });
+        document.getElementById('recTbody').innerHTML = html || '<tr><td colspan="8" class="empty">暂无申请记录</td></tr>';
+        document.getElementById('recCount').textContent = '共 ' + records.length + ' 条';
+    }
+    renderRecords();
+
+    // ===== 提交申请 =====
+    window.submitApply = function() {
+        var now = new Date();
+        function p2(n) { return n < 10 ? '0' + n : '' + n; }
+        var stamp = '' + now.getFullYear() + p2(now.getMonth() + 1) + p2(now.getDate());
+        var no = 'PF' + stamp + '001';
+        var time = now.getFullYear() + '-' + p2(now.getMonth() + 1) + '-' + p2(now.getDate()) + ' ' + p2(now.getHours()) + ':' + p2(now.getMinutes()) + ':' + p2(now.getSeconds());
+        records.unshift({
+            no: no,
+            prod: name,
+            total: fmt(total),
+            fee: fmt(fee),
+            ws: fmt(wsAmt),
+            sv: fmt(svAmt),
+            time: time,
+            status: 'pending'
+        });
+        renderRecords();
+        showToast('分账申请已提交，等待平台审核');
+    };
+
+    // ===== Toast =====
+    var toastTimer;
+    function showToast(msg) {
+        var el = document.getElementById('toast');
+        el.textContent = msg;
+        el.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function() { el.classList.remove('show'); }, 2200);
+    }
+
+    // ===== 功能说明浮窗 =====
+    window.toggleFuncModal = function() {
+        var el = document.getElementById('funcModal');
+        el.classList.toggle('show');
+        if (el.classList.contains('show') && !el.dataset.dragged) {
+            el.style.left = '50%'; el.style.top = '50%'; el.style.transform = 'translate(-50%,-50%)';
+        }
+    };
+    var modal, titleBar, offX, offY, dragging = false;
+    document.addEventListener('DOMContentLoaded', function() {
+        modal = document.getElementById('funcModal');
+        titleBar = modal.querySelector('.fm-title');
+        titleBar.addEventListener('mousedown', startDrag);
+        titleBar.addEventListener('touchstart', startDragTouch, {passive:true});
+        document.addEventListener('mousemove', onDrag);
+        document.addEventListener('mouseup', endDrag);
+        document.addEventListener('touchmove', onDragTouch, {passive:true});
+        document.addEventListener('touchend', endDrag);
+    });
+    function startDrag(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = e.clientX - rect.left; offY = e.clientY - rect.top; dragging = true; titleBar.style.cursor = 'grabbing'; }
+    function startDragTouch(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; var t = e.touches[0]; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = t.clientX - rect.left; offY = t.clientY - rect.top; dragging = true; }
+    function onDrag(e) { if (!dragging) return; modal.style.left = (e.clientX - offX) + 'px'; modal.style.top = (e.clientY - offY) + 'px'; }
+    function onDragTouch(e) { if (!dragging) return; var t = e.touches[0]; modal.style.left = (t.clientX - offX) + 'px'; modal.style.top = (t.clientY - offY) + 'px'; }
+    function endDrag() { dragging = false; if (titleBar) titleBar.style.cursor = 'grab'; }
+})();
+</script>
+
+</body>
+</html>
