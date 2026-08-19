@@ -363,6 +363,7 @@
                 <th>买家实付</th>
                 <th>买家手续费</th>
                 <th>卖家手续费</th>
+                <th>第三方支付手续费</th>
                 <th>卖家所得金额</th>
                 <th>订单状态</th>
                 <th>是否提货</th>
@@ -380,12 +381,14 @@
 
 <script>
 var data = [
-    { id: 1, orderNo: 'XB-txbuy26072004046001', payNo: '1260720111445095227', product: '东坡万里', buyer: '153019...', seller: '153563...', qty: 1, price: 9.9, buyerPay: 9.96, buyerFee: 0.3, sellerFee: 0.96, sellerIncome: 9.6, status: 'done', isPickup: '仓库暂存', platformFee: 0.18, serviceFee: 0.12, service: '四川华泰博文文化艺术发展有限公司', payProduct: '银行卡', payChannel: '宝付钱包', time: '2026-07-20 11:14:37' },
-    { id: 2, orderNo: 'XB-txbuy26072004034301', payNo: '1260720111244892128', product: '诺亚宝', buyer: '153019...', seller: '132952...', qty: 3, price: 3.78, buyerPay: 11.41, buyerFee: 0.35, sellerFee: 10.99, sellerIncome: 0, status: 'done', isPickup: '仓库暂存', platformFee: 0.21, serviceFee: 0.14, service: '四川华泰博文文化艺术发展有限公司', payProduct: '银行卡', payChannel: '汇付钱包', time: '2026-07-20 11:12:41' },
-    { id: 3, orderNo: 'XB-txbuy26072003711901', payNo: '—', product: '诺亚宝', buyer: '153019...', seller: '132952...', qty: 3, price: 3.78, buyerPay: 0, buyerFee: 0, sellerFee: 0, sellerIncome: 0, status: 'canceled', isPickup: '仓库暂存', platformFee: 0.21, serviceFee: 0.14, service: '四川华泰博文文化艺术发展有限公司', payProduct: '/', payChannel: '/', time: '2026-07-20 09:32:15' },
-    { id: 4, orderNo: 'XB-txbuy26071704007801', payNo: '1260717110765289498', product: '招财财', buyer: '153019...', seller: '131356...', qty: 1, price: 30, buyerPay: 30.18, buyerFee: 0.9, sellerFee: 29.1, sellerIncome: 0, status: 'done', isPickup: '仓库暂存', platformFee: 0.54, serviceFee: 0.36, service: '四川华泰博文文化艺术发展有限公司', payProduct: '银行卡', payChannel: '宝付钱包', time: '2026-07-17 11:08:14' },
-    { id: 5, orderNo: 'XB-txbuy26071703998401', payNo: '1260717110665197510', product: '东坡佛春', buyer: '153019...', seller: '138413...', qty: 1, price: 6.75, buyerPay: 6.8, buyerFee: 0.21, sellerFee: 6.54, sellerIncome: 0, status: 'done', isPickup: '仓库暂存', platformFee: 0.13, serviceFee: 0.08, service: '四川华泰博文文化艺术发展有限公司', payProduct: '银行卡', payChannel: '汇付钱包', time: '2026-07-17 11:06:43' },
-    { id: 6, orderNo: 'XB-txbuy26071703962401', payNo: '1260717110064894877', product: '招财财', buyer: '153019...', seller: '187321...', qty: 2, price: 29, buyerPay: 58.35, buyerFee: 1.74, sellerFee: 56.26, sellerIncome: 0, status: 'done', isPickup: '仓库暂存', platformFee: 1.05, serviceFee: 0.69, service: '四川华泰博文文化艺术发展有限公司', payProduct: '银行卡', payChannel: '宝付钱包', time: '2026-07-17 11:00:44' }
+    { id: 1, orderNo: 'XB-txbuy26072004034301', payNo: '1260720111244892128', product: '诺亚宝', buyer: '153019...', seller: '132952...', qty: 3, price: 4, buyerPay: 12, buyerFee: 0, sellerFee: 0.36, payFee: 0.07, sellerIncome: 11.57, status: 'done', isPickup: '仓库暂存', platformFee: 0.21, serviceFee: 0.15, service: '四川华泰博文文化艺术发展有限公司', payProduct: '银行卡', payChannel: '汇付钱包', time: '2026-07-20 11:12:41' },
+    { id: 2, orderNo: 'XB-txbuy26071703998401', payNo: '1260717110665197510', product: '东坡佛春', buyer: '153019...', seller: '138413...', qty: 1, price: 7, buyerPay: 7, buyerFee: 0, sellerFee: 0.21, payFee: 0.04, sellerIncome: 6.75, status: 'done', isPickup: '仓库暂存', platformFee: 0.13, serviceFee: 0.08, service: '四川华泰博文文化艺术发展有限公司', payProduct: '银行卡', payChannel: '汇付钱包', time: '2026-07-17 11:06:43' },
+    { id: 3, orderNo: 'XB-txbuy26072004046001', payNo: '1260720111445095227', product: '东坡万里', buyer: '153019...', seller: '153563...', qty: 1, price: 9.9, buyerPay: 9.96, buyerFee: 0.06, sellerFee: 0.3, payFee: 0.06, sellerIncome: 9.6, status: 'done', isPickup: '仓库暂存', platformFee: 0.18, serviceFee: 0.12, service: '四川华泰博文文化艺术发展有限公司', payProduct: '银行卡', payChannel: '宝付钱包', time: '2026-07-20 11:14:37' },
+    { id: 4, orderNo: 'XB-txbuy26071704007801', payNo: '1260717110765289498', product: '招财财', buyer: '153019...', seller: '131356...', qty: 1, price: 30, buyerPay: 30.18, buyerFee: 0.18, sellerFee: 0.91, payFee: 0.18, sellerIncome: 29.09, status: 'done', isPickup: '仓库暂存', platformFee: 0.55, serviceFee: 0.36, service: '四川华泰博文文化艺术发展有限公司', payProduct: '银行卡', payChannel: '宝付钱包', time: '2026-07-17 11:08:14' },
+    { id: 5, orderNo: 'XB-txbuy26071703962401', payNo: '1260717110064894877', product: '招财财', buyer: '153019...', seller: '187321...', qty: 2, price: 29, buyerPay: 58.36, buyerFee: 0.36, sellerFee: 1.75, payFee: 0.36, sellerIncome: 56.25, status: 'done', isPickup: '仓库暂存', platformFee: 1.05, serviceFee: 0.7, service: '四川华泰博文文化艺术发展有限公司', payProduct: '银行卡', payChannel: '宝付钱包', time: '2026-07-17 11:00:44' },
+    { id: 6, orderNo: 'XB-txbuy26081705190101', payNo: '1260817142501848223', product: '桧杉', buyer: '15817670339', seller: '18106056520', qty: 1, price: 12, buyerPay: 12.08, buyerFee: 0.08, sellerFee: 0.36, payFee: 0.08, sellerIncome: 11.64, status: 'done', isPickup: '仓库暂存', platformFee: 0.22, serviceFee: 0.14, service: '四川华泰博文文化艺术发展有限公司', payProduct: '银行卡', payChannel: '宝付钱包', time: '2026-08-17 14:30:00' },
+    { id: 7, orderNo: 'XB-txbuy26081305368501', payNo: '1260813145431632287', product: '2026 龙马精神', buyer: '13500062965', seller: '18206063601', qty: 3, price: 20, buyerPay: 60.36, buyerFee: 0.36, sellerFee: 1.8, payFee: 0.36, sellerIncome: 58.2, status: 'done', isPickup: '仓库暂存', platformFee: 1.08, serviceFee: 0.72, service: '四川华泰博文文化艺术发展有限公司', payProduct: '银行卡', payChannel: '宝付钱包', time: '2026-08-13 14:30:00' },
+    { id: 8, orderNo: 'XB-txbuy26072003711901', payNo: '—', product: '诺亚宝', buyer: '153019...', seller: '132952...', qty: 3, price: 4, buyerPay: 0, buyerFee: 0, sellerFee: 0, payFee: 0, sellerIncome: 0, status: 'canceled', isPickup: '仓库暂存', platformFee: 0.21, serviceFee: 0.15, service: '四川华泰博文文化艺术发展有限公司', payProduct: '/', payChannel: '/', time: '2026-07-20 09:32:15' }
 ];
 
 var statusNames = { done: '已成交', canceled: '已撤销' };
@@ -405,6 +408,7 @@ function renderTable() {
             '    <td>' + o.buyerPay + '</td>',
             '    <td>' + o.buyerFee + '</td>',
             '    <td>' + o.sellerFee + '</td>',
+            '    <td>' + o.payFee + '</td>',
             '    <td>' + o.sellerIncome + '</td>',
             '    <td><span class="status-tag ' + o.status + '">' + statusNames[o.status] + '</span></td>',
             '    <td>' + o.isPickup + '</td>',
@@ -440,11 +444,11 @@ renderTable();
       <li>原<b>支付渠道</b>改为<b>支付产品</b>（银行卡 / 余额）</li>
       <li>作为筛选条件并在列表中展示</li>
     </ul>
-    <h4><span class="badge">3</span> <span style="vertical-align:middle;">服务商运营服务费</span></h4>
+    <h4><span class="badge">3</span> <span style="vertical-align:middle;">金额计算规则（按支付渠道区分）</span></h4>
     <ul>
-      <li>去掉单独的「推荐人分佣」列表项</li>
-      <li>原「服务商手续费」与「推荐人分佣」合并为<b>服务商运营服务费</b>（推荐人分佣金额并入服务商手续费）</li>
-      <li>在一次交易中完成分账</li>
+      <li><b>汇付支付：</b>100% = 0.6%（第三方支付手续费）+ 3%（卖家手续费）+ 96.4%（卖家所得）</li>
+      <li style="list-style:none;padding-left:14px;color:#6b7588;">　买家实付 = 单价 × 数量；买家手续费 = 0；第三方支付手续费 = 买家实付 × 0.6%；卖家手续费 = 买家实付 × 3%；卖家所得 = 买家实付 × 96.4%</li>
+      <li><b>宝付支付：</b>保留宝付原真实数据</li>
     </ul>
   </div>
 </div>
