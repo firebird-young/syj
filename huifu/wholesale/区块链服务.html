@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>区块链服务</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+            background: #f0f2f5;
+            color: #1a1a2e;
+            font-size: 14px;
+        }
+
+        .topbar {
+            background: #fff;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .topbar-left { display: flex; align-items: center; gap: 16px; }
+        .menu-btn {
+            width: 32px; height: 32px;
+            border: 1px solid #d0d5dd;
+            border-radius: 4px;
+            background: #fff;
+            color: #6b7588;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+        .menu-btn:hover { background: #f5f5f7; }
+        .breadcrumb { font-size: 13px; color: #6b7588; }
+        .breadcrumb .active { color: #1a1a2e; }
+        .topbar-right {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        .topbar-right .avatar {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            background: #f5deb3;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px;
+        }
+        .topbar-right .name { font-size: 13px; }
+        .topbar-right .arrow { color: #9ba6b9; font-size: 12px; }
+
+        .container { padding: 16px; }
+        .page-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 16px;
+        }
+
+        /* 顶部卡片：余额 + 费用标准 */
+        .summary-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .summary-card {
+            flex: 1;
+            background: #fff;
+            border-radius: 6px;
+            padding: 18px 20px;
+        }
+        .summary-card .head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .summary-card .label {
+            font-size: 14px;
+            color: #4e5a6e;
+            font-weight: 500;
+        }
+        .balance-amount {
+            font-size: 30px;
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+        .balance-amount .cur { font-size: 18px; color: #4e5a6e; margin-right: 4px; }
+        .balance-sub { font-size: 12px; color: #86909c; margin-top: 6px; }
+        .btn-primary {
+            background: #1a78ff;
+            color: #fff;
+            border: none;
+            padding: 6px 18px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .btn-primary:hover { background: #0f6ae8; }
+
+        /* 费用标准 */
+        .fee-card { flex: 1; }
+        .fee-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 10px;
+        }
+        .fee-table { width: 100%; border-collapse: collapse; }
+        .fee-table th {
+            background: #fafbfc;
+            padding: 8px 10px;
+            text-align: left;
+            font-size: 12px;
+            color: #4e5a6e;
+            font-weight: 500;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .fee-table td {
+            padding: 8px 10px;
+            font-size: 13px;
+            color: #1a1a2e;
+            border-bottom: 1px solid #f5f5f7;
+        }
+        .fee-table tr:last-child td { border-bottom: none; }
+        .fee-price { color: #e67e22; font-weight: 600; }
+
+        /* 筛选区 */
+        .filter-bar {
+            background: #fff;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            border-radius: 6px 6px 0 0;
+        }
+        .filter-item {
+            display: flex;
+            align-items: center;
+            margin-right: 14px;
+            margin-bottom: 4px;
+        }
+        .filter-label { font-size: 13px; color: #4e5a6e; margin-right: 6px; white-space: nowrap; }
+        .filter-input {
+            width: 140px;
+            height: 30px;
+            padding: 0 10px;
+            border: 1px solid #d0d5dd;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #1a1a2e;
+            outline: none;
+        }
+        .filter-input:focus { border-color: #1a78ff; }
+        .filter-select {
+            height: 30px;
+            padding: 0 10px;
+            border: 1px solid #d0d5dd;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #1a1a2e;
+            outline: none;
+            background: #fff;
+        }
+        .filter-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: auto;
+        }
+        .btn-search {
+            background: #1a78ff;
+            color: #fff;
+            border: none;
+            padding: 0 14px;
+            height: 30px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .btn-search:hover { background: #0f6ae8; }
+        .btn-reset {
+            background: #f59e0b;
+            color: #fff;
+            border: none;
+            padding: 0 14px;
+            height: 30px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .btn-reset:hover { background: #e08d04; }
+
+        /* 明细表格 */
+        .table-card {
+            background: #fff;
+            border-radius: 0 0 6px 6px;
+            overflow-x: auto;
+        }
+        .table { width: 100%; border-collapse: collapse; }
+        .table th {
+            background: #fafbfc;
+            padding: 14px 16px;
+            text-align: left;
+            font-size: 13px;
+            color: #4e5a6e;
+            font-weight: 500;
+            border-bottom: 1px solid #f0f0f0;
+            white-space: nowrap;
+        }
+        .table td {
+            padding: 14px 16px;
+            font-size: 13px;
+            color: #1a1a2e;
+            border-bottom: 1px solid #f5f5f7;
+            white-space: nowrap;
+        }
+        .table tr:last-child td { border-bottom: none; }
+        .table td.amount-pos { color: #d92d20; font-weight: 700; }
+        .table td.amount-neg { color: #0b9a4f; font-weight: 700; }
+
+        /* 类型标签 */
+        .type-tag {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            background: #f2f3f5;
+            color: #4e5a6e;
+        }
+        .type-tag.zz { background: #e6f4ff; color: #1a78ff; }
+        .type-tag.zs { background: #f5f0ff; color: #7a5af8; }
+        .type-tag.jy { background: #e6fffb; color: #08979c; }
+        .type-tag.xh { background: #fff7e6; color: #e67e22; }
+        .type-tag.jz { background: #fff0f6; color: #eb2f96; }
+        .type-tag.cz { background: #e6f7eb; color: #1aab67; }
+
+        .empty-tip {
+            text-align: center;
+            color: #86909c;
+            font-size: 13px;
+            padding: 48px 0;
+        }
+        .table-foot {
+            padding: 12px 20px;
+            border-top: 1px solid #f5f5f7;
+            font-size: 13px;
+            color: #4e5a6e;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* 标注圆点 */
+        .badge {
+            display: inline-block;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 5px;
+            border-radius: 50%;
+            background: #ff2d55;
+            color: #fff;
+            font-size: 12px;
+            line-height: 18px;
+            text-align: center;
+            font-weight: 600;
+            box-shadow: 0 1px 3px rgba(255,45,85,0.3);
+        }
+
+        /* 功能说明浮窗 */
+        .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 580px; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 9999; padding: 24px; display: none; }
+        .f-modal.show { display: block; }
+        .f-modal .fm-title { font-size: 16px; font-weight: 600; color: #1a1a2e; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
+        .f-modal .fm-title:active { cursor: grabbing; }
+        .f-modal .fm-close { width: 28px; height: 28px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; color: #666; border: none; flex-shrink: 0; }
+        .f-modal .fm-close:hover { background: #e8e8e8; }
+        .f-modal .fm-body { font-size: 13px; color: #555; line-height: 1.8; }
+        .f-modal .fm-body h4 { font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 16px 0 8px; }
+        .f-modal .fm-body h4:first-child { margin-top: 0; }
+        .f-modal .fm-body ul { padding-left: 18px; margin: 0 0 12px; }
+        .f-modal .fm-body li { margin-bottom: 4px; }
+        .f-modal .fm-role { font-size: 13px; font-weight: 600; color: #e74c5e; margin: -6px 0 12px; }
+    </style>
+</head>
+<body>
+
+<div class="topbar">
+    <div class="topbar-left">
+        <button class="menu-btn">≡</button>
+        <div class="breadcrumb">
+            <span>首页</span> /
+            <span class="active">区块链服务</span>
+        </div>
+    </div>
+    <div class="topbar-right">
+        <button onclick="toggleFuncModal()" style="margin-right:12px;padding:6px 14px;border-radius:6px;background:#f5f7fa;color:#333;border:1px solid #e0e4ea;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:4px;">📖 功能说明</button>
+        <span class="avatar">👤</span>
+        <span class="name">系统参数设置</span>
+        <span class="arrow">▾</span>
+    </div>
+</div>
+
+<div class="container">
+    <div class="page-title">区块链服务</div>
+
+    <!-- 余额 + 费用标准 -->
+    <div class="summary-row">
+        <div class="summary-card">
+            <div class="head">
+                <span class="label">企业区块链服务余额</span>
+                <button class="btn-primary" onclick="openRechargeModal()">充值</button>
+            </div>
+            <div class="balance-amount"><span class="cur">¥</span><span id="balanceNum">3,085.90</span></div>
+            <div class="balance-sub" id="balanceSub">累计充值 ¥3,500.00　累计消费 ¥414.10</div>
+        </div>
+        <div class="summary-card fee-card">
+            <div class="fee-title">费用标准</div>
+            <table class="fee-table">
+                <tr><th>操作类型</th><th>费用标准</th></tr>
+                <tr><td>铸造</td><td class="fee-price">2.00 元/条</td></tr>
+                <tr><td>证书</td><td class="fee-price">1.00 元/条</td></tr>
+                <tr><td>交易</td><td class="fee-price">0.50 元/次</td></tr>
+                <tr><td>销毁</td><td class="fee-price">0.10 元/条</td></tr>
+                <tr><td>价值注入</td><td class="fee-price">5.00 元/次</td></tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- 筛选区 -->
+    <div class="filter-bar">
+        <div class="filter-item">
+            <span class="filter-label">时间段</span>
+            <input type="date" class="filter-input" id="fStart" value="2026-06-01">
+            <span style="color:#9ba6b9;margin:0 6px;">至</span>
+            <input type="date" class="filter-input" id="fEnd" value="2026-08-19">
+        </div>
+        <div class="filter-item">
+            <span class="filter-label">类型</span>
+            <select class="filter-select" id="fType">
+                <option value="">全部类型</option>
+                <option value="铸造">铸造</option>
+                <option value="证书">证书</option>
+                <option value="交易">交易</option>
+                <option value="销毁">销毁</option>
+                <option value="价值注入">价值注入</option>
+                <option value="充值">充值</option>
+            </select>
+        </div>
+        <div class="filter-item">
+            <span class="filter-label">收支</span>
+            <select class="filter-select" id="fIo">
+                <option value="">全部</option>
+                <option value="income">收入</option>
+                <option value="expense">支出</option>
+            </select>
+        </div>
+        <div class="filter-actions">
+            <button class="btn-search" onclick="applyFilter()">🔍 搜索</button>
+            <button class="btn-reset" onclick="resetFilter()">↻ 重置</button>
+        </div>
+    </div>
+
+    <!-- 消费明细 -->
+    <div class="table-card">
+        <div class="empty-tip" id="emptyTip" style="display:none;">暂无符合条件的记录</div>
+        <table class="table" id="tableEl">
+            <thead>
+                <tr>
+                    <th>序号</th>
+                    <th>时间</th>
+                    <th>类型</th>
+                    <th>产品名称</th>
+                    <th>业务单号</th>
+                    <th>数量</th>
+                    <th>单价（元）</th>
+                    <th>金额（元）</th>
+                    <th>收支</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+        <div class="table-foot">
+            <span id="totalText">共 0 条</span>
+            <span id="sumText"></span>
+        </div>
+    </div>
+</div>
+
+<!-- ====== 功能说明浮窗 ====== -->
+<div class="f-modal" id="funcModal">
+  <div class="fm-title">
+    <span>📖 功能说明</span>
+    <button class="fm-close" onclick="toggleFuncModal()">✕</button>
+  </div>
+  <div class="fm-role">批发商后台</div>
+  <div class="fm-body">
+    <h4><span class="badge">1</span> <span style="vertical-align:middle;">区块链服务余额</span></h4>
+    <ul>
+      <li>展示企业当前<b>区块链服务余额</b>，及累计充值、累计消费情况</li>
+      <li>点击<b>充值</b>按钮，提示<b>添加微信</b>详细咨询充值事宜</li>
+    </ul>
+    <h4><span class="badge">2</span> <span style="vertical-align:middle;">费用标准</span></h4>
+    <ul>
+      <li>共 5 类收费操作：<b>铸造 2.00 元/条、证书 1.00 元/条、交易 0.50 元/次、销毁 0.10 元/条、价值注入 5.00 元/次</b></li>
+      <li>以上均为<b>支出</b>类型；<b>收入</b>仅对应充值记录</li>
+    </ul>
+    <h4><span class="badge">3</span> <span style="vertical-align:middle;">消费明细查询</span></h4>
+    <ul>
+      <li>支持按<b>时间段、类型、收支</b>筛选查询，可一键重置</li>
+      <li>每条记录展示对应的<b>产品名称</b>（充值记录无产品，显示为 —）</li>
+      <li><b>铸造、证书</b>为批量操作，一条记录带<b>数量</b>（如一次铸造 100 条）；<b>交易、销毁、价值注入</b>数量固定为 1</li>
+      <li>收入标<b style="color:#d92d20;">红</b>（+），支出标<b style="color:#0b9a4f;">绿</b>（−）</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+/* ================= 数据 ================= */
+var TYPE_TAG = {
+    '铸造': 'zz',
+    '证书': 'zs',
+    '交易': 'jy',
+    '销毁': 'xh',
+    '价值注入': 'jz',
+    '充值': 'cz'
+};
+
+/* 收入（充值）与支出明细，时间倒序展示 */
+var records = [
+    { time: '2026-08-18 09:08:40', type: '铸造',     product: '西路财宝', no: 'ZZ202608180002', qty: 100, price: '2.00', amount: 200.00, io: 'expense' },
+    { time: '2026-08-18 09:08:36', type: '证书',     product: '西路财宝', no: 'ZS202608180002', qty: 100, price: '1.00', amount: 100.00, io: 'expense' },
+    { time: '2026-08-15 15:20:08', type: '价值注入', product: '中路财童', no: 'JZ202608150001', qty: 1,   price: '5.00', amount: 5.00,   io: 'expense' },
+    { time: '2026-08-12 10:44:21', type: '交易',     product: '中路财童', no: 'JY202608120001', qty: 1,   price: '0.50', amount: 0.50,   io: 'expense' },
+    { time: '2026-08-10 11:00:00', type: '充值',     product: '',          no: 'CZ202608100001', qty: 1,   price: '-',    amount: 500.00, io: 'income' },
+    { time: '2026-07-28 16:05:33', type: '销毁',     product: '西路财宝', no: 'XH202607280001', qty: 1,   price: '0.10', amount: 0.10,   io: 'expense' },
+    { time: '2026-07-20 10:15:00', type: '充值',     product: '',          no: 'CZ202607200001', qty: 1,   price: '-',    amount: 1000.00, io: 'income' },
+    { time: '2026-07-15 14:30:02', type: '交易',     product: '仙鹤莲池', no: 'JY202607150001', qty: 1,   price: '0.50', amount: 0.50,   io: 'expense' },
+    { time: '2026-07-05 09:12:40', type: '铸造',     product: '中路财童', no: 'ZZ202607050001', qty: 24,  price: '2.00', amount: 48.00,  io: 'expense' },
+    { time: '2026-06-10 10:20:18', type: '证书',     product: '中路财童', no: 'ZS202606100001', qty: 20,  price: '1.00', amount: 20.00,  io: 'expense' },
+    { time: '2026-06-10 10:20:15', type: '铸造',     product: '仙鹤莲池', no: 'ZZ202606100001', qty: 20,  price: '2.00', amount: 40.00,  io: 'expense' },
+    { time: '2026-06-01 09:30:00', type: '充值',     product: '',          no: 'CZ202606010001', qty: 1,   price: '-',    amount: 2000.00, io: 'income' }
+];
+
+/* ================= 余额 ================= */
+var balance = 3085.90;
+var totalIncome = 3500.00;
+var totalExpense = 414.10;
+
+function fmt(n) {
+    return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function updateBalance() {
+    document.getElementById('balanceNum').textContent = fmt(balance);
+    document.getElementById('balanceSub').textContent =
+        '累计充值 ¥' + fmt(totalIncome) + '　累计消费 ¥' + fmt(totalExpense);
+}
+
+/* ================= 渲染 ================= */
+function getFiltered() {
+    var fStart = document.getElementById('fStart').value;
+    var fEnd = document.getElementById('fEnd').value;
+    var fType = document.getElementById('fType').value;
+    var fIo = document.getElementById('fIo').value;
+    return records.filter(function (r) {
+        if (fStart && r.time.slice(0, 10) < fStart) return false;
+        if (fEnd && r.time.slice(0, 10) > fEnd) return false;
+        if (fType && r.type !== fType) return false;
+        if (fIo && r.io !== fIo) return false;
+        return true;
+    });
+}
+
+function renderTable() {
+    var data = getFiltered();
+    var html = '';
+    data.forEach(function (r, i) {
+        var cls = r.io === 'income' ? 'amount-pos' : 'amount-neg';
+        var sign = r.io === 'income' ? '+' : '−';
+        var tagCls = TYPE_TAG[r.type] || '';
+        html += [
+            '<tr>',
+            '  <td>' + (i + 1) + '</td>',
+            '  <td>' + r.time + '</td>',
+            '  <td><span class="type-tag ' + tagCls + '">' + r.type + '</span></td>',
+            '  <td>' + (r.product || '—') + '</td>',
+            '  <td>' + r.no + '</td>',
+            '  <td>' + r.qty + '</td>',
+            '  <td>' + r.price + '</td>',
+            '  <td class="' + cls + '">' + sign + fmt(r.amount) + '</td>',
+            '  <td>' + (r.io === 'income' ? '收入' : '支出') + '</td>',
+            '</tr>'
+        ].join('');
+    });
+    document.getElementById('tableBody').innerHTML = html;
+    document.getElementById('emptyTip').style.display = data.length ? 'none' : '';
+    document.getElementById('tableEl').style.display = data.length ? '' : 'none';
+    document.getElementById('totalText').textContent = '共 ' + data.length + ' 条';
+    var inc = data.filter(function (r) { return r.io === 'income'; });
+    var exp = data.filter(function (r) { return r.io === 'expense'; });
+    var sumInc = inc.reduce(function (s, r) { return s + r.amount; }, 0);
+    var sumExp = exp.reduce(function (s, r) { return s + r.amount; }, 0);
+    document.getElementById('sumText').textContent =
+        '收入合计 ¥' + fmt(sumInc) + '　支出合计 ¥' + fmt(sumExp);
+}
+
+function applyFilter() {
+    var s = document.getElementById('fStart').value;
+    var e = document.getElementById('fEnd').value;
+    if (s && e && s > e) { alert('开始日期不能晚于结束日期'); return; }
+    renderTable();
+}
+
+function resetFilter() {
+    document.getElementById('fStart').value = '2026-06-01';
+    document.getElementById('fEnd').value = '2026-08-19';
+    document.getElementById('fType').value = '';
+    document.getElementById('fIo').value = '';
+    renderTable();
+}
+
+/* ================= 充值 ================= */
+function openRechargeModal() {
+    alert('请添加微信 syj_service 详细咨询');
+}
+
+/* 初始化 */
+updateBalance();
+renderTable();
+
+/* ================= 功能说明 ================= */
+function toggleFuncModal() {
+    var el = document.getElementById('funcModal');
+    el.classList.toggle('show');
+    if (el.classList.contains('show') && !el.dataset.dragged) {
+        el.style.left = '50%'; el.style.top = '50%'; el.style.transform = 'translate(-50%,-50%)';
+    }
+}
+(function () {
+    var modal, titleBar, offX, offY, dragging = false;
+    document.addEventListener('DOMContentLoaded', function () {
+        modal = document.getElementById('funcModal');
+        titleBar = modal.querySelector('.fm-title');
+        titleBar.addEventListener('mousedown', startDrag);
+        titleBar.addEventListener('touchstart', startDragTouch, { passive: true });
+        document.addEventListener('mousemove', onDrag);
+        document.addEventListener('mouseup', endDrag);
+        document.addEventListener('touchmove', onDragTouch, { passive: true });
+        document.addEventListener('touchend', endDrag);
+    });
+    function startDrag(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = e.clientX - rect.left; offY = e.clientY - rect.top; dragging = true; titleBar.style.cursor = 'grabbing'; }
+    function startDragTouch(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; var t = e.touches[0]; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = t.clientX - rect.left; offY = t.clientY - rect.top; dragging = true; }
+    function onDrag(e) { if (!dragging) return; modal.style.left = (e.clientX - offX) + 'px'; modal.style.top = (e.clientY - offY) + 'px'; }
+    function onDragTouch(e) { if (!dragging) return; var t = e.touches[0]; modal.style.left = (t.clientX - offX) + 'px'; modal.style.top = (t.clientY - offY) + 'px'; }
+    function endDrag() { dragging = false; if (titleBar) titleBar.style.cursor = 'grab'; }
+})();
+</script>
+
+</body>
+</html>

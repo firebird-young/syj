@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>区块链服务管理</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+            background: #f0f2f5;
+            color: #1a1a2e;
+            font-size: 14px;
+        }
+
+        .topbar {
+            background: #fff;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .topbar-left { display: flex; align-items: center; gap: 16px; }
+        .menu-btn {
+            width: 32px; height: 32px;
+            border: 1px solid #d0d5dd;
+            border-radius: 4px;
+            background: #fff;
+            color: #6b7588;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+        .breadcrumb { font-size: 13px; color: #6b7588; }
+        .breadcrumb .active { color: #1a1a2e; }
+        .topbar-right {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        .topbar-right .avatar {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            background: #f5deb3;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px;
+        }
+        .topbar-right .name { font-size: 13px; }
+        .topbar-right .arrow { color: #9ba6b9; font-size: 12px; }
+
+        /* 统计卡片 */
+        .summary-row {
+            display: flex;
+            gap: 12px;
+            margin: 16px 12px 0;
+        }
+        .summary-card {
+            flex: 1;
+            background: #fff;
+            border-radius: 6px;
+            padding: 16px 20px;
+        }
+        .summary-card .label { font-size: 13px; color: #86909c; margin-bottom: 8px; }
+        .summary-card .value { font-size: 24px; font-weight: 700; color: #1a1a2e; }
+        .summary-card .value.balance { color: #1a78ff; }
+        .summary-card .value.income { color: #e74c5e; }
+        .summary-card .value.expense { color: #1c9d63; }
+
+        /* 费用标准卡片 */
+        .fee-card {
+            background: #fff;
+            margin: 12px 12px 0;
+            border-radius: 6px;
+            padding: 16px 20px;
+        }
+        .fee-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+        .fee-title { font-size: 15px; font-weight: 600; color: #1a1a2e; }
+        .fee-title .sub { font-size: 12px; font-weight: 400; color: #86909c; margin-left: 8px; }
+        .btn-save { background: #1a78ff; color: #fff; border: none; padding: 7px 24px; border-radius: 4px; font-size: 13px; cursor: pointer; }
+        .btn-save:hover { background: #0f6ae8; }
+        .fee-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+        }
+        .fee-item {
+            background: #f7f9fc;
+            border: 1px solid #eceff4;
+            border-radius: 6px;
+            padding: 12px 14px;
+        }
+        .fee-item .fi-name { font-size: 13px; color: #4e5a6e; margin-bottom: 8px; display: flex; align-items: center; gap: 4px; }
+        .fee-item .fi-unit { font-size: 11px; color: #9ba6b9; font-weight: 400; }
+        .fee-input {
+            width: 100%;
+            height: 32px;
+            padding: 0 10px;
+            border: 1px solid #d0d5dd;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a2e;
+            outline: none;
+        }
+        .fee-input:focus { border-color: #1a78ff; }
+
+        /* 筛选区 */
+        .filter-bar {
+            background: #fff;
+            margin: 12px 12px 0;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            border-radius: 6px;
+        }
+        .filter-item { display: flex; align-items: center; margin-right: 16px; margin-bottom: 4px; }
+        .filter-label { font-size: 13px; color: #4e5a6e; margin-right: 8px; white-space: nowrap; }
+        .filter-input {
+            width: 200px; height: 30px; padding: 0 10px;
+            border: 1px solid #d0d5dd; border-radius: 4px; font-size: 13px; outline: none;
+        }
+        .filter-select {
+            width: 130px; height: 30px; padding: 0 10px;
+            border: 1px solid #d0d5dd; border-radius: 4px; font-size: 13px; background: #fff; outline: none;
+        }
+        .filter-actions { display: flex; gap: 8px; margin-left: auto; }
+        .btn-search { background: #1a78ff; color: #fff; border: none; padding: 0 14px; height: 30px; border-radius: 4px; font-size: 13px; cursor: pointer; }
+        .btn-reset { background: #f59e0b; color: #fff; border: none; padding: 0 14px; height: 30px; border-radius: 4px; font-size: 13px; cursor: pointer; }
+
+        /* 表格 */
+        .table-card { background: #fff; margin: 12px; border-radius: 6px; overflow: hidden; }
+        .table { width: 100%; border-collapse: collapse; }
+        .table th {
+            background: #fafbfc; padding: 14px 12px; text-align: left;
+            font-size: 13px; color: #4e5a6e; font-weight: 500; border-bottom: 1px solid #f0f0f0;
+        }
+        .table td { padding: 14px 12px; font-size: 13px; color: #1a1a2e; border-bottom: 1px solid #f5f5f7; }
+        .table tr:last-child td { border-bottom: none; }
+
+        .type-tag { display: inline-block; padding: 3px 10px; border-radius: 4px; font-size: 12px; }
+        .type-tag.ws { background: #e6f4ff; color: #1a78ff; }
+        .type-tag.sv { background: #fdf0e0; color: #e67e22; }
+
+        .money { font-weight: 600; white-space: nowrap; }
+        .money.balance { color: #1a78ff; }
+        .money.income { color: #e74c5e; }
+        .money.expense { color: #1c9d63; }
+        /* 消费明细弹窗金额列：收入红、支出绿（需高于 .detail-modal .d-table td） */
+        .detail-modal .d-table td.money.income { color: #e74c5e; }
+        .detail-modal .d-table td.money.expense { color: #1c9d63; }
+
+        .btn-recharge {
+            background: #fff;
+            border: 1px solid #1a78ff;
+            color: #1a78ff;
+            padding: 4px 14px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .btn-recharge:hover { background: #1a78ff; color: #fff; }
+        .actions a { color: #1a78ff; margin-right: 8px; cursor: pointer; text-decoration: none; }
+        .actions a:hover { text-decoration: underline; }
+
+        .pagination {
+            padding: 12px 20px; display: flex; align-items: center; justify-content: flex-end;
+            gap: 8px; font-size: 13px; color: #4e5a6e;
+        }
+        .page-btn {
+            min-width: 28px; height: 28px; padding: 0 8px;
+            border: 1px solid #d0d5dd; border-radius: 4px; background: #fff; color: #4e5a6e; font-size: 12px; cursor: pointer;
+        }
+        .page-btn.active { background: #1a78ff; border-color: #1a78ff; color: #fff; }
+
+        /* 消费明细浮层 */
+        .detail-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+            display: none; align-items: center; justify-content: center; z-index: 2001;
+        }
+        .detail-overlay.show { display: flex; }
+        .detail-modal { background: #fff; border-radius: 8px; width: 960px; max-width: 96vw; }
+        .detail-header { padding: 16px 20px; border-bottom: 1px solid #f0f0f0; display: flex; align-items: center; justify-content: space-between; }
+        .detail-title { font-size: 16px; font-weight: 600; }
+        .detail-close { font-size: 22px; color: #86909c; cursor: pointer; line-height: 1; }
+        .detail-body { padding: 16px 20px; max-height: 70vh; overflow-y: auto; }
+        .dt-info {
+            display: flex;
+            gap: 24px;
+            background: #f5f7fa;
+            border-radius: 6px;
+            padding: 12px 16px;
+            margin-bottom: 14px;
+            font-size: 13px;
+            color: #4e5a6e;
+            flex-wrap: wrap;
+        }
+        .dt-info b { color: #1a1a2e; font-weight: 600; }
+        .detail-modal .d-table { width: 100%; border-collapse: collapse; }
+        .detail-modal .d-table th {
+            background: #fafbfc; padding: 10px 12px; text-align: left;
+            font-size: 12px; color: #4e5a6e; font-weight: 500; border-bottom: 1px solid #f0f0f0;
+        }
+        .detail-modal .d-table td { padding: 10px 12px; font-size: 13px; color: #1a1a2e; border-bottom: 1px solid #f5f5f7; }
+        .detail-modal .d-table tr:last-child td { border-bottom: none; }
+        .io-tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; }
+        .io-tag.income { background: #fdecee; color: #e74c5e; }
+        .io-tag.expense { background: #e8f7ef; color: #1c9d63; }
+        .type-chip { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; }
+        .type-chip.cast { background: #e6f4ff; color: #1a78ff; }
+        .type-chip.cert { background: #f3e8ff; color: #7b4dd4; }
+        .type-chip.trade { background: #eef2f7; color: #4e5a6e; }
+        .type-chip.burn { background: #fdecee; color: #e74c5e; }
+        .type-chip.inject { background: #fdf0e0; color: #e67e22; }
+        .type-chip.recharge { background: #e8f7ef; color: #1c9d63; }
+        .dt-footer { margin-top: 12px; text-align: right; font-size: 13px; color: #4e5a6e; }
+
+        /* 充值浮层 */
+        .rc-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+            display: none; align-items: center; justify-content: center; z-index: 2002;
+        }
+        .rc-overlay.show { display: flex; }
+        .rc-modal { background: #fff; border-radius: 8px; width: 420px; max-width: 94vw; }
+        .rc-header { padding: 16px 20px; border-bottom: 1px solid #f0f0f0; display: flex; align-items: center; justify-content: space-between; }
+        .rc-title { font-size: 16px; font-weight: 600; }
+        .rc-close { font-size: 22px; color: #86909c; cursor: pointer; line-height: 1; }
+        .rc-body { padding: 20px; }
+        .rc-row { margin-bottom: 14px; }
+        .rc-label { font-size: 13px; color: #4e5a6e; margin-bottom: 6px; }
+        .rc-label b { color: #1a1a2e; }
+        .rc-balance { font-size: 20px; font-weight: 700; color: #1a78ff; }
+        .rc-input {
+            width: 100%; height: 38px; padding: 0 12px; border: 1px solid #d0d5dd;
+            border-radius: 4px; font-size: 14px; color: #1a1a2e; outline: none; box-sizing: border-box;
+        }
+        .rc-input:focus { border-color: #1a78ff; }
+        .rc-tip { font-size: 12px; color: #9ba6b9; }
+        .rc-footer { padding: 12px 20px; border-top: 1px solid #f0f0f0; display: flex; justify-content: flex-end; gap: 8px; }
+        .rc-btn { padding: 7px 20px; border-radius: 4px; font-size: 13px; cursor: pointer; border: none; }
+        .rc-btn-default { background: #fff; border: 1px solid #d0d5dd; color: #4e5a6e; }
+        .rc-btn-primary { background: #1a78ff; color: #fff; }
+        .rc-btn-primary:hover { background: #0f6ae8; }
+        .rc-amount-big { font-size: 24px; font-weight: 700; color: #e74c5e; }
+        .rc-confirm-line { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #f0f0f0; font-size: 13px; }
+        .rc-confirm-line:last-child { border-bottom: none; }
+        .rc-confirm-line .k { color: #4e5a6e; }
+        .rc-confirm-line .v { color: #1a1a2e; font-weight: 600; }
+
+        /* 标注圆点 */
+        .badge { display: inline-block; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 50%; background: #ff2d55; color: #fff; font-size: 12px; line-height: 18px; text-align: center; font-weight: 600; box-shadow: 0 1px 3px rgba(255,45,85,0.3); }
+
+        /* 功能说明浮窗 */
+        .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 540px; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 9999; padding: 24px; display: none; }
+        .f-modal.show { display: block; }
+        .f-modal .fm-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
+        .f-modal .fm-title:active { cursor: grabbing; }
+        .f-modal .fm-close { width: 28px; height: 28px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; color: #666; border: none; flex-shrink: 0; }
+        .f-modal .fm-body { font-size: 13px; color: #555; line-height: 1.8; }
+        .f-modal .fm-body h4 { font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 16px 0 8px; }
+        .f-modal .fm-body h4:first-child { margin-top: 0; }
+        .f-modal .fm-body ul { padding-left: 18px; margin: 0 0 12px; }
+        .f-modal .fm-body li { margin-bottom: 4px; }
+    </style>
+</head>
+<body>
+
+<div class="topbar">
+    <div class="topbar-left">
+        <button class="menu-btn">≡</button>
+        <div class="breadcrumb">
+            <span>首页</span> /
+            <span>区块链服务</span> /
+            <span class="active">区块链服务管理</span>
+        </div>
+    </div>
+    <div class="topbar-right">
+        <button onclick="toggleFuncModal()" style="margin-right:12px;padding:6px 14px;border-radius:6px;background:#f5f7fa;color:#333;border:1px solid #e0e4ea;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:4px;">📖 功能说明</button>
+        <span class="avatar">👤</span>
+        <span class="name">系统参数设置</span>
+        <span class="arrow">▾</span>
+    </div>
+</div>
+
+<!-- 统计卡片 -->
+<div class="summary-row">
+    <div class="summary-card">
+        <div class="label">开通企业</div>
+        <div class="value">10</div>
+    </div>
+    <div class="summary-card">
+        <div class="label">服务总余额</div>
+        <div class="value balance" id="sumBalance">31,622.50</div>
+    </div>
+    <div class="summary-card">
+        <div class="label">累计充值</div>
+        <div class="value income" id="sumIncome">42,300.00</div>
+    </div>
+    <div class="summary-card">
+        <div class="label">累计消费</div>
+        <div class="value expense" id="sumExpense">10,677.50</div>
+    </div>
+</div>
+
+<!-- 费用标准 -->
+<div class="fee-card">
+    <div class="fee-head">
+        <div class="fee-title"><span class="badge">1</span> <span style="vertical-align:middle;">费用标准</span><span class="sub">支持修改各操作类型费用，保存后立即生效</span></div>
+        <button class="btn-save" onclick="saveFee()">💾 保存</button>
+    </div>
+    <div class="fee-grid">
+        <div class="fee-item">
+            <div class="fi-name">🏭 铸造<span class="fi-unit">（元/条）</span></div>
+            <input type="number" class="fee-input" id="feeCast" value="2.00" step="0.01" min="0">
+        </div>
+        <div class="fee-item">
+            <div class="fi-name">📜 证书<span class="fi-unit">（元/条）</span></div>
+            <input type="number" class="fee-input" id="feeCert" value="1.00" step="0.01" min="0">
+        </div>
+        <div class="fee-item">
+            <div class="fi-name">🔄 交易<span class="fi-unit">（元/次）</span></div>
+            <input type="number" class="fee-input" id="feeTrade" value="0.50" step="0.01" min="0">
+        </div>
+        <div class="fee-item">
+            <div class="fi-name">🗑 销毁<span class="fi-unit">（元/条）</span></div>
+            <input type="number" class="fee-input" id="feeBurn" value="0.10" step="0.01" min="0">
+        </div>
+        <div class="fee-item">
+            <div class="fi-name">💎 价值注入<span class="fi-unit">（元/次）</span></div>
+            <input type="number" class="fee-input" id="feeInject" value="5.00" step="0.01" min="0">
+        </div>
+    </div>
+</div>
+
+<!-- 筛选区 -->
+<div class="filter-bar">
+    <div class="filter-item">
+        <span class="filter-label">企业类型</span>
+        <select class="filter-select" id="fType">
+            <option value="">全部</option>
+            <option value="ws">批发商</option>
+            <option value="sv">服务商</option>
+        </select>
+    </div>
+    <div class="filter-item">
+        <span class="filter-label">企业名称</span>
+        <input class="filter-input" id="fName" placeholder="请输入企业名称">
+    </div>
+    <div class="filter-actions">
+        <button class="btn-search" onclick="filterTable()">🔍 搜索</button>
+        <button class="btn-reset" onclick="resetFilter()">↻ 重置</button>
+    </div>
+</div>
+
+<!-- 企业列表 -->
+<div class="table-card">
+    <table class="table">
+        <thead>
+            <tr>
+                <th style="width:50px;">序号</th>
+                <th>企业名称</th>
+                <th>企业类型</th>
+                <th>区块链服务余额</th>
+                <th>累计充值</th>
+                <th>累计消费</th>
+                <th style="width:150px;">操作</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+    </table>
+
+    <div class="pagination">
+        <span id="totalCount">共 10 条</span>
+        <button class="page-btn">‹</button>
+        <button class="page-btn active">1</button>
+        <button class="page-btn">›</button>
+    </div>
+</div>
+
+<!-- 消费明细浮层 -->
+<div class="detail-overlay" id="detailOverlay" onclick="if(event.target===this)closeDetail()">
+    <div class="detail-modal">
+        <div class="detail-header">
+            <span class="detail-title">🧾 区块链服务消费明细</span>
+            <span class="detail-close" onclick="closeDetail()">×</span>
+        </div>
+        <div class="detail-body">
+            <div class="dt-info">
+                <span>企业名称：<b id="dtName">-</b></span>
+                <span>企业类型：<b id="dtType">-</b></span>
+                <span>服务余额：<b id="dtBalance">-</b></span>
+                <span>累计充值：<b id="dtIncome">-</b></span>
+                <span>累计消费：<b id="dtExpense">-</b></span>
+            </div>
+            <table class="d-table">
+                <thead>
+                    <tr>
+                        <th style="width:50px;">序号</th>
+                        <th>时间</th>
+                        <th>类型</th>
+                        <th>产品名称</th>
+                        <th>业务单号</th>
+                        <th>数量</th>
+                        <th>单价</th>
+                        <th>金额</th>
+                        <th>收支</th>
+                    </tr>
+                </thead>
+                <tbody id="detailTbody"></tbody>
+            </table>
+            <div class="dt-footer" id="dtFooter"></div>
+        </div>
+    </div>
+</div>
+
+<!-- 充值浮层 -->
+<div class="rc-overlay" id="rcOverlay" onclick="if(event.target===this)closeRecharge()">
+    <div class="rc-modal">
+        <div class="rc-header">
+            <span class="rc-title">💳 区块链服务充值</span>
+            <span class="rc-close" onclick="closeRecharge()">×</span>
+        </div>
+        <div class="rc-body">
+            <!-- 第一步：填写金额 -->
+            <div id="rcStepInput">
+                <div class="rc-row">
+                    <div class="rc-label">充值企业：<b id="rcName">-</b></div>
+                </div>
+                <div class="rc-row">
+                    <div class="rc-label">当前服务余额</div>
+                    <div class="rc-balance" id="rcBalance">-</div>
+                </div>
+                <div class="rc-row">
+                    <div class="rc-label">充值金额（元）</div>
+                    <input type="number" class="rc-input" id="rcAmount" placeholder="请输入充值金额" min="0" step="0.01" onkeydown="if(event.key==='Enter')rcStepConfirm()">
+                </div>
+                <div class="rc-row rc-tip">充值到账后将在「消费明细」中生成一条收入记录，并同步更新企业余额与累计充值</div>
+            </div>
+            <!-- 第二步：二次确认 -->
+            <div id="rcStepConfirm" style="display:none;">
+                <div style="text-align:center;padding:6px 0 14px;">
+                    <div style="font-size:13px;color:#4e5a6e;margin-bottom:8px;">请确认以下充值信息</div>
+                    <div class="rc-amount-big">¥ <span id="rcCfmAmount">0.00</span></div>
+                </div>
+                <div class="rc-confirm-line"><span class="k">充值企业</span><span class="v" id="rcCfmName">-</span></div>
+                <div class="rc-confirm-line"><span class="k">充值金额</span><span class="v" id="rcCfmAmt">-</span></div>
+                <div class="rc-confirm-line"><span class="k">当前余额</span><span class="v" id="rcCfmCur">-</span></div>
+                <div class="rc-confirm-line"><span class="k">充值后余额</span><span class="v" style="color:#1c9d63;" id="rcCfmAfter">-</span></div>
+            </div>
+        </div>
+        <div class="rc-footer">
+            <button class="rc-btn rc-btn-default" id="rcBtnCancel" onclick="closeRecharge()">取消</button>
+            <button class="rc-btn rc-btn-primary" id="rcBtnNext" onclick="rcStepConfirm()">下一步</button>
+            <button class="rc-btn rc-btn-primary" id="rcBtnApply" style="display:none;" onclick="applyRecharge()">确认充值</button>
+        </div>
+    </div>
+</div>
+
+<!-- ====== 功能说明浮窗 ====== -->
+<div class="f-modal" id="funcModal">
+  <div class="fm-title">
+    <span>📖 功能说明</span>
+    <button class="fm-close" onclick="toggleFuncModal()">✕</button>
+  </div>
+  <div style="font-size:13px;font-weight:600;color:#e74c5e;margin:-6px 0 12px;">平台</div>
+  <div class="fm-body">
+    <h4><span class="badge">1</span> <span style="vertical-align:middle;">费用标准</span></h4>
+    <ul>
+      <li>展示区块链服务 5 类操作的收费标准：<b>铸造 / 证书 / 交易 / 销毁 / 价值注入</b></li>
+      <li>各费用<b>可直接输入数字修改</b>，点击「保存」后立即生效并应用到全部企业</li>
+    </ul>
+    <h4><span class="badge">2</span> <span style="vertical-align:middle;">企业列表</span></h4>
+    <ul>
+      <li>展示所有已开通区块链服务的企业，企业类型包括<b>批发商</b>与<b>服务商</b></li>
+      <li>列表展示<b>服务余额、累计充值、累计消费</b>，余额 = 累计充值 − 累计消费</li>
+      <li>支持按<b>企业类型</b>、<b>企业名称</b>筛选查询</li>
+    </ul>
+    <h4><span class="badge">3</span> <span style="vertical-align:middle;">充值</span></h4>
+    <ul>
+      <li>点击企业操作列<b>充值</b>按钮，弹出<b>金额输入框</b>填写充值金额</li>
+      <li>点击「下一步」进入<b>二次确认</b>，核对充值企业、金额与充值后余额，确认后到账</li>
+      <li>充值成功后生成一条<b>收入记录</b>，并同步更新企业余额、累计充值及顶部统计</li>
+    </ul>
+    <h4><span class="badge">4</span> <span style="vertical-align:middle;">消费明细</span></h4>
+    <ul>
+      <li>点击<b>消费明细</b>查看该企业全部区块链服务收支记录，每条记录带<b>产品名称</b>（充值记录无产品）</li>
+      <li>铸造、证书为<b>批量</b>计费（一条记录带数量）；交易、销毁、价值注入数量固定为 1</li>
+      <li>支出为绿色、充值收入为红色，底部汇总收入 / 支出合计</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+/* ================= 费用标准 ================= */
+var FEE = { cast: 2.00, cert: 1.00, trade: 0.50, burn: 0.10, inject: 5.00 };
+
+function saveFee() {
+    var map = [
+        ['feeCast', '铸造'], ['feeCert', '证书'], ['feeTrade', '交易'], ['feeBurn', '销毁'], ['feeInject', '价值注入']
+    ];
+    var val, name;
+    for (var i = 0; i < map.length; i++) {
+        val = parseFloat(document.getElementById(map[i][0]).value);
+        name = map[i][1];
+        if (isNaN(val) || val < 0) { alert('请填写有效的' + name + '费用（≥ 0 的数字）'); return; }
+    }
+    FEE.cast = parseFloat(document.getElementById('feeCast').value);
+    FEE.cert = parseFloat(document.getElementById('feeCert').value);
+    FEE.trade = parseFloat(document.getElementById('feeTrade').value);
+    FEE.burn = parseFloat(document.getElementById('feeBurn').value);
+    FEE.inject = parseFloat(document.getElementById('feeInject').value);
+    alert('费用标准保存成功！\n铸造 ' + FEE.cast.toFixed(2) + ' 元/条、证书 ' + FEE.cert.toFixed(2) + ' 元/条、交易 ' + FEE.trade.toFixed(2) + ' 元/次、销毁 ' + FEE.burn.toFixed(2) + ' 元/条、价值注入 ' + FEE.inject.toFixed(2) + ' 元/次');
+}
+
+/* ================= 企业数据 ================= */
+var enterprises = [
+    { name: '成都市天府新区明昌博物馆', type: 'ws', owner: '李文轩', balance: 3085.90, income: 3500.00, expense: 414.10, products: ['西路财宝', '中路财童'] },
+    { name: '杭州西泠文化传播有限公司', type: 'ws', owner: '张明远', balance: 3761.50, income: 5000.00, expense: 1238.50, products: ['仙鹤莲池', '进宝'] },
+    { name: '苏州吴门雅集文化艺术有限公司', type: 'ws', owner: '王海峰', balance: 3013.80, income: 4000.00, expense: 986.20, products: ['马到功成', '招财'] },
+    { name: '南京金陵墨香文化发展有限公司', type: 'ws', owner: '李国强', balance: 2254.40, income: 3000.00, expense: 745.60, products: ['洪宝', '仙鹤莲池'] },
+    { name: '广州南越文博文化传播有限公司', type: 'ws', owner: '陈志文', balance: 1987.70, income: 2500.00, expense: 512.30, products: ['进宝', '西路财宝'] },
+    { name: '四川华鑫博文文化艺术发展有限公司', type: 'sv', owner: '', balance: 5654.20, income: 8000.00, expense: 2345.80, products: ['榜样-统一', '青莲-舒展'] },
+    { name: '北京中艺华彩文化传媒有限公司', type: 'sv', owner: '', balance: 4109.60, income: 6000.00, expense: 1890.40, products: ['东坡-惜春', '东坡-虚静'] },
+    { name: '上海澄艺文化科技有限公司', type: 'sv', owner: '', balance: 3380.00, income: 4500.00, expense: 1120.00, products: ['东坡-神气', '榜样-统一'] },
+    { name: '深圳前海艺文网络科技有限公司', type: 'sv', owner: '', balance: 2831.50, income: 3800.00, expense: 968.50, products: ['青莲-舒展', '西路财宝'] },
+    { name: '杭州艺蕴文化创意有限公司', type: 'sv', owner: '', balance: 1543.90, income: 2000.00, expense: 456.10, products: ['招财', '中路财童'] }
+];
+
+/* ================= 消费明细数据 ================= */
+var details = {
+    '成都市天府新区明昌博物馆': [
+        { time: '2026-08-18 09:08:40', type: '铸造', no: 'ZZ202608180002', qty: '100 条', price: '2.00', amount: 200.00, io: 'expense' },
+        { time: '2026-08-15 10:45:33', type: '价值注入', no: 'JZ202608150001', qty: '1 次', price: '5.00', amount: 5.00, io: 'expense' },
+        { time: '2026-08-14 11:30:08', type: '交易', no: 'JY202608140012', qty: '1 次', price: '0.50', amount: 0.50, io: 'expense' },
+        { time: '2026-08-12 09:12:51', type: '销毁', no: 'XH202608120001', qty: '1 条', price: '0.10', amount: 0.10, io: 'expense' },
+        { time: '2026-08-10 14:02:17', type: '交易', no: 'JY202608100008', qty: '1 次', price: '0.50', amount: 0.50, io: 'expense' },
+        { time: '2026-08-08 16:26:44', type: '证书', no: 'ZS202608080003', qty: '48 条', price: '1.00', amount: 48.00, io: 'expense' },
+        { time: '2026-08-05 09:35:22', type: '证书', no: 'ZS202608050001', qty: '20 条', price: '1.00', amount: 20.00, io: 'expense' },
+        { time: '2026-08-02 10:18:36', type: '证书', no: 'ZS202608020002', qty: '40 条', price: '1.00', amount: 40.00, io: 'expense' },
+        { time: '2026-08-01 09:00:00', type: '铸造', no: 'ZZ202608010001', qty: '50 条', price: '2.00', amount: 100.00, io: 'expense' },
+        { time: '2026-07-28 15:40:55', type: '充值', no: 'CZ202607280001', qty: '-', price: '-', amount: 2000.00, io: 'income' },
+        { time: '2026-07-15 10:05:13', type: '充值', no: 'CZ202607150001', qty: '-', price: '-', amount: 1500.00, io: 'income' }
+    ],
+    '杭州西泠文化传播有限公司': [
+        { time: '2026-08-17 13:20:45', type: '铸造', no: 'ZZ202608170003', qty: '500 条', price: '2.00', amount: 1000.00, io: 'expense' },
+        { time: '2026-08-14 09:40:22', type: '证书', no: 'ZS202608140002', qty: '100 条', price: '1.00', amount: 100.00, io: 'expense' },
+        { time: '2026-08-12 15:18:07', type: '证书', no: 'ZS202608120006', qty: '66 条', price: '1.00', amount: 66.00, io: 'expense' },
+        { time: '2026-08-09 11:02:38', type: '铸造', no: 'ZZ202608090004', qty: '33 条', price: '2.00', amount: 66.00, io: 'expense' },
+        { time: '2026-08-06 10:26:51', type: '价值注入', no: 'JZ202608060002', qty: '1 次', price: '5.00', amount: 5.00, io: 'expense' },
+        { time: '2026-08-05 16:44:19', type: '交易', no: 'JY202608050014', qty: '1 次', price: '0.50', amount: 0.50, io: 'expense' },
+        { time: '2026-08-03 09:15:26', type: '销毁', no: 'XH202608030001', qty: '1 条', price: '0.10', amount: 0.10, io: 'expense' },
+        { time: '2026-08-01 14:33:40', type: '交易', no: 'JY202608010009', qty: '1 次', price: '0.50', amount: 0.50, io: 'expense' },
+        { time: '2026-07-30 09:50:12', type: '销毁', no: 'XH202607300002', qty: '4 条', price: '0.10', amount: 0.40, io: 'expense' },
+        { time: '2026-07-20 10:08:45', type: '充值', no: 'CZ202607200001', qty: '-', price: '-', amount: 3000.00, io: 'income' },
+        { time: '2026-07-05 15:36:28', type: '充值', no: 'CZ202607050001', qty: '-', price: '-', amount: 2000.00, io: 'income' }
+    ],
+    '苏州吴门雅集文化艺术有限公司': [
+        { time: '2026-08-16 10:12:30', type: '铸造', no: 'ZZ202608160004', qty: '400 条', price: '2.00', amount: 800.00, io: 'expense' },
+        { time: '2026-08-13 14:28:51', type: '证书', no: 'ZS202608130002', qty: '100 条', price: '1.00', amount: 100.00, io: 'expense' },
+        { time: '2026-08-10 09:36:17', type: '证书', no: 'ZS202608100003', qty: '80 条', price: '1.00', amount: 80.00, io: 'expense' },
+        { time: '2026-08-08 16:02:44', type: '价值注入', no: 'JZ202608080001', qty: '1 次', price: '5.00', amount: 5.00, io: 'expense' },
+        { time: '2026-08-05 11:20:33', type: '交易', no: 'JY202608050011', qty: '1 次', price: '0.50', amount: 0.50, io: 'expense' },
+        { time: '2026-08-02 10:44:08', type: '销毁', no: 'XH202608020001', qty: '1 条', price: '0.10', amount: 0.10, io: 'expense' },
+        { time: '2026-08-01 15:56:19', type: '销毁', no: 'XH202608010002', qty: '6 条', price: '0.10', amount: 0.60, io: 'expense' },
+        { time: '2026-07-25 09:14:52', type: '充值', no: 'CZ202607250001', qty: '-', price: '-', amount: 2500.00, io: 'income' },
+        { time: '2026-07-10 14:20:36', type: '充值', no: 'CZ202607100001', qty: '-', price: '-', amount: 1500.00, io: 'income' }
+    ],
+    '南京金陵墨香文化发展有限公司': [
+        { time: '2026-08-15 09:25:40', type: '铸造', no: 'ZZ202608150005', qty: '350 条', price: '2.00', amount: 700.00, io: 'expense' },
+        { time: '2026-08-12 15:48:23', type: '证书', no: 'ZS202608120004', qty: '40 条', price: '1.00', amount: 40.00, io: 'expense' },
+        { time: '2026-08-09 10:36:11', type: '价值注入', no: 'JZ202608090001', qty: '1 次', price: '5.00', amount: 5.00, io: 'expense' },
+        { time: '2026-08-06 14:12:57', type: '交易', no: 'JY202608060010', qty: '1 次', price: '0.50', amount: 0.50, io: 'expense' },
+        { time: '2026-08-04 09:30:44', type: '销毁', no: 'XH202608040001', qty: '1 条', price: '0.10', amount: 0.10, io: 'expense' },
+        { time: '2026-07-22 10:18:36', type: '充值', no: 'CZ202607220001', qty: '-', price: '-', amount: 2000.00, io: 'income' },
+        { time: '2026-07-08 16:05:29', type: '充值', no: 'CZ202607080001', qty: '-', price: '-', amount: 1000.00, io: 'income' }
+    ],
+    '广州南越文博文化传播有限公司': [
+        { time: '2026-08-14 11:16:08', type: '铸造', no: 'ZZ202608140003', qty: '200 条', price: '2.00', amount: 400.00, io: 'expense' },
+        { time: '2026-08-11 09:42:35', type: '证书', no: 'ZS202608110002', qty: '100 条', price: '1.00', amount: 100.00, io: 'expense' },
+        { time: '2026-08-08 15:26:12', type: '证书', no: 'ZS202608080004', qty: '6 条', price: '1.00', amount: 6.00, io: 'expense' },
+        { time: '2026-08-06 10:08:47', type: '价值注入', no: 'JZ202608060002', qty: '1 次', price: '5.00', amount: 5.00, io: 'expense' },
+        { time: '2026-08-03 14:36:21', type: '交易', no: 'JY202608030013', qty: '1 次', price: '0.50', amount: 0.50, io: 'expense' },
+        { time: '2026-08-01 09:20:56', type: '销毁', no: 'XH202608010001', qty: '1 条', price: '0.10', amount: 0.10, io: 'expense' },
+        { time: '2026-07-28 15:44:38', type: '交易', no: 'JY202607280002', qty: '1 次', price: '0.50', amount: 0.50, io: 'expense' },
+        { time: '2026-07-18 10:30:14', type: '销毁', no: 'XH202607180002', qty: '2 条', price: '0.10', amount: 0.20, io: 'expense' },
+        { time: '2026-07-10 09:12:45', type: '充值', no: 'CZ202607100002', qty: '-', price: '-', amount: 1500.00, io: 'income' },
+        { time: '2026-06-28 15:58:31', type: '充值', no: 'CZ202606280001', qty: '-', price: '-', amount: 1000.00, io: 'income' }
+    ],
+    '四川华鑫博文文化艺术发展有限公司': [
+        { time: '2026-08-18 14:22:40', type: '铸造', no: 'ZZ202608180001', qty: '1000 条', price: '2.00', amount: 2000.00, io: 'expense' },
+        { time: '2026-08-16 10:36:25', type: '证书', no: 'ZS202608160002', qty: '200 条', price: '1.00', amount: 200.00, io: 'expense' },
+        { time: '2026-08-13 09:48:13', type: '证书', no: 'ZS202608130001', qty: '140 条', price: '1.00', amount: 140.00, io: 'expense' },
+        { time: '2026-08-10 15:24:08', type: '价值注入', no: 'JZ202608100001', qty: '1 次', price: '5.00', amount: 5.00, io: 'expense' },
+        { time: '2026-08-07 11:02:37', type: '交易', no: 'JY202608070001', qty: '1 次', price: '0.50', amount: 0.50, io: 'expense' },
+        { time: '2026-08-05 09:16:44', type: '销毁', no: 'XH202608050001', qty: '1 条', price: '0.10', amount: 0.10, io: 'expense' },
+        { time: '2026-08-02 14:40:29', type: '销毁', no: 'XH202608020002', qty: '2 条', price: '0.10', amount: 0.20, io: 'expense' },
+        { time: '2026-07-26 10:12:18', type: '充值', no: 'CZ202607260001', qty: '-', price: '-', amount: 5000.00, io: 'income' },
+        { time: '2026-07-12 15:36:52', type: '充值', no: 'CZ202607120001', qty: '-', price: '-', amount: 3000.00, io: 'income' }
+    ],
+    '北京中艺华彩文化传媒有限公司': [
+        { time: '2026-08-17 09:38:22', type: '铸造', no: 'ZZ202608170001', qty: '800 条', price: '2.00', amount: 1600.00, io: 'expense' },
+        { time: '2026-08-14 15:20:44', type: '证书', no: 'ZS202608140001', qty: '200 条', price: '1.00', amount: 200.00, io: 'expense' },
+        { time: '2026-08-11 10:46:18', type: '证书', no: 'ZS202608110001', qty: '84 条', price: '1.00', amount: 84.00, io: 'expense' },
+        { time: '2026-08-08 09:22:36', type: '价值注入', no: 'JZ202608080002', qty: '1 次', price: '5.00', amount: 5.00, io: 'expense' },
+        { time: '2026-08-06 14:18:51', type: '交易', no: 'JY202608060002', qty: '1 次', price: '0.50', amount: 0.50, io: 'expense' },
+        { time: '2026-08-03 10:04:27', type: '销毁', no: 'XH202608030001', qty: '1 条', price: '0.10', amount: 0.10, io: 'expense' },
+        { time: '2026-08-01 15:52:13', type: '销毁', no: 'XH202608010003', qty: '8 条', price: '0.10', amount: 0.80, io: 'expense' },
+        { time: '2026-07-18 10:30:42', type: '充值', no: 'CZ202607180001', qty: '-', price: '-', amount: 4000.00, io: 'income' },
+        { time: '2026-07-05 15:14:25', type: '充值', no: 'CZ202607050001', qty: '-', price: '-', amount: 2000.00, io: 'income' }
+    ],
+    '上海澄艺文化科技有限公司': [
+        { time: '2026-08-16 13:12:36', type: '铸造', no: 'ZZ202608160001', qty: '500 条', price: '2.00', amount: 1000.00, io: 'expense' },
+        { time: '2026-08-13 09:34:12', type: '证书', no: 'ZS202608130001', qty: '100 条', price: '1.00', amount: 100.00, io: 'expense' },
+        { time: '2026-08-11 10:28:44', type: '证书', no: 'ZS202608110002', qty: '14 条', price: '1.00', amount: 14.00, io: 'expense' },
+        { time: '2026-08-09 15:46:08', type: '价值注入', no: 'JZ202608090002', qty: '1 次', price: '5.00', amount: 5.00, io: 'expense' },
+        { time: '2026-08-06 09:20:37', type: '交易', no: 'JY202608060001', qty: '1 次', price: '0.50', amount: 0.50, io: 'expense' },
+        { time: '2026-08-04 14:02:29', type: '交易', no: 'JY202608040002', qty: '1 次', price: '0.50', amount: 0.50, io: 'expense' },
+        { time: '2026-07-20 10:16:53', type: '充值', no: 'CZ202607200001', qty: '-', price: '-', amount: 2500.00, io: 'income' },
+        { time: '2026-07-06 15:28:41', type: '充值', no: 'CZ202607060001', qty: '-', price: '-', amount: 2000.00, io: 'income' }
+    ],
+    '深圳前海艺文网络科技有限公司': [
+        { time: '2026-08-15 10:42:16', type: '铸造', no: 'ZZ202608150001', qty: '400 条', price: '2.00', amount: 800.00, io: 'expense' },
+        { time: '2026-08-12 09:26:54', type: '证书', no: 'ZS202608120001', qty: '100 条', price: '1.00', amount: 100.00, io: 'expense' },
+        { time: '2026-08-10 15:08:37', type: '证书', no: 'ZS202608100001', qty: '62 条', price: '1.00', amount: 62.00, io: 'expense' },
+        { time: '2026-08-08 10:44:21', type: '价值注入', no: 'JZ202608080003', qty: '1 次', price: '5.00', amount: 5.00, io: 'expense' },
+        { time: '2026-08-06 14:36:48', type: '交易', no: 'JY202608060003', qty: '1 次', price: '0.50', amount: 0.50, io: 'expense' },
+        { time: '2026-08-03 09:12:29', type: '销毁', no: 'XH202608030002', qty: '1 条', price: '0.10', amount: 0.10, io: 'expense' },
+        { time: '2026-08-01 15:58:13', type: '销毁', no: 'XH202608010004', qty: '9 条', price: '0.10', amount: 0.90, io: 'expense' },
+        { time: '2026-07-25 10:22:36', type: '充值', no: 'CZ202607250002', qty: '-', price: '-', amount: 2000.00, io: 'income' },
+        { time: '2026-07-11 15:40:52', type: '充值', no: 'CZ202607110001', qty: '-', price: '-', amount: 1800.00, io: 'income' }
+    ],
+    '杭州艺蕴文化创意有限公司': [
+        { time: '2026-08-14 11:30:45', type: '铸造', no: 'ZZ202608140001', qty: '200 条', price: '2.00', amount: 400.00, io: 'expense' },
+        { time: '2026-08-11 09:18:33', type: '证书', no: 'ZS202608110001', qty: '50 条', price: '1.00', amount: 50.00, io: 'expense' },
+        { time: '2026-08-09 15:44:21', type: '价值注入', no: 'JZ202608090003', qty: '1 次', price: '5.00', amount: 5.00, io: 'expense' },
+        { time: '2026-08-06 10:36:57', type: '交易', no: 'JY202608060004', qty: '1 次', price: '0.50', amount: 0.50, io: 'expense' },
+        { time: '2026-08-03 14:12:36', type: '销毁', no: 'XH202608030003', qty: '1 条', price: '0.10', amount: 0.10, io: 'expense' },
+        { time: '2026-08-01 09:26:14', type: '交易', no: 'JY202608010001', qty: '1 次', price: '0.50', amount: 0.50, io: 'expense' },
+        { time: '2026-07-19 10:08:22', type: '充值', no: 'CZ202607190001', qty: '-', price: '-', amount: 1200.00, io: 'income' },
+        { time: '2026-07-07 15:32:48', type: '充值', no: 'CZ202607070001', qty: '-', price: '-', amount: 800.00, io: 'income' }
+    ]
+};
+
+/* ================= 渲染 ================= */
+var typeMap = { ws: '批发商', sv: '服务商' };
+var chipMap = {
+    '铸造': 'cast', '证书': 'cert', '交易': 'trade', '销毁': 'burn', '价值注入': 'inject', '充值': 'recharge'
+};
+
+function fmt(n) {
+    return n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+
+function renderTable() {
+    var fType = document.getElementById('fType').value;
+    var fName = (document.getElementById('fName').value || '').trim();
+    var list = enterprises.filter(function (o) {
+        if (fType && o.type !== fType) return false;
+        if (fName && o.name.indexOf(fName) < 0) return false;
+        return true;
+    });
+    var html = '';
+    list.forEach(function (o, i) {
+        html += '<tr>' +
+            '<td>' + (i + 1) + '</td>' +
+            '<td>' + o.name + '<div style="font-size:11px;color:#9ba6b9;margin-top:2px;">' + (o.owner || '') + '</div></td>' +
+            '<td><span class="type-tag ' + o.type + '">' + typeMap[o.type] + '</span></td>' +
+            '<td class="money balance">¥ ' + fmt(o.balance) + '</td>' +
+            '<td class="money income">¥ ' + fmt(o.income) + '</td>' +
+            '<td class="money expense">¥ ' + fmt(o.expense) + '</td>' +
+            '<td class="actions">' +
+            '  <button class="btn-recharge" onclick="recharge(\'' + o.name.replace(/'/g, "\\'") + '\')">充值</button>' +
+            '  <a onclick="openDetail(\'' + o.name.replace(/'/g, "\\'") + '\')">消费明细</a>' +
+            '</td>' +
+            '</tr>';
+    });
+    document.getElementById('tableBody').innerHTML = html;
+    document.getElementById('totalCount').textContent = '共 ' + list.length + ' 条';
+}
+
+function filterTable() { renderTable(); }
+
+function resetFilter() {
+    document.getElementById('fType').value = '';
+    document.getElementById('fName').value = '';
+    renderTable();
+}
+
+/* ================= 充值 ================= */
+var rcTarget = null;
+var rcAmountVal = 0;
+
+function findEnterprise(name) {
+    for (var i = 0; i < enterprises.length; i++) {
+        if (enterprises[i].name === name) return enterprises[i];
+    }
+    return null;
+}
+
+function recharge(name) {
+    var e = findEnterprise(name);
+    if (!e) return;
+    rcTarget = e;
+    document.getElementById('rcName').textContent = e.name;
+    document.getElementById('rcBalance').textContent = '¥ ' + fmt(e.balance);
+    document.getElementById('rcAmount').value = '';
+    document.getElementById('rcStepInput').style.display = 'block';
+    document.getElementById('rcStepConfirm').style.display = 'none';
+    document.getElementById('rcBtnNext').style.display = 'inline-block';
+    document.getElementById('rcBtnApply').style.display = 'none';
+    document.getElementById('rcBtnCancel').textContent = '取消';
+    document.getElementById('rcBtnCancel').onclick = closeRecharge;
+    document.getElementById('rcOverlay').classList.add('show');
+    document.getElementById('rcAmount').focus();
+}
+
+function rcStepConfirm() {
+    var val = parseFloat(document.getElementById('rcAmount').value);
+    if (isNaN(val) || val <= 0) { alert('请输入有效的充值金额（大于 0 的数字）'); return; }
+    rcAmountVal = Math.round(val * 100) / 100;
+    document.getElementById('rcCfmName').textContent = rcTarget.name;
+    document.getElementById('rcCfmAmt').textContent = '¥ ' + fmt(rcAmountVal);
+    document.getElementById('rcCfmCur').textContent = '¥ ' + fmt(rcTarget.balance);
+    document.getElementById('rcCfmAfter').textContent = '¥ ' + fmt(rcTarget.balance + rcAmountVal);
+    document.getElementById('rcCfmAmount').textContent = fmt(rcAmountVal);
+    document.getElementById('rcStepInput').style.display = 'none';
+    document.getElementById('rcStepConfirm').style.display = 'block';
+    document.getElementById('rcBtnNext').style.display = 'none';
+    document.getElementById('rcBtnApply').style.display = 'inline-block';
+    document.getElementById('rcBtnCancel').textContent = '上一步';
+    document.getElementById('rcBtnCancel').onclick = rcBackInput;
+}
+
+function rcBackInput() {
+    document.getElementById('rcStepInput').style.display = 'block';
+    document.getElementById('rcStepConfirm').style.display = 'none';
+    document.getElementById('rcBtnNext').style.display = 'inline-block';
+    document.getElementById('rcBtnApply').style.display = 'none';
+    document.getElementById('rcBtnCancel').textContent = '取消';
+    document.getElementById('rcBtnCancel').onclick = closeRecharge;
+}
+
+function closeRecharge() {
+    document.getElementById('rcOverlay').classList.remove('show');
+    rcTarget = null;
+    rcAmountVal = 0;
+}
+
+function pad4(n) { return n < 1000 ? ('000' + n).slice(-4) : '' + n; }
+
+function applyRecharge() {
+    var now = new Date();
+    function pad(n) { return n < 10 ? '0' + n : '' + n; }
+    var ts = now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate()) +
+             ' ' + pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds());
+    var dateStr = ts.slice(0, 10).replace(/-/g, '');
+    var recs = details[rcTarget.name] || [];
+    var seq = 1;
+    for (var i = 0; i < recs.length; i++) {
+        if (recs[i].no.indexOf('CZ' + dateStr) === 0) {
+            var n = parseInt(recs[i].no.slice(-4), 10);
+            if (n >= seq) seq = n + 1;
+        }
+    }
+    recs.unshift({
+        time: ts,
+        type: '充值',
+        product: '',
+        no: 'CZ' + dateStr + pad4(seq),
+        qty: '-',
+        price: '-',
+        amount: rcAmountVal,
+        io: 'income'
+    });
+    rcTarget.balance = Math.round((rcTarget.balance + rcAmountVal) * 100) / 100;
+    rcTarget.income = Math.round((rcTarget.income + rcAmountVal) * 100) / 100;
+    closeRecharge();
+    renderTable();
+    updateSummary();
+    alert('充值成功！\n' + rcTarget.name + '\n到账金额：¥ ' + fmt(rcAmountVal) + '\n当前余额：¥ ' + fmt(rcTarget.balance));
+}
+
+function updateSummary() {
+    var b = 0, inc = 0, exp = 0;
+    enterprises.forEach(function (o) {
+        b += o.balance; inc += o.income; exp += o.expense;
+    });
+    document.getElementById('sumBalance').textContent = fmt(b);
+    document.getElementById('sumIncome').textContent = fmt(inc);
+    document.getElementById('sumExpense').textContent = fmt(exp);
+}
+
+/* ================= 消费明细 ================= */
+function openDetail(name) {
+    var e = null;
+    for (var i = 0; i < enterprises.length; i++) {
+        if (enterprises[i].name === name) { e = enterprises[i]; break; }
+    }
+    if (!e) return;
+    document.getElementById('dtName').textContent = e.name;
+    document.getElementById('dtType').textContent = typeMap[e.type];
+    document.getElementById('dtBalance').textContent = '¥ ' + fmt(e.balance);
+    document.getElementById('dtIncome').textContent = '¥ ' + fmt(e.income);
+    document.getElementById('dtExpense').textContent = '¥ ' + fmt(e.expense);
+
+    var list = details[name] || [];
+    var html = '';
+    var sumIncome = 0, sumExpense = 0;
+    var products = e.products || [];
+    list.forEach(function (r, i) {
+        var isIncome = r.io === 'income';
+        if (isIncome) { sumIncome += r.amount; } else { sumExpense += r.amount; }
+        var product = r.product || (isIncome ? '' : (products.length ? products[i % products.length] : '—'));
+        html += '<tr>' +
+            '<td>' + (i + 1) + '</td>' +
+            '<td>' + r.time + '</td>' +
+            '<td><span class="type-chip ' + (chipMap[r.type] || '') + '">' + r.type + '</span></td>' +
+            '<td>' + (product || '—') + '</td>' +
+            '<td>' + r.no + '</td>' +
+            '<td>' + r.qty + '</td>' +
+            '<td>' + r.price + '</td>' +
+            '<td class="money ' + r.io + '">' + (isIncome ? '+' : '−') + ' ¥ ' + fmt(r.amount) + '</td>' +
+            '<td><span class="io-tag ' + r.io + '">' + (isIncome ? '收入' : '支出') + '</span></td>' +
+            '</tr>';
+    });
+    document.getElementById('detailTbody').innerHTML = html;
+    document.getElementById('dtFooter').innerHTML = '合计：收入 <span class="money income">+ ¥ ' + fmt(sumIncome) + '</span>，支出 <span class="money expense">− ¥ ' + fmt(sumExpense) + '</span>';
+    document.getElementById('detailOverlay').classList.add('show');
+}
+
+function closeDetail() {
+    document.getElementById('detailOverlay').classList.remove('show');
+}
+
+/* ================= 功能说明 ================= */
+function toggleFuncModal() {
+    var m = document.getElementById('funcModal');
+    m.classList.toggle('show');
+    if (m.classList.contains('show')) {
+        var el = m.querySelector('.fm-title');
+        var rect = el.getBoundingClientRect();
+        m.style.left = (window.innerWidth / 2 - m.offsetWidth / 2) + 'px';
+        m.style.top = (window.innerHeight / 2 - m.offsetHeight / 2) + 'px';
+    }
+}
+
+updateSummary();
+renderTable();
+</script>
+</body>
+</html>
