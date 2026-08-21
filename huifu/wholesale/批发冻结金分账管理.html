@@ -386,7 +386,7 @@
         }
         .modal .md-close:hover { background: #e8e8e8; }
 
-        /* 批量申请释放浮层 */
+        /* 批量申请分账浮层 */
         .apply-modal { width: 560px; }
         .apply-modal .sel-list {
             background: #f5f7fa;
@@ -679,15 +679,15 @@
 <!-- 状态提示 -->
 <div class="status-tip">
     <span class="tip-icon">i</span>
-    <span class="tip-text">仅展示<strong>已发货且满足发货后冻结金释放天数</strong>的提货单；勾选订单后可批量<strong>申请释放冻结金</strong>。</span>
+    <span class="tip-text">仅展示<strong>已发货且满足发货后冻结金分账天数</strong>的提货单；勾选订单后可批量<strong>申请分账冻结金</strong>。</span>
 </div>
 
 <!-- Tab 状态 -->
 <div class="tab-bar">
     <div class="tab-item active" data-tab="all" onclick="switchTab('all')">全部 <span class="count">8</span></div>
-    <div class="tab-item" data-tab="pending" onclick="switchTab('pending')">未释放 <span class="count">5</span></div>
+    <div class="tab-item" data-tab="pending" onclick="switchTab('pending')">未分账 <span class="count">5</span></div>
     <div class="tab-item" data-tab="applied" onclick="switchTab('applied')">已申请 <span class="count">2</span></div>
-    <div class="tab-item" data-tab="released" onclick="switchTab('released')">已释放 <span class="count">1</span></div>
+    <div class="tab-item" data-tab="released" onclick="switchTab('released')">已分账 <span class="count">1</span></div>
 </div>
 
 <!-- 表格 -->
@@ -695,7 +695,7 @@
     <!-- 批量操作栏 -->
     <div class="batch-bar" id="batchBar">
         <span>已选 <b id="selCount">0</b> 项</span>
-        <button class="batch-apply" onclick="openApply()">申请释放</button>
+        <button class="batch-apply" onclick="openApply()">申请分账</button>
         <button class="batch-cancel" onclick="clearSelect()">取消选择</button>
     </div>
 
@@ -706,16 +706,18 @@
                 <th class="seq">序号</th>
                 <th style="width:100px;">图片</th>
                 <th>产品名</th>
+                <th>提货单号</th>
                 <th>产品编号</th>
                 <th>所属企业</th>
-                <th>提货单号</th>
                 <th>所属仓库</th>
                 <th>用户账号</th>
                 <th>申请单号</th>
-                <th>释放状态</th>
+                <th>分账状态</th>
                 <th>冻结金金额</th>
                 <th>创建时间 <span class="col-sort">⇅</span></th>
                 <th>提货时间</th>
+                <th>发货时间</th>
+                <th>提货数量</th>
             </tr>
         </thead>
         <tbody id="tbody">
@@ -724,152 +726,168 @@
                 <td class="seq">1</td>
                 <td><img class="product-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Crect width='80' height='80' fill='%23d4af37'/%3E%3Ctext x='40' y='44' font-size='10' text-anchor='middle' fill='%23fff'%3E青莲·舒展%3C/text%3E%3C/svg%3E"></td>
                 <td>青莲·舒展</td>
+                <td>7554336430886062</td>
                 <td class="prod-no-cell" data-nos="#001,#002,#003,#004,#005">#001,#002,#003,#004,#005</td>
                 <td>成都市天府新区明昌博物馆</td>
-                <td>7554336430886062</td>
                 <td>四川华鑫博文文化艺术发展有限公司</td>
                 <td>19382153852</td>
                 <td class="app-no none">—</td>
-                <td><span class="status-tag pending">未释放</span></td>
+                <td><span class="status-tag pending">未分账</span></td>
                 <td>
                     <div class="f-amt">¥ 5,000.00</div>
-                    <div class="f-calc">20件 × ¥625 × 40%</div>
+                    <div class="f-calc">5个 × ¥2,500 × 40%</div>
                 </td>
                 <td>2026-07-21 14:37:31</td>
                 <td>2026-07-22 10:12:05</td>
+                <td>2026-07-21 20:15:30</td>
+                <td>5 个</td>
             </tr>
             <tr class="clickable" data-rel="pending">
                 <td class="check-cell"><input type="checkbox" class="row-check" disabled></td>
                 <td class="seq">2</td>
                 <td><img class="product-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Crect width='80' height='80' fill='%23d4af37'/%3E%3Ctext x='40' y='44' font-size='10' text-anchor='middle' fill='%23fff'%3E青莲·舒展%3C/text%3E%3C/svg%3E"></td>
                 <td>青莲·舒展</td>
+                <td>197377991264931</td>
                 <td class="prod-no-cell" data-nos="#006,#007,#008,#009">#006,#007,#008,#009</td>
                 <td>成都市天府新区明昌博物馆</td>
-                <td>197377991264931</td>
                 <td>四川华鑫博文文化艺术发展有限公司</td>
                 <td>19113541040</td>
                 <td class="app-no none">—</td>
-                <td><span class="status-tag pending">未释放</span></td>
+                <td><span class="status-tag pending">未分账</span></td>
                 <td>
                     <div class="f-amt">¥ 5,000.00</div>
-                    <div class="f-calc">10件 × ¥1,250 × 40%</div>
+                    <div class="f-calc">4个 × ¥3,125 × 40%</div>
                 </td>
                 <td>2026-07-21 14:36:17</td>
                 <td>2026-07-22 09:48:33</td>
+                <td>2026-07-21 19:48:10</td>
+                <td>4 个</td>
             </tr>
             <tr class="clickable" data-rel="applied">
                 <td class="check-cell"><input type="checkbox" class="row-check" disabled></td>
                 <td class="seq">3</td>
                 <td><img class="product-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Crect width='80' height='80' fill='%23d4af37'/%3E%3Ctext x='40' y='44' font-size='10' text-anchor='middle' fill='%23fff'%3E青莲·舒展%3C/text%3E%3C/svg%3E"></td>
                 <td>青莲·舒展</td>
+                <td>7482868364783633</td>
                 <td class="prod-no-cell" data-nos="#013,#014,#015,#016,#017,#018">#013,#014,#015,#016,#017,#018</td>
                 <td>成都市天府新区明昌博物馆</td>
-                <td>7482868364783633</td>
                 <td>四川华鑫博文文化艺术发展有限公司</td>
                 <td>19938062254</td>
                 <td><a class="app-no" onclick="openDetail('SQ202608031001')">SQ202608031001</a></td>
                 <td><span class="status-tag applied">已申请</span></td>
                 <td>
                     <div class="f-amt">¥ 5,000.00</div>
-                    <div class="f-calc">8件 × ¥1,562.50 × 40%</div>
+                    <div class="f-calc">6个 × ¥2,083.33 × 40%</div>
                 </td>
                 <td>2026-07-21 14:35:00</td>
                 <td>2026-07-23 09:15:20</td>
+                <td>2026-07-21 18:22:41</td>
+                <td>6 个</td>
             </tr>
             <tr class="clickable" data-rel="pending">
                 <td class="check-cell"><input type="checkbox" class="row-check" disabled></td>
                 <td class="seq">4</td>
                 <td><img class="product-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Crect width='80' height='80' fill='%23d4af37'/%3E%3Ctext x='40' y='44' font-size='10' text-anchor='middle' fill='%23fff'%3E青莲·舒展%3C/text%3E%3C/svg%3E"></td>
                 <td>青莲·舒展</td>
+                <td>9065460812978898</td>
                 <td class="prod-no-cell" data-nos="#019">#019</td>
                 <td>成都市天府新区明昌博物馆</td>
-                <td>9065460812978898</td>
                 <td>四川华鑫博文文化艺术发展有限公司</td>
                 <td>19130634113</td>
                 <td class="app-no none">—</td>
-                <td><span class="status-tag pending">未释放</span></td>
+                <td><span class="status-tag pending">未分账</span></td>
                 <td>
                     <div class="f-amt">¥ 5,000.00</div>
-                    <div class="f-calc">40件 × ¥312.50 × 40%</div>
+                    <div class="f-calc">1个 × ¥12,500 × 40%</div>
                 </td>
                 <td>2026-07-21 14:33:58</td>
                 <td>2026-07-22 17:26:41</td>
+                <td>2026-07-21 17:58:23</td>
+                <td>1 个</td>
             </tr>
             <tr class="clickable" data-rel="pending">
                 <td class="check-cell"><input type="checkbox" class="row-check" disabled></td>
                 <td class="seq">5</td>
                 <td><img class="product-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Crect width='80' height='80' fill='%23d4af37'/%3E%3Ctext x='40' y='44' font-size='10' text-anchor='middle' fill='%23fff'%3E青莲·舒展%3C/text%3E%3C/svg%3E"></td>
                 <td>青莲·舒展</td>
+                <td>9975703152356489</td>
                 <td class="prod-no-cell" data-nos="#020">#020</td>
                 <td>成都市天府新区明昌博物馆</td>
-                <td>9975703152356489</td>
                 <td>四川华鑫博文文化艺术发展有限公司</td>
                 <td>13908193164</td>
                 <td class="app-no none">—</td>
-                <td><span class="status-tag pending">未释放</span></td>
+                <td><span class="status-tag pending">未分账</span></td>
                 <td>
                     <div class="f-amt">¥ 5,000.00</div>
-                    <div class="f-calc">25件 × ¥500 × 40%</div>
+                    <div class="f-calc">1个 × ¥12,500 × 40%</div>
                 </td>
                 <td>2026-07-21 14:33:55</td>
                 <td>2026-07-23 16:54:12</td>
+                <td>2026-07-21 17:20:09</td>
+                <td>1 个</td>
             </tr>
             <tr class="clickable" data-rel="applied">
                 <td class="check-cell"><input type="checkbox" class="row-check" disabled></td>
                 <td class="seq">6</td>
                 <td><img class="product-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Crect width='80' height='80' fill='%23d4af37'/%3E%3Ctext x='40' y='44' font-size='10' text-anchor='middle' fill='%23fff'%3E青莲·舒展%3C/text%3E%3C/svg%3E"></td>
                 <td>青莲·舒展</td>
+                <td>0191839233733074</td>
                 <td class="prod-no-cell" data-nos="#021">#021</td>
                 <td>成都市天府新区明昌博物馆</td>
-                <td>0191839233733074</td>
                 <td>四川华鑫博文文化艺术发展有限公司</td>
                 <td>15982144114</td>
                 <td><a class="app-no" onclick="openDetail('SQ202608021001')">SQ202608021001</a></td>
                 <td><span class="status-tag applied">已申请</span></td>
                 <td>
                     <div class="f-amt">¥ 5,000.00</div>
-                    <div class="f-calc">5件 × ¥2,500 × 40%</div>
+                    <div class="f-calc">1个 × ¥12,500 × 40%</div>
                 </td>
                 <td>2026-07-21 14:28:09</td>
                 <td>2026-07-23 16:08:47</td>
+                <td>2026-07-21 16:45:37</td>
+                <td>1 个</td>
             </tr>
             <tr class="clickable" data-rel="pending">
                 <td class="check-cell"><input type="checkbox" class="row-check" disabled></td>
                 <td class="seq">7</td>
                 <td><img class="product-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Crect width='80' height='80' fill='%23d4af37'/%3E%3Ctext x='40' y='44' font-size='10' text-anchor='middle' fill='%23fff'%3E青莲·舒展%3C/text%3E%3C/svg%3E"></td>
                 <td>青莲·舒展</td>
+                <td>4462861094304195</td>
                 <td class="prod-no-cell" data-nos="#022,#023">#022,#023</td>
                 <td>成都市天府新区明昌博物馆</td>
-                <td>4462861094304195</td>
                 <td>四川华鑫博文文化艺术发展有限公司</td>
                 <td>13981422295</td>
                 <td class="app-no none">—</td>
-                <td><span class="status-tag pending">未释放</span></td>
+                <td><span class="status-tag pending">未分账</span></td>
                 <td>
                     <div class="f-amt">¥ 5,000.00</div>
-                    <div class="f-calc">16件 × ¥781.25 × 40%</div>
+                    <div class="f-calc">2个 × ¥6,250 × 40%</div>
                 </td>
                 <td>2026-07-21 14:27:02</td>
                 <td>2026-07-23 15:37:29</td>
+                <td>2026-07-21 16:12:55</td>
+                <td>2 个</td>
             </tr>
             <tr class="clickable" data-rel="released">
                 <td class="check-cell"><input type="checkbox" class="row-check" disabled></td>
                 <td class="seq">8</td>
                 <td><img class="product-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Crect width='80' height='80' fill='%23d4af37'/%3E%3Ctext x='40' y='44' font-size='10' text-anchor='middle' fill='%23fff'%3E青莲·舒展%3C/text%3E%3C/svg%3E"></td>
                 <td>青莲·舒展</td>
+                <td>0767506637361791</td>
                 <td class="prod-no-cell" data-nos="#024,#025,#026">#024,#025,#026</td>
                 <td>成都市天府新区明昌博物馆</td>
-                <td>0767506637361791</td>
                 <td>四川华鑫博文文化艺术发展有限公司</td>
                 <td>155328430479</td>
                 <td><a class="app-no" onclick="openDetail('SQ202607291001')">SQ202607291001</a></td>
-                <td><span class="status-tag released">已释放</span></td>
+                <td><span class="status-tag released">已分账</span></td>
                 <td>
                     <div class="f-amt">¥ 5,000.00</div>
-                    <div class="f-calc">50件 × ¥250 × 40%</div>
+                    <div class="f-calc">3个 × ¥4,166.67 × 40%</div>
                 </td>
                 <td>2026-07-21 14:26:32</td>
                 <td>2026-07-22 14:26:32</td>
+                <td>2026-07-21 15:30:12</td>
+                <td>3 个</td>
             </tr>
         </tbody>
     </table>
@@ -882,11 +900,11 @@
     </div>
 </div>
 
-<!-- 批量申请释放浮层 -->
+<!-- 批量申请分账浮层 -->
 <div class="mask" id="applyMask" onclick="closeApply()"></div>
 <div class="modal apply-modal" id="applyModal">
     <div class="md-title">
-        <span>📝 申请冻结金释放</span>
+        <span>📝 申请冻结金分账</span>
         <button class="md-close" onclick="closeApply()">✕</button>
     </div>
     <div class="sel-list">
@@ -894,16 +912,12 @@
         <div id="selList"></div>
     </div>
     <div class="am-field">
-        <label>释放金额 <span class="req">*</span></label>
-        <input type="text" id="applyAmount" placeholder="请输入申请释放金额">
+        <label>分账金额 <span style="color:#9ba6b9;font-size:12px;">（根据勾选订单冻结金自动计算）</span></label>
+        <input type="text" id="applyAmount" readonly style="background:#f5f7fa;color:#e67e22;font-weight:600;">
     </div>
     <div class="am-field">
         <label>申请原因 <span class="req">*</span></label>
-        <textarea id="applyReason" placeholder="请说明申请释放冻结金的原因"></textarea>
-    </div>
-    <div class="am-field">
-        <label>凭证图片（可选）</label>
-        <input type="text" placeholder="请上传发货凭证/物流单号">
+        <textarea id="applyReason" placeholder="请说明申请分账冻结金的原因"></textarea>
     </div>
     <div class="am-actions">
         <button class="btn-cancel" onclick="closeApply()">取 消</button>
@@ -929,9 +943,10 @@
             <tr>
                 <th style="width:50px;">序号</th>
                 <th>申请单号</th>
-                <th>提货单号</th>
                 <th>产品名称</th>
-                <th>释放金额</th>
+                <th>提货单数</th>
+                <th>提货总量</th>
+                <th>分账金额</th>
                 <th style="width:170px;">申请时间</th>
                 <th>状态</th>
             </tr>
@@ -940,8 +955,9 @@
             <tr data-status="pending">
                 <td>1</td>
                 <td><a class="app-no" onclick="openDetail('SQ202608031001')">SQ202608031001</a></td>
-                <td>7482868364783633</td>
                 <td>青莲·舒展</td>
+                <td>2</td>
+                <td>9</td>
                 <td style="color:#e67e22;font-weight:600;">¥ 5,000.00</td>
                 <td>2026-08-03 10:22:15</td>
                 <td><span class="status-tag applied">待审核</span></td>
@@ -949,8 +965,9 @@
             <tr data-status="pending">
                 <td>2</td>
                 <td><a class="app-no" onclick="openDetail('SQ202608021001')">SQ202608021001</a></td>
-                <td>0191839233733074</td>
                 <td>青莲·舒展</td>
+                <td>1</td>
+                <td>1</td>
                 <td style="color:#e67e22;font-weight:600;">¥ 5,000.00</td>
                 <td>2026-08-02 16:40:52</td>
                 <td><span class="status-tag applied">待审核</span></td>
@@ -958,8 +975,9 @@
             <tr data-status="approved">
                 <td>3</td>
                 <td><a class="app-no" onclick="openDetail('SQ202607291001')">SQ202607291001</a></td>
-                <td>0767506637361791</td>
                 <td>青莲·舒展</td>
+                <td>1</td>
+                <td>3</td>
                 <td style="color:#e67e22;font-weight:600;">¥ 5,000.00</td>
                 <td>2026-07-29 09:15:33</td>
                 <td><span class="status-tag released">已通过</span></td>
@@ -979,7 +997,7 @@
     <div class="dt-info">
         <span>申请单号：<b id="dtNo">-</b></span>
         <span>申请时间：<b id="dtTime">-</b></span>
-        <span>释放金额：<b id="dtAmt" style="color:#e67e22;">-</b></span>
+        <span>分账金额：<b id="dtAmt" style="color:#e67e22;">-</b></span>
         <span>状态：<b class="dt-status" id="dtStatus">-</b></span>
     </div>
     <div style="font-size:13px;color:#4e5a6e;margin-bottom:10px;">该申请单下共 <b id="dtCount">0</b> 笔提货单：</div>
@@ -1028,7 +1046,7 @@ function switchTab(tab) {
     // 更新总数
     var visible = tab === 'all' ? counts.all : counts[tab];
     document.getElementById('totalCount').textContent = '共 ' + visible + ' 条';
-    // 仅「未释放」Tab 支持勾选，其他 Tab 全部禁用
+    // 仅「未分账」Tab 支持勾选，其他 Tab 全部禁用
     var checkAll = document.getElementById('checkAll');
     if (tab === 'pending') {
         rows.forEach(function(r) {
@@ -1123,22 +1141,24 @@ function clearSelect() {
     updateBatchBar();
 }
 
-/* 批量申请释放浮层 */
+/* 批量申请分账浮层 */
 function openApply() {
     var rows = selectedRows();
-    if (rows.length === 0) { alert('请先勾选要申请释放的订单'); return; }
+    if (rows.length === 0) { alert('请先勾选要申请分账的订单'); return; }
     var listHtml = '';
+    var total = 0;
     rows.forEach(function(r) {
         var tds = r.querySelectorAll('td');
-        var no = tds[6].textContent.trim();
+        var no = tds[4].textContent.trim();
         var prod = tds[3].textContent.trim();
         var fAmtEl = tds[11].querySelector('.f-amt');
         var fAmt = fAmtEl ? fAmtEl.textContent.trim() : '¥ 5,000.00';
+        total += parseFloat(fAmt.replace(/[^0-9.]/g, '')) || 0;
         listHtml += '<div class="sel-item"><span>' + no + '（' + prod + '）</span><span class="f-amt">' + fAmt + '</span></div>';
     });
     document.getElementById('selListCount').textContent = rows.length;
     document.getElementById('selList').innerHTML = listHtml;
-    document.getElementById('applyAmount').value = '';
+    document.getElementById('applyAmount').value = '¥ ' + total.toFixed(2);
     document.getElementById('applyReason').value = '';
     document.getElementById('applyModal').classList.add('show');
     document.getElementById('applyMask').classList.add('show');
@@ -1157,21 +1177,28 @@ function nowStr() {
     return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes()) + ':' + p(d.getSeconds());
 }
 function submitApply() {
-    var amt = document.getElementById('applyAmount').value.trim();
     var reason = document.getElementById('applyReason').value.trim();
-    if (!amt) { alert('请输入释放金额'); return; }
     if (!reason) { alert('请输入申请原因'); return; }
+    // 分账金额 = 勾选订单冻结金合计（自动计算）
+    var rows = selectedRows();
+    var total = 0;
+    rows.forEach(function(r) {
+        var fAmtEl = r.querySelectorAll('td')[11].querySelector('.f-amt');
+        var fAmt = fAmtEl ? fAmtEl.textContent.trim() : '¥ 5,000.00';
+        total += parseFloat(fAmt.replace(/[^0-9.]/g, '')) || 0;
+    });
+    var fmtAmt = '¥ ' + total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     // 生成申请单号（同批勾选的订单共用一个申请单号）
     newNoCounter++;
     var newNo = 'SQ20260818' + String(newNoCounter).padStart(3, '0');
     var items = [];
     // 将勾选的订单状态改为「已申请」并填充申请单号
-    selectedRows().forEach(function(r) {
+    rows.forEach(function(r) {
         var tds = r.querySelectorAll('td');
         var prod = tds[3].textContent.trim();
-        var prods = tds[4].textContent.trim();
-        var co = tds[5].textContent.trim();
-        var no = tds[6].textContent.trim();
+        var prods = tds[5].textContent.trim();
+        var co = tds[6].textContent.trim();
+        var no = tds[4].textContent.trim();
         var wh = tds[7].textContent.trim();
         var acc = tds[8].textContent.trim();
         var time = tds[12].textContent.trim();
@@ -1194,7 +1221,29 @@ function submitApply() {
         a.onclick = function() { openDetail(newNo); };
         noCell.appendChild(a);
     });
-    pendingNewData[newNo] = { time: nowStr(), amt: '¥ 5,000.00', status: 'pending', statusText: '待审核', items: items };
+    pendingNewData[newNo] = { time: nowStr(), amt: fmtAmt, status: 'pending', statusText: '待审核', items: items };
+    // 追加一条申请记录（含提货单数、提货总量）
+    var recBody = document.getElementById('recTbody');
+    var totalQty = 0;
+    items.forEach(function(it) {
+        totalQty += (it.prods || '').split(',').map(function(s) { return s.trim(); }).filter(Boolean).length;
+    });
+    var recTr = document.createElement('tr');
+    recTr.setAttribute('data-status', 'pending');
+    recTr.innerHTML =
+        '<td>' + (recBody.querySelectorAll('tr').length + 1) + '</td>' +
+        '<td><a class="app-no" onclick="openDetail(\'' + newNo + '\')">' + newNo + '</a></td>' +
+        '<td>' + (items[0] ? items[0].prod : '—') + '</td>' +
+        '<td>' + items.length + '</td>' +
+        '<td>' + totalQty + '</td>' +
+        '<td style="color:#e67e22;font-weight:600;">' + fmtAmt + '</td>' +
+        '<td>' + nowStr() + '</td>' +
+        '<td><span class="status-tag applied">待审核</span></td>';
+    recBody.appendChild(recTr);
+    var allC = document.getElementById('recCountAll');
+    var penC = document.getElementById('recCountPending');
+    allC.textContent = parseInt(allC.textContent, 10) + 1;
+    penC.textContent = parseInt(penC.textContent, 10) + 1;
     alert('申请已提交，等待平台审核');
     closeApply();
     clearSelect();
@@ -1416,22 +1465,22 @@ function toggleFuncModal() {
     <h4><span class="badge">1</span> <span style="vertical-align:middle;">冻结金规则</span></h4>
     <ul>
       <li>提货时，平台按<b>产品数量 × 批发单价 × 40%</b> 冻结相应资金</li>
-      <li>发货后满足冻结释放天数，提货单进入可申请释放状态</li>
+      <li>发货后满足冻结分账天数，提货单进入可申请分账状态</li>
     </ul>
-    <h4><span class="badge">2</span> <span style="vertical-align:middle;">释放申请</span></h4>
+    <h4><span class="badge">2</span> <span style="vertical-align:middle;">分账申请</span></h4>
     <ul>
-      <li>列表仅展示<b>已发货且满足释放天数</b>的提货单</li>
-      <li>支持按<b>提货单编号</b>、<b>产品名称</b>筛选，按<b>释放状态</b>（未释放 / 已申请 / 已释放）切换查看</li>
-      <li>在「未释放」列表勾选提货单，点击<b>申请释放</b>批量提交释放申请</li>
+      <li>列表仅展示<b>已发货且满足分账天数</b>的提货单</li>
+      <li>支持按<b>提货单编号</b>、<b>产品名称</b>筛选，按<b>分账状态</b>（未分账 / 已申请 / 已分账）切换查看</li>
+      <li>在「未分账」列表勾选提货单，点击<b>申请分账</b>批量提交分账申请，<b>分账金额</b>按勾选订单冻结金<b>自动计算</b>合计</li>
     </ul>
     <h4><span class="badge">3</span> <span style="vertical-align:middle;">申请记录</span></h4>
     <ul>
       <li>点击右上角<b>申请记录</b>查看历史申请单，支持按状态过滤</li>
-      <li>点击<b>申请单号</b>查看申请单详情</li>
+      <li>申请记录展示该单的<b>提货单数</b>与<b>提货总量</b>，点击<b>申请单号</b>查看申请单详情</li>
     </ul>
     <h4><span class="badge">4</span> <span style="vertical-align:middle;">申请单详情</span></h4>
     <ul>
-      <li>显示申请单号、申请时间、释放金额、状态及该单下全部提货明细</li>
+      <li>显示申请单号、申请时间、分账金额、状态及该单下全部提货明细</li>
       <li>产品编号超过 2 排自动省略，<b>鼠标悬浮</b>展示完整编号并可<b>一键复制</b></li>
     </ul>
   </div>

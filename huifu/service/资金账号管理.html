@@ -632,9 +632,14 @@
     <h4><span class="badge">5</span> <span style="vertical-align:middle;">提现</span></h4>
     <ul>
       <li>宝付钱包、汇付钱包卡片增加<b>提现</b>按钮</li>
-      <li>提现浮层展示<b>当前可提余额</b>，填写<b>提现金额</b>和<b>原因</b>后申请</li>
+      <li>提现浮层展示<b>当前可提余额（即可用余额）</b>，填写<b>提现金额</b>和<b>原因</b>后申请</li>
       <li>浮层提供<b>提现申请记录</b>链接，展示所有渠道的提现记录（状态：待审核、已通过、已提现）</li>
       <li>交易类型中也增加<b>提现</b></li>
+    </ul>
+    <h4><span class="badge">6</span> <span style="vertical-align:middle;">汇付钱包余额</span></h4>
+    <ul>
+      <li>汇付钱包余额展示账户可用总余额，支持<b>提现</b>操作</li>
+      <li>点击<b>冻结释放记录</b>可查看历史冻结释放明细</li>
     </ul>
   </div>
 </div>
@@ -736,8 +741,8 @@ function toggleFuncModal() {
         </div>
         <div class="wd-body">
             <div class="wd-row">
-                <div class="wd-label">当前可提余额</div>
-                <div style="font-size:20px;font-weight:700;color:#1a78ff;">34,145.00</div>
+                <div class="wd-label">当前可提余额（可用余额）</div>
+                <div style="font-size:20px;font-weight:700;color:#1a78ff;">24,500.00</div>
             </div>
             <div class="wd-row">
                 <div class="wd-label">提现金额</div>

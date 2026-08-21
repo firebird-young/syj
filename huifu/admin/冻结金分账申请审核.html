@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>冻结金释放审核</title>
+    <title>冻结金分账申请审核</title>
     <style>
         * { margin:0; padding:0; box-sizing:border-box; }
         body {
@@ -263,7 +263,7 @@
         <div class="breadcrumb">
             <span>首页</span> /
             <span>资金管理</span> /
-            <span class="active">冻结金释放审核</span>
+            <span class="active">冻结金分账申请审核</span>
         </div>
     </div>
     <div class="topbar-right">
@@ -297,10 +297,6 @@
         <input class="filter-input" id="fNo" placeholder="请输入申请单号">
     </div>
     <div class="filter-item">
-        <span class="filter-label">提货单号</span>
-        <input class="filter-input" id="fPick" placeholder="请输入提货单号">
-    </div>
-    <div class="filter-item">
         <span class="filter-label">产品名称</span>
         <input class="filter-input" id="fProd" placeholder="请输入产品名称">
     </div>
@@ -326,11 +322,11 @@
             <tr>
                 <th class="seq" style="width:50px;">序号</th>
                 <th>申请单号</th>
-                <th>提货单号</th>
                 <th>产品名称</th>
-                <th>产品编号</th>
                 <th>所属企业</th>
                 <th>用户账号</th>
+                <th>提货单数量</th>
+                <th>产品总数量</th>
                 <th>冻结金金额</th>
                 <th style="width:160px;">申请时间</th>
                 <th>审核状态</th>
@@ -352,7 +348,7 @@
 <div class="audit-overlay" id="auditOverlay" onclick="if(event.target===this)closeAudit()">
     <div class="audit-modal">
         <div class="audit-header">
-            <span class="audit-title">冻结金释放审核</span>
+            <span class="audit-title">冻结金分账申请审核</span>
             <span class="audit-close" onclick="closeAudit()">×</span>
         </div>
         <div class="audit-body">
@@ -365,8 +361,8 @@
                 <div class="val" id="auditCo">-</div>
             </div>
             <div class="audit-row">
-                <div class="label">提货单号</div>
-                <div class="val" id="auditPick">-</div>
+                <div class="label">提货单数量</div>
+                <div class="val" id="auditPickCount">-</div>
             </div>
             <div class="audit-row">
                 <div class="label">产品</div>
@@ -409,7 +405,7 @@
             <div class="dt-info">
                 <span>申请单号：<b id="dtNo">-</b></span>
                 <span>申请时间：<b id="dtTime">-</b></span>
-                <span>释放金额：<b id="dtAmt">-</b></span>
+                <span>分账金额：<b id="dtAmt">-</b></span>
                 <span>审核状态：<b class="dt-status" id="dtStatus">-</b></span>
                 <span>产品数：<b id="dtCount">-</b></span>
             </div>
@@ -445,18 +441,18 @@
     <h4><span class="badge">1</span> <span style="vertical-align:middle;">冻结金规则</span></h4>
     <ul>
       <li>批发商提货时，平台按<b>产品数量 × 批发单价 × 40%</b> 冻结相应资金</li>
-      <li>发货后满足冻结释放天数，提货单进入可申请释放状态</li>
+      <li>发货后满足冻结分账天数，提货单进入可申请分账状态</li>
     </ul>
-    <h4><span class="badge">2</span> <span style="vertical-align:middle;">释放申请（批发商端）</span></h4>
+    <h4><span class="badge">2</span> <span style="vertical-align:middle;">分账申请（批发商端）</span></h4>
     <ul>
-      <li>批发商在<b>批发冻结金分账管理</b>中勾选符合条件的提货单，填写释放金额与申请原因，提交释放申请</li>
+      <li>批发商在<b>批发冻结金分账管理</b>中勾选符合条件的提货单，填写分账金额与申请原因，提交分账申请</li>
       <li>同一批勾选的订单共用一个<b>申请单号</b>，提交后进入「待审核」</li>
     </ul>
     <h4><span class="badge">3</span> <span style="vertical-align:middle;">平台审核</span></h4>
     <ul>
-      <li>本页面展示批发商提交的全部释放申请，支持按申请单号 / 提货单号 / 产品名称 / 审核状态筛选</li>
+      <li>本页面展示批发商提交的全部分账申请，支持按申请单号 / 产品名称 / 审核状态筛选</li>
       <li>点击<b>审核</b>查看申请信息与冻结金计算过程，可<b>通过</b>或<b>驳回</b>（驳回需填写备注）</li>
-      <li><b>已通过</b>：冻结金释放回批发商账户；<b>已驳回</b>：批发商可重新发起申请</li>
+      <li><b>已通过</b>：冻结金分账回批发商账户；<b>已驳回</b>：批发商可重新发起申请</li>
     </ul>
     <h4><span class="badge">4</span> <span style="vertical-align:middle;">申请单详情</span></h4>
     <ul>
@@ -468,9 +464,9 @@
 
 <script>
 var data = [
-    { no: 'SQ202608031001', pickNo: '7482868364783633', prod: '青莲·舒展', prods: '#013,#014,#015,#016,#017,#018', co: '成都市天府新区明昌博物馆', acc: '19938062254', qty: '8件', price: '¥ 1,562.50', amt: '¥ 5,000.00', calc: '8件 × ¥1,562.50 × 40%', time: '2026-08-03 10:22:15', status: 'pending' },
-    { no: 'SQ202608021001', pickNo: '0191839233733074', prod: '青莲·舒展', prods: '#021', co: '成都市天府新区明昌博物馆', acc: '15982144114', qty: '5件', price: '¥ 2,500', amt: '¥ 5,000.00', calc: '5件 × ¥2,500 × 40%', time: '2026-08-02 16:40:52', status: 'pending' },
-    { no: 'SQ202607291001', pickNo: '0767506637361791', prod: '青莲·舒展', prods: '#024,#025,#026', co: '成都市天府新区明昌博物馆', acc: '155328430479', qty: '50件', price: '¥ 250', amt: '¥ 5,000.00', calc: '50件 × ¥250 × 40%', time: '2026-07-29 09:15:33', status: 'approved' }
+    { no: 'SQ202608031001', pickCount: 2, prod: '青莲·舒展', prods: '#013,#014,#015,#016,#017,#018', co: '成都市天府新区明昌博物馆', acc: '19938062254', qty: '8件', price: '¥ 1,562.50', amt: '¥ 5,000.00', calc: '8件 × ¥1,562.50 × 40%', time: '2026-08-03 10:22:15', status: 'pending' },
+    { no: 'SQ202608021001', pickCount: 1, prod: '青莲·舒展', prods: '#021', co: '成都市天府新区明昌博物馆', acc: '15982144114', qty: '5件', price: '¥ 2,500', amt: '¥ 5,000.00', calc: '5件 × ¥2,500 × 40%', time: '2026-08-02 16:40:52', status: 'pending' },
+    { no: 'SQ202607291001', pickCount: 1, prod: '青莲·舒展', prods: '#024,#025,#026', co: '成都市天府新区明昌博物馆', acc: '155328430479', qty: '50件', price: '¥ 250', amt: '¥ 5,000.00', calc: '50件 × ¥250 × 40%', time: '2026-07-29 09:15:33', status: 'approved' }
 ];
 
 var statusMap = { pending: '待审核', approved: '已通过', rejected: '已驳回' };
@@ -490,11 +486,11 @@ function renderTable() {
         html += '<tr data-no="' + o.no + '">' +
             '<td class="seq">' + (i + 1) + '</td>' +
             '<td><a class="app-no" onclick="openDetail(\'' + o.no + '\')">' + o.no + '</a></td>' +
-            '<td>' + o.pickNo + '</td>' +
             '<td>' + o.prod + '</td>' +
-            '<td class="prod-no-cell" data-nos="' + o.prods + '">' + prodsText(o.prods) + '</td>' +
             '<td>' + o.co + '</td>' +
             '<td>' + o.acc + '</td>' +
+            '<td>' + o.pickCount + ' 单</td>' +
+            '<td>' + o.qty + '</td>' +
             '<td><div class="f-amt">' + o.amt + '</div><div class="f-calc">' + o.calc + '</div></td>' +
             '<td>' + o.time + '</td>' +
             '<td><span class="status-tag ' + o.status + '">' + statusMap[o.status] + '</span></td>' +
@@ -523,13 +519,11 @@ function updateTotal() {
 /* 筛选 */
 function filterTable() {
     var fNo = document.getElementById('fNo').value.trim().toLowerCase();
-    var fPick = document.getElementById('fPick').value.trim().toLowerCase();
     var fProd = document.getElementById('fProd').value.trim().toLowerCase();
     var fStatus = document.getElementById('fStatus').value;
     data.forEach(function(o) {
         var match =
             (!fNo || o.no.toLowerCase().indexOf(fNo) >= 0) &&
-            (!fPick || o.pickNo.toLowerCase().indexOf(fPick) >= 0) &&
             (!fProd || o.prod.toLowerCase().indexOf(fProd) >= 0) &&
             (!fStatus || o.status === fStatus);
         var row = document.querySelector('#tableBody tr[data-no="' + o.no + '"]');
@@ -539,7 +533,7 @@ function filterTable() {
 }
 
 function resetFilter() {
-    ['fNo', 'fPick', 'fProd'].forEach(function(id) { document.getElementById(id).value = ''; });
+    ['fNo', 'fProd'].forEach(function(id) { document.getElementById(id).value = ''; });
     document.getElementById('fStatus').value = '';
     filterTable();
 }
@@ -551,8 +545,8 @@ function openAudit(no) {
     if (!currentRow) return;
     document.getElementById('auditNo').textContent = currentRow.no;
     document.getElementById('auditCo').textContent = currentRow.co;
-    document.getElementById('auditPick').textContent = currentRow.pickNo;
-    document.getElementById('auditProd').textContent = currentRow.prod + '（' + prodsText(currentRow.prods) + '）';
+    document.getElementById('auditPickCount').textContent = currentRow.pickCount + ' 单';
+    document.getElementById('auditProd').textContent = currentRow.prod;
     document.getElementById('auditQty').textContent = '产品总数量：' + currentRow.qty;
     document.getElementById('auditPrice').textContent = currentRow.price;
     document.getElementById('auditTime').textContent = currentRow.time;
@@ -567,7 +561,7 @@ function closeAudit() {
 
 function approveAudit() {
     if (currentRow) currentRow.status = 'approved';
-    alert('已通过释放申请，冻结金将释放回批发商账户');
+    alert('已通过分账申请，冻结金将分账回批发商账户');
     closeAudit();
     renderTable();
 }
@@ -576,7 +570,7 @@ function rejectAudit() {
     var remark = document.getElementById('auditRemark').value.trim();
     if (!remark) { alert('驳回时必须填写审核备注'); return; }
     if (currentRow) currentRow.status = 'rejected';
-    alert('已驳回释放申请');
+    alert('已驳回分账申请');
     closeAudit();
     renderTable();
 }
@@ -590,7 +584,8 @@ var detailData = {
         status: 'pending',
         statusText: '待审核',
         items: [
-            { img: imgSrc, prod: '青莲·舒展', prods: '#013,#014,#015,#016,#017,#018', co: '成都市天府新区明昌博物馆', no: '7482868364783633', wh: '四川华鑫博文文化艺术发展有限公司', acc: '19938062254', time: '2026-07-21 14:35:00', pickTime: '2026-07-23 09:15:20' }
+            { img: imgSrc, prod: '青莲·舒展', prods: '#013,#014,#015', co: '成都市天府新区明昌博物馆', no: '7482868364783633', wh: '四川华鑫博文文化艺术发展有限公司', acc: '19938062254', time: '2026-07-21 14:35:00', pickTime: '2026-07-23 09:15:20' },
+            { img: imgSrc, prod: '青莲·舒展', prods: '#016,#017,#018', co: '成都市天府新区明昌博物馆', no: '8209456317289645', wh: '四川华鑫博文文化艺术发展有限公司', acc: '19938062254', time: '2026-07-21 15:02:18', pickTime: '2026-07-24 10:41:07' }
         ]
     },
     'SQ202608021001': {

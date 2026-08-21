@@ -249,6 +249,18 @@
             background: #fff3e0;
             color: #e67e22;
         }
+        .status-tag.delisted {
+            background: #eceff1;
+            color: #607d8b;
+        }
+        .status-tag.visible {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        .status-tag.hidden {
+            background: #fce4ec;
+            color: #c62828;
+        }
         .col-sort {
             display: inline-block;
             margin-left: 4px;
@@ -417,9 +429,17 @@
             <option>不推荐</option>
         </select>
     </div>
+    <div class="filter-item">
+        <span class="filter-label">显示状态</span>
+        <select class="filter-select" id="filterVisible">
+            <option value="">全部</option>
+            <option value="1">显示</option>
+            <option value="0">隐藏</option>
+        </select>
+    </div>
     <div class="filter-actions">
-        <button class="btn-search">🔍 搜 索</button>
-        <button class="btn-reset">↻ 重 置</button>
+        <button class="btn-search" onclick="filterRows()">🔍 搜 索</button>
+        <button class="btn-reset" onclick="resetFilter()">↻ 重 置</button>
     </div>
 </div>
 
@@ -431,6 +451,7 @@
     <div class="status-tab" data-status="uploading" onclick="selectTab(this)">上链中</div>
     <div class="status-tab" data-status="canceled" onclick="selectTab(this)">已驳回</div>
     <div class="status-tab" data-status="offline" onclick="selectTab(this)">待上市</div>
+    <div class="status-tab" data-status="delisted" onclick="selectTab(this)">已退市</div>
 </div>
 
 <!-- 表格 -->
@@ -444,18 +465,20 @@
                 <th>所属企业</th>
                 <th>创建时间 <span class="col-sort">⇅</span></th>
                 <th>状态</th>
+                <th>显示状态</th>
                 <th>阶段</th>
                 <th>操作</th>
             </tr>
         </thead>
         <tbody>
-            <tr data-rate="100"><td class="seq">1</td><td><img class="product-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23e8d4b8'/%3E%3Ctext x='50' y='55' font-size='12' text-anchor='middle' fill='%23fff'%3E西路财宝%3C/text%3E%3C/svg%3E"></td><td>西路财宝</td><td>成都市天府新区明昌博物馆</td><td>2026-07-21 09:51:02</td><td><span class="status-tag online">已上货</span></td><td>零售市场</td><td class="actions"><a>产品信息</a><a>企业信息</a><a>设置</a><a>评估报告</a><a>推荐</a><a style="color:#e74c5e;" onclick="openDelist('西路财宝')">退市</a></td></tr>
-            <tr data-rate="70"><td class="seq">2</td><td><img class="product-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23d4af37'/%3E%3Ctext x='50' y='55' font-size='12' text-anchor='middle' fill='%23fff'%3E中路财童%3C/text%3E%3C/svg%3E"></td><td>中路财童</td><td>成都市天府新区明昌博物馆</td><td>2026-07-14 09:22:25</td><td><span class="status-tag online">已上货</span></td><td>零售市场</td><td class="actions"><a>产品信息</a><a>企业信息</a><a>设置</a><a>评估报告</a><a>推荐</a><a style="color:#e74c5e;" onclick="openDelist('中路财童')">退市</a></td></tr>
-            <tr data-rate="100"><td class="seq">3</td><td><img class="product-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23c0392b'/%3E%3Ctext x='50' y='55' font-size='12' text-anchor='middle' fill='%23fff'%3E榜样-统一%3C/text%3E%3C/svg%3E"></td><td>榜样-统一</td><td>成都市天府新区明昌博物馆</td><td>2026-07-01 15:49:11</td><td><span class="status-tag online">已上货</span></td><td>零售市场</td><td class="actions"><a>产品信息</a><a>企业信息</a><a>设置</a><a>评估报告</a><a>推荐</a><a style="color:#e74c5e;" onclick="openDelist('榜样-统一')">退市</a></td></tr>
-            <tr data-rate="100"><td class="seq">4</td><td><img class="product-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23b8d4c8'/%3E%3Ctext x='50' y='55' font-size='12' text-anchor='middle' fill='%23fff'%3E青莲-舒展%3C/text%3E%3C/svg%3E"></td><td>青莲-舒展</td><td>成都市天府新区明昌博物馆</td><td>2026-06-30 14:19:34</td><td><span class="status-tag online">已上货</span></td><td>零售市场</td><td class="actions"><a>产品信息</a><a>企业信息</a><a>设置</a><a>评估报告</a><a>推荐</a><a style="color:#e74c5e;" onclick="openDelist('青莲-舒展')">退市</a></td></tr>
-            <tr data-rate="100"><td class="seq">5</td><td><img class="product-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23e6c8a0'/%3E%3Ctext x='50' y='55' font-size='12' text-anchor='middle' fill='%23fff'%3E东坡-惜春%3C/text%3E%3C/svg%3E"></td><td>东坡-惜春</td><td>成都市天府新区明昌博物馆</td><td>2026-06-12 13:39:55</td><td><span class="status-tag online">已上货</span></td><td>零售市场</td><td class="actions"><a>产品信息</a><a>企业信息</a><a>设置</a><a>评估报告</a><a>推荐</a><a style="color:#e74c5e;" onclick="openDelist('东坡-惜春')">退市</a></td></tr>
-            <tr data-rate="100"><td class="seq">6</td><td><img class="product-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%238b6f47'/%3E%3Ctext x='50' y='55' font-size='12' text-anchor='middle' fill='%23fff'%3E东坡-虚静%3C/text%3E%3C/svg%3E"></td><td>东坡-虚静</td><td>成都市天府新区明昌博物馆</td><td>2026-06-12 11:16:48</td><td><span class="status-tag online">已上货</span></td><td>零售市场</td><td class="actions"><a>产品信息</a><a>企业信息</a><a>设置</a><a>评估报告</a><a>推荐</a><a style="color:#e74c5e;" onclick="openDelist('东坡-虚静')">退市</a></td></tr>
-            <tr data-rate="100"><td class="seq">7</td><td><img class="product-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23a0826d'/%3E%3Ctext x='50' y='55' font-size='12' text-anchor='middle' fill='%23fff'%3E东坡-神气%3C/text%3E%3C/svg%3E"></td><td>东坡-神气</td><td>成都市天府新区明昌博物馆</td><td>2026-06-12 11:13:30</td><td><span class="status-tag online">已上货</span></td><td>零售市场</td><td class="actions"><a>产品信息</a><a>企业信息</a><a>设置</a><a>评估报告</a><a>推荐</a><a style="color:#e74c5e;" onclick="openDelist('东坡-神气')">退市</a></td></tr>
+            <tr data-rate="100" data-status="online" data-visible="1"><td class="seq">1</td><td><img class="product-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23e8d4b8'/%3E%3Ctext x='50' y='55' font-size='12' text-anchor='middle' fill='%23fff'%3E西路财宝%3C/text%3E%3C/svg%3E"></td><td>西路财宝</td><td>成都市天府新区明昌博物馆</td><td>2026-07-21 09:51:02</td><td><span class="status-tag online">已上货</span></td><td class="show-state"><span class="status-tag visible">显示</span></td><td>零售市场</td><td class="actions"><a>产品信息</a><a>企业信息</a><a>设置</a><a>评估报告</a><a>推荐</a><a style="color:#e74c5e;" onclick="openDelist('西路财宝')">退市</a></td></tr>
+            <tr data-rate="70" data-status="online" data-visible="1"><td class="seq">2</td><td><img class="product-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23d4af37'/%3E%3Ctext x='50' y='55' font-size='12' text-anchor='middle' fill='%23fff'%3E中路财童%3C/text%3E%3C/svg%3E"></td><td>中路财童</td><td>成都市天府新区明昌博物馆</td><td>2026-07-14 09:22:25</td><td><span class="status-tag online">已上货</span></td><td class="show-state"><span class="status-tag visible">显示</span></td><td>零售市场</td><td class="actions"><a>产品信息</a><a>企业信息</a><a>设置</a><a>评估报告</a><a>推荐</a><a style="color:#e74c5e;" onclick="openDelist('中路财童')">退市</a></td></tr>
+            <tr data-rate="100" data-status="online" data-visible="1"><td class="seq">3</td><td><img class="product-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23c0392b'/%3E%3Ctext x='50' y='55' font-size='12' text-anchor='middle' fill='%23fff'%3E榜样-统一%3C/text%3E%3C/svg%3E"></td><td>榜样-统一</td><td>成都市天府新区明昌博物馆</td><td>2026-07-01 15:49:11</td><td><span class="status-tag online">已上货</span></td><td class="show-state"><span class="status-tag visible">显示</span></td><td>零售市场</td><td class="actions"><a>产品信息</a><a>企业信息</a><a>设置</a><a>评估报告</a><a>推荐</a><a style="color:#e74c5e;" onclick="openDelist('榜样-统一')">退市</a></td></tr>
+            <tr data-rate="100" data-status="online" data-visible="1"><td class="seq">4</td><td><img class="product-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23b8d4c8'/%3E%3Ctext x='50' y='55' font-size='12' text-anchor='middle' fill='%23fff'%3E青莲-舒展%3C/text%3E%3C/svg%3E"></td><td>青莲-舒展</td><td>成都市天府新区明昌博物馆</td><td>2026-06-30 14:19:34</td><td><span class="status-tag online">已上货</span></td><td class="show-state"><span class="status-tag visible">显示</span></td><td>零售市场</td><td class="actions"><a>产品信息</a><a>企业信息</a><a>设置</a><a>评估报告</a><a>推荐</a><a style="color:#e74c5e;" onclick="openDelist('青莲-舒展')">退市</a></td></tr>
+            <tr data-rate="100" data-status="online" data-visible="1"><td class="seq">5</td><td><img class="product-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23e6c8a0'/%3E%3Ctext x='50' y='55' font-size='12' text-anchor='middle' fill='%23fff'%3E东坡-惜春%3C/text%3E%3C/svg%3E"></td><td>东坡-惜春</td><td>成都市天府新区明昌博物馆</td><td>2026-06-12 13:39:55</td><td><span class="status-tag online">已上货</span></td><td class="show-state"><span class="status-tag visible">显示</span></td><td>零售市场</td><td class="actions"><a>产品信息</a><a>企业信息</a><a>设置</a><a>评估报告</a><a>推荐</a><a style="color:#e74c5e;" onclick="openDelist('东坡-惜春')">退市</a></td></tr>
+            <tr data-rate="100" data-status="online" data-visible="1"><td class="seq">6</td><td><img class="product-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%238b6f47'/%3E%3Ctext x='50' y='55' font-size='12' text-anchor='middle' fill='%23fff'%3E东坡-虚静%3C/text%3E%3C/svg%3E"></td><td>东坡-虚静</td><td>成都市天府新区明昌博物馆</td><td>2026-06-12 11:16:48</td><td><span class="status-tag online">已上货</span></td><td class="show-state"><span class="status-tag visible">显示</span></td><td>零售市场</td><td class="actions"><a>产品信息</a><a>企业信息</a><a>设置</a><a>评估报告</a><a>推荐</a><a style="color:#e74c5e;" onclick="openDelist('东坡-虚静')">退市</a></td></tr>
+            <tr data-rate="100" data-status="delisted" data-visible="1"><td class="seq">7</td><td><img class="product-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23a0826d'/%3E%3Ctext x='50' y='55' font-size='12' text-anchor='middle' fill='%23fff'%3E东坡-神气%3C/text%3E%3C/svg%3E"></td><td>东坡-神气</td><td>成都市天府新区明昌博物馆</td><td>2026-06-12 11:13:30</td><td><span class="status-tag delisted">已退市</span></td><td class="show-state"><span class="status-tag visible">显示</span></td><td>零售市场</td><td class="actions"><a>产品信息</a><a>企业信息</a><a>设置</a><a>评估报告</a><a>推荐</a><a onclick="toggleShow(this)" style="color:#1a78ff;">隐藏</a></td></tr>
+            <tr data-rate="100" data-status="delisted" data-visible="0"><td class="seq">8</td><td><img class="product-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%239b7ed8'/%3E%3Ctext x='50' y='55' font-size='12' text-anchor='middle' fill='%23fff'%3E仙鹤莲池%3C/text%3E%3C/svg%3E"></td><td>仙鹤莲池</td><td>成都市天府新区明昌博物馆</td><td>2026-06-01 10:12:20</td><td><span class="status-tag delisted">已退市</span></td><td class="show-state"><span class="status-tag hidden">隐藏</span></td><td>零售市场</td><td class="actions"><a>产品信息</a><a>企业信息</a><a>设置</a><a>评估报告</a><a>推荐</a><a onclick="toggleShow(this)" style="color:#1a78ff;">显示</a></td></tr>
         </tbody>
     </table>
 </div>
@@ -495,6 +518,42 @@ function selectTab(el) {
         if (t.dataset.status) t.classList.remove('active');
     });
     el.classList.add('active');
+    filterRows();
+}
+
+// 按状态 Tab + 显示状态筛选
+function filterRows() {
+    var tab = document.querySelector('.status-tab.active');
+    var status = tab ? (tab.dataset.status || 'all') : 'all';
+    var vis = document.getElementById('filterVisible').value;
+    document.querySelectorAll('tbody tr').forEach(function(row) {
+        var st = row.getAttribute('data-status') || '';
+        var v = row.getAttribute('data-visible') || '';
+        var okStatus = status === 'all' || st === status;
+        var okVis = vis === '' || v === vis;
+        row.style.display = (okStatus && okVis) ? '' : 'none';
+    });
+}
+
+function resetFilter() {
+    document.getElementById('filterVisible').value = '';
+    filterRows();
+}
+
+// 已退市产品显示/隐藏切换
+function toggleShow(link) {
+    var row = link.closest('tr');
+    var stateCell = row.querySelector('.show-state');
+    var vis = row.getAttribute('data-visible');
+    if (vis === '1') {
+        row.setAttribute('data-visible', '0');
+        stateCell.innerHTML = '<span class="status-tag hidden">隐藏</span>';
+        link.textContent = '显示';
+    } else {
+        row.setAttribute('data-visible', '1');
+        stateCell.innerHTML = '<span class="status-tag visible">显示</span>';
+        link.textContent = '隐藏';
+    }
 }
 
 var delistTargetRow = null;
@@ -544,11 +603,28 @@ function showDelistSubmit() {
 
 function submitDelist() {
     if (delistTargetRow) {
-        // 更新阶段列（第7列 index 6）为已退市
         var cells = delistTargetRow.querySelectorAll('td');
-        cells[6].textContent = '已退市';
-        // 更新状态列为已退市（第6列 index 5）
-        cells[5].innerHTML = '<span class="status-tag online">已退市</span>';
+        delistTargetRow.setAttribute('data-status', 'delisted');
+        // 状态列（index 5）→ 已退市
+        cells[5].innerHTML = '<span class="status-tag delisted">已退市</span>';
+        // 显示状态列（index 6）→ 初始化为显示
+        cells[6].innerHTML = '<span class="status-tag visible">显示</span>';
+        delistTargetRow.setAttribute('data-visible', '1');
+        // 阶段列（index 7）→ 已退市
+        cells[7].textContent = '已退市';
+        // 操作列（index 8）→ 追加显示切换按钮
+        var actionCell = cells[8];
+        var hasToggle = false;
+        actionCell.querySelectorAll('a').forEach(function(a) {
+            if (a.getAttribute('onclick') && a.getAttribute('onclick').indexOf('toggleShow') !== -1) hasToggle = true;
+        });
+        if (!hasToggle) {
+            var a = document.createElement('a');
+            a.style.color = '#1a78ff';
+            a.textContent = '隐藏';
+            a.setAttribute('onclick', 'toggleShow(this)');
+            actionCell.appendChild(a);
+        }
     }
     alert('退市成功');
     closeDelist();
@@ -586,6 +662,13 @@ function submitDelist() {
       <li><span style="color: #f34235;">该产品的<b>状态列</b>更新为「已退市」</span></li>
       <li><span style="color: #f34235;">该产品的<b>阶段列</b>更新为「已退市」</span></li>
       <li>弹窗关闭</li>
+    </ul>
+    <h4>五、已退市管理</h4>
+    <ul>
+      <li>状态 Tab 新增<b>「已退市」</b>分类，点击可筛选查看全部已退市产品</li>
+      <li>表格新增<b>「显示状态」</b>列，标记产品当前为<b style="color:#2e7d32;">显示</b>（绿色）或<b style="color:#c62828;">隐藏</b>（红色）</li>
+      <li>已退市产品的操作列提供<b>显示切换</b>按钮：当前「显示」点击后变为「隐藏」，反之点击「显示」恢复展示</li>
+      <li>顶部搜索栏新增<b>「显示状态」</b>筛选条件，支持按 显示 / 隐藏 过滤列表，可与状态 Tab 组合使用</li>
     </ul>
   </div>
 </div>
