@@ -181,6 +181,26 @@
             color: #1a1a2e;
         }
         .wr-table td.money { color: #e67e22; font-weight: 600; text-align: right; }
+        .wr-sum {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 14px;
+            padding-top: 12px;
+            border-top: 1px dashed #e6eaf2;
+        }
+        .wr-sum-item {
+            flex: 1 1 calc(50% - 4px);
+            background: #fff;
+            border: 1px solid #eef0f4;
+            border-radius: 4px;
+            padding: 8px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .wr-sum-item span { font-size: 12px; color: #6b7588; }
+        .wr-sum-item b { font-size: 14px; color: #1a1a2e; font-weight: 600; }
         .audit-header { padding: 16px 20px; border-bottom: 1px solid #f0f0f0; display: flex; align-items: center; justify-content: space-between; }
         .audit-title { font-size: 16px; font-weight: 600; }
         .audit-close { font-size: 22px; color: #86909c; cursor: pointer; line-height: 1; }
@@ -332,13 +352,31 @@
             </div>
             <div class="wd-report">
                 <div class="wr-title">收支统计报表</div>
+                <div class="wr-sum">
+                    <div class="wr-sum-item">
+                        <span>服务商推广服务费合计</span>
+                        <b>¥ 20,050.00</b>
+                    </div>
+                    <div class="wr-sum-item">
+                        <span>运营服务费合计</span>
+                        <b>¥ 3,060.00</b>
+                    </div>
+                    <div class="wr-sum-item">
+                        <span>支出合计</span>
+                        <b>¥ 34,000.00</b>
+                    </div>
+                    <div class="wr-sum-item">
+                        <span>累计提现</span>
+                        <b>¥ 2,000.00</b>
+                    </div>
+                </div>
                 <div class="wr-sub">产品收入统计</div>
                 <table class="wr-table">
                     <thead>
                         <tr>
                             <th>产品</th>
-                            <th style="text-align:right;">批发市场分佣</th>
-                            <th style="text-align:right;">零售市场手续费</th>
+                            <th style="text-align:right;">服务商推广服务费（批发市场分佣）</th>
+                            <th style="text-align:right;">运营服务费（零售市场手续费）</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -405,7 +443,7 @@
       <li>平台审核<b>服务商提现</b>申请（宝付/汇付钱包）</li>
       <li>审核状态：<b>待审核、已通过、已提现</b></li>
       <li>审核操作支持<b>通过</b>和<b>驳回</b></li>
-      <li>审核弹窗展示服务商申请时看到的<b>收支统计报表</b>（产品收入统计 + 每月支出记录），供审核参考</li>
+      <li>审核弹窗展示服务商申请时看到的<b>收支统计报表</b>（产品收入统计 + 每月支出记录 + 费用合计），供审核参考</li>
     </ul>
   </div>
 </div>
