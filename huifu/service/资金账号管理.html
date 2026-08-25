@@ -482,7 +482,7 @@
         .rec-modal {
             background: #fff;
             border-radius: 8px;
-            width: 560px;
+            width: 660px;
             max-width: 94vw;
             max-height: 80vh;
             display: flex;
@@ -522,6 +522,130 @@
         .rec-status.pending { background: #fff4e6; color: #e67e22; }
         .rec-status.approved { background: #e6f4ff; color: #1a78ff; }
         .rec-status.done { background: #e6f7eb; color: #1aab67; }
+
+        /* 冻结释放记录 */
+        .frz-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2002;
+        }
+        .frz-overlay.show { display: flex; }
+        .frz-modal {
+            background: #fff;
+            border-radius: 6px;
+            width: 720px;
+            max-width: 94vw;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .frz-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .frz-title { font-size: 15px; font-weight: 600; color: #1a1a2e; }
+        .frz-close { font-size: 22px; color: #86909c; cursor: pointer; line-height: 1; }
+        .frz-stats {
+            display: flex;
+            gap: 12px;
+            padding: 14px 20px;
+            background: #fafbfc;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .frz-stat {
+            flex: 1;
+            background: #fff;
+            border: 1px solid #f0f0f0;
+            border-radius: 6px;
+            padding: 12px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .frz-stat .ls { font-size: 12px; color: #6b7588; }
+        .frz-stat .lv { font-size: 18px; font-weight: 700; }
+        .frz-stat.freeze .lv { color: #e67e22; }
+        .frz-stat.release .lv { color: #1aab67; }
+        .frz-body { padding: 0; overflow: auto; flex: 1; }
+        .frz-table { width: 100%; border-collapse: collapse; }
+        .frz-table th {
+            background: #fafbfc;
+            padding: 10px 16px;
+            text-align: left;
+            font-size: 13px;
+            color: #4e5a6e;
+            font-weight: 500;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .frz-table td {
+            padding: 12px 16px;
+            font-size: 13px;
+            color: #1a1a2e;
+            border-bottom: 1px solid #f5f5f7;
+        }
+        .frz-type {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        .frz-type.freeze { background: #fff4e6; color: #e67e22; }
+        .frz-type.release { background: #e6f7eb; color: #1aab67; }
+        .frz-pager {
+            padding: 12px 20px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: #4e5a6e;
+        }
+        .frz-pager a, .frz-pager span {
+            min-width: 24px;
+            height: 24px;
+            padding: 0 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 3px;
+            cursor: pointer;
+            color: #4e5a6e;
+            text-decoration: none;
+        }
+        .frz-pager a:hover { background: #f5f7fa; }
+        .frz-pager .cur { background: #1a78ff; color: #fff; }
+        .frz-footer {
+            padding: 12px 20px;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+        .frz-btn-default {
+            background: #fff;
+            border: 1px solid #d0d5dd;
+            color: #4e5a6e;
+            padding: 6px 18px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .frz-btn-primary {
+            background: #1a78ff;
+            border: none;
+            color: #fff;
+            padding: 6px 18px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+        }
 
         /* Tab 切换 */
         .tabs-bar {
@@ -616,7 +740,7 @@
                     </div>
                 </div>
                 <div class="sc-actions">
-                    <div class="sc-action">冻结释放记录</div>
+                    <div class="sc-action" onclick="openFrzModal()">冻结释放记录</div>
                     <div class="sc-action">产品交易金划转</div>
                 </div>
             </div>
@@ -642,7 +766,7 @@
                     </div>
                 </div>
                 <div class="sc-actions">
-                    <div class="sc-action">冻结释放记录</div>
+                    <div class="sc-action" onclick="openFrzModal()">冻结释放记录</div>
                 </div>
             </div>
             <div class="summary-card">
@@ -760,7 +884,7 @@
     <h4><span class="badge">3</span> <span style="vertical-align:middle;">第三方支付手续费</span></h4>
     <ul>
       <li>表格新增<b>第三方支付手续费</b>列（位于<b>平台手续费</b>之后）</li>
-      <li><b>批发佣金支出</b>、<b>零售佣金支出</b>、<b>现金奖励</b>有数据：手续费 = 总金额 × 2%</li>
+      <li><b>批发佣金支出</b>、<b>零售佣金支出</b>、<b>现金奖励</b>有数据：手续费 = 总金额 × 2%（营销支付）</li>
       <li><b>批发佣金支出</b>、<b>零售佣金支出</b>、<b>现金奖励</b>的<b>实际金额</b> = 总金额 − 第三方支付手续费</li>
       <li>其他类型该列显示 "-"</li>
     </ul>
@@ -770,7 +894,7 @@
     </ul>
     <h4><span class="badge">5</span> <span style="vertical-align:middle;">提现</span></h4>
     <ul>
-      <li>宝付钱包、汇付钱包卡片增加<b>提现</b>按钮</li>
+      <li>汇付钱包卡片增加<b>提现</b>按钮</li>
       <li>提现浮层展示<b>当前可提余额（即可用余额）</b>，填写<b>提现金额</b>和<b>原因</b>后申请</li>
       <li>浮层提供<b>提现申请记录</b>链接，展示所有渠道的提现记录（状态：待审核、已通过、已提现）</li>
       <li>交易类型中也增加<b>提现</b></li>
@@ -787,7 +911,16 @@
       <li>提现浮层下方展示<b>收支统计报表</b>，包含<b>产品收入统计</b>与<b>每月支出记录</b></li>
       <li>产品收入统计按产品列出<b>服务商推广服务费（批发市场分佣）</b>与<b>运营服务费（零售市场手续费）</b>金额</li>
       <li>每月支出记录按月份列出各月<b>支出金额</b></li>
-      <li>报表底部汇总<b>服务商推广服务费合计、运营服务费合计、支出合计、累计提现</b></li>
+      <li>报表汇总<b>服务商推广服务费合计、运营服务费合计、支出合计、累计提现</b></li>
+    </ul>
+    <h4><span class="badge">8</span> <span style="vertical-align:middle;">冻结释放记录（汇付/宝付）</span></h4>
+    <ul>
+      <li>点击总余额卡片的<b>冻结释放记录</b>按钮弹出记录弹窗（宝付、汇付各自分开统计，宝付的不动）</li>
+      <li>弹窗顶部展示统计：<b>冻结金总计</b>（¥1,280.00）、<b>释放总计</b>（¥530.00），与明细一致</li>
+      <li>表格列：<b>名称、用途、类型、金额、创建时间</b></li>
+      <li>用途仅<b>活动奖金池</b></li>
+      <li>类型区分<b>冻结</b>（橙色）与<b>释放</b>（绿色），按<b>创建时间倒序</b>排列</li>
+      <li>底部支持<b>分页</b>，当前 10 条记录</li>
     </ul>
   </div>
 </div>
@@ -997,6 +1130,7 @@ function toggleFuncModal() {
                         <th>支付渠道</th>
                         <th>提现金额</th>
                         <th>原因</th>
+                        <th>审核时间</th>
                         <th>状态</th>
                     </tr>
                 </thead>
@@ -1006,6 +1140,7 @@ function toggleFuncModal() {
                         <td>汇付钱包</td>
                         <td>500.00</td>
                         <td>日常提现</td>
+                        <td>2026-07-20 11:20:00</td>
                         <td><span class="rec-status done">已提现</span></td>
                     </tr>
                     <tr>
@@ -1013,6 +1148,7 @@ function toggleFuncModal() {
                         <td>宝付钱包</td>
                         <td>200.00</td>
                         <td>结算提取</td>
+                        <td>2026-07-15 16:45:00</td>
                         <td><span class="rec-status approved">已通过</span></td>
                     </tr>
                     <tr>
@@ -1020,6 +1156,7 @@ function toggleFuncModal() {
                         <td>汇付钱包</td>
                         <td>1000.00</td>
                         <td>资金周转</td>
+                        <td>-</td>
                         <td><span class="rec-status pending">待审核</span></td>
                     </tr>
                     <tr>
@@ -1027,6 +1164,7 @@ function toggleFuncModal() {
                         <td>宝付钱包</td>
                         <td>300.00</td>
                         <td>运营资金</td>
+                        <td>2026-07-02 09:15:00</td>
                         <td><span class="rec-status done">已提现</span></td>
                     </tr>
                 </tbody>
@@ -1035,7 +1173,128 @@ function toggleFuncModal() {
     </div>
 </div>
 
+<!-- 冻结释放记录 -->
+<div class="frz-overlay" id="frzOverlay" onclick="if(event.target===this)closeFrzModal()">
+    <div class="frz-modal">
+        <div class="frz-header">
+            <span class="frz-title">冻结释放记录</span>
+            <span class="frz-close" onclick="closeFrzModal()">×</span>
+        </div>
+        <div class="frz-stats">
+            <div class="frz-stat freeze">
+                <span class="ls">冻结金总计</span>
+                <span class="lv">¥ 1,280.00</span>
+            </div>
+            <div class="frz-stat release">
+                <span class="ls">释放总计</span>
+                <span class="lv">¥ 530.00</span>
+            </div>
+        </div>
+        <div class="frz-body">
+            <table class="frz-table">
+                <thead>
+                    <tr>
+                        <th>名称</th>
+                        <th>用途</th>
+                        <th>类型</th>
+                        <th>金额</th>
+                        <th>创建时间</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>山水空灵</td>
+                        <td>活动奖金池</td>
+                        <td><span class="frz-type release">释放</span></td>
+                        <td>100.00</td>
+                        <td>2025-04-28 16:44:27</td>
+                    </tr>
+                    <tr>
+                        <td>山水空灵</td>
+                        <td>活动奖金池</td>
+                        <td><span class="frz-type release">释放</span></td>
+                        <td>100.00</td>
+                        <td>2025-04-28 16:44:22</td>
+                    </tr>
+                    <tr>
+                        <td>山水空灵</td>
+                        <td>活动奖金池</td>
+                        <td><span class="frz-type freeze">冻结</span></td>
+                        <td>100.00</td>
+                        <td>2025-04-28 16:44:14</td>
+                    </tr>
+                    <tr>
+                        <td>山水空灵</td>
+                        <td>活动奖金池</td>
+                        <td><span class="frz-type release">释放</span></td>
+                        <td>100.00</td>
+                        <td>2025-04-28 16:43:05</td>
+                    </tr>
+                    <tr>
+                        <td>逸新活动</td>
+                        <td>活动奖金池</td>
+                        <td><span class="frz-type release">释放</span></td>
+                        <td>80.00</td>
+                        <td>2025-04-28 16:00:03</td>
+                    </tr>
+                    <tr>
+                        <td>山水空灵</td>
+                        <td>活动奖金池</td>
+                        <td><span class="frz-type release">释放</span></td>
+                        <td>100.00</td>
+                        <td>2025-04-28 15:43:23</td>
+                    </tr>
+                    <tr>
+                        <td>逸新活动</td>
+                        <td>活动奖金池</td>
+                        <td><span class="frz-type freeze">冻结</span></td>
+                        <td>100.00</td>
+                        <td>2025-04-28 15:04:42</td>
+                    </tr>
+                    <tr>
+                        <td>山水空灵</td>
+                        <td>活动奖金池</td>
+                        <td><span class="frz-type release">释放</span></td>
+                        <td>50.00</td>
+                        <td>2025-04-28 14:43:46</td>
+                    </tr>
+                    <tr>
+                        <td>山水空灵</td>
+                        <td>活动奖金池</td>
+                        <td><span class="frz-type freeze">冻结</span></td>
+                        <td>80.00</td>
+                        <td>2025-04-28 14:40:25</td>
+                    </tr>
+                    <tr>
+                        <td>山水空灵</td>
+                        <td>活动奖金池</td>
+                        <td><span class="frz-type freeze">冻结</span></td>
+                        <td>1,000.00</td>
+                        <td>2025-04-28 14:00:00</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="frz-pager">
+            <span>共 10 条</span>
+            <a>‹</a>
+            <span class="cur">1</span>
+            <a>›</a>
+        </div>
+        <div class="frz-footer">
+            <button class="frz-btn-default" onclick="closeFrzModal()">取消</button>
+            <button class="frz-btn-primary" onclick="closeFrzModal()">确定</button>
+        </div>
+    </div>
+</div>
+
 <script>
+function openFrzModal() {
+    document.getElementById('frzOverlay').classList.add('show');
+}
+function closeFrzModal() {
+    document.getElementById('frzOverlay').classList.remove('show');
+}
 function openWithdrawModal() {
     document.getElementById('wdOverlay').classList.add('show');
 }

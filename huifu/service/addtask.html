@@ -440,8 +440,10 @@
                     <span style="color:#86909c;font-size:13px;">元</span>
                 </div>
                 <div class="inline-group" id="bonusChannelWrap" style="margin-top:8px;display:none;">
+                    <span style="color:#e74c5e;font-size:13px;">*</span>
                     <span style="color:#4e5a6e;font-size:13px;">支付渠道：</span>
                     <select id="bonusChannel" class="form-select" style="width:200px;height:32px;border:1px solid #d0d5dd;border-radius:4px;font-size:13px;background:#fff;">
+                        <option value="">请选择支付渠道</option>
                         <option value="汇付">汇付</option>
                     </select>
                 </div>
@@ -705,7 +707,7 @@
 
     <div class="form-actions">
         <button class="btn btn-cancel">取消</button>
-        <button class="btn btn-submit">确定</button>
+        <button class="btn btn-submit" onclick="submitTask()">确定</button>
     </div>
 </div>
 
@@ -742,7 +744,21 @@ function toggleShareReward(sel) {
 function togglePayChannel() {
     var input = document.getElementById('bonusPool');
     var wrap = document.getElementById('bonusChannelWrap');
-    wrap.style.display = (input.value && parseFloat(input.value) > 0) ? 'block' : 'none';
+    var channel = document.getElementById('bonusChannel');
+    var show = (input.value && parseFloat(input.value) > 0);
+    wrap.style.display = show ? 'block' : 'none';
+    if (show && !channel.value) channel.value = '';
+}
+
+function submitTask() {
+    var amount = document.getElementById('bonusPool');
+    var channel = document.getElementById('bonusChannel');
+    if (amount.value && parseFloat(amount.value) > 0 && !channel.value) {
+        alert('请选择支付渠道');
+        channel.focus();
+        return;
+    }
+    alert('任务提交成功');
 }
 
 function syncShareReward(sel) {
@@ -997,12 +1013,9 @@ function reindexPickupProducts(container) {
       <li>页面进入时任务类型默认为空，下方不展示任何内容。用户从下拉框选择类型后，展示对应的配置面板</li>
     </ul>
 
-    <h4>一、分享邀请好友（原功能无需修改）</h4>
+    <h4>一、分享邀请好友</h4>
     <ul>
-      <li><b>上传分享图</b>：上传分享邀请卡片图片</li>
-      <li><b>任务规则</b>：支持动态新增/删除多条规则，每条规则包含规则选择 + 独立奖励配置</li>
-      <li><b>规则选项</b>：邀请绑卡、邀请完成一笔交易</li>
-      <li>每条规则的奖励配置包括：<b>奖励对象选择、奖励类型选择、奖励类型联动字段</b></li>
+      <li>填入奖金池金额时必须选择支付渠道</li>
     </ul>
 
     <h4>二、提货（本次新增功能）</h4>

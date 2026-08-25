@@ -285,6 +285,10 @@
         </select>
     </div>
     <div class="filter-item">
+        <span class="filter-label">提现原因</span>
+        <input class="filter-input" placeholder="请输入提现原因关键词">
+    </div>
+    <div class="filter-item">
         <span class="filter-label">时间</span>
         <input class="filter-input" placeholder="开始日期" style="width:130px;">
         <span style="color:#9ba6b9;margin:0 6px;">至</span>
@@ -307,6 +311,7 @@
                 <th>提现金额</th>
                 <th>提现原因</th>
                 <th>申请时间</th>
+                <th>审核时间</th>
                 <th>审核状态</th>
                 <th>操作</th>
             </tr>
@@ -450,12 +455,12 @@
 
 <script>
 var data = [
-    { no: 'TX-20260801001', service: '四川华泰博文文化艺术发展有限公司', channel: '汇付钱包', amount: '5000.00', time: '2026-08-01 10:20:00', reason: '日常资金提现', status: 'pending' },
-    { no: 'TX-20260801002', service: '四川世华博源广告传播有限公司', channel: '宝付钱包', amount: '1200.00', time: '2026-08-01 09:45:00', reason: '结算提取', status: 'pending' },
-    { no: 'TX-20260731003', service: '四川华鑫博文文化艺术发展有限公司', channel: '汇付钱包', amount: '8000.00', time: '2026-07-31 16:30:00', reason: '运营资金周转', status: 'pending' },
-    { no: 'TX-20260731004', service: '四川华泰博文文化艺术发展有限公司', channel: '汇付钱包', amount: '3000.00', time: '2026-07-31 14:10:00', reason: '业务结算', status: 'approved' },
-    { no: 'TX-20260730005', service: '成都星曜文化传媒有限公司', channel: '宝付钱包', amount: '2000.00', time: '2026-07-30 11:25:00', reason: '日常提现', status: 'done' },
-    { no: 'TX-20260730006', service: '四川世华博源广告传播有限公司', channel: '汇付钱包', amount: '6600.00', time: '2026-07-30 10:05:00', reason: '货款提取', status: 'done' }
+    { no: 'TX-20260801001', service: '四川华泰博文文化艺术发展有限公司', channel: '汇付钱包', amount: '5000.00', time: '2026-08-01 10:20:00', reason: '日常资金提现', status: 'pending', auditTime: '' },
+    { no: 'TX-20260801002', service: '四川世华博源广告传播有限公司', channel: '宝付钱包', amount: '1200.00', time: '2026-08-01 09:45:00', reason: '结算提取', status: 'pending', auditTime: '' },
+    { no: 'TX-20260731003', service: '四川华鑫博文文化艺术发展有限公司', channel: '汇付钱包', amount: '8000.00', time: '2026-07-31 16:30:00', reason: '运营资金周转', status: 'pending', auditTime: '' },
+    { no: 'TX-20260731004', service: '四川华泰博文文化艺术发展有限公司', channel: '汇付钱包', amount: '3000.00', time: '2026-07-31 14:10:00', reason: '业务结算', status: 'approved', auditTime: '2026-07-31 15:30:00' },
+    { no: 'TX-20260730005', service: '成都星曜文化传媒有限公司', channel: '宝付钱包', amount: '2000.00', time: '2026-07-30 11:25:00', reason: '日常提现', status: 'done', auditTime: '2026-07-30 12:05:00' },
+    { no: 'TX-20260730006', service: '四川世华博源广告传播有限公司', channel: '汇付钱包', amount: '6600.00', time: '2026-07-30 10:05:00', reason: '货款提取', status: 'done', auditTime: '2026-07-30 11:20:00' }
 ];
 
 var statusMap = { pending: '待审核', approved: '已通过', done: '已提现' };
@@ -471,6 +476,7 @@ function renderTable() {
             '    <td style="color:#e74c5e;font-weight:600;">' + o.amount + '</td>',
             '    <td>' + o.reason + '</td>',
             '    <td>' + o.time + '</td>',
+            '    <td>' + (o.auditTime || '-') + '</td>',
             '    <td><span class="status-tag ' + o.status + '">' + statusMap[o.status] + '</span></td>',
             '    <td class="actions"><a onclick="openAudit(\'' + o.no + '\')">审核</a></td>',
             '</tr>'
@@ -494,7 +500,10 @@ function closeAudit() {
     document.getElementById('auditOverlay').classList.remove('show');
 }
 function approveAudit() {
-    if (currentRow) currentRow.status = 'approved';
+    if (currentRow) {
+        currentRow.status = 'approved';
+        currentRow.auditTime = new Date().toLocaleString('zh-CN', { hour12: false }).replace(/\//g, '-');
+    }
     alert('已通过提现申请');
     closeAudit();
     renderTable();
