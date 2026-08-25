@@ -130,7 +130,57 @@
             display: none; align-items: center; justify-content: center; z-index: 2000;
         }
         .audit-overlay.show { display: flex; }
-        .audit-modal { background: #fff; border-radius: 8px; width: 460px; max-width: 94vw; }
+        .audit-modal { background: #fff; border-radius: 8px; width: 560px; max-width: 94vw; }
+
+        /* 审核浮层-收支统计报表 */
+        .wd-report {
+            border: 1px solid #eef0f4;
+            border-radius: 6px;
+            padding: 14px 16px;
+            background: #fafbfc;
+            margin-top: 4px;
+        }
+        .wr-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .wr-title::before {
+            content: '';
+            width: 3px;
+            height: 14px;
+            background: #1a78ff;
+            border-radius: 2px;
+        }
+        .wr-sub {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin: 14px 0 8px;
+        }
+        .wr-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        .wr-table th {
+            background: #f0f3f8;
+            color: #4e5a6e;
+            font-weight: 600;
+            text-align: left;
+            padding: 7px 10px;
+            border: 1px solid #eef0f4;
+        }
+        .wr-table td {
+            padding: 7px 10px;
+            border: 1px solid #eef0f4;
+            color: #1a1a2e;
+        }
+        .wr-table td.money { color: #e67e22; font-weight: 600; text-align: right; }
         .audit-header { padding: 16px 20px; border-bottom: 1px solid #f0f0f0; display: flex; align-items: center; justify-content: space-between; }
         .audit-title { font-size: 16px; font-weight: 600; }
         .audit-close { font-size: 22px; color: #86909c; cursor: pointer; line-height: 1; }
@@ -235,6 +285,7 @@
                 <th>服务商</th>
                 <th>支付渠道</th>
                 <th>提现金额</th>
+                <th>提现原因</th>
                 <th>申请时间</th>
                 <th>审核状态</th>
                 <th>操作</th>
@@ -279,6 +330,59 @@
                 <div class="label">提现原因</div>
                 <div class="val" id="auditReason">-</div>
             </div>
+            <div class="wd-report">
+                <div class="wr-title">收支统计报表</div>
+                <div class="wr-sub">产品收入统计</div>
+                <table class="wr-table">
+                    <thead>
+                        <tr>
+                            <th>产品</th>
+                            <th style="text-align:right;">批发市场分佣</th>
+                            <th style="text-align:right;">零售市场手续费</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1、仙鹤莲池</td>
+                            <td class="money">¥ 8,650.00</td>
+                            <td class="money">¥ 1,320.00</td>
+                        </tr>
+                        <tr>
+                            <td>2、浮休东坡产品</td>
+                            <td class="money">¥ 6,280.00</td>
+                            <td class="money">¥ 960.00</td>
+                        </tr>
+                        <tr>
+                            <td>3、青莲·舒展</td>
+                            <td class="money">¥ 5,120.00</td>
+                            <td class="money">¥ 780.00</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="wr-sub">每月支出记录</div>
+                <table class="wr-table">
+                    <thead>
+                        <tr>
+                            <th>月份</th>
+                            <th style="text-align:right;">支出金额</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>2026-07</td>
+                            <td class="money">¥ 12,680.00</td>
+                        </tr>
+                        <tr>
+                            <td>2026-06</td>
+                            <td class="money">¥ 9,870.00</td>
+                        </tr>
+                        <tr>
+                            <td>2026-05</td>
+                            <td class="money">¥ 11,450.00</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
         <div class="audit-footer">
             <button class="btn-reject" onclick="rejectAudit()">驳回</button>
@@ -301,6 +405,7 @@
       <li>平台审核<b>服务商提现</b>申请（宝付/汇付钱包）</li>
       <li>审核状态：<b>待审核、已通过、已提现</b></li>
       <li>审核操作支持<b>通过</b>和<b>驳回</b></li>
+      <li>审核弹窗展示服务商申请时看到的<b>收支统计报表</b>（产品收入统计 + 每月支出记录），供审核参考</li>
     </ul>
   </div>
 </div>
@@ -326,6 +431,7 @@ function renderTable() {
             '    <td>' + o.service + '</td>',
             '    <td>' + o.channel + '</td>',
             '    <td style="color:#e74c5e;font-weight:600;">' + o.amount + '</td>',
+            '    <td>' + o.reason + '</td>',
             '    <td>' + o.time + '</td>',
             '    <td><span class="status-tag ' + o.status + '">' + statusMap[o.status] + '</span></td>',
             '    <td class="actions"><a onclick="openAudit(\'' + o.no + '\')">审核</a></td>',

@@ -95,6 +95,37 @@
             cursor: pointer;
         }
         .sc-head .btn:hover { background: #0f6ae8; }
+        .wallet-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: #f5f7fa;
+            border: 1px solid #e6eaf2;
+            border-radius: 10px;
+            padding: 16px;
+        }
+        .wallet-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #2b2f36;
+            padding: 0 2px;
+        }
+        .wallet-cards {
+            display: flex;
+            gap: 10px;
+        }
+        .wallet-cards .summary-card { flex: 1; }
+        .amount.avail { color: #16b364; }
+        .sc-head .label .dot {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #16b364;
+            margin-right: 6px;
+            vertical-align: 1px;
+        }
         .sc-actions {
             display: flex;
             border-top: 1px solid #f5f5f7;
@@ -293,7 +324,7 @@
         .wd-modal {
             background: #fff;
             border-radius: 8px;
-            width: 440px;
+            width: 760px;
             max-width: 94vw;
             max-height: 90vh;
             display: flex;
@@ -330,6 +361,55 @@
             display: inline-block;
         }
         .wd-link:hover { text-decoration: underline; }
+        /* 提现浮层-收支统计报表 */
+        .wd-report {
+            border: 1px solid #eef0f4;
+            border-radius: 6px;
+            padding: 14px 16px;
+            background: #fafbfc;
+            margin-bottom: 16px;
+        }
+        .wr-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .wr-title::before {
+            content: '';
+            width: 3px;
+            height: 14px;
+            background: #1a78ff;
+            border-radius: 2px;
+        }
+        .wr-sub {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin: 14px 0 8px;
+        }
+        .wr-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        .wr-table th {
+            background: #f0f3f8;
+            color: #4e5a6e;
+            font-weight: 600;
+            text-align: left;
+            padding: 7px 10px;
+            border: 1px solid #eef0f4;
+        }
+        .wr-table td {
+            padding: 7px 10px;
+            border: 1px solid #eef0f4;
+            color: #1a1a2e;
+        }
+        .wr-table td.money { color: #e67e22; font-weight: 600; text-align: right; }
         .wd-footer {
             padding: 12px 20px;
             border-top: 1px solid #f0f0f0;
@@ -493,29 +573,55 @@
 
 <!-- 资金汇总卡片 -->
 <div class="summary-row">
-    <div class="summary-card">
-        <div class="sc-head">
-            <div>
-                <div class="label">宝付钱包余额</div>
-                <div class="amount bff">1,280.00</div>
+    <div class="wallet-group">
+        <div class="wallet-title">宝付钱包</div>
+        <div class="wallet-cards">
+            <div class="summary-card">
+                <div class="sc-head">
+                    <div>
+                        <div class="label">总余额</div>
+                        <div class="amount bff">1,280.00</div>
+                    </div>
+                </div>
+                <div class="sc-actions">
+                    <div class="sc-action">冻结释放记录</div>
+                    <div class="sc-action">产品交易金划转</div>
+                </div>
             </div>
-            <button class="btn" onclick="openWithdrawModal()">提现</button>
-        </div>
-        <div class="sc-actions">
-            <div class="sc-action">冻结释放记录</div>
-            <div class="sc-action">产品交易金划转</div>
+            <div class="summary-card">
+                <div class="sc-head">
+                    <div>
+                        <div class="label"><span class="dot"></span>可用余额</div>
+                        <div class="amount avail">1,080.00</div>
+                    </div>
+                    <button class="btn" onclick="openWithdrawModal()">提现</button>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="summary-card">
-        <div class="sc-head">
-            <div>
-                <div class="label">汇付钱包余额</div>
-                <div class="amount hf">32,865.00</div>
+    <div class="wallet-group">
+        <div class="wallet-title">汇付钱包</div>
+        <div class="wallet-cards">
+            <div class="summary-card">
+                <div class="sc-head">
+                    <div>
+                        <div class="label">总余额</div>
+                        <div class="amount hf">32,865.00</div>
+                    </div>
+                </div>
+                <div class="sc-actions">
+                    <div class="sc-action">冻结释放记录</div>
+                </div>
             </div>
-            <button class="btn" onclick="openWithdrawModal()">提现</button>
-        </div>
-        <div class="sc-actions">
-            <div class="sc-action">冻结释放记录</div>
+            <div class="summary-card">
+                <div class="sc-head">
+                    <div>
+                        <div class="label"><span class="dot"></span>可用余额</div>
+                        <div class="amount avail">24,500.00</div>
+                    </div>
+                    <button class="btn" onclick="openWithdrawModal()">提现</button>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -636,10 +742,18 @@
       <li>浮层提供<b>提现申请记录</b>链接，展示所有渠道的提现记录（状态：待审核、已通过、已提现）</li>
       <li>交易类型中也增加<b>提现</b></li>
     </ul>
-    <h4><span class="badge">6</span> <span style="vertical-align:middle;">汇付钱包余额</span></h4>
+    <h4><span class="badge">6</span> <span style="vertical-align:middle;">钱包余额卡片</span></h4>
     <ul>
-      <li>汇付钱包余额展示账户可用总余额，支持<b>提现</b>操作</li>
-      <li>点击<b>冻结释放记录</b>可查看历史冻结释放明细</li>
+      <li>宝付、汇付钱包分别归为一组，组内<b>总余额</b>与<b>可用余额</b>两张卡片并排</li>
+      <li>总余额展示账户全部资金，可用余额即当前可提余额</li>
+      <li>可用余额与提现浮层<b>当前可提余额</b>一致（汇付 24,500.00）</li>
+      <li><b>提现</b>按钮位于可用余额卡片，<b>冻结释放记录</b>等操作位于总余额卡片</li>
+    </ul>
+    <h4><span class="badge">7</span> <span style="vertical-align:middle;">提现收支统计报表</span></h4>
+    <ul>
+      <li>提现浮层下方展示<b>收支统计报表</b>，包含<b>产品收入统计</b>与<b>每月支出记录</b></li>
+      <li>产品收入统计按产品列出<b>批发市场分佣</b>与<b>零售市场手续费</b>金额</li>
+      <li>每月支出记录按月份列出各月<b>支出金额</b></li>
     </ul>
   </div>
 </div>
@@ -751,6 +865,59 @@ function toggleFuncModal() {
             <div class="wd-row">
                 <div class="wd-label">填写原因</div>
                 <input type="text" class="wd-input" id="wdReason" placeholder="请输入提现原因">
+            </div>
+            <div class="wd-report">
+                <div class="wr-title">收支统计报表</div>
+                <div class="wr-sub">产品收入统计</div>
+                <table class="wr-table">
+                    <thead>
+                        <tr>
+                            <th>产品</th>
+                            <th style="text-align:right;">批发市场分佣</th>
+                            <th style="text-align:right;">零售市场手续费</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1、仙鹤莲池</td>
+                            <td class="money">¥ 8,650.00</td>
+                            <td class="money">¥ 1,320.00</td>
+                        </tr>
+                        <tr>
+                            <td>2、浮休东坡产品</td>
+                            <td class="money">¥ 6,280.00</td>
+                            <td class="money">¥ 960.00</td>
+                        </tr>
+                        <tr>
+                            <td>3、青莲·舒展</td>
+                            <td class="money">¥ 5,120.00</td>
+                            <td class="money">¥ 780.00</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="wr-sub">每月支出记录</div>
+                <table class="wr-table">
+                    <thead>
+                        <tr>
+                            <th>月份</th>
+                            <th style="text-align:right;">支出金额</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>2026-07</td>
+                            <td class="money">¥ 12,680.00</td>
+                        </tr>
+                        <tr>
+                            <td>2026-06</td>
+                            <td class="money">¥ 9,870.00</td>
+                        </tr>
+                        <tr>
+                            <td>2026-05</td>
+                            <td class="money">¥ 11,450.00</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
             <div class="wd-row">
                 <span class="wd-link" onclick="openRecords()">提现申请记录 ›</span>
