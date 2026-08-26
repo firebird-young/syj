@@ -566,7 +566,6 @@
                 <div class="pay-icon hui">💰</div>
                 <div class="pay-info">
                     <div class="pay-name">汇付钱包 <span class="pay-link" id="payLink" onclick="event.stopPropagation();goRecharge()">去充值</span></div>
-                    <div style="font-size:11px;color:#e74c5e;margin-top:2px;">汇付平台收取0.6%的交易手续费</div>
                 </div>
                 <div class="pay-radio"></div>
             </div>
@@ -657,8 +656,7 @@ function selectPay(opt) {
     var btn = document.getElementById('modalConfirmBtn');
     btn.classList.add('active');
     var amount = 950 * qty;
-    var fee = amount * 0.006;
-    btn.innerHTML = '去支付 ¥' + amount.toFixed(2) + '+¥' + fee.toFixed(2) + '<span style="font-size:11px;opacity:0.85;">（第三方支付手续费）</span>';
+    btn.innerHTML = '去支付 ¥' + amount.toFixed(2);
     btn.onclick = function() { alert('支付成功！'); };
 }
 
