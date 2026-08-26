@@ -99,6 +99,29 @@
         .type-card .tc-desc { font-size: 12px; color: #86909c; margin-top: 4px; }
         .type-card.active .tc-name { color: #1a78ff; }
 
+        .gen-date {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #f8fafc;
+            border: 1px dashed #d0d7e2;
+            border-radius: 8px;
+            padding: 10px 14px;
+        }
+        .gen-date-label { font-size: 13px; color: #4e5a6e; }
+        .gen-date-input {
+            width: 150px;
+            height: 30px;
+            border: 1px solid #d0d5dd;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #1a1a2e;
+            padding: 0 8px;
+            background: #fff;
+        }
+        .gen-date-sep { font-size: 13px; color: #6b7588; }
+        .gen-date-hint { font-size: 12px; color: #86909c; }
+
         .gen-actions {
             display: flex;
             align-items: center;
@@ -291,6 +314,13 @@
             <div class="tc-desc">每个服务商的产品交易次数、手续费、交易金额、时间范围</div>
         </div>
     </div>
+    <div class="gen-date" id="dateRangeWrap" style="display:none;margin-bottom:16px;">
+        <span class="gen-date-label">统计时间段：</span>
+        <input type="date" id="dateStart" class="gen-date-input" value="2026-07-01">
+        <span class="gen-date-sep">至</span>
+        <input type="date" id="dateEnd" class="gen-date-input" value="2026-08-19">
+        <span class="gen-date-hint">仅"服务商交易明细"需选择时间段</span>
+    </div>
     <div class="gen-actions">
         <button class="btn-gen" id="genBtn" onclick="genReport()">⚙ 生成报表</button>
         <span class="gen-hint">生成后将在下方历史列表展示，可随时下载</span>
@@ -335,19 +365,19 @@
     </ul>
     <h4><span class="badge">2</span> <span style="vertical-align:middle;">生成报表</span></h4>
     <ul>
-      <li>选择报表类型后点击<b>「生成报表」</b>，系统按当前统计周期生成报表文件，并写入下方历史生成记录</li>
+      <li>选择报表类型后点击<b>「生成报表」</b>，系统按当前统计周期生成报表文件</li>
       <li>生成成功后即可在操作列点击<b>下载</b>获取文件</li>
     </ul>
-    <h4><span class="badge">3</span> <span style="vertical-align:middle;">历史生成记录</span></h4>
-    <ul>
-      <li>列表只展示历史生成记录，不展示报表明细数据；下载后可用 Excel 打开查看完整数据</li>
-      <li>文件命名格式：<b>平台产品销售报表_报表类型_统计周期.csv</b></li>
-    </ul>
-    <h4><span class="badge">4</span> <span style="vertical-align:middle;">分账口径说明</span></h4>
+    <h4><span class="badge">3</span> <span style="vertical-align:middle;">分账口径说明</span></h4>
     <ul>
       <li>批发商<b>分账金额</b> = 售卖金额 ×（25% − 0.6% 手续费）</li>
       <li>服务商<b>批发市场分账金额</b> = 售卖金额 × 20%；<b>留存金额</b> = 售卖金额 × 55%</li>
       <li>提货率 = 提货数量 ÷ 销售数量 × 100%</li>
+    </ul>
+    <h4><span class="badge">4</span> <span style="vertical-align:middle;">报表要求</span></h4>
+    <ul>
+      <li>生成的报表需符合平台标准模板格式，请参照模板下载：<a href="../../asset/深艺交平台产品销售报表.xlsx" download style="color:#1a78ff;">📥 深艺交平台产品销售报表.xlsx</a></li>
+      <li>模板含 4 个 Sheet：<b>批发商销售汇总、委托服务商分账汇总、批发商销售明细、服务商交易明细</b></li>
     </ul>
   </div>
 </div>
@@ -411,9 +441,9 @@ var REPORTS = {
 
 /* ================= 历史生成记录 ================= */
 var historyData = [
-    { key: 'ws_sum', range: '2026-07-01 ~ 2026-07-31', time: '2026-08-01 09:00:12', operator: '系统参数设置', status: '成功' },
-    { key: 'sv_sum', range: '2026-07-01 ~ 2026-07-31', time: '2026-08-01 09:02:45', operator: '系统参数设置', status: '成功' },
-    { key: 'ws_detail', range: '2026-06-01 ~ 2026-06-30', time: '2026-07-01 08:30:20', operator: '系统参数设置', status: '成功' }
+    { key: 'ws_sum', range: '2026-07-01 ~ 2026-07-31', date: '2026-08-01', time: '2026-08-01 09:00:12', operator: '系统参数设置', status: '成功' },
+    { key: 'sv_sum', range: '2026-07-01 ~ 2026-07-31', date: '2026-08-01', time: '2026-08-01 09:02:45', operator: '系统参数设置', status: '成功' },
+    { key: 'ws_detail', range: '2026-06-01 ~ 2026-06-30', date: '2026-07-01', time: '2026-07-01 08:30:20', operator: '系统参数设置', status: '成功' }
 ];
 
 var currentType = 'ws_sum';
@@ -423,6 +453,7 @@ function selectType(type) {
     currentType = type;
     var cards = document.querySelectorAll('.type-card');
     cards.forEach(function (c) { c.classList.toggle('active', c.dataset.type === type); });
+    document.getElementById('dateRangeWrap').style.display = (type === 'sv_detail') ? 'flex' : 'none';
 }
 
 /* ================= 生成报表 ================= */
@@ -433,10 +464,18 @@ function genReport() {
     showToast('正在生成「' + r.title + '」报表，请稍候…');
     setTimeout(function () {
         var now = new Date();
-        var range = formatMonth(now) + ' ~ ' + formatDate(now);
+        var range;
+        if (currentType === 'sv_detail') {
+            var ds = document.getElementById('dateStart').value;
+            var de = document.getElementById('dateEnd').value;
+            range = (ds || formatMonth(now)) + ' ~ ' + (de || formatDate(now));
+        } else {
+            range = formatMonth(now) + ' ~ ' + formatDate(now);
+        }
         historyData.unshift({
             key: currentType,
             range: range,
+            date: formatDate(now),
             time: formatNow(now),
             operator: '系统参数设置',
             status: '成功'
@@ -452,7 +491,8 @@ function renderHistory() {
     var body = '';
     historyData.forEach(function (rec, i) {
         var r = REPORTS[rec.key];
-        var file = '平台产品销售报表_' + r.exportName + '_' + rec.range.replace(/ ~ /g, '~') + '.csv';
+        var suffix = (rec.key === 'sv_detail') ? rec.range.replace(/ ~ /g, '~') : rec.date;
+        var file = '平台产品销售报表_' + r.exportName + '_' + suffix + '.csv';
         body += [
             '<tr>',
             '  <td>' + (i + 1) + '</td>',
@@ -491,7 +531,7 @@ function exportReport(idx) {
     var url = URL.createObjectURL(blob);
     var a = document.createElement('a');
     a.href = url;
-    a.download = '平台产品销售报表_' + r.exportName + '_' + rec.range.replace(/ ~ /g, '~') + '.csv';
+    a.download = '平台产品销售报表_' + r.exportName + '_' + ((rec.key === 'sv_detail') ? rec.range.replace(/ ~ /g, '~') : rec.date) + '.csv';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
