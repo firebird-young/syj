@@ -527,14 +527,18 @@ function togglePermanent(chk) {
     <h4><span style="display:inline-flex;width:18px;height:18px;border-radius:50%;background:#E91E63;color:#fff;font-size:11px;font-weight:700;align-items:center;justify-content:center;margin-right:6px;vertical-align:middle;">2</span> <span style="vertical-align:middle;">法人身份证</span></h4>
     <ul>
       <li>上传法人身份证后，系统 <b>OCR 识别身份证</b>，自动填入<b>法人姓名、身份证号、证件起始日期、截止日期</b></li>
-      <li>识别结果支持<b>手动修改</b></li>
+      <li>识别结果法人姓名、身份证号不可修改，证件日期支持<b>手动修改</b></li>
     </ul>
     <h4><span style="display:inline-flex;width:18px;height:18px;border-radius:50%;background:#E91E63;color:#fff;font-size:11px;font-weight:700;align-items:center;justify-content:center;margin-right:6px;vertical-align:middle;">3</span> <span style="vertical-align:middle;">企业证件类型变更</span></h4>
     <ul>
       <li>企业证件类型支持选择<b>三证合一 / 普通证照</b></li>
       <li>选择类型后提交认证，系统按对应类型进行审核</li>
     </ul>
-    <h4><span class="badge">4</span> <span style="vertical-align:middle;">开户方式</span></h4>
+    <h4><span style="display:inline-flex;width:18px;height:18px;border-radius:50%;background:#E91E63;color:#fff;font-size:11px;font-weight:700;align-items:center;justify-content:center;margin-right:6px;vertical-align:middle;">4</span> <span style="vertical-align:middle;">提交审核校验</span></h4>
+    <ul>
+      <li>提交审核时，前端根据后端返回的 <b>OCR 结果</b>，校验<b>营业执照法人姓名</b>与<b>身份证法人姓名</b>是否一致</li>
+    </ul>
+    <h4><span class="badge">5</span> <span style="vertical-align:middle;">开户方式</span></h4>
     <ul>
       <li>后台审核认证后，<b>不主动给用户开户</b></li>
       <li>需要用户在<b>资金管理</b>去开户</li>
