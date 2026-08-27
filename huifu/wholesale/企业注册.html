@@ -131,6 +131,21 @@
             color: #e74c5e;
             margin-right: 2px;
         }
+        .form-label .help-tip {
+            display: inline-flex;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #c9d2e0;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 700;
+            align-items: center;
+            justify-content: center;
+            margin-left: 6px;
+            cursor: help;
+            vertical-align: middle;
+        }
         .form-control {
             flex: 1;
             max-width: 560px;
@@ -328,15 +343,28 @@
             </div>
         </div>
 
-        <div class="form-row upload-row">
-            <div class="form-label"><span class="required">*</span>企业LOGO</div>
+        <div class="form-row">
+            <div class="form-label"><span class="required">*</span>企业类型<span class="help-tip" title="主体为艺术品所有者的企业为一类，比如博物馆；主体为代理运营的企业为二类">?</span></div>
             <div class="form-control">
-                <div class="upload-box">
-                    <div class="upload-icon">⬆</div>
-                    <div class="upload-text">将文件拖到此处，或<span class="link">点击上传</span></div>
-                    <div class="upload-tip">只能上传png/jpg文件，且不超过500kb</div>
-                    <input type="file" class="upload-input" accept="image/png,image/jpeg">
-                </div>
+                <select class="form-select">
+                    <option>一类</option>
+                    <option>二类</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-label"><span class="required">*</span>所属行业</div>
+            <div class="form-control">
+                <select class="form-select">
+                    <option>数字娱乐</option>
+                    <option>大宗商品现货交易</option>
+                    <option>收藏品交易</option>
+                    <option>电商B2B</option>
+                    <option>零售B2C</option>
+                    <option>代理商</option>
+                    <option>其他</option>
+                </select>
             </div>
         </div>
 
