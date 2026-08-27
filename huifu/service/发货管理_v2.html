@@ -401,6 +401,7 @@
                 <th>状态</th>
                 <th>创建时间 <span class="col-sort">⇅</span></th>
                 <th>提货时间</th>
+                <th>发货时间</th>
                 <th>操作</th>
             </tr>
         </thead>
@@ -421,6 +422,7 @@
                 <td><span class="status-tag pending">待发货</span></td>
                 <td>2026-07-21 14:49:19</td>
                 <td class="pick-time none">—</td>
+                <td class="pick-time none">—</td>
                 <td class="actions"><a>处理</a><a>查看详情</a><a class="danger">撤销</a></td>
             </tr>
             <tr data-status="shipped">
@@ -439,6 +441,7 @@
                 <td><span class="status-tag shipped">已发货</span></td>
                 <td>2026-07-21 14:37:31</td>
                 <td>2026-07-22 10:12:05</td>
+                <td>2026-07-22 14:30:00</td>
                 <td class="actions"><a>查看详情</a></td>
             </tr>
             <tr data-status="shipped">
@@ -457,6 +460,7 @@
                 <td><span class="status-tag shipped">已发货</span></td>
                 <td>2026-07-21 14:36:17</td>
                 <td>2026-07-22 09:48:33</td>
+                <td>2026-07-22 13:05:20</td>
                 <td class="actions"><a>查看详情</a></td>
             </tr>
             <tr data-status="shipped">
@@ -475,6 +479,7 @@
                 <td><span class="status-tag shipped">已发货</span></td>
                 <td>2026-07-21 14:35:00</td>
                 <td>2026-07-23 09:15:20</td>
+                <td>2026-07-23 16:40:00</td>
                 <td class="actions"><a>查看详情</a></td>
             </tr>
             <tr data-status="shipped">
@@ -493,6 +498,7 @@
                 <td><span class="status-tag shipped">已发货</span></td>
                 <td>2026-07-21 14:33:58</td>
                 <td>2026-07-22 17:26:41</td>
+                <td>2026-07-23 10:15:30</td>
                 <td class="actions"><a>查看详情</a></td>
             </tr>
             <tr data-status="shipped">
@@ -511,6 +517,7 @@
                 <td><span class="status-tag shipped">已发货</span></td>
                 <td>2026-07-21 14:33:55</td>
                 <td>2026-07-23 16:54:12</td>
+                <td>2026-07-24 09:20:00</td>
                 <td class="actions"><a>查看详情</a></td>
             </tr>
             <tr data-status="shipped">
@@ -529,6 +536,7 @@
                 <td><span class="status-tag shipped">已发货</span></td>
                 <td>2026-07-21 14:28:09</td>
                 <td>2026-07-23 16:08:47</td>
+                <td>2026-07-24 10:45:00</td>
                 <td class="actions"><a>查看详情</a></td>
             </tr>
             <tr data-status="shipped">
@@ -547,6 +555,7 @@
                 <td><span class="status-tag shipped">已发货</span></td>
                 <td>2026-07-21 14:27:02</td>
                 <td>2026-07-23 15:37:29</td>
+                <td>2026-07-23 18:50:00</td>
                 <td class="actions"><a>查看详情</a></td>
             </tr>
         </tbody>
@@ -570,7 +579,7 @@ function exportData() {
         visible.push(row);
     });
     if (!visible.length) { alert('暂无可导出的数据'); return; }
-    var headers = ['序号','产品名','产品编号','产品数量','提货数量','所属企业','提货单号','所属仓库','用户账号','用户姓名','收货地址','状态','创建时间','提货时间'];
+    var headers = ['序号','产品名','产品编号','产品数量','提货数量','所属企业','提货单号','所属仓库','用户账号','用户姓名','收货地址','状态','创建时间','提货时间','发货时间'];
     var csv = '\uFEFF' + headers.join(',') + '\n';
     visible.forEach(function(row) {
         var cells = row.querySelectorAll('td');
@@ -590,7 +599,8 @@ function exportData() {
             cells[11].textContent.trim(),
             cells[12].textContent.trim(),
             cells[13].textContent.trim(),
-            cells[14].textContent.trim()
+            cells[14].textContent.trim(),
+            cells[15].textContent.trim()
         ];
         csv += vals.map(function(v) { return '"' + String(v).replace(/"/g, '""') + '"'; }).join(',') + '\n';
     });
@@ -709,7 +719,7 @@ function switchTab(el, key) {
     <h4>四、导出数据</h4>
     <ul>
       <li>点击<b>「📥 导 出」</b>按钮，将当前列表数据导出为 CSV 文件</li>
-      <li>导出内容包含：序号、产品名、产品编号、产品数量、提货数量、所属企业、提货单号、所属仓库、用户账号、用户姓名、收货地址、状态、创建时间、提货时间</li>
+      <li>导出内容包含：序号、产品名、产品编号、产品数量、提货数量、所属企业、提货单号、所属仓库、用户账号、用户姓名、收货地址、状态、创建时间、提货时间、发货时间</li>
       <li>产品编号按<b>完整值</b>导出（非省略显示）；仅导出当前标签页筛选后的可见数据</li>
     </ul>
   </div>
