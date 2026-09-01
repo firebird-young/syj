@@ -291,8 +291,8 @@
                 <th>批发商</th>
                 <th>批发总金额</th>
                 <th>第三方支付手续费</th>
-                <th>批发商金额</th>
-                <th>服务商金额</th>
+                <th>批发分账金额</th>
+                <th>运营服务费金额</th>
                 <th style="width:160px;">申请时间</th>
                 <th>审核状态</th>
                 <th style="width:130px;">操作</th>
@@ -339,11 +339,11 @@
                 <div class="val" id="auditFee">-</div>
             </div>
             <div class="audit-row">
-                <div class="label">批发商金额</div>
+                <div class="label">批发分账金额</div>
                 <div class="val amount" id="auditWsAmt">-</div>
             </div>
             <div class="audit-row">
-                <div class="label">服务商金额</div>
+                <div class="label">运营服务费金额</div>
                 <div class="val amount" id="auditSvAmt" style="color:#e67e22;">-</div>
             </div>
             <div class="audit-row">
@@ -374,8 +374,8 @@
             <div class="dt-info">
                 <span>申请单号：<b id="dtNo">-</b></span>
                 <span>申请时间：<b id="dtTime">-</b></span>
-                <span>批发商金额：<b id="dtWsAmt">-</b></span>
-                <span>服务商金额：<b id="dtSvAmt">-</b></span>
+                <span>批发分账金额：<b id="dtWsAmt">-</b></span>
+                <span>运营服务费金额：<b id="dtSvAmt">-</b></span>
                 <span>审核状态：<b class="dt-status" id="dtStatus">-</b></span>
             </div>
             <table class="d-table">
@@ -388,8 +388,8 @@
                         <th>实际销售数量</th>
                         <th>批发总金额</th>
                         <th>第三方支付手续费</th>
-                        <th>批发商金额</th>
-                        <th>服务商金额</th>
+                        <th>批发分账金额</th>
+                        <th>运营服务费金额</th>
                     </tr>
                 </thead>
                 <tbody id="detailTbody"></tbody>
@@ -415,8 +415,8 @@
     <ul>
       <li><b>批发总金额</b> = 批发单价 × 批发实际销售数量</li>
       <li><b>第三方支付手续费</b> = 批发总金额 × 0.6%</li>
-      <li><b>批发商金额</b> = 批发总金额 × 25% − 第三方支付手续费</li>
-      <li><b>服务商金额</b> = 批发总金额 × 20%</li>
+      <li><b>批发分账金额</b> = 批发总金额 × 25% − 第三方支付手续费</li>
+      <li><b>运营服务费金额</b> = 批发总金额 × 20%</li>
       <li>自洽校验：100% = 25%（批发商计提，含 0.6% 第三方支付手续费）+ 20%（服务商）+ 55%（平台留存）</li>
     </ul>
     <h4><span class="badge">3</span> <span style="vertical-align:middle;">平台审核</span></h4>

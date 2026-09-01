@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>分佣管理</title>
+    <style>
+        :root{
+          --primary:#1a78ff;--primary-hover:#0f6ae8;--primary-bg:#e6f4ff;
+          --brand:#e74c3e;--danger:#e74c5e;
+          --page-bg:#f0f2f5;--card-bg:#fff;--info-bg:#f5f7fa;
+          --ink:#1a1a2e;--ink-muted:#4e5a6e;--ink-subtle:#6b7588;--ink-faint:#9ba6b9;
+          --border:#d0d5dd;--border-light:#f0f0f0;
+          --radius-sm:4px;--radius-md:6px;
+          --font:"-apple-system","BlinkMacSystemFont","PingFang SC","Microsoft YaHei","Helvetica Neue",sans-serif;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: var(--font);
+            background: var(--page-bg);
+            color: var(--ink);
+            font-size: 14px;
+        }
+
+        /* 整体布局 */
+        .app { display: flex; min-height: 100vh; }
+
+        /* 侧边栏 */
+        .sidebar {
+            width: 200px;
+            background: #1f2c3d;
+            color: #a8b2c0;
+            flex-shrink: 0;
+        }
+        .logo {
+            height: 56px;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            background: #fff;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .logo-icon {
+            width: 28px; height: 28px;
+            background: var(--brand);
+            border-radius: 4px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+        }
+        .menu { padding: 8px 0; }
+        .menu-item, .menu-group-title {
+            display: flex;
+            align-items: center;
+            height: 44px;
+            padding: 0 20px;
+            color: #c0c8d4;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all .15s;
+        }
+        .menu-item:hover, .menu-group-title:hover { background: #2a3849; color: #fff; }
+        .menu-item.active, .menu-group-title.active { color: var(--primary); background: #2a3849; }
+        .menu-item .icon, .menu-group-title .icon {
+            width: 20px;
+            margin-right: 10px;
+            font-size: 16px;
+            text-align: center;
+        }
+        .menu-group-title .arrow { margin-left: auto; font-size: 12px; }
+        .menu-group .submenu { display: none; }
+        .menu-group.open .submenu { display: block; }
+        .menu-group .submenu a {
+            display: flex;
+            align-items: center;
+            height: 36px;
+            padding: 0 20px 0 50px;
+            color: #a8b2c0;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 13px;
+        }
+        .menu-group .submenu a:hover { color: #fff; }
+        .menu-group .submenu a.active { color: var(--primary); }
+
+        /* 主体 */
+        .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+
+        /* 顶栏 */
+        .topbar {
+            background: #fff;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            border-bottom: 1px solid var(--border-light);
+        }
+        .breadcrumb { font-size: 13px; color: var(--ink-subtle); display: flex; align-items: center; gap: 6px; }
+        .breadcrumb .sep { color: #c0c8d4; }
+        .breadcrumb .active { color: var(--ink); }
+        .topbar-right {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .btn-func {
+            padding: 6px 14px;
+            border-radius: 6px;
+            background: #f5f7fa;
+            color: #333;
+            border: 1px solid #e0e4ea;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-family: inherit;
+        }
+        .btn-func:hover { border-color: var(--primary); color: var(--primary); }
+        .user-chip {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        .user-chip .avatar {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            background: #f5deb3;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px;
+        }
+        .user-chip .name { font-size: 13px; color: var(--ink); }
+        .user-chip .arrow { color: var(--ink-faint); font-size: 12px; }
+
+        /* 内容区 */
+        .content { flex: 1; padding: 12px; overflow-y: auto; }
+
+        /* 筛选区 */
+        .filter-bar {
+            background: #fff;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            border-radius: var(--radius-md);
+        }
+        .filter-item { display: flex; align-items: center; margin-right: 16px; margin-bottom: 4px; }
+        .filter-label { font-size: 13px; color: var(--ink-muted); margin-right: 8px; white-space: nowrap; }
+        .filter-input {
+            width: 150px; height: 30px; padding: 0 10px;
+            border: 1px solid var(--border); border-radius: var(--radius-sm);
+            font-size: 13px; color: var(--ink); outline: none;
+        }
+        .filter-input:focus { border-color: var(--primary); }
+        .filter-select {
+            width: 150px; height: 30px; padding: 0 10px;
+            border: 1px solid var(--border); border-radius: var(--radius-sm);
+            font-size: 13px; color: var(--ink); outline: none; background: #fff;
+        }
+        .filter-date-input {
+            width: 110px; height: 30px; padding: 0 10px;
+            border: 1px solid var(--border); border-radius: var(--radius-sm);
+            font-size: 13px; color: var(--ink); outline: none;
+        }
+        .filter-sep { font-size: 13px; color: var(--ink-faint); margin: 0 6px; }
+        .filter-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+        .btn-search {
+            background: var(--primary); color: #fff; border: none;
+            padding: 0 14px; height: 30px; border-radius: var(--radius-sm);
+            font-size: 13px; cursor: pointer;
+        }
+        .btn-search:hover { background: var(--primary-hover); }
+        .btn-reset {
+            background: #fff; color: var(--ink-muted); border: 1px solid var(--border);
+            padding: 0 14px; height: 30px; border-radius: var(--radius-sm);
+            font-size: 13px; cursor: pointer;
+        }
+        .btn-reset:hover { border-color: var(--primary); color: var(--primary); }
+        .btn-export {
+            background: #fff; color: var(--primary); border: 1px solid var(--primary);
+            padding: 0 14px; height: 30px; border-radius: var(--radius-sm);
+            font-size: 13px; cursor: pointer; white-space: nowrap;
+        }
+        .btn-export:hover { background: var(--primary-bg); }
+
+        /* 表格 */
+        .table-card {
+            background: #fff;
+            margin-top: 12px;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            overflow-x: auto;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1280px;
+        }
+        .table th {
+            background: #fafbfc;
+            padding: 12px 14px;
+            text-align: left;
+            font-size: 13px;
+            color: var(--ink-muted);
+            font-weight: 500;
+            border-bottom: 1px solid var(--border-light);
+            white-space: nowrap;
+        }
+        .table td {
+            padding: 13px 14px;
+            font-size: 13px;
+            color: var(--ink);
+            border-bottom: 1px solid #f5f5f7;
+            white-space: nowrap;
+        }
+        .table tr:last-child td { border-bottom: none; }
+        .col-sort {
+            display: inline-block;
+            margin-left: 4px;
+            color: #c0c8d4;
+            cursor: pointer;
+        }
+        .money { font-weight: 600; }
+        .money.commission { color: var(--primary); }
+
+        /* 分页 */
+        .pagination {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--ink-muted);
+        }
+        .pagination .total { margin-right: 16px; }
+        .page-btn {
+            min-width: 28px; height: 28px; padding: 0 8px;
+            border: 1px solid var(--border); border-radius: var(--radius-sm);
+            background: #fff; color: var(--ink-muted);
+            font-size: 12px; cursor: pointer;
+        }
+        .page-btn:hover { border-color: var(--primary); color: var(--primary); }
+        .page-btn.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+        .page-jump {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-left: 12px;
+        }
+
+        /* 标注圆点 */
+        .badge { display: inline-block; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 50%; background: var(--primary); color: #fff; font-size: 12px; line-height: 18px; text-align: center; font-weight: 600; box-shadow: 0 1px 3px rgba(26,120,255,0.3); }
+
+        /* 功能说明浮窗 */
+        .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 560px; max-width: 94vw; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 8px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 9999; padding: 24px; display: none; }
+        .f-modal.show { display: block; }
+        .f-modal .fm-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
+        .f-modal .fm-title:active { cursor: grabbing; }
+        .f-modal .fm-close { width: 28px; height: 28px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; color: #666; border: none; flex-shrink: 0; }
+        .f-modal .fm-close:hover { background: #e8e8e8; }
+        .f-modal .fm-body { font-size: 13px; color: #555; line-height: 1.8; }
+        .f-modal .fm-body h4 { font-size: 14px; font-weight: 600; color: var(--ink); margin: 16px 0 8px; }
+        .f-modal .fm-body h4:first-child { margin-top: 0; }
+        .f-modal .fm-body ul { padding-left: 18px; margin: 0 0 12px; }
+        .f-modal .fm-body li { margin-bottom: 4px; }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <!-- 侧边栏 -->
+    <div class="sidebar">
+        <div class="logo">
+            <div class="logo-icon">深</div>
+        </div>
+        <div class="menu">
+            <a class="menu-item" href="信息查看.html">
+                <span class="icon">📋</span><span>信息查看</span>
+            </a>
+            <a class="menu-item" href="产品管理.html">
+                <span class="icon">📦</span><span>我的产品</span>
+            </a>
+            <a class="menu-item" href="批发资金管理.html">
+                <span class="icon">💰</span><span>资金管理</span>
+            </a>
+            <a class="menu-item active" href="#">
+                <span class="icon">📊</span><span>分佣管理</span>
+            </a>
+            <a class="menu-item" href="#">
+                <span class="icon">📢</span><span>系统公告</span>
+            </a>
+            <a class="menu-item" href="#">
+                <span class="icon">🏷️</span><span>价值管理</span>
+            </a>
+            <a class="menu-item" href="#">
+                <span class="icon">🏭</span><span>仓库管理</span>
+            </a>
+            <a class="menu-item" href="#">
+                <span class="icon">📝</span><span>任务管理</span>
+            </a>
+            <div class="menu-group open">
+                <div class="menu-group-title" onclick="this.parentNode.classList.toggle('open')">
+                    <span class="icon">⚙️</span><span>系统管理</span><span class="arrow">▾</span>
+                </div>
+                <div class="submenu">
+                    <a href="用户管理.html">用户管理</a>
+                    <a href="角色管理.html">角色管理</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主体 -->
+    <div class="main">
+        <div class="topbar">
+            <div class="breadcrumb">
+                <span>首页</span><span class="sep">/</span><span class="active">分佣管理</span>
+            </div>
+            <div class="topbar-right">
+                <button class="btn-func" onclick="toggleFuncModal()">📖 功能说明</button>
+                <div class="user-chip">
+                    <span class="avatar">👤</span>
+                    <span class="name">批发商：Kevin Li</span>
+                    <span class="arrow">▾</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- 筛选区 -->
+            <div class="filter-bar">
+                <div class="filter-item">
+                    <span class="filter-label">产品名称</span>
+                    <input class="filter-input" placeholder="请输入产品名称">
+                </div>
+                <div class="filter-item">
+                    <span class="filter-label">订单编号</span>
+                    <input class="filter-input" placeholder="请输入订单编号">
+                </div>
+                <div class="filter-item">
+                    <span class="filter-label">分佣账号</span>
+                    <input class="filter-input" placeholder="请输入分佣账号">
+                </div>
+                <div class="filter-item">
+                    <span class="filter-label">买家账号</span>
+                    <input class="filter-input" placeholder="请输入买家账号">
+                </div>
+                <div class="filter-item">
+                    <span class="filter-label">卖家账号</span>
+                    <input class="filter-input" placeholder="请输入卖家账号">
+                </div>
+                <div class="filter-item">
+                    <span class="filter-label">时间范围</span>
+                    <input class="filter-date-input" placeholder="开始日期">
+                    <span class="filter-sep">至</span>
+                    <input class="filter-date-input" placeholder="结束日期">
+                </div>
+                <div class="filter-item">
+                    <span class="filter-label">分佣阶段</span>
+                    <select class="filter-select">
+                        <option>请选择</option>
+                        <option>批发市场</option>
+                        <option>零售市场</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <span class="filter-label">支付渠道</span>
+                    <select class="filter-select">
+                        <option>请选择</option>
+                        <option>汇付钱包</option>
+                    </select>
+                </div>
+                <div class="filter-actions">
+                    <button class="btn-search">🔍 搜 索</button>
+                    <button class="btn-reset">重 置</button>
+                    <button class="btn-export">导出数据</button>
+                </div>
+            </div>
+
+            <!-- 表格 -->
+            <div class="table-card">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>订单编号</th>
+                            <th>支付单号</th>
+                            <th>分佣账号</th>
+                            <th>买家账号</th>
+                            <th>卖家账号</th>
+                            <th>产品名称</th>
+                            <th>单价</th>
+                            <th>数量</th>
+                            <th>总价</th>
+                            <th>平台交易手续费</th>
+                            <th>分佣金额</th>
+                            <th>分佣阶段</th>
+                            <th>支付渠道</th>
+                            <th>创建时间 <span class="col-sort">⇅</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>XB-first26052505252698 01</td><td>20260525144513010 373000001190727</td><td>18227406306</td><td>19981465373</td><td></td><td>提前结案</td><td>2</td><td>31</td><td class="money">62</td><td>0</td><td class="money commission">1.86</td><td>批发市场</td><td>汇付钱包</td><td>2026-05-25 14:45:14</td></tr>
+                        <tr><td>XB-txbuy2604080526 5401</td><td>20260409000000010 373000001187002</td><td>18227406306</td><td>18227406306</td><td>19981465373</td><td>印度阿三</td><td>20</td><td>1</td><td class="money">20</td><td>0.60</td><td class="money commission">0.24</td><td>零售市场</td><td>汇付钱包</td><td>2026-04-09 00:00:01</td></tr>
+                        <tr><td>XB-first26040805751 101</td><td>20260408160404010 373000001186994</td><td>19981465373</td><td>18227406306</td><td></td><td>45发首发</td><td>2</td><td>20</td><td class="money">40</td><td>0</td><td class="money commission">1.20</td><td>批发市场</td><td>汇付钱包</td><td>2026-04-08 16:04:05</td></tr>
+                        <tr><td>XB-first26040805747 701</td><td>20260408160404010 373000001186993</td><td>19981465373</td><td>18227406306</td><td></td><td>45发首发</td><td>2</td><td>50</td><td class="money">100</td><td>0</td><td class="money commission">3.00</td><td>批发市场</td><td>汇付钱包</td><td>2026-04-08 16:04:04</td></tr>
+                        <tr><td>XB-first26040805745 201</td><td>20260408160403010 373000001186992</td><td>19981465373</td><td>18227406306</td><td></td><td>45发首发</td><td>2</td><td>10</td><td class="money">20</td><td>0</td><td class="money commission">0.60</td><td>批发市场</td><td>汇付钱包</td><td>2026-04-08 16:04:04</td></tr>
+                        <tr><td>XB-first26040805743 101</td><td>20260408160403010 373000001186991</td><td>19981465373</td><td>18227406306</td><td></td><td>45发首发</td><td>2</td><td>5</td><td class="money">10</td><td>0</td><td class="money commission">0.30</td><td>批发市场</td><td>汇付钱包</td><td>2026-04-08 16:04:03</td></tr>
+                        <tr><td>XB-first26040805742 001</td><td>20260408160402010 373000001186990</td><td>19981465373</td><td>18227406306</td><td></td><td>45发首发</td><td>2</td><td>4</td><td class="money">8</td><td>0</td><td class="money commission">0.24</td><td>批发市场</td><td>汇付钱包</td><td>2026-04-08 16:04:03</td></tr>
+                        <tr><td>XB-first26040805738 601</td><td>20260408160401010 373000001186989</td><td>18227406306</td><td>19981465373</td><td></td><td>45发首发</td><td>2</td><td>5</td><td class="money">10</td><td>0</td><td class="money commission">0.30</td><td>批发市场</td><td>汇付钱包</td><td>2026-04-08 16:04:02</td></tr>
+                        <tr><td>XB-first26040805736 901</td><td>20260408160401010 373000001186988</td><td>18227406306</td><td>19981465373</td><td></td><td>45发首发</td><td>2</td><td>4</td><td class="money">8</td><td>0</td><td class="money commission">0.24</td><td>批发市场</td><td>汇付钱包</td><td>2026-04-08 16:04:02</td></tr>
+                        <tr><td>XB-first26040305276 01</td><td>20260403150943010 37300000186943</td><td>19981465373</td><td>18227406306</td><td></td><td>首发文创</td><td>2</td><td>20</td><td class="money">40</td><td>0</td><td class="money commission">1.20</td><td>批发市场</td><td>汇付钱包</td><td>2026-04-03 15:09:44</td></tr>
+                    </tbody>
+                </table>
+
+                <div class="pagination">
+                    <span class="total">共 8387 条</span>
+                    <button class="page-btn">‹</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn">2</button>
+                    <button class="page-btn">3</button>
+                    <button class="page-btn">4</button>
+                    <button class="page-btn">5</button>
+                    <span style="color:#9ba6b9;">...</span>
+                    <button class="page-btn">839</button>
+                    <button class="page-btn">›</button>
+                    <div class="page-jump">10条/页</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ====== 功能说明浮窗 ====== -->
+<div class="f-modal" id="funcModal">
+  <div class="fm-title">
+    <span>📖 功能说明</span>
+    <button class="fm-close" onclick="toggleFuncModal()">✕</button>
+  </div>
+  <div style="font-size:13px;font-weight:600;color:#e67e22;margin:-6px 0 12px;">批发商 · 分佣管理</div>
+  <div class="fm-body">
+    <h4><span class="badge">1</span> <span style="vertical-align:middle;">分佣列表</span></h4>
+    <ul>
+      <li><b>列表字段</b>：订单编号、支付单号、分佣账号、买家账号、卖家账号、产品名称、单价、数量、总价、平台交易手续费、分佣金额、分佣阶段、支付渠道、创建时间</li>
+      <li><b>分佣阶段</b>：统一为"批发市场"和"零售市场"，决定不同的金额计算逻辑</li>
+      <li><b>支付渠道</b>：统一为汇付钱包</li>
+      <li><b>创建时间</b>：支持按创建时间排序查看</li>
+    </ul>
+    <h4><span class="badge">2</span> <span style="vertical-align:middle;">金额计算逻辑</span></h4>
+    <ul>
+      <li><b>总价</b> = 单价 × 数量</li>
+      <li><b>批发市场</b>：平台交易手续费 = 0，分佣金额 = 总价 × 3%</li>
+      <li><b>零售市场</b>：平台交易手续费 = 总价 × 3%，分佣金额 = 总价 × 1.2%</li>
+    </ul>
+    <h4><span class="badge">3</span> <span style="vertical-align:middle;">筛选查询</span></h4>
+    <ul>
+      <li><b>筛选条件</b>：产品名称、订单编号、分佣账号、买家账号、卖家账号、时间范围、分佣阶段、支付渠道</li>
+      <li><b>操作</b>：点击"🔍 搜索"按条件查询，点击"重置"清空筛选条件</li>
+      <li><b>导出数据</b>：将当前列表数据导出为文件</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+function toggleFuncModal() {
+  var el = document.getElementById('funcModal');
+  el.classList.toggle('show');
+  if (el.classList.contains('show') && !el.dataset.dragged) {
+    el.style.left = '50%'; el.style.top = '50%'; el.style.transform = 'translate(-50%,-50%)';
+  }
+}
+(function() {
+  var modal, titleBar, offX, offY, dragging = false;
+  document.addEventListener('DOMContentLoaded', function() {
+    modal = document.getElementById('funcModal');
+    titleBar = modal.querySelector('.fm-title');
+    titleBar.addEventListener('mousedown', startDrag);
+    titleBar.addEventListener('touchstart', startDragTouch, {passive:true});
+    document.addEventListener('mousemove', onDrag);
+    document.addEventListener('mouseup', endDrag);
+    document.addEventListener('touchmove', onDragTouch, {passive:true});
+    document.addEventListener('touchend', endDrag);
+  });
+  function startDrag(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = e.clientX - rect.left; offY = e.clientY - rect.top; dragging = true; titleBar.style.cursor = 'grabbing'; }
+  function startDragTouch(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; var t = e.touches[0]; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = t.clientX - rect.left; offY = t.clientY - rect.top; dragging = true; }
+  function onDrag(e) { if (!dragging) return; modal.style.left = (e.clientX - offX) + 'px'; modal.style.top = (e.clientY - offY) + 'px'; }
+  function onDragTouch(e) { if (!dragging) return; var t = e.touches[0]; modal.style.left = (t.clientX - offX) + 'px'; modal.style.top = (t.clientY - offY) + 'px'; }
+  function endDrag() { dragging = false; if (titleBar) titleBar.style.cursor = 'grab'; }
+})();
+</script>
+
+</body>
+</html>

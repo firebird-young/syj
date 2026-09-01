@@ -466,7 +466,10 @@
                             <td class="role-cell">系统管理员</td>
                             <td><span class="status-tag on">启用</span></td>
                             <td>2026-07-01 09:00:00</td>
-                            <td class="actions"><span class="locked">🔒 系统管理员记录不可编辑</span></td>
+                            <td class="actions">
+                                <a onclick="openPwd(this)">重置密码</a>
+                                <span class="locked">🔒 不可编辑</span>
+                            </td>
                         </tr>
                         <tr data-acc="kevin.li">
                             <td class="seq">2</td>
@@ -588,7 +591,15 @@
         <button class="md-close" onclick="closePwd()">✕</button>
     </div>
     <div class="pwd-info">
-        将重置用户 <b id="pwdUserName">-</b>（账号 <b id="pwdUserAcc">-</b>）的登录密码，重置后为初始密码，系统将通知用户。
+        正在为用户 <b id="pwdUserName">-</b>（账号 <b id="pwdUserAcc">-</b>）重置登录密码，请输入新密码。
+    </div>
+    <div class="fm-field">
+        <label>新密码 <span class="req">*</span></label>
+        <input type="password" id="pwdNewInput" placeholder="请输入新密码（6-20 位，区分大小写）">
+    </div>
+    <div class="fm-field">
+        <label>确认新密码 <span class="req">*</span></label>
+        <input type="password" id="pwdConfirmInput" placeholder="请再次输入新密码">
     </div>
     <div class="fm-actions">
         <button class="btn-cancel" onclick="closePwd()">取 消</button>
@@ -607,7 +618,7 @@
     <h4><span class="badge">1</span> <span style="vertical-align:middle;">用户列表</span></h4>
     <ul>
       <li>展示平台全部用户，支持按<b>用户账号</b>、<b>所属角色</b>筛选</li>
-      <li>第一条<b>系统管理员</b>（账号 13800138000）为<b>最高权限</b>账号，该记录<b>不可编辑、不可删除、不可停用</b></li>
+      <li>第一条<b>系统管理员</b>（账号 13800138000）为<b>最高权限</b>账号，该记录<b>不可编辑、不可删除、不可停用</b>，但可<b>重置密码</b></li>
     </ul>
     <h4><span class="badge">2</span> <span style="vertical-align:middle;">新建用户</span></h4>
     <ul>
@@ -622,7 +633,12 @@
     <h4><span class="badge">4</span> <span style="vertical-align:middle;">用户维护</span></h4>
     <ul>
       <li>支持<b>编辑</b>用户信息、<b>重置密码</b>、<b>启用/停用</b>、<b>删除</b></li>
-      <li>系统管理员记录上述操作全部不可用</li>
+      <li>系统管理员记录仅支持<b>重置密码</b>，编辑、停用、删除不可用</li>
+    </ul>
+    <h4><span class="badge">5</span> <span style="vertical-align:middle;">重置密码</span></h4>
+    <ul>
+      <li>点击「<b>重置密码</b>」弹窗输入<b>新密码</b>及<b>确认新密码</b>（6-20 位，区分大小写）</li>
+      <li>两次输入不一致或格式不合法将提示并阻止提交；确认后新密码立即生效</li>
     </ul>
   </div>
 </div>
@@ -720,6 +736,8 @@ function openPwd(el) {
     var tds = pwdRow.querySelectorAll('td');
     document.getElementById('pwdUserName').textContent = tds[2].textContent.trim();
     document.getElementById('pwdUserAcc').textContent = tds[1].textContent.replace('最高权限', '').trim();
+    document.getElementById('pwdNewInput').value = '';
+    document.getElementById('pwdConfirmInput').value = '';
     document.getElementById('pwdModal').classList.add('show');
     document.getElementById('pwdMask').classList.add('show');
 }
@@ -728,8 +746,13 @@ function closePwd() {
     document.getElementById('pwdMask').classList.remove('show');
 }
 function confirmPwd() {
+    var pwd = document.getElementById('pwdNewInput').value;
+    var pwd2 = document.getElementById('pwdConfirmInput').value;
+    if (!pwd) { alert('请输入新密码'); return; }
+    if (pwd.length < 6 || pwd.length > 20) { alert('新密码长度需为 6-20 位'); return; }
+    if (pwd !== pwd2) { alert('两次输入的密码不一致'); return; }
     closePwd();
-    alert('密码已重置为初始密码，并已通知用户');
+    alert('密码已重置，新密码已生效并通知用户');
 }
 
 /* 启用/停用 */

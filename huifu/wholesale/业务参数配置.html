@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>业务参数配置</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+            background: #f0f2f5;
+            color: #1a1a2e;
+            font-size: 14px;
+        }
+
+        .topbar {
+            background: #fff;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .topbar-left { display: flex; align-items: center; gap: 16px; }
+        .menu-btn {
+            width: 32px; height: 32px;
+            border: 1px solid #d0d5dd;
+            border-radius: 4px;
+            background: #fff;
+            color: #6b7588;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+        .menu-btn:hover { background: #f5f5f7; }
+        .breadcrumb { font-size: 13px; color: #6b7588; }
+        .breadcrumb .active { color: #1a1a2e; }
+        .topbar-right {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        .topbar-right .avatar {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            background: #f5deb3;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px;
+        }
+        .topbar-right .name { font-size: 13px; }
+        .topbar-right .arrow { color: #9ba6b9; font-size: 12px; }
+
+        /* 业务参数配置 */
+        .config-container {
+            max-width: 720px;
+            margin: 24px auto;
+            padding: 0 16px;
+        }
+        .config-card {
+            background: #fff;
+            border-radius: 8px;
+            padding: 28px 32px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        }
+        .config-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 20px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .config-row {
+            display: flex;
+            align-items: center;
+            padding: 18px 0;
+        }
+        .config-row + .config-row {
+            border-top: 1px dashed #f0f0f0;
+        }
+        .config-label {
+            width: 160px;
+            font-size: 14px;
+            color: #1a1a2e;
+            font-weight: 500;
+        }
+        .config-input-wrap {
+            flex: 1;
+            display: flex;
+            align-items: stretch;
+            border: 1px solid #d0d5dd;
+            border-radius: 4px;
+            overflow: hidden;
+            background: #fff;
+            max-width: 460px;
+        }
+        .config-input-wrap input {
+            flex: 1;
+            border: none;
+            outline: none;
+            padding: 10px 14px;
+            font-size: 14px;
+            color: #1a1a2e;
+            background: transparent;
+            font-family: inherit;
+        }
+        .config-input-wrap input::placeholder { color: #c0c8d4; }
+        .config-unit {
+            width: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f5f6f8;
+            color: #6b7588;
+            font-size: 14px;
+            border-left: 1px solid #e5e7eb;
+        }
+
+        .btn-primary {
+            background: #1a78ff;
+            color: #fff;
+            border: none;
+            padding: 8px 22px;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .btn-primary:hover { background: #0f6ae8; }
+
+        .footer-actions {
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid #f0f0f0;
+            text-align: right;
+        }
+
+        /* ── 功能说明浮窗 ── */
+        .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 540px; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 9999; padding: 24px; display: none; }
+        .f-modal.show { display: block; }
+        .f-modal .fm-title { font-size: 16px; font-weight: 600; color: #1a1a2e; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
+        .f-modal .fm-title:active { cursor: grabbing; }
+        .f-modal .fm-close { width: 28px; height: 28px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; color: #666; border: none; flex-shrink: 0; }
+        .f-modal .fm-close:hover { background: #e8e8e8; }
+        .f-modal .fm-body { font-size: 13px; color: #555; line-height: 1.8; }
+        .f-modal .fm-body h4 { font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 16px 0 8px; }
+        .f-modal .fm-body h4:first-child { margin-top: 0; }
+        .f-modal .fm-body ul { padding-left: 18px; margin: 0 0 12px; }
+        .f-modal .fm-body li { margin-bottom: 4px; }
+    </style>
+</head>
+<body>
+
+<div class="topbar">
+    <div class="topbar-left">
+        <button class="menu-btn">≡</button>
+        <div class="breadcrumb">
+            <span>首页</span> /
+            <span class="active">业务参数配置</span>
+        </div>
+    </div>
+    <div class="topbar-right">
+        <button onclick="toggleFuncModal()" style="margin-right:12px;padding:6px 14px;border-radius:6px;background:#f5f7fa;color:#333;border:1px solid #e0e4ea;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:4px;">📖 功能说明</button>
+        <span class="avatar">👤</span>
+        <span class="name">系统参数设置</span>
+        <span class="arrow">▾</span>
+    </div>
+</div>
+
+<div class="config-container">
+    <div class="config-card">
+        <div class="config-title">返佣比例设置</div>
+
+        <div class="config-row">
+            <div class="config-label">批发市场返佣比例</div>
+            <div class="config-input-wrap">
+                <input type="number" id="rateWholesale" value="3" placeholder="请输入返佣比例" min="0" max="100" step="1">
+                <div class="config-unit">%</div>
+            </div>
+        </div>
+
+        <div class="config-row">
+            <div class="config-label">零售市场返佣比例</div>
+            <div class="config-input-wrap">
+                <input type="number" id="rateRetail" value="100" placeholder="请输入返佣比例" min="0" max="100" step="1">
+                <div class="config-unit">%</div>
+            </div>
+        </div>
+
+        <div class="footer-actions">
+            <button class="btn-primary" onclick="saveConfig()">保存</button>
+        </div>
+    </div>
+</div>
+
+<script>
+function saveConfig() {
+    var w = document.getElementById('rateWholesale').value;
+    var r = document.getElementById('rateRetail').value;
+    if (w === '' || r === '') {
+        alert('请填写完整的返佣比例');
+        return;
+    }
+    if (parseFloat(w) < 0 || parseFloat(w) > 100 || parseFloat(r) < 0 || parseFloat(r) > 100) {
+        alert('返佣比例需在 0~100 之间');
+        return;
+    }
+    alert('保存成功\n批发市场返佣比例：' + w + '%\n零售市场返佣比例：' + r + '%');
+}
+</script>
+
+<!-- ====== 功能说明浮窗 ====== -->
+<div class="f-modal" id="funcModal">
+  <div class="fm-title">
+    <span>📖 功能说明</span>
+    <button class="fm-close" onclick="toggleFuncModal()">✕</button>
+  </div>
+  <div style="font-size:13px;font-weight:600;color:#e74c5e;margin:-6px 0 12px;">平台、服务商后台</div>
+  <div class="fm-body">
+    <p style="margin:0 0 12px;color:#666">分佣比例配置功能：去掉之前由平台统一配置批发市场和零售市场返佣的业务逻辑，改为由服务商自己来配置。该配置只对服务商下面所有代理的产品生效。</p>
+    <h4>一、入口</h4>
+    <ul>
+      <li>服务商后台新增<b>业务参数配置</b>页面</li>
+    </ul>
+    <h4>二、配置参数</h4>
+    <ul>
+      <li><b>批发市场返佣比例</b>：默认 3%，可以调整，0-20%</li>
+      <li><b>零售市场返佣比例</b>：默认 100%，可调整，0-100%</li>
+    </ul>
+    <h4>三、老系统修改</h4>
+    <ul>
+      <li>去掉 admin 的业务参数配置里的<b>批发市场返佣比例</b>、<b>零售市场返佣比例</b></li>
+    </ul>
+  </div>
+</div>
+
+<script>
+function toggleFuncModal() {
+  var el = document.getElementById('funcModal');
+  el.classList.toggle('show');
+  if (el.classList.contains('show') && !el.dataset.dragged) {
+    el.style.left = '50%'; el.style.top = '50%'; el.style.transform = 'translate(-50%,-50%)';
+  }
+}
+(function() {
+  var modal, titleBar, offX, offY, dragging = false;
+  document.addEventListener('DOMContentLoaded', function() {
+    modal = document.getElementById('funcModal');
+    titleBar = modal.querySelector('.fm-title');
+    titleBar.addEventListener('mousedown', startDrag);
+    titleBar.addEventListener('touchstart', startDragTouch, {passive:true});
+    document.addEventListener('mousemove', onDrag);
+    document.addEventListener('mouseup', endDrag);
+    document.addEventListener('touchmove', onDragTouch, {passive:true});
+    document.addEventListener('touchend', endDrag);
+  });
+  function startDrag(e) { modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = e.clientX - rect.left; offY = e.clientY - rect.top; dragging = true; titleBar.style.cursor = 'grabbing'; }
+  function startDragTouch(e) { var t = e.touches[0]; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = t.clientX - rect.left; offY = t.clientY - rect.top; dragging = true; }
+  function onDrag(e) { if (!dragging) return; modal.style.left = (e.clientX - offX) + 'px'; modal.style.top = (e.clientY - offY) + 'px'; }
+  function onDragTouch(e) { if (!dragging) return; var t = e.touches[0]; modal.style.left = (t.clientX - offX) + 'px'; modal.style.top = (t.clientY - offY) + 'px'; }
+  function endDrag() { dragging = false; if (titleBar) titleBar.style.cursor = 'grab'; }
+})();
+</script>
+
+</body>
+</html>

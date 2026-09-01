@@ -5,58 +5,76 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>批发市场分账申请</title>
 <style>
+    :root{
+      --primary:#1a78ff;--primary-hover:#0f6ae8;--primary-bg:#e6f4ff;
+      --brand:#e74c3e;--danger:#e74c5e;
+      --page-bg:#f0f2f5;--card-bg:#fff;--info-bg:#f5f7fa;
+      --ink:#1a1a2e;--ink-muted:#4e5a6e;--ink-subtle:#6b7588;--ink-faint:#9ba6b9;
+      --border:#d0d5dd;--border-light:#f0f0f0;
+      --radius-sm:4px;--radius-md:6px;
+      --font:"-apple-system","BlinkMacSystemFont","PingFang SC","Microsoft YaHei","Helvetica Neue",sans-serif;
+    }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-        font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
-        background: #f2f3f7;
-        color: #1a1a2e;
+        font-family: var(--font);
+        background: var(--page-bg);
+        color: var(--ink);
+        font-size: 14px;
+        min-height: 100vh;
     }
 
-    /* 顶栏 */
+    /* 顶栏（白底企业风，无侧边栏） */
     .topbar {
         height: 56px;
-        background: #1a1a2e;
+        background: #fff;
+        border-bottom: 1px solid var(--border-light);
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 0 20px;
-        color: #fff;
+        padding: 0 24px;
     }
-    .topbar-left { display: flex; align-items: center; gap: 16px; }
-    .topbar-left .logo { font-size: 16px; font-weight: 600; }
-    .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #9ba6b9; }
-    .breadcrumb .sep { color: #5a6276; }
-    .breadcrumb .cur { color: #fff; }
-    .topbar-right { display: flex; align-items: center; gap: 10px; }
-    .avatar {
-        width: 30px; height: 30px; border-radius: 50%;
-        background: #2f3550; display: flex; align-items: center; justify-content: center;
-        font-size: 14px;
+    .topbar-left { display: flex; align-items: center; gap: 14px; min-width: 0; }
+    .logo-icon {
+        width: 28px; height: 28px; background: var(--brand); border-radius: 4px;
+        color: #fff; display: flex; align-items: center; justify-content: center;
+        font-weight: 700; font-size: 14px; flex-shrink: 0;
     }
-    .name { font-size: 13px; }
-    .arrow { color: #9ba6b9; font-size: 12px; }
+    .logo-text { font-size: 16px; font-weight: 600; color: var(--ink); white-space: nowrap; }
+    .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink-subtle); white-space: nowrap; overflow: hidden; }
+    .breadcrumb .sep { color: #c0c8d4; }
+    .breadcrumb .active { color: var(--ink); font-weight: 500; }
+    .topbar-right { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+    .btn-func {
+        padding: 6px 14px; border-radius: 6px; background: #f5f7fa; color: #333;
+        border: 1px solid #e0e4ea; font-size: 13px; font-weight: 500; cursor: pointer;
+        white-space: nowrap; display: inline-flex; align-items: center; gap: 4px; font-family: inherit;
+    }
+    .btn-func:hover { border-color: var(--primary); color: var(--primary); }
+    .user-chip { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+    .user-chip .avatar {
+        width: 30px; height: 30px; border-radius: 50%; background: #f5deb3;
+        display: flex; align-items: center; justify-content: center; font-size: 15px;
+    }
+    .user-chip .name { font-size: 13px; color: var(--ink); }
+    .user-chip .arrow { color: var(--ink-faint); font-size: 12px; }
 
-    .container { max-width: 1200px; margin: 0 auto; padding: 20px 24px 40px; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 12px 24px 40px; }
 
-    /* 产品信息卡片 */
-    .card {
-        background: #fff;
-        border-radius: 8px;
-        padding: 20px;
-    }
-    .card-head {
-        font-size: 15px;
-        font-weight: 600;
-        color: #1a1a2e;
-        margin-bottom: 16px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-    .card-head .dot { width: 4px; height: 14px; border-radius: 2px; background: #1a78ff; }
+    /* 返回产品管理 */
+    .back-bar { padding: 8px 0 4px; }
+    .back-link { font-size: 13px; color: var(--primary); text-decoration: none; cursor: pointer; }
+    .back-link:hover { text-decoration: underline; }
+
+    /* 信息区块 */
+    .section { background: var(--card-bg); border-radius: var(--radius-md); margin-bottom: 12px; overflow: hidden; }
+    .section-title { background: var(--primary); color: #fff; padding: 12px 20px; font-size: 14px; font-weight: 600; display: flex; align-items: center; justify-content: space-between; }
+    .section-title .count { font-size: 12px; font-weight: 400; color: rgba(255,255,255,0.9); background: rgba(255,255,255,0.18); padding: 2px 10px; border-radius: 10px; }
+    .section-body { padding: 20px; }
+
+    /* 产品主信息 */
     .prod-main { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
     .product-img {
-        width: 52px; height: 52px; border-radius: 8px; flex-shrink: 0;
+        width: 52px; height: 52px; border-radius: var(--radius-md); flex-shrink: 0;
         display: flex; align-items: center; justify-content: center;
         color: #fff; font-size: 24px; font-weight: 600;
     }
@@ -67,41 +85,41 @@
     .product-img.img5 { background: linear-gradient(135deg, #5c7a4e, #a3c28f); }
     .product-img.img6 { background: linear-gradient(135deg, #8e5a4e, #d8a79c); }
     .prod-name { font-size: 18px; font-weight: 600; }
+    .prod-src { font-size: 12px; color: var(--ink-faint); margin-top: 4px; }
 
+    /* 信息卡片网格 */
     .info-grid {
         display: grid;
         grid-template-columns: repeat(5, 1fr);
         gap: 12px;
-        background: #f7f8fa;
-        border-radius: 8px;
-        padding: 16px 20px;
     }
-    .info-item .label { font-size: 12px; color: #86909c; margin-bottom: 8px; }
-    .info-item .val { font-size: 16px; font-weight: 600; color: #1a1a2e; }
-    .info-item .val.total { color: #e67e22; }
-    .info-item .val.fee { color: #e74c5e; }
-    .info-item .calc { font-size: 12px; color: #9ba6b9; font-weight: 400; margin-top: 4px; }
+    .info-card { background: var(--info-bg); border-radius: var(--radius-md); padding: 14px 16px; min-height: 80px; }
+    .info-card .label { font-size: 12px; color: var(--ink-subtle); margin-bottom: 8px; }
+    .info-card .value { font-size: 16px; font-weight: 600; color: var(--ink); word-break: break-all; }
+    .info-card .value.total { color: #e67e22; }
+    .info-card .value.fee { color: var(--brand); }
+    .info-card .calc { font-size: 12px; color: var(--ink-faint); font-weight: 400; margin-top: 6px; line-height: 1.5; }
 
     /* 分账金额 */
-    .split-card { display: flex; gap: 16px; margin-top: 16px; }
+    .split-card { display: flex; gap: 12px; margin-top: 12px; }
     .split-box {
         flex: 1;
-        background: #fff;
-        border-radius: 8px;
+        background: var(--card-bg);
+        border-radius: var(--radius-md);
         padding: 20px;
-        border-top: 3px solid #1a78ff;
+        border-top: 3px solid var(--primary);
     }
     .split-box.service { border-top-color: #e67e22; }
-    .split-label { font-size: 13px; color: #4e5a6e; }
+    .split-label { font-size: 13px; color: var(--ink-muted); }
     .split-val { font-size: 26px; font-weight: 700; margin: 10px 0 6px; }
-    .split-box.wholesale .split-val { color: #1a78ff; }
+    .split-box.wholesale .split-val { color: var(--primary); }
     .split-box.service .split-val { color: #e67e22; }
-    .split-calc { font-size: 12px; color: #9ba6b9; }
+    .split-calc { font-size: 12px; color: var(--ink-faint); }
 
     .split-action {
         width: 220px;
-        background: #fff;
-        border-radius: 8px;
+        background: var(--card-bg);
+        border-radius: var(--radius-md);
         padding: 20px;
         display: flex;
         flex-direction: column;
@@ -110,50 +128,41 @@
         gap: 10px;
     }
     .btn-submit {
-        background: #1a78ff;
+        background: var(--primary);
         color: #fff;
         border: none;
         height: 40px;
         padding: 0 32px;
-        border-radius: 6px;
+        border-radius: var(--radius-sm);
         font-size: 14px;
+        font-weight: 500;
         cursor: pointer;
     }
-    .btn-submit:hover { background: #0f6ae8; }
-    .split-action .hint { font-size: 12px; color: #9ba6b9; text-align: center; line-height: 1.5; }
+    .btn-submit:hover { background: var(--primary-hover); }
+    .split-action .hint { font-size: 12px; color: var(--ink-faint); text-align: center; line-height: 1.5; }
 
-    /* 申请记录 */
-    .table-card { background: #fff; border-radius: 8px; margin-top: 16px; overflow: hidden; }
-    .table-title {
-        padding: 16px 20px;
-        font-size: 15px;
-        font-weight: 600;
-        border-bottom: 1px solid #f0f0f0;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    .table-title .count { font-size: 12px; font-weight: 400; color: #86909c; }
-    table { width: 100%; border-collapse: collapse; }
-    th {
+    /* 申请记录表格 */
+    .table { width: 100%; border-collapse: collapse; }
+    .table th {
         background: #fafbfc;
         text-align: left;
-        padding: 11px 14px;
-        font-size: 12px;
-        color: #4e5a6e;
+        padding: 12px 14px;
+        font-size: 13px;
+        color: var(--ink-muted);
         font-weight: 500;
-        border-bottom: 1px solid #f0f0f0;
+        border-bottom: 1px solid var(--border-light);
         white-space: nowrap;
     }
-    td {
+    .table td {
         padding: 13px 14px;
         font-size: 13px;
-        color: #1a1a2e;
+        color: var(--ink);
         border-bottom: 1px solid #f5f5f7;
     }
-    tr:last-child td { border-bottom: none; }
+    .table tr:last-child td { border-bottom: none; }
     .money { font-weight: 600; }
-    .money.ws { color: #1a78ff; }
+    .money.fee { color: var(--brand); }
+    .money.ws { color: var(--primary); }
     .money.sv { color: #e67e22; }
 
     .status-tag {
@@ -163,10 +172,10 @@
         font-size: 12px;
         line-height: 1.4;
     }
-    .status-tag.pending { background: #e6f4ff; color: #1a78ff; }
+    .status-tag.pending { background: var(--primary-bg); color: var(--primary); }
     .status-tag.approved { background: #e6f7eb; color: #1aab67; }
 
-    .empty { text-align: center; color: #9ba6b9; padding: 40px 0; font-size: 13px; }
+    .empty { text-align: center; color: var(--ink-faint); padding: 40px 0; font-size: 13px; }
 
     /* 提示浮层 */
     .toast {
@@ -187,72 +196,85 @@
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
     /* 功能说明浮窗 */
-    .badge { display: inline-block; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 50%; background: #ff2d55; color: #fff; font-size: 12px; line-height: 18px; text-align: center; font-weight: 600; box-shadow: 0 1px 3px rgba(255,45,85,0.3); }
-    .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 540px; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 9999; padding: 24px; display: none; }
+    .badge { display: inline-block; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 50%; background: var(--primary); color: #fff; font-size: 12px; line-height: 18px; text-align: center; font-weight: 600; box-shadow: 0 1px 3px rgba(26,120,255,0.3); }
+    .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 540px; max-width: 94vw; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 8px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 9999; padding: 24px; display: none; }
     .f-modal.show { display: block; }
     .f-modal .fm-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
     .f-modal .fm-title:active { cursor: grabbing; }
     .f-modal .fm-close { width: 28px; height: 28px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; color: #666; border: none; flex-shrink: 0; }
     .f-modal .fm-body { font-size: 13px; color: #555; line-height: 1.8; }
-    .f-modal .fm-body h4 { font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 16px 0 8px; }
+    .f-modal .fm-body h4 { font-size: 14px; font-weight: 600; color: var(--ink); margin: 16px 0 8px; }
     .f-modal .fm-body h4:first-child { margin-top: 0; }
     .f-modal .fm-body ul { padding-left: 18px; margin: 0 0 12px; }
     .f-modal .fm-body li { margin-bottom: 4px; }
+
+    @media (max-width: 1100px) { .info-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 800px)  { .info-grid { grid-template-columns: repeat(2, 1fr); } .split-card { flex-direction: column; } .split-action { width: 100%; } }
 </style>
 </head>
 <body>
 
 <div class="topbar">
     <div class="topbar-left">
-        <span class="logo">⬡ 深艺交 · 批发商工作台</span>
+        <span class="logo-icon">深</span>
+        <span class="logo-text">深艺交 · 批发商工作台</span>
         <div class="breadcrumb">
             <span>首页</span><span class="sep">/</span>
             <span>产品管理</span><span class="sep">/</span>
-            <span class="cur">批发市场分账申请</span>
+            <span class="active">批发市场分账申请</span>
         </div>
     </div>
     <div class="topbar-right">
-        <button onclick="toggleFuncModal()" style="margin-right:12px;padding:6px 14px;border-radius:6px;background:#f5f7fa;color:#333;border:1px solid #e0e4ea;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:4px;">📖 功能说明</button>
-        <span class="avatar">👤</span>
-        <span class="name">批发商：李文轩</span>
-        <span class="arrow">▾</span>
+        <button class="btn-func" onclick="toggleFuncModal()">📖 功能说明</button>
+        <div class="user-chip">
+            <span class="avatar">👤</span>
+            <span class="name">批发商：李文轩</span>
+            <span class="arrow">▾</span>
+        </div>
     </div>
 </div>
 
 <div class="container">
 
+    <!-- 返回产品管理 -->
+    <div class="back-bar">
+        <a class="back-link" href="javascript:history.back()">← 返回产品管理</a>
+    </div>
+
     <!-- 本次分账申请 -->
-    <div class="card">
-        <div class="card-head"><span class="dot"></span>本次分账申请</div>
-        <div class="prod-main">
-            <div class="product-img" id="prodImg">品</div>
-            <div>
-                <div class="prod-name" id="prodName">-</div>
-                <div style="font-size:12px;color:#86909c;margin-top:4px;">来源：产品管理「批发分账申请」</div>
+    <div class="section">
+        <div class="section-title">本次分账申请</div>
+        <div class="section-body">
+            <div class="prod-main">
+                <div class="product-img" id="prodImg">品</div>
+                <div>
+                    <div class="prod-name" id="prodName">-</div>
+                    <div class="prod-src">来源：产品管理「批发分账申请」</div>
+                </div>
             </div>
-        </div>
-        <div class="info-grid">
-            <div class="info-item">
-                <div class="label">批发单价</div>
-                <div class="val" id="unitPrice">-</div>
-            </div>
-            <div class="info-item">
-                <div class="label">批发总数量</div>
-                <div class="val" id="totalQty">-</div>
-            </div>
-            <div class="info-item">
-                <div class="label">批发实际销售数量</div>
-                <div class="val" id="soldQty">-</div>
-            </div>
-            <div class="info-item">
-                <div class="label">批发总金额</div>
-                <div class="val total" id="totalAmt">-</div>
-                <div class="calc">批发单价 × 批发实际销售数量</div>
-            </div>
-            <div class="info-item">
-                <div class="label">第三方支付手续费</div>
-                <div class="val fee" id="feeAmt">-</div>
-                <div class="calc">批发总金额 × 0.6%</div>
+            <div class="info-grid">
+                <div class="info-card">
+                    <div class="label">批发单价</div>
+                    <div class="value" id="unitPrice">-</div>
+                </div>
+                <div class="info-card">
+                    <div class="label">批发总数量</div>
+                    <div class="value" id="totalQty">-</div>
+                </div>
+                <div class="info-card">
+                    <div class="label">批发实际销售数量</div>
+                    <div class="value" id="soldQty">-</div>
+                </div>
+                <div class="info-card">
+                    <div class="label">批发总金额</div>
+                    <div class="value total" id="totalAmt">-</div>
+                    <div class="calc">批发单价 × 批发实际销售数量</div>
+                </div>
+                <div class="info-card">
+                    <div class="label">第三方支付手续费</div>
+                    <div class="value fee" id="feeAmt">-</div>
+                    <div class="calc">批发总金额 × 0.6%</div>
+                </div>
             </div>
         </div>
     </div>
@@ -260,12 +282,12 @@
     <!-- 分账金额计算 -->
     <div class="split-card">
         <div class="split-box wholesale">
-            <div class="split-label">批发商金额</div>
+            <div class="split-label">批发分账金额</div>
             <div class="split-val" id="wsAmt">-</div>
             <div class="split-calc">= 批发总金额 × 25% − 第三方支付手续费</div>
         </div>
         <div class="split-box service">
-            <div class="split-label">服务商金额</div>
+            <div class="split-label">运营服务费金额</div>
             <div class="split-val" id="svAmt">-</div>
             <div class="split-calc">= 批发总金额 × 20%</div>
         </div>
@@ -276,20 +298,20 @@
     </div>
 
     <!-- 申请记录 -->
-    <div class="table-card">
-        <div class="table-title">
+    <div class="section">
+        <div class="section-title">
             <span>申请记录</span>
             <span class="count" id="recCount">共 3 条</span>
         </div>
-        <table>
+        <table class="table">
             <thead>
                 <tr>
                     <th>申请单号</th>
                     <th>产品名称</th>
                     <th>批发总金额</th>
                     <th>第三方支付手续费</th>
-                    <th>批发商金额</th>
-                    <th>服务商金额</th>
+                    <th>批发分账金额</th>
+                    <th>运营服务费金额</th>
                     <th>申请时间</th>
                     <th>状态</th>
                 </tr>
@@ -317,8 +339,8 @@
     <ul>
       <li><b>批发总金额</b> = 批发单价 × 批发实际销售数量</li>
       <li><b>第三方支付手续费</b> = 批发总金额 × 0.6%</li>
-      <li><b>批发商金额</b> = 批发总金额 × 25% − 第三方支付手续费</li>
-      <li><b>服务商金额</b> = 批发总金额 × 20%</li>
+      <li><b>批发分账金额</b> = 批发总金额 × 25% − 第三方支付手续费</li>
+      <li><b>运营服务费金额</b> = 批发总金额 × 20%</li>
     </ul>
     <h4><span class="badge">3</span> <span style="vertical-align:middle;">提交申请</span></h4>
     <ul>
@@ -348,8 +370,8 @@
     // ===== 金额计算 =====
     var total = price * sold;               // 批发总金额
     var fee = total * 0.006;                // 第三方支付手续费 = 总金额 × 0.6%
-    var wsAmt = total * 0.25 - fee;         // 批发商金额 = 总金额 × 25% − 手续费
-    var svAmt = total * 0.20;               // 服务商金额 = 总金额 × 20%
+    var wsAmt = total * 0.25 - fee;         // 批发分账金额 = 总金额 × 25% − 手续费
+    var svAmt = total * 0.20;               // 运营服务费金额 = 总金额 × 20%
 
     function fmt(n) {
         return '¥' + n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -387,7 +409,7 @@
                 '<td>' + r.no + '</td>' +
                 '<td>' + r.prod + '</td>' +
                 '<td class="money">' + r.total + '</td>' +
-                '<td class="money" style="color:#e74c5e;">' + r.fee + '</td>' +
+                '<td class="money fee">' + r.fee + '</td>' +
                 '<td class="money ws">' + r.ws + '</td>' +
                 '<td class="money sv">' + r.sv + '</td>' +
                 '<td>' + r.time + '</td>' +

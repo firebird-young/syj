@@ -16,10 +16,10 @@
         .app-container {
             max-width: 430px;
             margin: 0 auto;
-            background: #f0f2f5;
+            background: #f5f5f5;
             min-height: 100vh;
             position: relative;
-            padding-bottom: 24px;
+            padding-bottom: 40px;
             box-shadow: 0 0 20px rgba(0,0,0,0.06);
         }
 
@@ -31,9 +31,7 @@
             align-items: center;
             justify-content: center;
             position: relative;
-            font-size: 16px;
-            font-weight: 500;
-            color: #1a1a2e;
+            border-bottom: 1px solid #f0f0f0;
         }
         .header .back {
             position: absolute;
@@ -45,53 +43,50 @@
             cursor: pointer;
             padding: 4px 8px;
         }
-
-        /* 持有产品列表 */
-        .list-card {
-            background: #fff;
-            margin: 10px 12px 0;
-            border-radius: 12px;
-            padding: 0;
-            overflow: hidden;
-        }
-        .list-title {
+        .header-title {
             font-size: 15px;
             font-weight: 600;
             color: #1a1a2e;
-            padding: 14px 16px 10px;
-            border-bottom: 1px solid #f5f5f7;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            max-width: 280px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
-        .list-title .count {
-            font-size: 12px;
-            color: #86909c;
-            font-weight: 400;
-            background: #f5f7fa;
-            padding: 2px 8px;
+
+        /* 持有详情列表 */
+        .list-card {
+            background: #fff;
+            margin: 10px 12px 0;
             border-radius: 10px;
+            overflow: hidden;
         }
+        .list-title {
+            padding: 12px 14px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a2e;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #f5f5f7;
+        }
+        .list-title .count { font-size: 12px; font-weight: 400; color: #86909c; }
         .product-row {
             display: flex;
             gap: 12px;
             align-items: center;
-            padding: 14px 16px;
+            padding: 14px;
             border-bottom: 1px solid #f5f5f7;
-            position: relative;
             cursor: pointer;
         }
         .product-row:last-child { border-bottom: none; }
         .product-row:active { background: #fafbfc; }
         .pr-img {
-            width: 72px;
-            height: 72px;
-            border-radius: 10px;
-            background: #fafbfc;
+            width: 64px;
+            height: 64px;
+            border-radius: 8px;
+            background: #f5f7fa;
             flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             overflow: hidden;
         }
         .pr-img img {
@@ -112,10 +107,10 @@
         }
         .pr-code {
             font-size: 11px;
-            color: #e74c5e;
+            color: #1a78ff;
             font-weight: 600;
-            background: #fff0f1;
-            border: 1px solid #ffd5d9;
+            background: #e6f4ff;
+            border: 1px solid #b7dcff;
             padding: 2px 8px;
             border-radius: 4px;
         }
@@ -127,24 +122,22 @@
         .pr-meta .pr-price {
             color: #e74c5e;
             font-weight: 700;
-            font-size: 18px;
+            font-size: 16px;
             margin-left: 4px;
         }
-        .pr-time {
-            font-size: 11px;
-            color: #86909c;
-        }
+        .pr-time { font-size: 11px; color: #86909c; }
         .pr-arrow {
             flex-shrink: 0;
             color: #e74c5e;
-            background: #fff0f1;
+            background: #fff;
             border: 1px solid #e74c5e;
             font-size: 13px;
             font-weight: 500;
-            padding: 6px 16px;
-            border-radius: 16px;
+            padding: 6px 18px;
+            border-radius: 17px;
             cursor: pointer;
         }
+        .pr-arrow:active { background: #fdecee; }
         /* 标注圆点 */
         .badge {
             display: inline-block;
@@ -172,8 +165,7 @@
         .sheet-overlay {
             position: absolute;
             inset: 0;
-            background: rgba(0,0,0,0.5);
-            animation: fadeIn .2s ease;
+            background: rgba(0,0,0,0.4);
         }
         .sheet-body {
             position: absolute;
@@ -184,13 +176,15 @@
             max-width: 430px;
             background: #fff;
             border-radius: 16px 16px 0 0;
-            padding: 14px 16px 20px;
-            max-height: 88vh;
+            padding: 16px 16px calc(20px + env(safe-area-inset-bottom));
+            max-height: 90vh;
             overflow-y: auto;
             animation: slideUp .25s ease;
         }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideUp { from { transform: translate(-50%, 100%); } to { transform: translate(-50%, 0); } }
+        @keyframes slideUp {
+            from { transform: translateX(-50%) translateY(100%); }
+            to { transform: translateX(-50%) translateY(0); }
+        }
 
         .sheet-title {
             display: flex;
@@ -200,7 +194,8 @@
             font-weight: 600;
             color: #1a1a2e;
             padding-bottom: 12px;
-            border-bottom: 1px solid #f0f0f5;
+            border-bottom: 1px solid #f0f0f0;
+            margin-bottom: 4px;
         }
         .sheet-title .btn-cancel {
             background: none;
@@ -217,7 +212,6 @@
             gap: 12px;
             padding: 14px 0;
             border-bottom: 1px solid #f0f0f5;
-            position: relative;
         }
         .sp-img {
             width: 48px;
@@ -243,10 +237,7 @@
             color: #1a1a2e;
             margin-bottom: 4px;
         }
-        .sp-code {
-            font-size: 12px;
-            color: #86909c;
-        }
+        .sp-code { font-size: 12px; color: #9ba6b9; }
         .sell-row {
             display: flex;
             align-items: center;
@@ -254,19 +245,13 @@
             padding: 12px 0;
             border-bottom: 1px solid #f0f0f5;
         }
-        .sr-label {
-            font-size: 14px;
-            color: #1a1a2e;
-        }
+        .sr-label { font-size: 14px; color: #1a1a2e; }
         .sr-right {
             display: flex;
             align-items: center;
             gap: 6px;
         }
-        .sr-yen {
-            color: #e74c5e;
-            font-size: 14px;
-        }
+        .sr-yen { color: #e74c5e; font-size: 14px; }
         .sr-right input {
             border: none;
             background: transparent;
@@ -280,15 +265,15 @@
         .sr-right input::placeholder { color: #c0c8d4; }
         .sr-unit {
             font-size: 13px;
-            color: #86909c;
+            color: #9ba6b9;
             margin-left: 2px;
         }
         .sr-range {
             font-size: 12px;
-            color: #e74c5e;
+            color: #1a78ff;
             padding: 0 0 12px;
             margin-top: -6px;
-            border-bottom: 1px solid #f0f0f5;
+            border-bottom: 1px solid #f0f0f0;
         }
 
         .sell-actual {
@@ -309,7 +294,7 @@
         }
         .sa-tip {
             font-size: 11px;
-            color: #86909c;
+            color: #9ba6b9;
         }
 
         /* 结算渠道 */
@@ -331,9 +316,7 @@
             border-radius: 8px;
             position: relative;
         }
-        .channel-item.selected {
-            border-color: #e74c5e;
-        }
+        .channel-item.selected { border-color: #1a78ff; }
         .channel-logo {
             width: 32px;
             height: 32px;
@@ -347,10 +330,7 @@
             font-weight: 600;
             flex-shrink: 0;
         }
-        .channel-name {
-            font-size: 14px;
-            color: #1a1a2e;
-        }
+        .channel-name { font-size: 14px; color: #1a1a2e; }
         .channel-status {
             margin-left: auto;
             font-size: 13px;
@@ -362,7 +342,7 @@
             bottom: -1px;
             width: 20px;
             height: 20px;
-            background: #e74c5e;
+            background: #1a78ff;
             color: #fff;
             border-radius: 50% 0 6px 0;
             display: flex;
@@ -386,10 +366,7 @@
             accent-color: #e74c5e;
             cursor: pointer;
         }
-        .link-red {
-            color: #e74c5e;
-            cursor: pointer;
-        }
+        .link-red { color: #e74c5e; cursor: pointer; }
 
         .btn-submit {
             width: 100%;
@@ -401,8 +378,10 @@
             font-size: 15px;
             font-weight: 600;
             cursor: pointer;
-            margin-top: 10px;
+            margin-top: 14px;
+            font-family: inherit;
         }
+        .btn-submit:active { background: #d43d4e; }
         .btn-submit:disabled {
             background: #ffb8c0;
             cursor: not-allowed;
@@ -428,7 +407,7 @@
 
     <div class="header">
         <span class="back">‹</span>
-        永淳·夏日帖
+        <span class="header-title">零售市场寄售 · 永淳·夏日帖</span>
     </div>
 
     <!-- 持有详情列表 -->
@@ -488,7 +467,7 @@
 
 </div>
 
-<!-- ====== 出售数字资产 弹窗 ====== -->
+<!-- ====== 出售数字资产 弹窗（底部 sheet） ====== -->
 <div class="sell-sheet" id="sellSheet">
   <div class="sheet-overlay" onclick="closeSellModal()"></div>
   <div class="sheet-body">
@@ -628,7 +607,6 @@ function submitSell() {
     <h4><span class="badge">3</span> <span style="vertical-align:middle;">结算渠道</span></h4>
     <ul>
       <li>当前<b>只展示汇付钱包</b>，已开通默认选中</li>
-      <li>样式参考原零售市场寄售页面</li>
     </ul>
     <h4><span class="badge">4</span> <span style="vertical-align:middle;">实际所得</span></h4>
     <ul>

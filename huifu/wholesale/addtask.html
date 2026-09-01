@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新增任务</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            background: #f6f8fc;
+            padding: 30px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.02);
+            padding: 44px 52px;
+            width: 880px;
+        }
+
+        .page-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 28px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #edf0f5;
+            letter-spacing: 0.3px;
+        }
+
+        .form-section { margin-bottom: 32px; }
+        .form-section-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 20px;
+            padding-left: 12px;
+            border-left: 3px solid #4f7cff;
+            line-height: 1;
+        }
+
+        .form-row {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 22px;
+        }
+
+        .form-label {
+            width: 120px;
+            flex-shrink: 0;
+            font-size: 14px;
+            color: #4e5a6e;
+            line-height: 36px;
+            text-align: right;
+            padding-right: 16px;
+            font-weight: 500;
+        }
+
+        .form-label .required { color:#e74c5e; margin-right:4px; }
+
+        .form-control { flex:1; min-width:0; }
+
+        .form-control input[type="text"],
+        .form-control input[type="number"],
+        .form-control input[type="file"],
+        .form-control select,
+        .form-control textarea {
+            width: 100%;
+            height: 38px;
+            padding: 0 12px;
+            border: 1px solid #e2e6ee;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #1d2129;
+            background: #fff;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-control input:focus,
+        .form-control select:focus,
+        .form-control textarea:focus {
+            border-color: #4f7cff;
+            box-shadow: 0 0 0 3px rgba(79,124,255,0.10);
+        }
+
+        .form-control textarea {
+            height: 80px;
+            padding: 8px 12px;
+            resize: vertical;
+        }
+
+        .form-control input[type="file"] {
+            padding: 4px;
+            height: auto;
+            border: none;
+        }
+
+        .inline-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .inline-group select,
+        .inline-group input { width: auto !important; }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 36px;
+            padding: 0 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid #e2e6ee;
+            background: #fff;
+            color: #4e5a6e;
+            white-space: nowrap;
+            font-weight: 500;
+        }
+        .btn:hover {
+            border-color: #c8cedb;
+            background: #f8f9fd;
+        }
+
+        .btn-add {
+            border: 1px dashed #c8cedb;
+            color: #8b95a8;
+            background: transparent;
+            font-size: 13px;
+        }
+        .btn-add:hover {
+            border-color: #4f7cff;
+            color: #4f7cff;
+            background: #f5f8ff;
+        }
+
+        .btn-danger-text {
+            border: none;
+            color: #e74c5e;
+            background: transparent;
+            padding: 0 10px;
+            font-size: 13px;
+        }
+        .btn-danger-text:hover {
+            color: #d1364a;
+            background: rgba(231,76,94,0.06);
+            border-radius: 6px;
+        }
+
+        .upload-area {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .upload-box {
+            width: 96px;
+            height: 96px;
+            border: 2px dashed #e2e6ee;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #fafbfe;
+        }
+        .upload-box:hover {
+            border-color: #4f7cff;
+            background: #f5f8ff;
+        }
+        .upload-box .icon {
+            font-size: 26px;
+            color: #b0b8c9;
+            line-height: 1;
+            font-weight: 200;
+        }
+        .upload-box .text {
+            font-size: 12px;
+            color: #8b95a8;
+            margin-top: 6px;
+        }
+
+        .rule-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: #f7f9fd;
+            border: 1px solid #edf0f5;
+            border-radius: 10px;
+            flex-wrap: nowrap;
+            transition: box-shadow 0.2s;
+            min-height: 48px;
+        }
+
+        .rule-item:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        .rule-item select,
+        .rule-item input[type="number"] {
+            width: auto !important;
+            min-width: 90px;
+            height: 34px;
+            font-size: 13px;
+        }
+
+        .rule-item .rule-label {
+            font-size: 13px;
+            color: #4e5a6e;
+            white-space: nowrap;
+            font-weight: 500;
+            min-width: 52px;
+        }
+
+        .rule-group {
+            margin-bottom: 10px;
+        }
+
+        .rule-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .share-reward-config {
+            padding: 12px 16px 4px;
+            background: #f7f9fd;
+            border: 1px solid #edf0f5;
+            border-radius: 0 0 10px 10px;
+            border-top: none;
+        }
+
+        .reward-extra { display: none; }
+        .reward-extra.show { display: inline-flex; align-items: center; gap: 4px; }
+
+        .task-type-content { display: none; }
+        .task-type-content.active { display: block; }
+
+        .divider {
+            height: 1px;
+            background: #edf0f5;
+            margin: 28px 0;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 36px;
+            padding-top: 24px;
+            border-top: 1px solid #edf0f5;
+        }
+        .form-actions .btn { min-width:120px; height:42px; font-size:15px; }
+
+        .btn-cancel {
+            background:#fff;
+            border-color:#e2e6ee;
+            color:#4e5a6e;
+        }
+        .btn-cancel:hover {
+            background:#f8f9fd;
+            border-color:#c8cedb;
+        }
+
+        .btn-submit {
+            background:#4f7cff;
+            color:#fff;
+            border-color:#4f7cff;
+            font-weight: 500;
+        }
+        .btn-submit:hover {
+            background:#3d68e8;
+            border-color:#3d68e8;
+        }
+
+        .cover-upload-area {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .reward-block {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .reward-line {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .reward-line select,
+        .reward-line input {
+            width: auto !important;
+            min-width: 130px;
+            height: 38px;
+        }
+
+        .reward-line .label-text {
+            font-size: 14px;
+            color: #4e5a6e;
+            font-weight: 500;
+            min-width: 70px;
+        }
+
+        .editor-toolbar {
+            display: flex;
+            gap: 2px;
+            padding: 6px 10px;
+            border: 1px solid #e2e6ee;
+            border-bottom: none;
+            border-radius: 8px 8px 0 0;
+            background: #f8f9fd;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .editor-toolbar button {
+            width: 34px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            border-radius: 6px;
+            background: transparent;
+            cursor: pointer;
+            font-size: 14px;
+            color: #4e5a6e;
+            transition: all 0.15s;
+        }
+
+        .editor-toolbar button:hover {
+            background: #e8ecf5;
+            color: #1a1a2e;
+        }
+
+        .editor-toolbar .sep {
+            width: 1px;
+            height: 18px;
+            background: #e2e6ee;
+            margin: 0 6px;
+        }
+
+        .editor-content {
+            min-height: 110px;
+            padding: 12px 14px;
+            border: 1px solid #e2e6ee;
+            border-radius: 0 0 8px 8px;
+            font-size: 14px;
+            color: #1d2129;
+            line-height: 1.7;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .editor-content:focus {
+            border-color: #4f7cff;
+            box-shadow: 0 0 0 3px rgba(79,124,255,0.10);
+        }
+
+        #taskTypeSelect {
+            width: 220px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 5l3 3 3-3' stroke='%238b95a8' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            appearance: none;
+            -webkit-appearance: none;
+            padding-right: 32px;
+        }
+
+        /* ── 功能说明浮窗 ── */
+        .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 620px; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 9999; padding: 24px; display: none; }
+        .f-modal.show { display: block; }
+        .f-modal .fm-title { font-size: 16px; font-weight: 600; color: #1a1a2e; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
+        .f-modal .fm-title:active { cursor: grabbing; }
+        .f-modal .fm-close { width: 28px; height: 28px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; color: #666; border: none; flex-shrink: 0; }
+        .f-modal .fm-close:hover { background: #e8e8e8; }
+        .f-modal .fm-body { font-size: 13px; color: #555; line-height: 1.8; }
+        .f-modal .fm-body h4 { font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 16px 0 8px; }
+        .f-modal .fm-body h4:first-child { margin-top: 0; }
+        .f-modal .fm-body ul { padding-left: 18px; margin: 0 0 12px; }
+        .f-modal .fm-body li { margin-bottom: 4px; }
+        .f-modal .fm-body .sub { margin-left: 18px; }
+    </style>
+</head>
+<body>
+<button onclick="toggleFuncModal()" style="position:fixed;top:12px;right:16px;z-index:99999;background:#fff;color:#333;padding:7px 16px;border-radius:20px;border:1px solid #ddd;font-size:13px;font-weight:500;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.08);font-family:inherit;display:inline-flex;align-items:center;gap:4px;">📖 说明</button>
+<div class="container">
+    <div class="page-title">新增任务</div>
+
+    <!-- ============ 基本信息 ============ -->
+    <div class="form-section">
+        <div class="form-section-title">基本信息</div>
+
+        <div class="form-row">
+            <div class="form-label"><span class="required">*</span>任务名称</div>
+            <div class="form-control">
+                <input type="text" placeholder="请输入任务名称" value="月末冲刺任务">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-label"><span class="required">*</span>任务时间</div>
+            <div class="form-control">
+                <div class="inline-group" style="flex-wrap:nowrap;">
+                    <input type="text" placeholder="开始时间" value="2026-05-01 00:00" style="flex:1;">
+                    <span style="color:#86909c;">—</span>
+                    <input type="text" placeholder="结束时间" value="2026-06-01 00:00" style="flex:1;">
+                </div>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-label">任务简介</div>
+            <div class="form-control">
+                <textarea placeholder="请输入任务简介">邀请好友注册并完成首笔交易，即可获得丰厚奖励！</textarea>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-label">奖金池（非必填）</div>
+            <div class="form-control">
+                <div class="inline-group">
+                    <input type="number" id="bonusPool" placeholder="奖金池金额" style="width:160px;" oninput="togglePayChannel()">
+                    <span style="color:#86909c;font-size:13px;">元</span>
+                </div>
+                <div class="inline-group" id="bonusChannelWrap" style="margin-top:8px;display:none;">
+                    <span style="color:#e74c5e;font-size:13px;">*</span>
+                    <span style="color:#4e5a6e;font-size:13px;">支付渠道：</span>
+                    <select id="bonusChannel" class="form-select" style="width:200px;height:32px;border:1px solid #d0d5dd;border-radius:4px;font-size:13px;background:#fff;">
+                        <option value="">请选择支付渠道</option>
+                        <option value="汇付">汇付</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-label">任务详情</div>
+            <div class="form-control">
+                <div class="editor-toolbar">
+                    <button type="button" onclick="document.execCommand('bold')" title="加粗"><b>B</b></button>
+                    <button type="button" onclick="document.execCommand('italic')" title="斜体"><i>I</i></button>
+                    <button type="button" onclick="document.execCommand('underline')" title="下划线"><u>U</u></button>
+                    <span class="sep"></span>
+                    <button type="button" onclick="document.execCommand('insertOrderedList')" title="有序列表">OL</button>
+                    <button type="button" onclick="document.execCommand('insertUnorderedList')" title="无序列表">UL</button>
+                    <button type="button" onclick="document.execCommand('formatBlock', false, 'h3')" title="标题">H</button>
+                    <span class="sep"></span>
+                    <button type="button" onclick="document.execCommand('removeFormat')" title="清除格式">清除</button>
+                </div>
+                <div class="editor-content" contenteditable="true"><p>用户通过分享链接邀请好友注册平台，好友完成绑卡及首笔交易后，邀请者获得现金奖励。</p></div>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-label">任务封面</div>
+            <div class="form-control">
+                <div class="cover-upload-area">
+                    <div class="upload-box" onclick="document.getElementById('coverInput').click()">
+                        <div class="icon">+</div>
+                        <div class="text">点击上传</div>
+                    </div>
+                    <input type="file" id="coverInput" accept="image/*" style="display:none;">
+                    <div>
+                        <div style="font-size:12px;color:#86909c;">支持 jpg、png、gif 格式</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ============ 任务配置 ============ -->
+    <div class="form-section">
+        <div class="form-section-title">任务配置</div>
+
+        <div class="form-row">
+            <div class="form-label"><span class="required">*</span>任务类型</div>
+            <div class="form-control">
+                <select id="taskTypeSelect" onchange="switchTaskType()" style="width:200px;">
+                    <option value="">请选择任务类型</option>
+                    <option value="share">分享邀请好友</option>
+                    <option value="pickup">提货</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- ===== 分享邀请好友 ===== -->
+        <div id="shareContent" class="task-type-content">
+
+            <div class="form-row">
+                <div class="form-label">上传分享图</div>
+                <div class="form-control">
+                    <div class="upload-area">
+                        <div class="upload-box" onclick="document.getElementById('shareImgInput').click()">
+                            <div class="icon">+</div>
+                            <div class="text">上传图片</div>
+                        </div>
+                        <input type="file" id="shareImgInput" accept="image/*" style="display:none;">
+                        <div>
+                            <div style="font-size:13px;color:#4e5969;">分享邀请卡片图</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-label"><span class="required">*</span>任务规则</div>
+                <div class="form-control">
+                    <div id="shareRuleList">
+                        <div class="rule-group">
+                            <div class="rule-item">
+                                <span class="rule-label">规则 1：</span>
+                                <select onchange="toggleShareReward(this)">
+                                    <option value="">请选择规则</option>
+                                    <option value="bind_card">邀请绑卡</option>
+                                    <option value="complete_trade">邀请完成一笔交易</option>
+                                </select>
+                                <button class="btn btn-danger-text" onclick="removeShareRule(this)">删除</button>
+                            </div>
+                            <div class="share-reward-config" style="display:none;">
+                                <div class="reward-block" style="margin-top:10px;">
+                                    <div class="reward-line">
+                                        <span class="label-text">奖励对象：</span>
+                                        <select class="share-reward-target">
+                                            <option value="tasker">任务方</option>
+                                            <option value="target">任务对方</option>
+                                        </select>
+                                    </div>
+                                    <div class="reward-line">
+                                        <span class="label-text">奖励类型：</span>
+                                        <select class="share-reward-type" onchange="syncShareReward(this)">
+                                            <option value="cash">现金</option>
+                                        </select>
+                                    </div>
+                                    <div class="reward-line">
+                                        <span class="reward-extra reward-extra-cash show">
+                                            <span class="label-text">奖励金额：</span>
+                                            <input type="number" value="500">
+                                            <span style="color:#9ba6b9;font-size:13px;">元</span>
+                                        </span>
+                                        <span class="reward-extra reward-extra-product">
+                                            <span class="label-text">选择产品：</span>
+                                            <select>
+                                                <option value="crane">仙鹤莲池</option>
+                                                <option value="fortune">进宝</option>
+                                                <option value="success">马到功成</option>
+                                                <option value="wealth">招财</option>
+                                            </select>
+                                            <span class="label-text">奖励份数：</span>
+                                            <input type="number" value="1" style="width:80px;">
+                                            <span class="label-text">赠送账号：</span>
+                                            <select>
+                                                <option value="a1">user_001</option>
+                                                <option value="a2">user_002</option>
+                                                <option value="a3">user_003</option>
+                                            </select>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn btn-add" onclick="addShareRule()" style="margin-top:8px;">
+                        ＋ 新增规则
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== 提货 ===== -->
+        <div id="pickupContent" class="task-type-content">
+
+            <div class="form-row">
+                <div class="form-label">任务终止条件</div>
+                <div class="form-control">
+                    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                        <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:14px;color:#4e5a6e;">
+                            <input type="checkbox" id="stopOnReward" onchange="toggleStopCondition()">
+                            当奖励内容到达数量后自动结束任务
+                        </label>
+                        <span id="stopRewardHint" style="display:none;font-size:12px;color:#9ba6b9;">（基于所有规则奖励中的新品优先权累计数量）</span>
+                    </div>
+                    <div id="stopConditionConfig" style="display:none;margin-top:10px;padding:10px 14px;background:#fff8e6;border-radius:8px;">
+                        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                            <span style="font-size:13px;color:#e67e22;font-weight:500;">奖励内容累计发放达到</span>
+                            <select id="stopRewardType" style="height:34px;border:1px solid #f0dbb0;border-radius:6px;padding:0 8px;font-size:13px;color:#e67e22;font-weight:500;outline:none;">
+                                <option value="new_product">新品优先权</option>
+                            </select>
+                            <input type="number" id="stopRewardQty" value="100" style="width:100px;height:34px;border:1px solid #f0dbb0;border-radius:6px;padding:0 8px;font-size:14px;font-weight:600;color:#e67e22;text-align:center;outline:none;">
+                            <span style="font-size:13px;color:#e67e22;">件时自动结束</span>
+                        </div>
+                        <div style="font-size:11px;color:#9ba6b9;margin-top:4px;">系统统计所有规则中已发放的对应奖励总数，达到设定值后任务自动终止</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-label"><span class="required">*</span>任务规则</div>
+                <div class="form-control">
+                    <div id="pickupRuleList">
+                        <!-- 规则组：每个规则组包含 产品列表（且关系）+ 每人上限 + 独立奖励配置 -->
+                        <div class="rule-group">
+                            <div class="rule-item" style="background:#f0f4ff;border-color:#d6e0ff;border-radius:10px 10px 0 0;border-bottom:none;">
+                                <span class="rule-label" style="font-weight:600;color:#4f7cff;">规则 1</span>
+                                <button class="btn btn-danger-text" onclick="removePickupRule(this)">删除本规则</button>
+                            </div>
+                            <div style="border:1px solid #d6e0ff;border-top:none;border-radius:0 0 10px 10px;padding:12px 16px;background:#fafcff;">
+                                <div style="font-size:13px;color:#4e5a6e;margin-bottom:8px;font-weight:500;">产品条件（且关系）：</div>
+                                <div class="pickup-products-inner">
+                                    <div class="rule-item" style="margin-bottom:6px;">
+                                        <span class="rule-label">产品 1：</span>
+                                        <select class="pickup-product" style="width:130px;" onchange="togglePickupQty(this)">
+                                            <option value="">选择产品</option>
+                                            <option value="crane">仙鹤莲池</option>
+                                            <option value="fortune">进宝</option>
+                                            <option value="success">马到功成</option>
+                                            <option value="wealth">招财</option>
+                                        </select>
+                                        <span class="pickup-qty" style="display:none;">
+                                            <span style="font-size:13px;color:#4e5969;">数量：</span>
+                                            <input type="number" value="20" style="width:80px;">
+                                            <span style="color:#86909c;font-size:13px;">件</span>
+                                        </span>
+                                        <button class="btn btn-danger-text" onclick="removePickupProduct(this)">删除</button>
+                                    </div>
+                                </div>
+                                <button class="btn btn-add" onclick="addPickupProduct(this)" style="margin-top:4px;height:30px;font-size:12px;">＋ 新增产品</button>
+
+                                <div style="margin-top:12px;padding:10px 12px;background:#fff8e6;border-radius:8px;">
+                                    <div style="display:flex;align-items:center;gap:8px;">
+                                        <span style="font-size:13px;color:#e67e22;font-weight:500;">每人最多完成</span>
+                                        <input type="number" class="pickup-personal-max" value="3" style="width:80px;height:34px;border:1px solid #f0dbb0;border-radius:6px;padding:0 8px;font-size:14px;font-weight:600;color:#e67e22;text-align:center;outline:none;">
+                                        <span style="font-size:13px;color:#e67e22;">次</span>
+                                    </div>
+                                </div>
+
+                                <div style="margin-top:12px;padding-top:12px;border-top:1px dashed #e2e6ee;">
+                                    <div style="font-size:13px;color:#4e5a6e;margin-bottom:10px;font-weight:500;">奖励配置：</div>
+                                    <div class="reward-block">
+                                        <div class="reward-line" style="gap:8px;">
+                                            <span class="label-text" style="min-width:60px;font-size:13px;">奖励对象：</span>
+                                            <select class="pickup-reward-target" style="height:34px;min-width:120px;">
+                                                <option value="tasker">任务方</option>
+                                            </select>
+                                        </div>
+                                        <div class="reward-line" style="gap:8px;">
+                                            <span class="label-text" style="min-width:60px;font-size:13px;">奖励类型：</span>
+                                            <select class="pickup-reward-type" style="height:34px;min-width:140px;" onchange="syncPickupRewardExtra(this)">
+                                                <option value="new_product">新品优先权</option>
+                                                <option value="cash">现金</option>
+                                                <option value="product">产品</option>
+                                            </select>
+                                        </div>
+                                        <div class="reward-line" style="gap:8px;">
+                                            <span class="reward-extra pickup-reward-extra-new_product show">
+                                                <span class="label-text" style="min-width:60px;font-size:13px;">数量：</span>
+                                                <input type="number" value="3" style="width:80px;height:34px;">
+                                                <span style="color:#9ba6b9;font-size:13px;">件</span>
+                                            </span>
+                                            <span class="reward-extra pickup-reward-extra-cash">
+                                                <span class="label-text" style="min-width:60px;font-size:13px;">奖励金额：</span>
+                                                <input type="number" value="500" style="width:100px;height:34px;">
+                                                <span style="color:#9ba6b9;font-size:13px;">元</span>
+                                            </span>
+                                            <span class="reward-extra pickup-reward-extra-product">
+                                                <span class="label-text" style="min-width:60px;font-size:13px;">选择产品：</span>
+                                                <select style="height:34px;min-width:110px;">
+                                                    <option value="crane">仙鹤莲池</option>
+                                                    <option value="fortune">进宝</option>
+                                                    <option value="success">马到功成</option>
+                                                    <option value="wealth">招财</option>
+                                                </select>
+                                                <span class="label-text" style="min-width:50px;font-size:13px;">份数：</span>
+                                                <input type="number" value="1" style="width:70px;height:34px;">
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn btn-add" onclick="addPickupRule()" style="margin-top:8px;">
+                        ＋ 新增规则
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-actions">
+        <button class="btn btn-cancel">取消</button>
+        <button class="btn btn-submit" onclick="submitTask()">确定</button>
+    </div>
+</div>
+
+<script>
+function switchTaskType() {
+    var sel = document.getElementById('taskTypeSelect');
+    document.getElementById('shareContent').classList.toggle('active', sel.value === 'share');
+    document.getElementById('pickupContent').classList.toggle('active', sel.value === 'pickup');
+}
+
+switchTaskType();
+
+function toggleStopCondition() {
+    var cb = document.getElementById('stopOnReward');
+    var config = document.getElementById('stopConditionConfig');
+    var hint = document.getElementById('stopRewardHint');
+    config.style.display = cb.checked ? '' : 'none';
+    hint.style.display = cb.checked ? '' : 'none';
+}
+
+function syncRewardExtraIn(parent, val) {
+    var extras = parent.querySelectorAll('.reward-extra');
+    extras.forEach(function(el) { el.classList.remove('show'); });
+    var target = parent.querySelector('.reward-extra-' + val);
+    if (target) target.classList.add('show');
+}
+
+function toggleShareReward(sel) {
+    var group = sel.closest('.rule-group');
+    var config = group.querySelector('.share-reward-config');
+    config.style.display = sel.value ? '' : 'none';
+}
+
+function togglePayChannel() {
+    var input = document.getElementById('bonusPool');
+    var wrap = document.getElementById('bonusChannelWrap');
+    var channel = document.getElementById('bonusChannel');
+    var show = (input.value && parseFloat(input.value) > 0);
+    wrap.style.display = show ? 'block' : 'none';
+    if (show && !channel.value) channel.value = '';
+}
+
+function submitTask() {
+    var amount = document.getElementById('bonusPool');
+    var channel = document.getElementById('bonusChannel');
+    if (amount.value && parseFloat(amount.value) > 0 && !channel.value) {
+        alert('请选择支付渠道');
+        channel.focus();
+        return;
+    }
+    alert('任务提交成功');
+}
+
+function syncShareReward(sel) {
+    var group = sel.closest('.rule-group');
+    syncRewardExtraIn(group, sel.value);
+}
+
+function syncPickupRewardExtra(sel) {
+    var group = sel.closest('.rule-group');
+    if (!group) return;
+    var extras = group.querySelectorAll('.reward-extra');
+    extras.forEach(function(el) { el.classList.remove('show'); });
+    var val = sel.value;
+    var target = group.querySelector('.pickup-reward-extra-' + val);
+    if (target) target.classList.add('show');
+}
+
+// 提货产品下拉选择后，显示/隐藏数量输入
+function togglePickupQty(sel) {
+    var item = sel.closest('.rule-item');
+    var qty = item.querySelector('.pickup-qty');
+    if (qty) qty.style.display = sel.value ? '' : 'none';
+}
+
+function addShareRule() {
+    var list = document.getElementById('shareRuleList');
+    var idx = list.children.length + 1;
+    var group = document.createElement('div');
+    group.className = 'rule-group';
+    group.innerHTML = [
+        '<div class="rule-item">',
+        '    <span class="rule-label">规则 ' + idx + '：</span>',
+        '    <select onchange="toggleShareReward(this)">',
+        '        <option value="">请选择规则</option>',
+        '        <option value="bind_card">邀请绑卡</option>',
+        '        <option value="complete_trade">邀请完成一笔交易</option>',
+        '    </select>',
+        '    <button class="btn btn-danger-text" onclick="removeShareRule(this)">删除</button>',
+        '</div>',
+        '<div class="share-reward-config" style="display:none;">',
+        '    <div class="reward-block" style="margin-top:10px;">',
+        '        <div class="reward-line">',
+        '            <span class="label-text">奖励对象：</span>',
+        '            <select class="share-reward-target">',
+        '                <option value="tasker">任务方</option>',
+        '                <option value="target">任务对方</option>',
+        '            </select>',
+        '        </div>',
+        '        <div class="reward-line">',
+        '            <span class="label-text">奖励类型：</span>',
+        '            <select class="share-reward-type" onchange="syncShareReward(this)">',
+        '                <option value="cash">现金</option>',
+        '            </select>',
+        '        </div>',
+        '        <div class="reward-line">',
+        '            <span class="reward-extra reward-extra-cash show">',
+        '                <span class="label-text">奖励金额：</span>',
+        '                <input type="number" value="500">',
+        '                <span style="color:#9ba6b9;font-size:13px;">元</span>',
+        '            </span>',
+        '            <span class="reward-extra reward-extra-product">',
+        '                <span class="label-text">选择产品：</span>',
+        '                <select>',
+        '                    <option value="crane">仙鹤莲池</option>',
+        '                    <option value="fortune">进宝</option>',
+        '                    <option value="success">马到功成</option>',
+        '                    <option value="wealth">招财</option>',
+        '                </select>',
+        '                <span class="label-text">奖励份数：</span>',
+        '                <input type="number" value="1" style="width:80px;">',
+        '                <span class="label-text">赠送账号：</span>',
+        '                <select>',
+        '                    <option value="a1">user_001</option>',
+        '                    <option value="a2">user_002</option>',
+        '                    <option value="a3">user_003</option>',
+        '                </select>',
+        '            </span>',
+        '        </div>',
+        '    </div>',
+        '</div>'
+    ].join('');
+    list.appendChild(group);
+}
+
+function removeShareRule(btn) {
+    var group = btn.closest('.rule-group');
+    if (group) group.remove();
+    reindexShareRules();
+}
+
+function reindexShareRules() {
+    var groups = document.querySelectorAll('#shareRuleList .rule-group');
+    groups.forEach(function(group, i) {
+        var label = group.querySelector('.rule-item .rule-label');
+        if (label) label.textContent = '规则 ' + (i + 1) + '：';
+    });
+}
+
+// ===== 提货规则管理 =====
+
+function addPickupRule() {
+    var list = document.getElementById('pickupRuleList');
+    var idx = list.querySelectorAll('.rule-group').length + 1;
+    var group = document.createElement('div');
+    group.className = 'rule-group';
+    group.innerHTML = [
+        '<div class="rule-item" style="background:#f0f4ff;border-color:#d6e0ff;border-radius:10px 10px 0 0;border-bottom:none;">',
+        '    <span class="rule-label" style="font-weight:600;color:#4f7cff;">规则 ' + idx + '</span>',
+        '    <button class="btn btn-danger-text" onclick="removePickupRule(this)">删除本规则</button>',
+        '</div>',
+        '<div style="border:1px solid #d6e0ff;border-top:none;border-radius:0 0 10px 10px;padding:12px 16px;background:#fafcff;">',
+        '    <div style="font-size:13px;color:#4e5a6e;margin-bottom:8px;font-weight:500;">产品条件（且关系）：</div>',
+        '    <div class="pickup-products-inner">',
+        '        <div class="rule-item" style="margin-bottom:6px;">',
+        '            <span class="rule-label">产品 1：</span>',
+        '            <select class="pickup-product" style="width:130px;" onchange="togglePickupQty(this)">',
+        '                <option value="">选择产品</option>',
+        '                <option value="crane">仙鹤莲池</option>',
+        '                <option value="fortune">进宝</option>',
+        '                <option value="success">马到功成</option>',
+        '                <option value="wealth">招财</option>',
+        '            </select>',
+        '            <span class="pickup-qty" style="display:none;">',
+        '                <span style="font-size:13px;color:#4e5969;">数量：</span>',
+        '                <input type="number" value="10" style="width:80px;">',
+        '                <span style="color:#86909c;font-size:13px;">件</span>',
+        '            </span>',
+        '            <button class="btn btn-danger-text" onclick="removePickupProduct(this)">删除</button>',
+        '        </div>',
+        '    </div>',
+        '    <button class="btn btn-add" onclick="addPickupProduct(this)" style="margin-top:4px;height:30px;font-size:12px;">＋ 新增产品</button>',
+        '    <div style="margin-top:12px;padding:10px 12px;background:#fff8e6;border-radius:8px;">',
+        '        <div style="display:flex;align-items:center;gap:8px;">',
+        '            <span style="font-size:13px;color:#e67e22;font-weight:500;">每人最多完成</span>',
+        '            <input type="number" class="pickup-personal-max" value="3" style="width:80px;height:34px;border:1px solid #f0dbb0;border-radius:6px;padding:0 8px;font-size:14px;font-weight:600;color:#e67e22;text-align:center;outline:none;">',
+        '            <span style="font-size:13px;color:#e67e22;">次</span>',
+        '        </div>',
+        '    </div>',
+        '    <div style="margin-top:12px;padding-top:12px;border-top:1px dashed #e2e6ee;">',
+        '        <div style="font-size:13px;color:#4e5a6e;margin-bottom:10px;font-weight:500;">奖励配置：</div>',
+        '        <div class="reward-block">',
+        '            <div class="reward-line" style="gap:8px;">',
+        '                <span class="label-text" style="min-width:60px;font-size:13px;">奖励对象：</span>',
+        '                <select class="pickup-reward-target" style="height:34px;min-width:120px;">',
+        '                    <option value="tasker">任务方</option>',
+        '                </select>',
+        '            </div>',
+        '            <div class="reward-line" style="gap:8px;">',
+        '                <span class="label-text" style="min-width:60px;font-size:13px;">奖励类型：</span>',
+        '                <select class="pickup-reward-type" style="height:34px;min-width:140px;" onchange="syncPickupRewardExtra(this)">',
+        '                    <option value="new_product">新品优先权</option>',
+        '                    <option value="cash">现金</option>',
+        '                    <option value="product">产品</option>',
+        '                </select>',
+        '            </div>',
+        '            <div class="reward-line" style="gap:8px;">',
+        '                <span class="reward-extra pickup-reward-extra-new_product show">',
+        '                    <span class="label-text" style="min-width:60px;font-size:13px;">数量：</span>',
+        '                    <input type="number" value="3" style="width:80px;height:34px;">',
+        '                    <span style="color:#9ba6b9;font-size:13px;">件</span>',
+        '                </span>',
+        '                <span class="reward-extra pickup-reward-extra-cash">',
+        '                    <span class="label-text" style="min-width:60px;font-size:13px;">奖励金额：</span>',
+        '                    <input type="number" value="500" style="width:100px;height:34px;">',
+        '                    <span style="color:#9ba6b9;font-size:13px;">元</span>',
+        '                </span>',
+        '                <span class="reward-extra pickup-reward-extra-product">',
+        '                    <span class="label-text" style="min-width:60px;font-size:13px;">选择产品：</span>',
+        '                    <select style="height:34px;min-width:110px;">',
+        '                        <option value="crane">仙鹤莲池</option>',
+        '                        <option value="fortune">进宝</option>',
+        '                        <option value="success">马到功成</option>',
+        '                        <option value="wealth">招财</option>',
+        '                    </select>',
+        '                    <span class="label-text" style="min-width:50px;font-size:13px;">份数：</span>',
+        '                    <input type="number" value="1" style="width:70px;height:34px;">',
+        '                </span>',
+        '            </div>',
+        '        </div>',
+        '    </div>',
+        '</div>'
+    ].join('');
+    list.appendChild(group);
+}
+
+function removePickupRule(btn) {
+    var group = btn.closest('.rule-group');
+    if (group) group.remove();
+    reindexPickupRules();
+}
+
+function reindexPickupRules() {
+    var groups = document.querySelectorAll('#pickupRuleList .rule-group');
+    groups.forEach(function(group, i) {
+        var label = group.querySelector('.rule-item .rule-label');
+        if (label) label.textContent = '规则 ' + (i + 1);
+    });
+}
+
+function addPickupProduct(btn) {
+    var innerContainer = btn.closest('[style*="border:1px solid"]').querySelector('.pickup-products-inner');
+    var items = innerContainer.querySelectorAll('.rule-item');
+    var idx = items.length + 1;
+    var div = document.createElement('div');
+    div.className = 'rule-item';
+    div.style.marginBottom = '6px';
+    div.innerHTML = [
+        '<span class="rule-label">产品 ' + idx + '：</span>',
+        '<select class="pickup-product" style="width:130px;" onchange="togglePickupQty(this)">',
+        '    <option value="">选择产品</option>',
+        '    <option value="crane">仙鹤莲池</option>',
+        '    <option value="fortune">进宝</option>',
+        '    <option value="success">马到功成</option>',
+        '    <option value="wealth">招财</option>',
+        '</select>',
+        '<span class="pickup-qty" style="display:none;">',
+        '    <span style="font-size:13px;color:#4e5969;">数量：</span>',
+        '    <input type="number" value="10" style="width:80px;">',
+        '    <span style="color:#86909c;font-size:13px;">件</span>',
+        '</span>',
+        '<button class="btn btn-danger-text" onclick="removePickupProduct(this)">删除</button>'
+    ].join('');
+    innerContainer.appendChild(div);
+}
+
+function removePickupProduct(btn) {
+    var innerContainer = btn.closest('.pickup-products-inner');
+    btn.closest('.rule-item').remove();
+    reindexPickupProducts(innerContainer);
+}
+
+function reindexPickupProducts(container) {
+    if (!container) container = document;
+    var items = container.querySelectorAll('.rule-item');
+    items.forEach(function(item, i) {
+        var label = item.querySelector('.rule-label');
+        if (label) label.textContent = '产品 ' + (i + 1) + '：';
+    });
+}
+</script>
+
+<!-- ====== 功能说明浮窗 ====== -->
+<div class="f-modal" id="funcModal">
+  <div class="fm-title">
+    <span>📖 功能说明</span>
+    <button class="fm-close" onclick="toggleFuncModal()">✕</button>
+  </div>
+  <div style="font-size:13px;font-weight:600;color:#e74c5e;margin:-6px 0 12px;">服务商后台</div>
+  <div class="fm-body">
+    <h4>任务配置区 - 任务类型选择</h4>
+    <ul>
+      <li>页面进入时任务类型默认为空，下方不展示任何内容。用户从下拉框选择类型后，展示对应的配置面板</li>
+    </ul>
+
+    <h4>一、分享邀请好友</h4>
+    <ul>
+      <li>填入奖金池金额时必须选择支付渠道</li>
+    </ul>
+
+    <h4>二、提货（本次新增功能）</h4>
+    <p style="color:#666;">页面位置：新增任务 > 任务类型选择"提货"后展示</p>
+    <ul>
+      <li><b>任务规则（可多条）</b>：点击"＋ 新增规则"可创建多条规则，每条规则包含：</li>
+      <li class="sub"><b>产品条件（且关系）</b>：每条规则内可添加多个产品，产品之间是且（AND）关系，用户必须同时提取规则内指定的所有产品才算满足条件。每个产品需设置：选择产品名称 + 所需数量（件）。点击"＋ 新增产品"添加更多产品条件，每个产品右侧有"删除"按钮可移除</li>
+      <li class="sub"><b>每人最多完成次数</b>：每条规则独立设置，默认值 3，表示该规则每个用户最多可完成次数上限，黄色背景醒目显示</li>
+      <li class="sub"><b>奖励配置</b>：每条规则独立配置奖励。奖励对象：本期只有<b>"任务方"</b>；奖励类型：<span style="color:#e74c5e;">本期只实现"新品优先权"（设置数量件）</span>。选择不同奖励类型时，下方自动切换显示对应的配置项</li>
+      <li><b>任务终止条件</b>：勾选"当奖励内容到达数量后自动结束任务"后，可设置奖励内容累计发放达到指定数量（本期为新品优先权累计数量，默认 100 件）时自动结束任务。系统统计所有规则中已发放的对应奖励总数，达到设定值后任务自动终止</li>
+    </ul>
+    <p style="color:#666;"><b>交互操作：</b></p>
+    <ul>
+      <li><b>新增规则</b>：点击"＋ 新增规则"在列表末尾添加一条新规则</li>
+      <li><b>删除规则</b>：点击规则头部的"删除本规则"移除整条规则</li>
+      <li><b>新增产品</b>：在每条规则内点击"＋ 新增产品"添加产品条件</li>
+      <li><b>删除产品</b>：点击产品右侧的"删除"移除该产品条件</li>
+      <li>规则序号自动重新编排（删除后）</li>
+    </ul>
+    <p style="margin:12px 0 0;color:#e74c5e;font-weight:600;line-height:1.7;">
+      去掉分享邀请好友的<b>产品奖励</b>，只保留<b>现金</b>（需要去汇付申请开通<b>营销支付</b>，运营评估是否本期实现）
+    </p>
+  </div>
+</div>
+
+<script>
+function toggleFuncModal() {
+  var el = document.getElementById('funcModal');
+  el.classList.toggle('show');
+  if (el.classList.contains('show') && !el.dataset.dragged) {
+    el.style.left = '50%'; el.style.top = '50%'; el.style.transform = 'translate(-50%,-50%)';
+  }
+}
+(function() {
+  var modal, titleBar, offX, offY, dragging = false;
+  document.addEventListener('DOMContentLoaded', function() {
+    modal = document.getElementById('funcModal');
+    titleBar = modal.querySelector('.fm-title');
+    titleBar.addEventListener('mousedown', startDrag);
+    titleBar.addEventListener('touchstart', startDragTouch, {passive:true});
+    document.addEventListener('mousemove', onDrag);
+    document.addEventListener('mouseup', endDrag);
+    document.addEventListener('touchmove', onDragTouch, {passive:true});
+    document.addEventListener('touchend', endDrag);
+  });
+  function startDrag(e) { modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = e.clientX - rect.left; offY = e.clientY - rect.top; dragging = true; titleBar.style.cursor = 'grabbing'; }
+  function startDragTouch(e) { var t = e.touches[0]; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = t.clientX - rect.left; offY = t.clientY - rect.top; dragging = true; }
+  function onDrag(e) { if (!dragging) return; modal.style.left = (e.clientX - offX) + 'px'; modal.style.top = (e.clientY - offY) + 'px'; }
+  function onDragTouch(e) { if (!dragging) return; var t = e.touches[0]; modal.style.left = (t.clientX - offX) + 'px'; modal.style.top = (t.clientY - offY) + 'px'; }
+  function endDrag() { dragging = false; if (titleBar) titleBar.style.cursor = 'grab'; }
+})();
+</script>
+
+</body>
+</html>
