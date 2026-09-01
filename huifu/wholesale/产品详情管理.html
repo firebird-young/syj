@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>产品管理</title>
+    <title>产品详情管理</title>
     <style>
         * { margin:0; padding:0; box-sizing:border-box; }
         :root{
@@ -112,8 +112,6 @@
         .btn-search:hover { background:var(--primary-hover); }
         .btn-reset { background:#fff; color:var(--ink-muted); border:1px solid var(--border); padding:0 14px; height:30px; border-radius:var(--radius-sm); font-size:13px; cursor:pointer; }
         .btn-reset:hover { border-color:var(--primary); color:var(--primary); }
-        .btn-add { background:#fff; color:var(--primary); border:1px solid var(--primary); padding:0 14px; height:30px; border-radius:var(--radius-sm); font-size:13px; cursor:pointer; white-space:nowrap; }
-        .btn-add:hover { background:var(--primary-bg); }
 
         /* ── 表格 ── */
         .table-card {
@@ -127,13 +125,13 @@
             border-bottom:1px solid var(--border-light); white-space:nowrap;
         }
         .table td {
-            padding:14px 12px; font-size:13px; color:var(--ink);
+            padding:12px; font-size:13px; color:var(--ink);
             border-bottom:1px solid #f5f5f7;
         }
         .table tr:last-child td { border-bottom:none; }
 
         .product-img {
-            width:60px; height:60px; border-radius:var(--radius-sm);
+            width:56px; height:56px; border-radius:var(--radius-sm);
             background-image:linear-gradient(135deg,#f0e8d8 0%,#c9b88e 100%); display:block;
         }
         .product-img.img1 { background-image:linear-gradient(135deg,#d8e0e8 0%,#98a8c4 100%); }
@@ -144,28 +142,17 @@
         .product-img.img6 { background-image:linear-gradient(135deg,#f7e8d4 0%,#c8a888 100%); }
 
         .product-name { font-weight:600; white-space:nowrap; }
-        .type-cell { color:var(--ink-muted); }
+        .product-no { font-size:12px; color:var(--ink-faint); margin-top:3px; white-space:nowrap; }
 
-        /* 批发模式标签（可组合） */
-        .mode-cell { white-space:nowrap; }
-        .mode-tag { display:inline-block; padding:2px 8px; border-radius:var(--radius-sm); font-size:11px; margin-right:4px; }
-        .mode-tag.prior { background:#e6f4ff; color:#1a78ff; }
-        .mode-tag.draw  { background:#fdf0e4; color:#e67e22; }
-        .mode-tag.open  { background:#e6f7eb; color:#1aab67; }
-
-        /* 阶段标签 */
-        .stage-cell { white-space:nowrap; }
-        .stage-tag { display:inline-block; padding:3px 10px; border-radius:var(--radius-sm); font-size:12px; }
-        .stage-tag.wholesale { background:#e6f4ff; color:#1a78ff; }
-        .stage-tag.done { background:#e6f7eb; color:#1aab67; }
-        .stage-tag.retail { background:#f3f0ff; color:#6c5ce7; }
-
+        .phone-cell { font-variant-numeric:tabular-nums; white-space:nowrap; }
+        .num-cell { white-space:nowrap; }
+        .trade-count { font-weight:600; }
+        .remain-cell { white-space:nowrap; }
+        .remain-tag { display:inline-block; padding:2px 8px; border-radius:var(--radius-sm); font-size:12px; background:#e6f7eb; color:#1aab67; }
+        .remain-tag.warn { background:#fdf0e4; color:#e67e22; }
+        .remain-tag.danger { background:#fff1f0; color:#e74c5e; }
         .time-cell { color:var(--ink-subtle); white-space:nowrap; }
-
-        .status-tag {
-            display:inline-block; padding:3px 10px; border-radius:var(--radius-sm); font-size:12px;
-            background:#e6f7eb; color:#1aab67;
-        }
+        .amount-cell { color:#e74c3e; font-weight:600; white-space:nowrap; }
 
         /* 操作列 */
         .actions { white-space:nowrap; }
@@ -178,6 +165,39 @@
         .actions a.disabled { color:#c0c8d4; cursor:default; }
         .actions a.disabled:hover { text-decoration:none; }
 
+        /* ── 交易详情弹窗 ── */
+        .detail-mask { position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:9998; display:none; }
+        .detail-mask.show { display:block; }
+        .detail-modal {
+            position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+            width:820px; max-width:94vw; max-height:82vh;
+            background:#fff; border-radius:12px; box-shadow:0 8px 40px rgba(0,0,0,.25);
+            z-index:9999; display:none; flex-direction:column; overflow:hidden;
+        }
+        .detail-modal.show { display:flex; }
+        .dm-title {
+            display:flex; align-items:center; padding:16px 20px;
+            border-bottom:1px solid var(--border-light); font-size:15px; font-weight:600;
+        }
+        .dm-sub { margin-left:10px; font-size:12px; color:var(--ink-subtle); font-weight:400; }
+        .dm-close {
+            margin-left:auto; width:28px; height:28px; border-radius:50%;
+            background:#f5f5f5; display:flex; align-items:center; justify-content:center;
+            cursor:pointer; font-size:14px; color:#666; border:none; flex-shrink:0;
+        }
+        .dm-close:hover { background:#e8e8e8; }
+        .dm-body { padding:16px 20px; overflow-y:auto; }
+        .dm-note { font-size:12px; color:var(--ink-faint); margin-bottom:10px; }
+        .dm-table { width:100%; border-collapse:collapse; }
+        .dm-table th {
+            background:#fafbfc; padding:10px 12px; text-align:left;
+            font-size:12px; color:var(--ink-muted); font-weight:500;
+            border-bottom:1px solid var(--border-light); white-space:nowrap;
+        }
+        .dm-table td { padding:10px 12px; font-size:13px; border-bottom:1px solid #f5f5f7; white-space:nowrap; }
+        .dm-table tr:last-child td { border-bottom:none; }
+        .dm-table .dm-amount { color:#e74c3e; font-weight:600; }
+        .dm-empty { text-align:center; color:var(--ink-faint); padding:30px 0; font-size:13px; }
 
         /* ── 功能说明浮窗 ── */
         .f-modal { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); width:560px; max-height:80vh; overflow-y:auto; background:#fff; border-radius:16px; box-shadow:0 8px 40px rgba(0,0,0,.2); z-index:9999; padding:24px; display:none; }
@@ -190,7 +210,7 @@
         .f-modal .fm-body h4 { font-size:14px; font-weight:600; color:var(--ink); margin:16px 0 8px; }
         .f-modal .fm-body ul { padding-left:18px; margin:0 0 12px; }
         .f-modal .fm-body li { margin-bottom:4px; }
-        .f-modal .fm-tag { display:inline-block; padding:2px 8px; border-radius:var(--radius-sm); font-size:11px; margin-right:4px; }
+        .badge { display:inline-block; min-width:18px; height:18px; padding:0 5px; border-radius:50%; background:#ff2d55; color:#fff; font-size:12px; line-height:18px; text-align:center; font-weight:600; }
     </style>
 </head>
 <body>
@@ -210,8 +230,8 @@
                     <span class="icon">📦</span><span>产品管理</span><span class="arrow">▾</span>
                 </div>
                 <div class="submenu">
-                    <a href="产品管理.html" class="active">产品列表</a>
-                    <a href="产品详情管理.html">产品详情管理</a>
+                    <a href="产品管理.html">产品列表</a>
+                    <a href="产品详情管理.html" class="active">产品详情管理</a>
                 </div>
             </div>
             <div class="menu-group">
@@ -268,7 +288,7 @@
     <div class="main">
         <div class="topbar">
             <div class="breadcrumb">
-                <span>首页</span><span class="sep">/</span><span class="active">产品管理</span>
+                <span>首页</span><span class="sep">/</span><span>产品管理</span><span class="sep">/</span><span class="active">产品详情管理</span>
             </div>
             <div class="topbar-right">
                 <button class="btn-func" onclick="toggleFuncModal()">📖 功能说明</button>
@@ -285,21 +305,15 @@
             <div class="filter-bar">
                 <div class="filter-item">
                     <span class="filter-label">产品名称</span>
-                    <input type="text" class="filter-input" id="searchInput" placeholder="请输入产品名称">
+                    <input type="text" class="filter-input" id="searchName" placeholder="请输入产品名称">
                 </div>
                 <div class="filter-item">
-                    <span class="filter-label">阶段</span>
-                    <select class="filter-input" id="stageFilter" style="width:140px;">
-                        <option value="">全部阶段</option>
-                        <option>批发市场</option>
-                        <option>批发完成</option>
-                        <option>零售市场</option>
-                    </select>
+                    <span class="filter-label">产品编号</span>
+                    <input type="text" class="filter-input" id="searchNo" placeholder="请输入产品编号" style="width:160px;">
                 </div>
                 <div class="filter-actions">
-                    <button class="btn-add">＋ 新增数字艺术品</button>
-                    <button class="btn-search">🔍 搜 索</button>
-                    <button class="btn-reset">↻ 重 置</button>
+                    <button class="btn-search" onclick="doSearch()">🔍 搜 索</button>
+                    <button class="btn-reset" onclick="doReset()">↻ 重 置</button>
                 </div>
             </div>
 
@@ -310,146 +324,122 @@
                         <tr>
                             <th style="width:80px;">图片</th>
                             <th>产品名称</th>
-                            <th>产品类型</th>
-                            <th>状态</th>
-                            <th>批发模式</th>
-                            <th>阶段</th>
-                            <th>创建时间</th>
-                            <th>修改时间</th>
-                            <th>操作</th>
+                            <th>当前持有人</th>
+                            <th>交易次数</th>
+                            <th>剩余次数</th>
+                            <th>最后交易时间</th>
+                            <th>最后交易金额</th>
+                            <th style="width:100px;">操作</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
+                    <tbody id="tbBody">
+                        <tr data-name="青莲-初心" data-no="xb000001">
                             <td><img class="product-img img1" src=""></td>
-                            <td><span class="product-name">青莲-初心</span></td>
-                            <td class="type-cell">鉴赏</td>
-                            <td><span class="status-tag">已上货</span></td>
-                            <td class="mode-cell">
-                                <span class="mode-tag draw">抽签购</span><span class="mode-tag open">全民购</span>
+                            <td>
+                                <div class="product-name">青莲-初心</div>
+                                <div class="product-no">XB000001</div>
                             </td>
-                            <td class="stage-cell"><span class="stage-tag wholesale">批发市场</span></td>
-                            <td class="time-cell">2026-07-29 13:56:46</td>
+                            <td class="phone-cell">13800172866</td>
+                            <td class="num-cell trade-count">6</td>
+                            <td class="remain-cell"><span class="remain-tag">14</span></td>
                             <td class="time-cell">2026-07-30 15:38:13</td>
-                            <td class="actions">
-                                <a>产品详情</a>
-                                <a>批发管理</a>
-                                <a>文本价值要素标注</a>
-                                <a>文本价值要素数据集</a>
-                                <a onclick="location.href='批发市场分账申请.html?name='+encodeURIComponent('青莲-初心')+'&price=1562.50&qty=8&sold=6&img=img1'">批发分账申请</a>
-                                <a onclick="location.href='批发冻结金分账管理.html'">批发冻结金分账申请</a>
-                                <a class="disabled">货款提取（已废弃）</a>
-                            </td>
+                            <td class="amount-cell">¥1,562.50</td>
+                            <td class="actions"><a onclick="openDetail(0)">详情</a></td>
                         </tr>
-                        <tr>
+                        <tr data-name="西路财童" data-no="xb000002">
                             <td><img class="product-img img2" src=""></td>
-                            <td><span class="product-name">西路财童</span></td>
-                            <td class="type-cell">鉴赏</td>
-                            <td><span class="status-tag">已上货</span></td>
-                            <td class="mode-cell">
-                                <span class="mode-tag prior">优先购</span>
+                            <td>
+                                <div class="product-name">西路财童</div>
+                                <div class="product-no">XB000002</div>
                             </td>
-                            <td class="stage-cell"><span class="stage-tag done">批发完成</span></td>
-                            <td class="time-cell">2026-07-21 09:51:04</td>
+                            <td class="phone-cell">19981465373</td>
+                            <td class="num-cell trade-count">5</td>
+                            <td class="remain-cell"><span class="remain-tag">15</span></td>
                             <td class="time-cell">2026-07-22 15:30:19</td>
-                            <td class="actions">
-                                <a>产品详情</a>
-                                <a>批发管理</a>
-                                <a>文本价值要素标注</a>
-                                <a>文本价值要素数据集</a>
-                                <a onclick="location.href='批发市场分账申请.html?name='+encodeURIComponent('西路财童')+'&price=2500&qty=5&sold=5&img=img2'">批发分账申请</a>
-                                <a onclick="location.href='批发冻结金分账管理.html'">批发冻结金分账申请</a>
-                                <a class="disabled">货款提取（已废弃）</a>
-                            </td>
+                            <td class="amount-cell">¥2,500.00</td>
+                            <td class="actions"><a onclick="openDetail(1)">详情</a></td>
                         </tr>
-                        <tr>
+                        <tr data-name="中路财童" data-no="xb000003">
                             <td><img class="product-img img3" src=""></td>
-                            <td><span class="product-name">中路财童</span></td>
-                            <td class="type-cell">鉴赏</td>
-                            <td><span class="status-tag">已上货</span></td>
-                            <td class="mode-cell">
-                                <span class="mode-tag draw">抽签购</span>
+                            <td>
+                                <div class="product-name">中路财童</div>
+                                <div class="product-no">XB000003</div>
                             </td>
-                            <td class="stage-cell"><span class="stage-tag wholesale">批发市场</span></td>
-                            <td class="time-cell">2026-07-14 09:22:25</td>
+                            <td class="phone-cell">18227406306</td>
+                            <td class="num-cell trade-count">40</td>
+                            <td class="remain-cell"><span class="remain-tag warn">10</span></td>
                             <td class="time-cell">2026-07-31 08:00:01</td>
-                            <td class="actions">
-                                <a>产品详情</a>
-                                <a>批发管理</a>
-                                <a>文本价值要素标注</a>
-                                <a>文本价值要素数据集</a>
-                                <a onclick="location.href='批发市场分账申请.html?name='+encodeURIComponent('中路财童')+'&price=250&qty=50&sold=40&img=img3'">批发分账申请</a>
-                                <a onclick="location.href='批发冻结金分账管理.html'">批发冻结金分账申请</a>
-                                <a class="disabled">货款提取（已废弃）</a>
-                            </td>
+                            <td class="amount-cell">¥250.00</td>
+                            <td class="actions"><a onclick="openDetail(2)">详情</a></td>
                         </tr>
-                        <tr>
+                        <tr data-name="榜样-统一" data-no="xb000004">
                             <td><img class="product-img img4" src=""></td>
-                            <td><span class="product-name">榜样-统一</span></td>
-                            <td class="type-cell">期待</td>
-                            <td><span class="status-tag">已上货</span></td>
-                            <td class="mode-cell">
-                                <span class="mode-tag prior">优先购</span><span class="mode-tag draw">抽签购</span>
+                            <td>
+                                <div class="product-name">榜样-统一</div>
+                                <div class="product-no">XB000004</div>
                             </td>
-                            <td class="stage-cell"><span class="stage-tag retail">零售市场</span></td>
-                            <td class="time-cell">2026-07-01 15:49:11</td>
+                            <td class="phone-cell">15528430479</td>
+                            <td class="num-cell trade-count">12</td>
+                            <td class="remain-cell"><span class="remain-tag warn">8</span></td>
                             <td class="time-cell">2026-07-13 15:29:54</td>
-                            <td class="actions">
-                                <a>产品详情</a>
-                                <a>批发管理</a>
-                                <a>文本价值要素标注</a>
-                                <a>文本价值要素数据集</a>
-                                <a onclick="location.href='批发市场分账申请.html?name='+encodeURIComponent('榜样-统一')+'&price=1200&qty=20&sold=12&img=img4'">批发分账申请</a>
-                                <a onclick="location.href='批发冻结金分账管理.html'">批发冻结金分账申请</a>
-                                <a class="disabled">货款提取（已废弃）</a>
-                            </td>
+                            <td class="amount-cell">¥1,200.00</td>
+                            <td class="actions"><a onclick="openDetail(3)">详情</a></td>
                         </tr>
-                        <tr>
+                        <tr data-name="青莲-舒展" data-no="xb000005">
                             <td><img class="product-img img5" src=""></td>
-                            <td><span class="product-name">青莲-舒展</span></td>
-                            <td class="type-cell">期待</td>
-                            <td><span class="status-tag">已上货</span></td>
-                            <td class="mode-cell">
-                                <span class="mode-tag open">全民购</span>
+                            <td>
+                                <div class="product-name">青莲-舒展</div>
+                                <div class="product-no">XB000005</div>
                             </td>
-                            <td class="stage-cell"><span class="stage-tag done">批发完成</span></td>
-                            <td class="time-cell">2026-06-30 14:19:34</td>
+                            <td class="phone-cell">19382153852</td>
+                            <td class="num-cell trade-count">25</td>
+                            <td class="remain-cell"><span class="remain-tag danger">5</span></td>
                             <td class="time-cell">2026-07-22 09:39:56</td>
-                            <td class="actions">
-                                <a>产品详情</a>
-                                <a>批发管理</a>
-                                <a>文本价值要素标注</a>
-                                <a>文本价值要素数据集</a>
-                                <a onclick="location.href='批发市场分账申请.html?name='+encodeURIComponent('青莲-舒展')+'&price=800&qty=30&sold=25&img=img5'">批发分账申请</a>
-                                <a onclick="location.href='批发冻结金分账管理.html'">批发冻结金分账申请</a>
-                                <a class="disabled">货款提取（已废弃）</a>
-                            </td>
+                            <td class="amount-cell">¥800.00</td>
+                            <td class="actions"><a onclick="openDetail(4)">详情</a></td>
                         </tr>
-                        <tr>
+                        <tr data-name="东坡-惜春" data-no="xb000006">
                             <td><img class="product-img img6" src=""></td>
-                            <td><span class="product-name">东坡-惜春</span></td>
-                            <td class="type-cell">活动</td>
-                            <td><span class="status-tag">已上货</span></td>
-                            <td class="mode-cell">
-                                <span class="mode-tag prior">优先购</span><span class="mode-tag draw">抽签购</span><span class="mode-tag open">全民购</span>
+                            <td>
+                                <div class="product-name">东坡-惜春</div>
+                                <div class="product-no">XB000006</div>
                             </td>
-                            <td class="stage-cell"><span class="stage-tag wholesale">批发市场</span></td>
-                            <td class="time-cell">2026-06-12 13:39:55</td>
+                            <td class="phone-cell">19113541040</td>
+                            <td class="num-cell trade-count">8</td>
+                            <td class="remain-cell"><span class="remain-tag danger">2</span></td>
                             <td class="time-cell">2026-07-31 08:00:01</td>
-                            <td class="actions">
-                                <a>产品详情</a>
-                                <a>批发管理</a>
-                                <a>文本价值要素标注</a>
-                                <a>文本价值要素数据集</a>
-                                <a onclick="location.href='批发市场分账申请.html?name='+encodeURIComponent('东坡-惜春')+'&price=3000&qty=10&sold=8&img=img6'">批发分账申请</a>
-                                <a onclick="location.href='批发冻结金分账管理.html'">批发冻结金分账申请</a>
-                                <a class="disabled">货款提取（已废弃）</a>
-                            </td>
+                            <td class="amount-cell">¥3,000.00</td>
+                            <td class="actions"><a onclick="openDetail(5)">详情</a></td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </div>
+    </div>
+</div>
+
+<!-- 交易详情弹窗 -->
+<div class="detail-mask" id="detailMask" onclick="closeDetail()"></div>
+<div class="detail-modal" id="detailModal">
+    <div class="dm-title">
+        交易记录详情
+        <span class="dm-sub" id="dmProduct"></span>
+        <button class="dm-close" onclick="closeDetail()">✕</button>
+    </div>
+    <div class="dm-body">
+        <div class="dm-note" id="dmNote"></div>
+        <table class="dm-table">
+            <thead>
+                <tr>
+                    <th>订单编号</th>
+                    <th>卖家</th>
+                    <th>买家</th>
+                    <th>成交金额</th>
+                    <th>成交时间</th>
+                </tr>
+            </thead>
+            <tbody id="dmBody"></tbody>
+        </table>
     </div>
 </div>
 
@@ -459,30 +449,128 @@
     <span>📖 功能说明</span>
     <button class="fm-close" onclick="toggleFuncModal()">✕</button>
   </div>
-  <div style="font-size:13px;font-weight:600;color:#e74c5e;margin:-6px 0 12px;">批发商后台</div>
+  <div style="font-size:13px;font-weight:600;color:#e74c5e;margin:-6px 0 12px;">批发商后台 · 产品管理 / 产品详情管理</div>
   <div class="fm-body">
-    <div style="background:#fff7f7;border:1px solid #ffd9d9;border-radius:8px;padding:10px 12px;margin-bottom:14px;font-size:13px;color:#7a2e33;line-height:1.9;">
-      <div style="font-weight:600;color:#e74c5e;margin-bottom:4px;"><span class="badge" style="display:inline-block;min-width:18px;height:18px;padding:0 5px;border-radius:50%;background:#ff2d55;color:#fff;font-size:12px;line-height:18px;text-align:center;font-weight:600;">1</span> <span style="vertical-align:middle;">▎迁移说明：服务商产品管理</span></div>
-      本次将<b>服务商的产品管理功能</b>迁移至批发商后台：<br>
-      ① 新增列：<b>批发模式</b>（优先购 / 抽签购 / 全民购，支持组合）、<b>阶段</b>（批发市场 / 批发完成 / 零售市场）；<br>
-      ② 操作栏新增按钮：<b>批发管理</b>、<b>文本价值要素标注</b>、<b>文本价值要素数据集</b>；<br>
-      功能逻辑沿用之前服务商版本，不做变更。
-    </div>
-    <h4><span class="badge" style="display:inline-block;min-width:18px;height:18px;padding:0 5px;border-radius:50%;background:#ff2d55;color:#fff;font-size:12px;line-height:18px;text-align:center;font-weight:600;">2</span> <span style="vertical-align:middle;">货款提取（已废弃）</span></h4>
+    <h4><span class="badge">1</span> <span style="vertical-align:middle;">页面说明</span></h4>
     <ul>
-      <li>老入口灰色展示，点开后的数据展示保留</li>
-      <li>只针对之前开通了<b>宝付</b>的企业展示</li>
-      <li>新企业进来不再展示该按钮</li>
+      <li>产品管理下的二级菜单，展示每个产品的<b>当前持有人、交易次数、剩余次数</b>及最近交易信息</li>
+      <li><b>剩余次数</b> = 产品交易次数上限 − 已交易次数，剩余 ≤ 10 橙色、≤ 5 红色提示</li>
     </ul>
-    <h4><span class="badge" style="display:inline-block;min-width:18px;height:18px;padding:0 5px;border-radius:50%;background:#ff2d55;color:#fff;font-size:12px;line-height:18px;text-align:center;font-weight:600;">3</span> <span style="vertical-align:middle;">新增按钮</span></h4>
+    <h4><span class="badge">2</span> <span style="vertical-align:middle;">搜索</span></h4>
     <ul>
-      <li>「<b>批发分账申请</b>」：发起批发货款分账申请</li>
-      <li>「<b>批发冻结金分账申请</b>」：进入<b>批发冻结金分账管理</b>，发起冻结金释放申请</li>
+      <li>支持按<b>产品名称</b>、<b>产品编号</b>模糊搜索，可组合条件</li>
+    </ul>
+    <h4><span class="badge">3</span> <span style="vertical-align:middle;">交易详情浮层</span></h4>
+    <ul>
+      <li>点击操作列「<b>详情</b>」，浮层列表展示该产品的<b>全部</b>交易记录（数量 = 交易次数）</li>
+      <li>包含字段：<b>订单编号、卖家、买家、成交金额、成交时间</b></li>
+      <li>交易次数较多时，浮层内列表可滚动查看</li>
+    </ul>
+    <h4><span class="badge">4</span> <span style="vertical-align:middle;">手机号展示</span></h4>
+    <ul>
+      <li>当前持有人、卖家、买家统一以<b>11 位手机号</b>展示</li>
     </ul>
   </div>
 </div>
 
 <script>
+// ===== 产品交易数据（详情浮层展示全部交易记录）=====
+var phonePool = ['13800172866','19981465373','18227406306','15528430479','19382153852','19113541040','19130634113','13908193164'];
+
+function pad2(n) { return (n < 10 ? '0' : '') + n; }
+function pad3(n) { return (n < 10 ? '00' : n < 100 ? '0' : '') + n; }
+function fmtMoney(n) { return '¥' + n.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+
+// 生成某产品全部交易记录（确定性生成，按时间从早到晚排序）
+function buildRecords(holder, trades, lastTime, lastAmount, orderPrefix) {
+    var list = [];
+    var t = new Date(lastTime.replace(/-/g, '/'));
+    var amt = lastAmount;
+    var pool = phonePool.filter(function (x) { return x !== holder; });
+    for (var i = 0; i < trades; i++) {
+        // 时间确定性往前推：每笔间隔 2~6 天，并错开不同时段
+        var gap = 2 + (i % 5);
+        t = new Date(t.getTime() - gap * 86400000 - (i * 7 % 96) * 3600000);
+        var Y = t.getFullYear(), M = pad2(t.getMonth() + 1), D = pad2(t.getDate());
+        var h = pad2(t.getHours()), mi = pad2(t.getMinutes()), s = pad2(t.getSeconds());
+        var order = orderPrefix + Y + M + D + h + mi + s + pad3(trades - i);
+        // 最新一笔买家为当前持有人，其余在手机号池中轮换
+        var seller = pool[(i * 3 + 1) % pool.length];
+        var buyer = (i === 0) ? holder : pool[(i * 2 + 2) % pool.length];
+        while (buyer === seller) { buyer = pool[(i * 2 + 3) % pool.length]; }
+        // 金额确定性变化
+        amt = Math.max(50, Math.round(amt * (0.975 - (i % 6) * 0.003) * 100) / 100);
+        list.push({
+            order: order,
+            seller: seller,
+            buyer: buyer,
+            amount: fmtMoney(amt),
+            time: Y + '-' + M + '-' + D + ' ' + h + ':' + mi + ':' + s
+        });
+    }
+    return list.reverse();
+}
+
+var products = [
+    { no: 'XB000001', name: '青莲-初心', holder: '13800172866', trades: 6, limit: 20, lastTime: '2026-07-30 15:38:13', lastAmount: 1562.50 },
+    { no: 'XB000002', name: '西路财童', holder: '19981465373', trades: 5, limit: 20, lastTime: '2026-07-22 15:30:19', lastAmount: 2500.00 },
+    { no: 'XB000003', name: '中路财童', holder: '18227406306', trades: 40, limit: 50, lastTime: '2026-07-31 08:00:01', lastAmount: 250.00 },
+    { no: 'XB000004', name: '榜样-统一', holder: '15528430479', trades: 12, limit: 20, lastTime: '2026-07-13 15:29:54', lastAmount: 1200.00 },
+    { no: 'XB000005', name: '青莲-舒展', holder: '19382153852', trades: 25, limit: 30, lastTime: '2026-07-22 09:39:56', lastAmount: 800.00 },
+    { no: 'XB000006', name: '东坡-惜春', holder: '19113541040', trades: 8, limit: 10, lastTime: '2026-07-31 08:00:01', lastAmount: 3000.00 }
+];
+
+// 每个产品的交易记录数量 = 交易次数（全部交易）
+products.forEach(function (p) {
+    p.records = buildRecords(p.holder, p.trades, p.lastTime, p.lastAmount, p.no);
+});
+
+// ===== 搜索 / 重置 =====
+function doSearch() {
+    var kw1 = document.getElementById('searchName').value.trim().toLowerCase();
+    var kw2 = document.getElementById('searchNo').value.trim().toLowerCase();
+    var rows = document.querySelectorAll('#tbBody tr');
+    rows.forEach(function(tr) {
+        var name = (tr.getAttribute('data-name') || '').toLowerCase();
+        var no = (tr.getAttribute('data-no') || '').toLowerCase();
+        var ok = (!kw1 || name.indexOf(kw1) >= 0) && (!kw2 || no.indexOf(kw2) >= 0);
+        tr.style.display = ok ? '' : 'none';
+    });
+}
+
+function doReset() {
+    document.getElementById('searchName').value = '';
+    document.getElementById('searchNo').value = '';
+    document.querySelectorAll('#tbBody tr').forEach(function(tr) { tr.style.display = ''; });
+}
+
+// 回车搜索
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') doSearch();
+});
+
+// ===== 交易详情弹窗 =====
+function openDetail(idx) {
+    var p = products[idx];
+    document.getElementById('dmProduct').textContent = p.name + '（' + p.no + '）';
+    document.getElementById('dmNote').textContent = '该产品共交易 ' + p.trades + ' 次，当前持有人：' + p.holder + '，以下为该产品全部 ' + p.records.length + ' 笔交易记录：';
+    var body = document.getElementById('dmBody');
+    body.innerHTML = '';
+    p.records.forEach(function(r) {
+        var tr = document.createElement('tr');
+        tr.innerHTML = '<td>' + r.order + '</td><td>' + r.seller + '</td><td>' + r.buyer + '</td><td class="dm-amount">' + r.amount + '</td><td>' + r.time + '</td>';
+        body.appendChild(tr);
+    });
+    document.getElementById('detailMask').classList.add('show');
+    document.getElementById('detailModal').classList.add('show');
+}
+
+function closeDetail() {
+    document.getElementById('detailMask').classList.remove('show');
+    document.getElementById('detailModal').classList.remove('show');
+}
+
+// ===== 功能说明浮窗 =====
 function toggleFuncModal() {
   var el = document.getElementById('funcModal');
   el.classList.toggle('show');

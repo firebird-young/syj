@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>寄售详情管理</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+            background: #f0f2f5;
+            color: #1a1a2e;
+            font-size: 14px;
+        }
+
+        /* 顶部 */
+        .topbar {
+            background: #fff;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            border-bottom: 1px solid #f0f0f0;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .topbar-left { display: flex; align-items: center; gap: 16px; }
+        .menu-btn {
+            width: 32px; height: 32px;
+            border: 1px solid #d0d5dd;
+            border-radius: 4px;
+            background: #fff;
+            color: #6b7588;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+        .menu-btn:hover { background: #f5f5f7; }
+        .breadcrumb { font-size: 13px; color: #6b7588; }
+        .breadcrumb .active { color: #1a1a2e; }
+        .topbar-right {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        .topbar-right .btn-func {
+            margin-right: 12px;
+            padding: 6px 14px;
+            border-radius: 6px;
+            background: #f5f7fa;
+            color: #333;
+            border: 1px solid #e0e4ea;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .topbar-right .btn-func:hover { border-color: #1a78ff; color: #1a78ff; }
+        .topbar-right .avatar {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            background: #f5deb3;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px;
+        }
+        .topbar-right .name { font-size: 13px; }
+        .topbar-right .arrow { color: #9ba6b9; font-size: 12px; }
+
+        /* 二级面包屑 */
+        .subnav {
+            background: #fff;
+            padding: 12px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 13px;
+            color: #6b7588;
+        }
+        .subnav .tab {
+            display: inline-block;
+            padding: 6px 14px;
+            background: #f5f7fc;
+            color: #4e5a6e;
+            border-radius: 4px;
+            margin-right: 8px;
+            cursor: pointer;
+        }
+        .subnav .tab.active {
+            background: #1a78ff;
+            color: #fff;
+        }
+
+        /* 统计卡 */
+        .stat-card {
+            margin: 12px 20px 0;
+            background: #fff;
+            border-radius: 6px;
+            padding: 16px 0;
+            display: flex;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        }
+        .stat-item {
+            flex: 1;
+            text-align: center;
+            position: relative;
+        }
+        .stat-item + .stat-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 15%;
+            height: 70%;
+            width: 1px;
+            background: #f0f0f0;
+        }
+        .stat-num { font-size: 22px; font-weight: 700; color: #1a1a2e; margin-bottom: 4px; }
+        .stat-num.red { color: #e74c5e; }
+        .stat-num.green { color: #1aab67; }
+        .stat-label { font-size: 13px; color: #86909c; }
+
+        /* 筛选区 */
+        .filter-bar {
+            background: #fff;
+            margin: 12px 20px 0;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            border-radius: 6px;
+        }
+        .filter-item {
+            display: flex;
+            align-items: center;
+            margin-right: 16px;
+            margin-bottom: 4px;
+        }
+        .filter-label {
+            font-size: 13px;
+            color: #4e5a6e;
+            margin-right: 8px;
+            white-space: nowrap;
+        }
+        .filter-input {
+            width: 170px;
+            height: 30px;
+            padding: 0 10px;
+            border: 1px solid #d0d5dd;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #1a1a2e;
+            outline: none;
+        }
+        .filter-input:focus { border-color: #1a78ff; }
+        .filter-select {
+            width: 130px;
+            height: 30px;
+            padding: 0 10px;
+            border: 1px solid #d0d5dd;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #1a1a2e;
+            outline: none;
+            background: #fff;
+        }
+        .filter-date-input {
+            width: 110px;
+            height: 30px;
+            padding: 0 10px;
+            border: 1px solid #d0d5dd;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #1a1a2e;
+            outline: none;
+        }
+        .filter-sep {
+            font-size: 13px;
+            color: #9ba6b9;
+            margin: 0 6px;
+        }
+        .filter-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: auto;
+        }
+        .btn-export {
+            background: #f59e0b;
+            color: #fff;
+            border: none;
+            padding: 0 14px;
+            height: 30px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .btn-export:hover { background: #e08d04; }
+        .btn-search {
+            background: #1a78ff;
+            color: #fff;
+            border: none;
+            padding: 0 14px;
+            height: 30px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .btn-search:hover { background: #0f6ae8; }
+        .btn-reset {
+            background: #fff;
+            color: #1a78ff;
+            border: 1px solid #1a78ff;
+            padding: 0 14px;
+            height: 30px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .btn-reset:hover { background: #f5f8ff; }
+
+        /* 表格 */
+        .table-card {
+            background: #fff;
+            margin: 12px 20px;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .table th {
+            background: #fafbfc;
+            padding: 14px 14px;
+            text-align: left;
+            font-size: 13px;
+            color: #4e5a6e;
+            font-weight: 500;
+            border-bottom: 1px solid #f0f0f0;
+            white-space: nowrap;
+        }
+        .table td {
+            padding: 14px 14px;
+            font-size: 13px;
+            color: #1a1a2e;
+            border-bottom: 1px solid #f5f5f7;
+        }
+        .table tr:last-child td { border-bottom: none; }
+
+        .product-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 6px;
+            object-fit: cover;
+            background: linear-gradient(135deg,#f0e8d8 0%,#c9b88e 100%);
+            display: block;
+        }
+        .product-img.img1 { background-image: linear-gradient(135deg,#d8e0e8 0%,#98a8c4 100%); }
+        .product-img.img2 { background-image: linear-gradient(135deg,#f5e8b8 0%,#c9a04a 100%); }
+        .product-img.img3 { background-image: linear-gradient(135deg,#e8d8a0 0%,#c08830 100%); }
+        .product-img.img4 { background-image: linear-gradient(135deg,#d8b8a0 0%,#a87850 100%); }
+        .product-img.img5 { background-image: linear-gradient(135deg,#d4d8d4 0%,#98a098 100%); }
+        .product-img.img6 { background-image: linear-gradient(135deg,#f7e8d4 0%,#c8a888 100%); }
+
+        .product-name { font-weight: 600; white-space: nowrap; }
+        .product-no { font-size: 12px; color: #9ba6b9; margin-top: 3px; white-space: nowrap; }
+
+        .phone-cell { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .amount-cell { color: #e74c3e; font-weight: 600; white-space: nowrap; }
+        .amount-cell.green { color: #1aab67; }
+        .time-cell { color: #6b7588; white-space: nowrap; }
+
+        .status-tag {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+        .status-tag.selling { background: #fdecee; color: #e74c5e; }
+        .status-tag.sold { background: #e8f8f0; color: #1aab67; }
+        .status-tag.off { background: #f2f3f5; color: #86909c; }
+
+        .remain-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            background: #fff7e6;
+            color: #e67e22;
+            white-space: nowrap;
+        }
+        .order-link {
+            display: inline-block;
+            color: #1a78ff;
+            text-decoration: none;
+            font-size: 12px;
+            cursor: pointer;
+            white-space: nowrap;
+            margin-bottom: 3px;
+        }
+        .order-link:hover { text-decoration: underline; }
+
+        .actions { white-space: nowrap; }
+        .actions a {
+            color: #1a78ff;
+            text-decoration: none;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .actions a:hover { text-decoration: underline; }
+
+        /* 详情弹窗 */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal-box {
+            background: #fff;
+            border-radius: 6px;
+            width: 560px;
+            max-width: 94vw;
+            max-height: 86vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.25);
+        }
+        .modal-header {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .modal-title { font-size: 16px; font-weight: 600; color: #1a1a2e; }
+        .modal-sub { margin-left: 10px; font-size: 12px; color: #6b7588; font-weight: 400; }
+        .modal-close {
+            margin-left: auto;
+            font-size: 20px;
+            color: #999;
+            cursor: pointer;
+            padding: 0 8px;
+        }
+        .modal-close:hover { color: #666; }
+        .modal-body { padding: 16px 20px; overflow-y: auto; }
+
+        .d-product {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid #f5f5f7;
+            margin-bottom: 12px;
+        }
+        .d-info { flex: 1; min-width: 0; }
+        .d-name { font-size: 15px; font-weight: 600; color: #1a1a2e; display: flex; align-items: center; gap: 8px; }
+        .d-code {
+            font-size: 11px; color: #1a78ff; font-weight: 600;
+            background: #e6f4ff; border: 1px solid #b7dcff;
+            padding: 2px 8px; border-radius: 4px;
+        }
+        .d-status { margin-top: 6px; }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            row-gap: 12px;
+            column-gap: 16px;
+        }
+        .detail-grid .dg-item {}
+        .detail-grid .dg-label { font-size: 12px; color: #9ba6b9; margin-bottom: 3px; }
+        .detail-grid .dg-value { font-size: 14px; color: #1a1a2e; }
+        .detail-grid .dg-value.red { color: #e74c3e; font-weight: 600; }
+        .detail-grid .dg-value.green { color: #1aab67; font-weight: 600; }
+
+        /* ── 功能说明浮窗 ── */
+        .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 560px; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 9999; padding: 24px; display: none; }
+        .f-modal.show { display: block; }
+        .f-modal .fm-title { font-size: 16px; font-weight: 600; color: #1a1a2e; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
+        .f-modal .fm-title:active { cursor: grabbing; }
+        .f-modal .fm-close { width: 28px; height: 28px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; color: #666; border: none; flex-shrink: 0; }
+        .f-modal .fm-close:hover { background: #e8e8e8; }
+        .f-modal .fm-body { font-size: 13px; color: #555; line-height: 1.8; }
+        .f-modal .fm-body h4 { font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 16px 0 8px; }
+        .f-modal .fm-body h4:first-child { margin-top: 0; }
+        .f-modal .fm-body ul { padding-left: 18px; margin: 0 0 12px; }
+        .f-modal .fm-body li { margin-bottom: 4px; }
+        .badge { display: inline-block; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 50%; background: #ff2d55; color: #fff; font-size: 12px; line-height: 18px; text-align: center; font-weight: 600; box-shadow: 0 1px 3px rgba(255,45,85,0.3); }
+    </style>
+</head>
+<body>
+
+<!-- 顶部 -->
+<div class="topbar">
+    <div class="topbar-left">
+        <button class="menu-btn">≡</button>
+        <div class="breadcrumb">
+            <span>首页</span> /
+            <span>寄售管理</span> /
+            <span class="active">寄售详情管理</span>
+        </div>
+    </div>
+    <div class="topbar-right">
+        <button class="btn-func" onclick="toggleFuncModal()">📖 功能说明</button>
+        <span class="avatar">👤</span>
+        <span class="name">平台账号</span>
+        <span class="arrow">▾</span>
+    </div>
+</div>
+
+<!-- 二级面包屑 -->
+<div class="subnav">
+    <span>首页 / 寄售管理 /</span>
+    <span class="tab active">寄售详情管理</span>
+</div>
+
+<!-- 统计卡 -->
+<div class="stat-card">
+    <div class="stat-item">
+        <div class="stat-num red">4</div>
+        <div class="stat-label">寄售中</div>
+    </div>
+    <div class="stat-item">
+        <div class="stat-num green">3</div>
+        <div class="stat-label">已售出</div>
+    </div>
+    <div class="stat-item">
+        <div class="stat-num">2</div>
+        <div class="stat-label">已下架</div>
+    </div>
+    <div class="stat-item">
+        <div class="stat-num">¥404.80</div>
+        <div class="stat-label">累计成交</div>
+    </div>
+</div>
+
+<!-- 筛选区 -->
+<div class="filter-bar">
+    <div class="filter-item">
+        <span class="filter-label">寄售人账号</span>
+        <input class="filter-input" id="searchUser" placeholder="请输入寄售人手机号">
+    </div>
+    <div class="filter-item">
+        <span class="filter-label">产品名称</span>
+        <input class="filter-input" id="searchName" placeholder="请输入产品名称">
+    </div>
+    <div class="filter-item">
+        <span class="filter-label">产品编号</span>
+        <input class="filter-input" id="searchNo" placeholder="请输入产品编号" style="width:140px;">
+    </div>
+    <div class="filter-item">
+        <span class="filter-label">寄售状态</span>
+        <select class="filter-select" id="searchStatus">
+            <option value="">全部</option>
+            <option value="selling">寄售中</option>
+            <option value="sold">已售出</option>
+            <option value="off">已下架</option>
+        </select>
+    </div>
+    <div class="filter-item">
+        <span class="filter-label">挂单时间</span>
+        <input class="filter-date-input" id="dateStart" placeholder="开始日期">
+        <span class="filter-sep">至</span>
+        <input class="filter-date-input" id="dateEnd" placeholder="结束日期">
+    </div>
+    <div class="filter-actions">
+        <button class="btn-export" onclick="doExport()">⬇ 导 出</button>
+        <button class="btn-search" onclick="doSearch()">🔍 搜 索</button>
+        <button class="btn-reset" onclick="doReset()">↻ 重 置</button>
+    </div>
+</div>
+
+<!-- 表格 -->
+<div class="table-card">
+    <table class="table">
+        <thead>
+            <tr>
+                <th style="width:74px;">图片</th>
+                <th>产品名称</th>
+                <th>寄售人</th>
+                <th>挂单价格</th>
+                <th>挂单时间</th>
+                <th>状态</th>
+                <th>剩余天数 / 成交信息</th>
+                <th>成交时间</th>
+                <th style="width:90px;">操作</th>
+            </tr>
+        </thead>
+        <tbody id="tbBody"></tbody>
+    </table>
+</div>
+
+<!-- 寄售详情弹窗 -->
+<div class="modal-overlay" id="detailOverlay" onclick="if(event.target===this)closeDetail()">
+    <div class="modal-box">
+        <div class="modal-header">
+            <span class="modal-title">寄售详情</span>
+            <span class="modal-sub" id="dmSub"></span>
+            <span class="modal-close" onclick="closeDetail()">×</span>
+        </div>
+        <div class="modal-body">
+            <div class="d-product">
+                <img class="product-img" id="dmImg" src="">
+                <div class="d-info">
+                    <div class="d-name"><span id="dmName"></span><span class="d-code" id="dmCode"></span></div>
+                    <div class="d-status"><span class="status-tag" id="dmStatus"></span></div>
+                </div>
+            </div>
+            <div class="detail-grid" id="dmGrid"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ====== 功能说明浮窗 ====== -->
+<div class="f-modal" id="funcModal">
+  <div class="fm-title">
+    <span>📖 功能说明</span>
+    <button class="fm-close" onclick="toggleFuncModal()">✕</button>
+  </div>
+  <div style="font-size:13px;font-weight:600;color:#e74c5e;margin:-6px 0 12px;">平台 · 寄售管理 / 寄售详情管理</div>
+  <div class="fm-body">
+    <h4><span class="badge">1</span> <span style="vertical-align:middle;">页面说明</span></h4>
+    <ul>
+      <li>展示平台上<b>所有用户、所有产品</b>的寄售记录（对应零售端「我的寄售」）</li>
+      <li>顶部统计：寄售中件数、已售出件数、已下架件数、<b>累计成交金额</b></li>
+      <li>本页面<b>仅可查看</b>，不支持下架 / 撤销，操作列提供「查看详情」</li>
+    </ul>
+    <h4><span class="badge">2</span> <span style="vertical-align:middle;">寄售记录字段</span></h4>
+    <ul>
+      <li>每行展示：产品图、产品名称、<b>寄售人手机号</b>、挂单价格、挂单时间、寄售状态、成交时间</li>
+      <li><b>寄售中</b>：成交信息列展示剩余挂单天数（橙色标签）</li>
+      <li><b>已售出</b>：成交信息列仅展示<b>订单编号</b>（点击跳转订单管理），成交价与交易服务费见详情浮层</li>
+      <li><b>已下架</b>：成交信息列展示下架时间</li>
+    </ul>
+    <h4><span class="badge">3</span> <span style="vertical-align:middle;">筛选</span></h4>
+    <ul>
+      <li>支持按<b>寄售人账号</b>、<b>产品名称</b>、<b>产品编号</b>模糊搜索</li>
+      <li>支持按<b>寄售状态</b>（寄售中 / 已售出 / 已下架）及<b>挂单时间范围</b>筛选，可组合条件</li>
+    </ul>
+    <h4><span class="badge">4</span> <span style="vertical-align:middle;">寄售详情浮层</span></h4>
+    <ul>
+      <li>点击操作列「查看详情」展示完整寄售信息：产品信息、寄售人、挂单价格与时间、到期时间、状态</li>
+      <li>已售出记录额外展示：<b>订单编号</b>（点击跳转订单管理）、成交价、<b>买家账号</b>、交易服务费、成交时间</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+// ===== 全平台寄售数据（status: selling 寄售中 / sold 已售出 / off 已下架）=====
+var records = [
+    { img: 'img1', name: '永淳·夏日帖', code: '#0027', user: '13800172866', status: 'selling', price: 92.00, time: '2026-07-30 14:23', remain: 5, endTime: '2026-09-05 14:23' },
+    { img: 'img3', name: '兰亭序', code: '#0031', user: '18227406306', status: 'selling', price: 128.00, time: '2026-08-01 09:15', remain: 9, endTime: '2026-09-10 09:15' },
+    { img: 'img1', name: '永淳·夏日帖', code: '#0029', user: '19981465373', status: 'selling', price: 88.00, time: '2026-07-25 11:30', remain: 2, endTime: '2026-09-02 11:30' },
+    { img: 'img4', name: '山水空灵', code: '#0018', user: '15528430479', status: 'selling', price: 45.00, time: '2026-08-03 16:08', remain: 11, endTime: '2026-09-12 16:08' },
+    { img: 'img1', name: '永淳·夏日帖', code: '#0025', user: '13800172866', status: 'sold', price: 98.00, time: '2026-07-23 10:12', deal: 96.00, fee: 3.46, buyer: '19130634113', dealTime: '2026-07-28 16:42', order: 'XB-txbuy26072804025101' },
+    { img: 'img4', name: '山水空灵', code: '#0012', user: '19382153852', status: 'sold', price: 256.00, time: '2026-07-15 09:30', deal: 250.00, fee: 9.00, buyer: '13908193164', dealTime: '2026-07-22 15:30', order: 'XB-txbuy26072203050102' },
+    { img: 'img5', name: '十七贴', code: '#0044', user: '19113541040', status: 'sold', price: 60.00, time: '2026-07-24 14:05', deal: 58.80, fee: 2.12, buyer: '18227406306', dealTime: '2026-07-30 11:20', order: 'XB-txbuy26073005010103' },
+    { img: 'img1', name: '永淳·夏日帖', code: '#0028', user: '13800172866', status: 'off', price: 110.00, time: '2026-07-26 09:45', offTime: '2026-07-28 09:45' },
+    { img: 'img3', name: '兰亭序', code: '#0033', user: '19981465373', status: 'off', price: 66.00, time: '2026-07-18 15:22', offTime: '2026-07-20 15:22' }
+];
+
+var statusNames = { selling: '寄售中', sold: '已售出', off: '已下架' };
+
+function fmt(n) { return n.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+
+function render(list) {
+    var html = '';
+    list.forEach(function(o) {
+        var extra;
+        if (o.status === 'selling') {
+            extra = '<span class="remain-tag">剩余 ' + o.remain + ' 天</span>';
+        } else if (o.status === 'sold') {
+            extra = '<a class="order-link" href="零售市场订单.html" title="点击查看订单" onclick="event.stopPropagation()">' + o.order + '</a>';
+        } else {
+            extra = '<div class="time-cell">' + o.offTime + '</div>';
+        }
+        html +=
+            '<tr data-user="' + o.user + '" data-name="' + o.name + '" data-code="' + o.code + '" data-status="' + o.status + '" data-time="' + o.time + '">' +
+                '<td><img class="product-img ' + o.img + '" src=""></td>' +
+                '<td><div class="product-name">' + o.name + '</div><div class="product-no">' + o.code + '</div></td>' +
+                '<td class="phone-cell">' + o.user + '</td>' +
+                '<td class="amount-cell">¥' + fmt(o.price) + '</td>' +
+                '<td class="time-cell">' + o.time + '</td>' +
+                '<td><span class="status-tag ' + o.status + '">' + statusNames[o.status] + '</span></td>' +
+                '<td>' + extra + '</td>' +
+                '<td class="time-cell">' + (o.status === 'sold' ? o.dealTime : '') + '</td>' +
+                '<td class="actions"><a onclick="openDetail(' + records.indexOf(o) + ')">查看详情</a></td>' +
+            '</tr>';
+    });
+    document.getElementById('tbBody').innerHTML = html;
+}
+
+// ===== 搜索 / 重置 =====
+function doSearch() {
+    var kwUser = document.getElementById('searchUser').value.trim().toLowerCase();
+    var kwName = document.getElementById('searchName').value.trim().toLowerCase();
+    var kwNo = document.getElementById('searchNo').value.trim().toLowerCase();
+    var st = document.getElementById('searchStatus').value;
+    var ds = document.getElementById('dateStart').value;
+    var de = document.getElementById('dateEnd').value;
+    var rows = document.querySelectorAll('#tbBody tr');
+    rows.forEach(function(tr) {
+        var user = (tr.getAttribute('data-user') || '').toLowerCase();
+        var name = (tr.getAttribute('data-name') || '').toLowerCase();
+        var no = (tr.getAttribute('data-code') || '').toLowerCase();
+        var status = tr.getAttribute('data-status');
+        var time = tr.getAttribute('data-time') || '';
+        var ok = true;
+        if (kwUser && user.indexOf(kwUser) < 0) ok = false;
+        if (kwName && name.indexOf(kwName) < 0) ok = false;
+        if (kwNo && no.indexOf(kwNo) < 0) ok = false;
+        if (st && status !== st) ok = false;
+        if (ds && time < ds) ok = false;
+        if (de && time > de + ' 23:59:59') ok = false;
+        tr.style.display = ok ? '' : 'none';
+    });
+}
+
+function doReset() {
+    document.getElementById('searchUser').value = '';
+    document.getElementById('searchName').value = '';
+    document.getElementById('searchNo').value = '';
+    document.getElementById('searchStatus').value = '';
+    document.getElementById('dateStart').value = '';
+    document.getElementById('dateEnd').value = '';
+    document.querySelectorAll('#tbBody tr').forEach(function(tr) { tr.style.display = ''; });
+}
+
+function doExport() {
+    alert('已导出当前筛选条件下的寄售记录（演示）');
+}
+
+// 回车搜索
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') doSearch();
+});
+
+// ===== 寄售详情弹窗 =====
+function openDetail(idx) {
+    var o = records[idx];
+    document.getElementById('dmSub').textContent = '寄售人 ' + o.user;
+    document.getElementById('dmImg').className = 'product-img ' + o.img;
+    document.getElementById('dmName').textContent = o.name;
+    document.getElementById('dmCode').textContent = o.code;
+    var st = document.getElementById('dmStatus');
+    st.className = 'status-tag ' + o.status;
+    st.textContent = statusNames[o.status];
+
+    var grid = document.getElementById('dmGrid');
+    var items = [
+        ['寄售人账号', o.user, ''],
+        ['挂单价格', '¥' + fmt(o.price), 'red'],
+        ['挂单时间', o.time, ''],
+        ['结算渠道', '汇付钱包', '']
+    ];
+    if (o.status === 'selling') {
+        items.push(['挂单到期时间', o.endTime, '']);
+        items.push(['剩余天数', o.remain + ' 天', '']);
+    } else if (o.status === 'sold') {
+        items.push(['订单编号', '<a class="order-link" href="零售市场订单.html" title="点击查看订单">' + o.order + '</a>', '']);
+        items.push(['成交价', '¥' + fmt(o.deal), 'green']);
+        items.push(['买家账号', o.buyer, '']);
+        items.push(['交易服务费', '¥' + fmt(o.fee), '']);
+        items.push(['成交时间', o.dealTime, '']);
+    } else {
+        items.push(['下架时间', o.offTime, '']);
+    }
+    grid.innerHTML = '';
+    items.forEach(function(it) {
+        var div = document.createElement('div');
+        div.className = 'dg-item';
+        div.innerHTML = '<div class="dg-label">' + it[0] + '</div><div class="dg-value ' + it[2] + '">' + it[1] + '</div>';
+        grid.appendChild(div);
+    });
+
+    document.getElementById('detailOverlay').classList.add('show');
+}
+
+function closeDetail() {
+    document.getElementById('detailOverlay').classList.remove('show');
+}
+
+// ===== 功能说明浮窗 =====
+function toggleFuncModal() {
+  var el = document.getElementById('funcModal');
+  el.classList.toggle('show');
+  if (el.classList.contains('show') && !el.dataset.dragged) {
+    el.style.left = '50%'; el.style.top = '50%'; el.style.transform = 'translate(-50%,-50%)';
+  }
+}
+(function() {
+  var modal, titleBar, offX, offY, dragging = false;
+  document.addEventListener('DOMContentLoaded', function() {
+    modal = document.getElementById('funcModal');
+    titleBar = modal.querySelector('.fm-title');
+    titleBar.addEventListener('mousedown', startDrag);
+    titleBar.addEventListener('touchstart', startDragTouch, {passive:true});
+    document.addEventListener('mousemove', onDrag);
+    document.addEventListener('mouseup', endDrag);
+    document.addEventListener('touchmove', onDragTouch, {passive:true});
+    document.addEventListener('touchend', endDrag);
+  });
+  function startDrag(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = e.clientX - rect.left; offY = e.clientY - rect.top; dragging = true; titleBar.style.cursor = 'grabbing'; }
+  function startDragTouch(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; var t = e.touches[0]; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = t.clientX - rect.left; offY = t.clientY - rect.top; dragging = true; }
+  function onDrag(e) { if (!dragging) return; modal.style.left = (e.clientX - offX) + 'px'; modal.style.top = (e.clientY - offY) + 'px'; }
+  function onDragTouch(e) { if (!dragging) return; var t = e.touches[0]; modal.style.left = (t.clientX - offX) + 'px'; modal.style.top = (t.clientY - offY) + 'px'; }
+  function endDrag() { dragging = false; if (titleBar) titleBar.style.cursor = 'grab'; }
+})();
+
+// 初始化
+render(records);
+</script>
+
+</body>
+</html>

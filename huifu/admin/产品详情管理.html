@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>产品详情管理</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+            background: #f0f2f5;
+            color: #1a1a2e;
+            font-size: 14px;
+        }
+
+        /* 顶部 */
+        .topbar {
+            background: #fff;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            border-bottom: 1px solid #f0f0f0;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .topbar-left { display: flex; align-items: center; gap: 16px; }
+        .menu-btn {
+            width: 32px; height: 32px;
+            border: 1px solid #d0d5dd;
+            border-radius: 4px;
+            background: #fff;
+            color: #6b7588;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+        .menu-btn:hover { background: #f5f5f7; }
+        .breadcrumb { font-size: 13px; color: #6b7588; }
+        .breadcrumb .active { color: #1a1a2e; }
+        .topbar-right {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        .topbar-right .btn-func {
+            margin-right: 12px;
+            padding: 6px 14px;
+            border-radius: 6px;
+            background: #f5f7fa;
+            color: #333;
+            border: 1px solid #e0e4ea;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .topbar-right .btn-func:hover { border-color: #1a78ff; color: #1a78ff; }
+        .topbar-right .avatar {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            background: #f5deb3;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px;
+        }
+        .topbar-right .name { font-size: 13px; }
+        .topbar-right .arrow { color: #9ba6b9; font-size: 12px; }
+
+        /* 二级面包屑 */
+        .subnav {
+            background: #fff;
+            padding: 12px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 13px;
+            color: #6b7588;
+        }
+        .subnav .tab {
+            display: inline-block;
+            padding: 6px 14px;
+            background: #f5f7fc;
+            color: #4e5a6e;
+            border-radius: 4px;
+            margin-right: 8px;
+            cursor: pointer;
+        }
+        .subnav .tab.active {
+            background: #1a78ff;
+            color: #fff;
+        }
+
+        /* 筛选区 */
+        .filter-bar {
+            background: #fff;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .filter-item {
+            display: flex;
+            align-items: center;
+            margin-right: 16px;
+            margin-bottom: 4px;
+        }
+        .filter-label {
+            font-size: 13px;
+            color: #4e5a6e;
+            margin-right: 8px;
+            white-space: nowrap;
+        }
+        .filter-input {
+            width: 180px;
+            height: 30px;
+            padding: 0 10px;
+            border: 1px solid #d0d5dd;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #1a1a2e;
+            outline: none;
+        }
+        .filter-input:focus { border-color: #1a78ff; }
+        .filter-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: auto;
+        }
+        .btn-search {
+            background: #1a78ff;
+            color: #fff;
+            border: none;
+            padding: 0 14px;
+            height: 30px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .btn-search:hover { background: #0f6ae8; }
+        .btn-reset {
+            background: #fff;
+            color: #1a78ff;
+            border: 1px solid #1a78ff;
+            padding: 0 14px;
+            height: 30px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .btn-reset:hover { background: #f5f8ff; }
+
+        /* 表格 */
+        .table-card {
+            background: #fff;
+            margin: 12px;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .table th {
+            background: #fafbfc;
+            padding: 14px 16px;
+            text-align: left;
+            font-size: 13px;
+            color: #4e5a6e;
+            font-weight: 500;
+            border-bottom: 1px solid #f0f0f0;
+            white-space: nowrap;
+        }
+        .table td {
+            padding: 14px 16px;
+            font-size: 13px;
+            color: #1a1a2e;
+            border-bottom: 1px solid #f5f5f7;
+        }
+        .table tr:last-child td { border-bottom: none; }
+
+        .product-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 6px;
+            object-fit: cover;
+            background: linear-gradient(135deg,#f0e8d8 0%,#c9b88e 100%);
+            display: block;
+        }
+        .product-img.img1 { background-image: linear-gradient(135deg,#d8e0e8 0%,#98a8c4 100%); }
+        .product-img.img2 { background-image: linear-gradient(135deg,#f5e8b8 0%,#c9a04a 100%); }
+        .product-img.img3 { background-image: linear-gradient(135deg,#e8d8a0 0%,#c08830 100%); }
+        .product-img.img4 { background-image: linear-gradient(135deg,#d8b8a0 0%,#a87850 100%); }
+        .product-img.img5 { background-image: linear-gradient(135deg,#d4d8d4 0%,#98a098 100%); }
+        .product-img.img6 { background-image: linear-gradient(135deg,#f7e8d4 0%,#c8a888 100%); }
+
+        .product-name { font-weight: 600; white-space: nowrap; }
+        .product-no { font-size: 12px; color: #9ba6b9; margin-top: 3px; white-space: nowrap; }
+
+        .phone-cell { font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+        .ws-cell { line-height: 1.5; }
+        .ws-cell .ws-co { font-size: 13px; color: #1a1a2e; white-space: nowrap; }
+
+        .num-cell { white-space: nowrap; }
+        .trade-count { font-weight: 600; }
+        .remain-cell { white-space: nowrap; }
+        .remain-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            background: #e6f7eb;
+            color: #1aab67;
+        }
+        .remain-tag.warn { background: #fdf0e4; color: #e67e22; }
+        .remain-tag.danger { background: #fff1f0; color: #e74c5e; }
+        .time-cell { color: #6b7588; white-space: nowrap; }
+        .amount-cell { color: #e74c3e; font-weight: 600; white-space: nowrap; }
+
+        .actions { white-space: nowrap; }
+        .actions a {
+            color: #1a78ff;
+            margin-right: 8px;
+            text-decoration: none;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .actions a:last-child { margin-right: 0; }
+        .actions a:hover { text-decoration: underline; }
+
+        /* 交易详情弹窗 */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal-box {
+            background: #fff;
+            border-radius: 6px;
+            width: 820px;
+            max-width: 94vw;
+            max-height: 84vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.25);
+        }
+        .modal-header {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .modal-title { font-size: 16px; font-weight: 600; color: #1a1a2e; }
+        .modal-sub { margin-left: 10px; font-size: 12px; color: #6b7588; font-weight: 400; }
+        .modal-close {
+            margin-left: auto;
+            font-size: 20px;
+            color: #999;
+            cursor: pointer;
+            padding: 0 8px;
+        }
+        .modal-close:hover { color: #666; }
+        .modal-body { padding: 16px 20px; overflow-y: auto; }
+        .dm-note { font-size: 12px; color: #9ba6b9; margin-bottom: 10px; }
+        .dm-table { width: 100%; border-collapse: collapse; }
+        .dm-table th {
+            background: #fafbfc;
+            padding: 10px 12px;
+            text-align: left;
+            font-size: 12px;
+            color: #4e5a6e;
+            font-weight: 500;
+            border-bottom: 1px solid #f0f0f0;
+            white-space: nowrap;
+        }
+        .dm-table td {
+            padding: 10px 12px;
+            font-size: 13px;
+            color: #1a1a2e;
+            border-bottom: 1px solid #f5f5f7;
+            white-space: nowrap;
+            font-variant-numeric: tabular-nums;
+        }
+        .dm-table tr:last-child td { border-bottom: none; }
+        .dm-table .dm-amount { color: #e74c3e; font-weight: 600; }
+        .dm-table .dm-time { color: #6b7588; }
+
+        /* ── 功能说明浮窗 ── */
+        .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 560px; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 9999; padding: 24px; display: none; }
+        .f-modal.show { display: block; }
+        .f-modal .fm-title { font-size: 16px; font-weight: 600; color: #1a1a2e; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
+        .f-modal .fm-title:active { cursor: grabbing; }
+        .f-modal .fm-close { width: 28px; height: 28px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; color: #666; border: none; flex-shrink: 0; }
+        .f-modal .fm-close:hover { background: #e8e8e8; }
+        .f-modal .fm-body { font-size: 13px; color: #555; line-height: 1.8; }
+        .f-modal .fm-body h4 { font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 16px 0 8px; }
+        .f-modal .fm-body h4:first-child { margin-top: 0; }
+        .f-modal .fm-body ul { padding-left: 18px; margin: 0 0 12px; }
+        .f-modal .fm-body li { margin-bottom: 4px; }
+        .badge { display: inline-block; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 50%; background: #ff2d55; color: #fff; font-size: 12px; line-height: 18px; text-align: center; font-weight: 600; box-shadow: 0 1px 3px rgba(255,45,85,0.3); }
+    </style>
+</head>
+<body>
+
+<!-- 顶部 -->
+<div class="topbar">
+    <div class="topbar-left">
+        <button class="menu-btn">≡</button>
+        <div class="breadcrumb">
+            <span>首页</span> /
+            <span>产品管理</span> /
+            <span class="active">产品详情管理</span>
+        </div>
+    </div>
+    <div class="topbar-right">
+        <button class="btn-func" onclick="toggleFuncModal()">📖 功能说明</button>
+        <span class="avatar">👤</span>
+        <span class="name">平台账号</span>
+        <span class="arrow">▾</span>
+    </div>
+</div>
+
+<!-- 二级面包屑 -->
+<div class="subnav">
+    <span>首页 / 产品管理 /</span>
+    <span class="tab active">产品详情管理</span>
+</div>
+
+<!-- 筛选区 -->
+<div class="filter-bar">
+    <div class="filter-item">
+        <span class="filter-label">产品名称</span>
+        <input class="filter-input" id="searchName" placeholder="请输入产品名称">
+    </div>
+    <div class="filter-item">
+        <span class="filter-label">产品编号</span>
+        <input class="filter-input" id="searchNo" placeholder="请输入产品编号" style="width:160px;">
+    </div>
+    <div class="filter-item">
+        <span class="filter-label">批发商</span>
+        <input class="filter-input" id="searchWs" placeholder="请输入批发商名称">
+    </div>
+    <div class="filter-actions">
+        <button class="btn-search" onclick="doSearch()">🔍 搜 索</button>
+        <button class="btn-reset" onclick="doReset()">↻ 重 置</button>
+    </div>
+</div>
+
+<!-- 表格 -->
+<div class="table-card">
+    <table class="table">
+        <thead>
+            <tr>
+                <th style="width:82px;">图片</th>
+                <th>产品名称</th>
+                <th>当前持有人</th>
+                <th>批发商</th>
+                <th>交易次数</th>
+                <th>剩余次数</th>
+                <th>最后交易时间</th>
+                <th>最后交易金额</th>
+                <th style="width:100px;">操作</th>
+            </tr>
+        </thead>
+        <tbody id="tbBody">
+            <tr data-name="青莲-初心" data-no="xb000001" data-ws="成都市天府新区明昌博物馆">
+                <td><img class="product-img img1" src=""></td>
+                <td>
+                    <div class="product-name">青莲-初心</div>
+                    <div class="product-no">XB000001</div>
+                </td>
+                <td class="phone-cell">13800172866</td>
+                <td>
+                    <div class="ws-cell">
+                        <div class="ws-co">成都市天府新区明昌博物馆</div>
+                    </div>
+                </td>
+                <td class="num-cell trade-count">6</td>
+                <td class="remain-cell"><span class="remain-tag">14</span></td>
+                <td class="time-cell">2026-07-30 15:38:13</td>
+                <td class="amount-cell">¥1,562.50</td>
+                <td class="actions"><a onclick="openDetail(0)">详情</a></td>
+            </tr>
+            <tr data-name="西路财童" data-no="xb000002" data-ws="杭州西泠文化传播有限公司">
+                <td><img class="product-img img2" src=""></td>
+                <td>
+                    <div class="product-name">西路财童</div>
+                    <div class="product-no">XB000002</div>
+                </td>
+                <td class="phone-cell">19981465373</td>
+                <td>
+                    <div class="ws-cell">
+                        <div class="ws-co">杭州西泠文化传播有限公司</div>
+                    </div>
+                </td>
+                <td class="num-cell trade-count">5</td>
+                <td class="remain-cell"><span class="remain-tag">15</span></td>
+                <td class="time-cell">2026-07-22 15:30:19</td>
+                <td class="amount-cell">¥2,500.00</td>
+                <td class="actions"><a onclick="openDetail(1)">详情</a></td>
+            </tr>
+            <tr data-name="中路财童" data-no="xb000003" data-ws="苏州吴门雅集文化艺术有限公司">
+                <td><img class="product-img img3" src=""></td>
+                <td>
+                    <div class="product-name">中路财童</div>
+                    <div class="product-no">XB000003</div>
+                </td>
+                <td class="phone-cell">18227406306</td>
+                <td>
+                    <div class="ws-cell">
+                        <div class="ws-co">苏州吴门雅集文化艺术有限公司</div>
+                    </div>
+                </td>
+                <td class="num-cell trade-count">40</td>
+                <td class="remain-cell"><span class="remain-tag warn">10</span></td>
+                <td class="time-cell">2026-07-31 08:00:01</td>
+                <td class="amount-cell">¥250.00</td>
+                <td class="actions"><a onclick="openDetail(2)">详情</a></td>
+            </tr>
+            <tr data-name="榜样-统一" data-no="xb000004" data-ws="南京金陵墨香文化发展有限公司">
+                <td><img class="product-img img4" src=""></td>
+                <td>
+                    <div class="product-name">榜样-统一</div>
+                    <div class="product-no">XB000004</div>
+                </td>
+                <td class="phone-cell">15528430479</td>
+                <td>
+                    <div class="ws-cell">
+                        <div class="ws-co">南京金陵墨香文化发展有限公司</div>
+                    </div>
+                </td>
+                <td class="num-cell trade-count">12</td>
+                <td class="remain-cell"><span class="remain-tag warn">8</span></td>
+                <td class="time-cell">2026-07-13 15:29:54</td>
+                <td class="amount-cell">¥1,200.00</td>
+                <td class="actions"><a onclick="openDetail(3)">详情</a></td>
+            </tr>
+            <tr data-name="青莲-舒展" data-no="xb000005" data-ws="广州南越文博文化传播有限公司">
+                <td><img class="product-img img5" src=""></td>
+                <td>
+                    <div class="product-name">青莲-舒展</div>
+                    <div class="product-no">XB000005</div>
+                </td>
+                <td class="phone-cell">19382153852</td>
+                <td>
+                    <div class="ws-cell">
+                        <div class="ws-co">广州南越文博文化传播有限公司</div>
+                    </div>
+                </td>
+                <td class="num-cell trade-count">25</td>
+                <td class="remain-cell"><span class="remain-tag danger">5</span></td>
+                <td class="time-cell">2026-07-22 09:39:56</td>
+                <td class="amount-cell">¥800.00</td>
+                <td class="actions"><a onclick="openDetail(4)">详情</a></td>
+            </tr>
+            <tr data-name="东坡-惜春" data-no="xb000006" data-ws="成都市天府新区明昌博物馆">
+                <td><img class="product-img img6" src=""></td>
+                <td>
+                    <div class="product-name">东坡-惜春</div>
+                    <div class="product-no">XB000006</div>
+                </td>
+                <td class="phone-cell">19113541040</td>
+                <td>
+                    <div class="ws-cell">
+                        <div class="ws-co">成都市天府新区明昌博物馆</div>
+                    </div>
+                </td>
+                <td class="num-cell trade-count">8</td>
+                <td class="remain-cell"><span class="remain-tag danger">2</span></td>
+                <td class="time-cell">2026-07-31 08:00:01</td>
+                <td class="amount-cell">¥3,000.00</td>
+                <td class="actions"><a onclick="openDetail(5)">详情</a></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- 交易详情弹窗 -->
+<div class="modal-overlay" id="detailOverlay" onclick="if(event.target===this)closeDetail()">
+    <div class="modal-box">
+        <div class="modal-header">
+            <span class="modal-title">交易记录详情</span>
+            <span class="modal-sub" id="dmProduct"></span>
+            <span class="modal-close" onclick="closeDetail()">×</span>
+        </div>
+        <div class="modal-body">
+            <div class="dm-note" id="dmNote"></div>
+            <table class="dm-table">
+                <thead>
+                    <tr>
+                        <th>订单编号</th>
+                        <th>卖家</th>
+                        <th>买家</th>
+                        <th>成交金额</th>
+                        <th>成交时间</th>
+                    </tr>
+                </thead>
+                <tbody id="dmBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- ====== 功能说明浮窗 ====== -->
+<div class="f-modal" id="funcModal">
+  <div class="fm-title">
+    <span>📖 功能说明</span>
+    <button class="fm-close" onclick="toggleFuncModal()">✕</button>
+  </div>
+  <div style="font-size:13px;font-weight:600;color:#e74c5e;margin:-6px 0 12px;">平台 · 产品管理 / 产品详情管理</div>
+  <div class="fm-body">
+    <h4><span class="badge">1</span> <span style="vertical-align:middle;">页面说明</span></h4>
+    <ul>
+      <li>产品管理下的二级菜单，展示每个产品的<b>当前持有人、所属批发商、交易次数、剩余次数</b>及最近交易信息</li>
+      <li><b>批发商</b>列展示该产品所属批发商的企业名称</li>
+      <li><b>剩余次数</b> = 产品交易次数上限 − 已交易次数，剩余 ≤ 10 橙色、≤ 5 红色提示</li>
+    </ul>
+    <h4><span class="badge">2</span> <span style="vertical-align:middle;">搜索</span></h4>
+    <ul>
+      <li>支持按<b>产品名称</b>、<b>产品编号</b>、<b>批发商</b>（企业名称）模糊搜索，可组合条件</li>
+    </ul>
+    <h4><span class="badge">3</span> <span style="vertical-align:middle;">交易详情浮层</span></h4>
+    <ul>
+      <li>点击操作列「<b>详情</b>」，浮层列表展示该产品的<b>全部</b>交易记录（数量 = 交易次数）</li>
+      <li>包含字段：<b>订单编号、卖家、买家、成交金额、成交时间</b></li>
+      <li>交易次数较多时，浮层内列表可滚动查看</li>
+    </ul>
+    <h4><span class="badge">4</span> <span style="vertical-align:middle;">手机号展示</span></h4>
+    <ul>
+      <li>当前持有人、卖家、买家统一以<b>11 位手机号</b>展示</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+// ===== 产品交易数据（详情浮层展示全部交易记录）=====
+var phonePool = ['13800172866','19981465373','18227406306','15528430479','19382153852','19113541040','19130634113','13908193164'];
+
+function pad2(n) { return (n < 10 ? '0' : '') + n; }
+function pad3(n) { return (n < 10 ? '00' : n < 100 ? '0' : '') + n; }
+function fmtMoney(n) { return '¥' + n.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+
+// 生成某产品全部交易记录（确定性生成，按时间从早到晚排序）
+function buildRecords(holder, trades, lastTime, lastAmount, orderPrefix) {
+    var list = [];
+    var t = new Date(lastTime.replace(/-/g, '/'));
+    var amt = lastAmount;
+    var pool = phonePool.filter(function (x) { return x !== holder; });
+    for (var i = 0; i < trades; i++) {
+        // 时间确定性往前推：每笔间隔 2~6 天，并错开不同时段
+        var gap = 2 + (i % 5);
+        t = new Date(t.getTime() - gap * 86400000 - (i * 7 % 96) * 3600000);
+        var Y = t.getFullYear(), M = pad2(t.getMonth() + 1), D = pad2(t.getDate());
+        var h = pad2(t.getHours()), mi = pad2(t.getMinutes()), s = pad2(t.getSeconds());
+        var order = orderPrefix + Y + M + D + h + mi + s + pad3(trades - i);
+        // 最新一笔买家为当前持有人，其余在手机号池中轮换
+        var seller = pool[(i * 3 + 1) % pool.length];
+        var buyer = (i === 0) ? holder : pool[(i * 2 + 2) % pool.length];
+        while (buyer === seller) { buyer = pool[(i * 2 + 3) % pool.length]; }
+        // 金额确定性变化
+        amt = Math.max(50, Math.round(amt * (0.975 - (i % 6) * 0.003) * 100) / 100);
+        list.push({
+            order: order,
+            seller: seller,
+            buyer: buyer,
+            amount: fmtMoney(amt),
+            time: Y + '-' + M + '-' + D + ' ' + h + ':' + mi + ':' + s
+        });
+    }
+    return list.reverse();
+}
+
+var products = [
+    { no: 'XB000001', name: '青莲-初心', holder: '13800172866', trades: 6, limit: 20, wsCo: '成都市天府新区明昌博物馆', lastTime: '2026-07-30 15:38:13', lastAmount: 1562.50 },
+    { no: 'XB000002', name: '西路财童', holder: '19981465373', trades: 5, limit: 20, wsCo: '杭州西泠文化传播有限公司', lastTime: '2026-07-22 15:30:19', lastAmount: 2500.00 },
+    { no: 'XB000003', name: '中路财童', holder: '18227406306', trades: 40, limit: 50, wsCo: '苏州吴门雅集文化艺术有限公司', lastTime: '2026-07-31 08:00:01', lastAmount: 250.00 },
+    { no: 'XB000004', name: '榜样-统一', holder: '15528430479', trades: 12, limit: 20, wsCo: '南京金陵墨香文化发展有限公司', lastTime: '2026-07-13 15:29:54', lastAmount: 1200.00 },
+    { no: 'XB000005', name: '青莲-舒展', holder: '19382153852', trades: 25, limit: 30, wsCo: '广州南越文博文化传播有限公司', lastTime: '2026-07-22 09:39:56', lastAmount: 800.00 },
+    { no: 'XB000006', name: '东坡-惜春', holder: '19113541040', trades: 8, limit: 10, wsCo: '成都市天府新区明昌博物馆', lastTime: '2026-07-31 08:00:01', lastAmount: 3000.00 }
+];
+
+// 每个产品的交易记录数量 = 交易次数（全部交易）
+products.forEach(function (p) {
+    p.records = buildRecords(p.holder, p.trades, p.lastTime, p.lastAmount, p.no);
+});
+
+// ===== 搜索 / 重置 =====
+function doSearch() {
+    var kw1 = document.getElementById('searchName').value.trim().toLowerCase();
+    var kw2 = document.getElementById('searchNo').value.trim().toLowerCase();
+    var kw3 = document.getElementById('searchWs').value.trim().toLowerCase();
+    var rows = document.querySelectorAll('#tbBody tr');
+    rows.forEach(function(tr) {
+        var name = (tr.getAttribute('data-name') || '').toLowerCase();
+        var no = (tr.getAttribute('data-no') || '').toLowerCase();
+        var ws = (tr.getAttribute('data-ws') || '').toLowerCase();
+        var ok = (!kw1 || name.indexOf(kw1) >= 0) && (!kw2 || no.indexOf(kw2) >= 0) && (!kw3 || ws.indexOf(kw3) >= 0);
+        tr.style.display = ok ? '' : 'none';
+    });
+}
+
+function doReset() {
+    document.getElementById('searchName').value = '';
+    document.getElementById('searchNo').value = '';
+    document.getElementById('searchWs').value = '';
+    document.querySelectorAll('#tbBody tr').forEach(function(tr) { tr.style.display = ''; });
+}
+
+// 回车搜索
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') doSearch();
+});
+
+// ===== 交易详情弹窗 =====
+function openDetail(idx) {
+    var p = products[idx];
+    document.getElementById('dmProduct').textContent = p.name + '（' + p.no + '）';
+    document.getElementById('dmNote').textContent = '该产品共交易 ' + p.trades + ' 次，所属批发商：' + p.wsCo + '，当前持有人：' + p.holder + '，以下为该产品全部 ' + p.records.length + ' 笔交易记录：';
+    var body = document.getElementById('dmBody');
+    body.innerHTML = '';
+    p.records.forEach(function(r) {
+        var tr = document.createElement('tr');
+        tr.innerHTML = '<td>' + r.order + '</td><td>' + r.seller + '</td><td>' + r.buyer + '</td><td class="dm-amount">' + r.amount + '</td><td class="dm-time">' + r.time + '</td>';
+        body.appendChild(tr);
+    });
+    document.getElementById('detailOverlay').classList.add('show');
+}
+
+function closeDetail() {
+    document.getElementById('detailOverlay').classList.remove('show');
+}
+
+// ===== 功能说明浮窗 =====
+function toggleFuncModal() {
+  var el = document.getElementById('funcModal');
+  el.classList.toggle('show');
+  if (el.classList.contains('show') && !el.dataset.dragged) {
+    el.style.left = '50%'; el.style.top = '50%'; el.style.transform = 'translate(-50%,-50%)';
+  }
+}
+(function() {
+  var modal, titleBar, offX, offY, dragging = false;
+  document.addEventListener('DOMContentLoaded', function() {
+    modal = document.getElementById('funcModal');
+    titleBar = modal.querySelector('.fm-title');
+    titleBar.addEventListener('mousedown', startDrag);
+    titleBar.addEventListener('touchstart', startDragTouch, {passive:true});
+    document.addEventListener('mousemove', onDrag);
+    document.addEventListener('mouseup', endDrag);
+    document.addEventListener('touchmove', onDragTouch, {passive:true});
+    document.addEventListener('touchend', endDrag);
+  });
+  function startDrag(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = e.clientX - rect.left; offY = e.clientY - rect.top; dragging = true; titleBar.style.cursor = 'grabbing'; }
+  function startDragTouch(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; var t = e.touches[0]; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = t.clientX - rect.left; offY = t.clientY - rect.top; dragging = true; }
+  function onDrag(e) { if (!dragging) return; modal.style.left = (e.clientX - offX) + 'px'; modal.style.top = (e.clientY - offY) + 'px'; }
+  function onDragTouch(e) { if (!dragging) return; var t = e.touches[0]; modal.style.left = (t.clientX - offX) + 'px'; modal.style.top = (t.clientY - offY) + 'px'; }
+  function endDrag() { dragging = false; if (titleBar) titleBar.style.cursor = 'grab'; }
+})();
+</script>
+
+</body>
+</html>
