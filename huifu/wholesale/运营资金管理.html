@@ -1,0 +1,1348 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>运营资金管理</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+            background: #f0f2f5;
+            color: #1a1a2e;
+            font-size: 14px;
+        }
+
+        /* ── 企业风格框架：侧边栏 + 主体 ── */
+        .app { display: flex; min-height: 100vh; }
+
+        /* 侧边栏 */
+        .sidebar { width: 200px; background: #1f2c3d; color: #a8b2c0; flex-shrink: 0; }
+        .logo {
+            height: 56px; display: flex; align-items: center; padding: 0 16px;
+            background: #fff; border-bottom: 1px solid #f0f0f0;
+        }
+        .logo-icon {
+            width: 28px; height: 28px; background: #e74c3e; border-radius: 4px;
+            color: #fff; display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 14px;
+        }
+        .menu { padding: 8px 0; }
+        .menu-item, .menu-group-title {
+            display: flex; align-items: center; height: 44px; padding: 0 20px;
+            color: #c0c8d4; cursor: pointer; text-decoration: none; font-size: 14px;
+            transition: all .15s;
+        }
+        .menu-item:hover, .menu-group-title:hover { background: #2a3849; color: #fff; }
+        .menu-item.active, .menu-group-title.active { color: #1a78ff; background: #2a3849; }
+        .menu-item .icon, .menu-group-title .icon { width: 20px; margin-right: 10px; font-size: 16px; text-align: center; }
+        .menu-group-title .arrow { margin-left: auto; font-size: 12px; }
+        .menu-group .submenu { display: none; }
+        .menu-group.open .submenu { display: block; }
+        .menu-group .submenu a {
+            display: flex; align-items: center; height: 36px; padding: 0 20px 0 50px;
+            color: #a8b2c0; cursor: pointer; text-decoration: none; font-size: 13px;
+        }
+        .menu-group .submenu a:hover { color: #fff; }
+        .menu-group .submenu a.active { color: #1a78ff; }
+        .menu-group .submenu .sub-note {
+            display: flex; align-items: center; height: 36px; padding: 0 20px 0 50px;
+            color: #6b7588; cursor: not-allowed; font-size: 13px;
+        }
+        .menu-group .submenu .sub-note .note-tag {
+            font-size: 11px; color: #8a94a6; margin-left: 6px;
+            background: #2a3849; padding: 1px 6px; border-radius: 3px; white-space: nowrap;
+        }
+
+        /* 主体 */
+        .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+        .content { flex: 1; overflow-y: auto; min-width: 0; }
+
+        /* 顶栏 */
+        .topbar {
+            background: #fff;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .breadcrumb { font-size: 13px; color: #6b7588; display: flex; align-items: center; gap: 6px; }
+        .breadcrumb .sep { color: #c0c8d4; }
+        .breadcrumb .active { color: #1a1a2e; }
+        .topbar-right {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .btn-func {
+            padding: 6px 14px; border-radius: 6px; background: #f5f7fa; color: #333;
+            border: 1px solid #e0e4ea; font-size: 13px; font-weight: 500; cursor: pointer;
+            white-space: nowrap; display: inline-flex; align-items: center; gap: 4px;
+        }
+        .btn-func:hover { border-color: #1a78ff; color: #1a78ff; }
+        .user-chip { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+        .user-chip .avatar {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            background: #f5deb3;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px;
+        }
+        .user-chip .name { font-size: 13px; color: #1a1a2e; }
+        .user-chip .arrow { color: #9ba6b9; font-size: 12px; }
+
+        /* 资金汇总卡片 */
+        .summary-row {
+            display: flex;
+            gap: 12px;
+            padding: 12px;
+        }
+        .summary-card {
+            flex: 1;
+            background: #fff;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        }
+        .sc-head {
+            padding: 16px 18px 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        .sc-head .label {
+            font-size: 14px;
+            color: #4e5a6e;
+            font-weight: 500;
+        }
+        .sc-head .amount {
+            font-size: 22px;
+            font-weight: 700;
+            margin-top: 6px;
+        }
+        .sc-head .amount.bff { color: #e67e22; }
+        .sc-head .amount.hf { color: #4f7cff; }
+        .sc-head .btn {
+            background: #1a78ff;
+            color: #fff;
+            border: none;
+            padding: 5px 16px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .sc-head .btn:hover { background: #0f6ae8; }
+        .wallet-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: #f5f7fa;
+            border: 1px solid #e6eaf2;
+            border-radius: 10px;
+            padding: 16px;
+        }
+        .wallet-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #2b2f36;
+            padding: 0 2px;
+        }
+        .wallet-cards {
+            display: flex;
+            gap: 10px;
+        }
+        .wallet-cards .summary-card { flex: 1; }
+        .amount.avail { color: #16b364; }
+        .sc-head .label .dot {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #16b364;
+            margin-right: 6px;
+            vertical-align: 1px;
+        }
+        .sc-actions {
+            display: flex;
+            border-top: 1px solid #f5f5f7;
+        }
+        .sc-action {
+            flex: 1;
+            padding: 12px 10px;
+            text-align: center;
+            font-size: 13px;
+            color: #1a78ff;
+            cursor: pointer;
+            border-right: 1px solid #f5f5f7;
+        }
+        .sc-action:last-child { border-right: none; }
+        .sc-action:hover { background: #f5f8ff; }
+
+        /* 筛选区 */
+        .filter-bar {
+            background: #fff;
+            margin: 0 12px 12px;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            border-radius: 6px;
+        }
+        .filter-item {
+            display: flex;
+            align-items: center;
+            margin-right: 16px;
+            margin-bottom: 4px;
+        }
+        .filter-label {
+            font-size: 13px;
+            color: #4e5a6e;
+            margin-right: 8px;
+            white-space: nowrap;
+        }
+        .filter-input {
+            width: 160px;
+            height: 30px;
+            padding: 0 10px;
+            border: 1px solid #d0d5dd;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #1a1a2e;
+            outline: none;
+        }
+        .filter-input:focus { border-color: #1a78ff; }
+        .filter-select {
+            width: 160px;
+            height: 30px;
+            padding: 0 10px;
+            border: 1px solid #d0d5dd;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #1a1a2e;
+            outline: none;
+            background: #fff;
+        }
+        .filter-date-input {
+            width: 130px;
+            height: 30px;
+            padding: 0 10px;
+            border: 1px solid #d0d5dd;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #1a1a2e;
+            outline: none;
+        }
+        .filter-sep {
+            font-size: 13px;
+            color: #9ba6b9;
+            margin: 0 6px;
+        }
+        .filter-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: auto;
+        }
+        .btn-search {
+            background: #1a78ff;
+            color: #fff;
+            border: none;
+            padding: 0 14px;
+            height: 30px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .btn-search:hover { background: #0f6ae8; }
+        .btn-export {
+            background: #e8f1ff;
+            color: #1a78ff;
+            border: none;
+            padding: 0 14px;
+            height: 30px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .btn-export:hover { background: #d7e8ff; }
+        .btn-reset {
+            background: #f59e0b;
+            color: #fff;
+            border: none;
+            padding: 0 14px;
+            height: 30px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .btn-reset:hover { background: #e08d04; }
+
+        /* 表格 */
+        .table-card {
+            background: #fff;
+            margin: 0 12px 12px;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .table th {
+            background: #fafbfc;
+            padding: 14px 16px;
+            text-align: left;
+            font-size: 13px;
+            color: #4e5a6e;
+            font-weight: 500;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .table td {
+            padding: 14px 16px;
+            font-size: 13px;
+            color: #1a1a2e;
+            border-bottom: 1px solid #f5f5f7;
+        }
+        .table tr:last-child td { border-bottom: none; }
+        .col-sort {
+            display: inline-block;
+            margin-left: 4px;
+            color: #c0c8d4;
+            cursor: pointer;
+        }
+
+        .pagination {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 8px;
+            font-size: 13px;
+            color: #4e5a6e;
+        }
+        .pagination .total { margin-right: 16px; }
+        .page-btn {
+            min-width: 28px;
+            height: 28px;
+            padding: 0 8px;
+            background: #fff;
+            border: 1px solid #d0d5dd;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #4e5a6e;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .page-btn:hover { color: #1a78ff; border-color: #1a78ff; }
+        .page-btn.active {
+            background: #1a78ff;
+            color: #fff;
+            border-color: #1a78ff;
+        }
+        .page-jump {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-left: 12px;
+        }
+        .page-jump input {
+            width: 48px;
+            height: 28px;
+            border: 1px solid #d0d5dd;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 13px;
+            outline: none;
+        }
+
+        /* 提现浮层 */
+        .wd-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        .wd-overlay.show { display: flex; }
+        .wd-modal {
+            background: #fff;
+            border-radius: 8px;
+            width: 760px;
+            max-width: 94vw;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .wd-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .wd-title { font-size: 16px; font-weight: 600; color: #1a1a2e; }
+        .wd-close { font-size: 22px; color: #86909c; cursor: pointer; line-height: 1; }
+        .wd-header-right { display: flex; align-items: center; gap: 14px; }
+        .wd-body { padding: 20px; overflow-y: auto; flex: 1; }
+        .wd-row { margin-bottom: 16px; }
+        .wd-label { font-size: 13px; color: #1a1a2e; margin-bottom: 6px; }
+        .wd-input {
+            width: 100%;
+            height: 36px;
+            padding: 0 12px;
+            border: 1px solid #d0d5dd;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #1a1a2e;
+            outline: none;
+        }
+        .wd-input:focus { border-color: #1a78ff; }
+        .wd-link {
+            font-size: 13px;
+            color: #1a78ff;
+            cursor: pointer;
+            margin-top: 4px;
+            display: inline-block;
+        }
+        .wd-link:hover { text-decoration: underline; }
+        /* 提现浮层-收支统计报表 */
+        .wd-report {
+            border: 1px solid #eef0f4;
+            border-radius: 6px;
+            padding: 14px 16px;
+            background: #fafbfc;
+            margin-bottom: 16px;
+        }
+        .wr-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .wr-title::before {
+            content: '';
+            width: 3px;
+            height: 14px;
+            background: #1a78ff;
+            border-radius: 2px;
+        }
+        .wr-sub {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin: 14px 0 8px;
+        }
+        .wr-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        .wr-table th {
+            background: #f0f3f8;
+            color: #4e5a6e;
+            font-weight: 600;
+            text-align: left;
+            padding: 7px 10px;
+            border: 1px solid #eef0f4;
+        }
+        .wr-table td {
+            padding: 7px 10px;
+            border: 1px solid #eef0f4;
+            color: #1a1a2e;
+        }
+        .wr-table td.money { color: #e67e22; font-weight: 600; text-align: right; }
+        .wr-sum {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 14px;
+            padding-top: 12px;
+            border-top: 1px dashed #e6eaf2;
+        }
+        .wr-sum-item {
+            flex: 1 1 calc(50% - 4px);
+            background: #fff;
+            border: 1px solid #eef0f4;
+            border-radius: 4px;
+            padding: 8px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .wr-sum-item span { font-size: 12px; color: #6b7588; }
+        .wr-sum-item b { font-size: 14px; color: #1a1a2e; font-weight: 600; }
+        .wd-footer {
+            padding: 12px 20px;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+        .wd-btn-default {
+            background: #fff;
+            border: 1px solid #d0d5dd;
+            color: #4e5a6e;
+            padding: 7px 20px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .wd-btn-primary {
+            background: #1a78ff;
+            border: none;
+            color: #fff;
+            padding: 7px 20px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        /* 提现申请记录 */
+        .rec-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2001;
+        }
+        .rec-overlay.show { display: flex; }
+        .rec-modal {
+            background: #fff;
+            border-radius: 8px;
+            width: 660px;
+            max-width: 94vw;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .rec-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .rec-title { font-size: 16px; font-weight: 600; color: #1a1a2e; }
+        .rec-close { font-size: 22px; color: #86909c; cursor: pointer; line-height: 1; }
+        .rec-body { padding: 16px 20px; overflow-y: auto; flex: 1; }
+        .rec-table { width: 100%; border-collapse: collapse; }
+        .rec-table th {
+            background: #fafbfc;
+            padding: 10px;
+            text-align: left;
+            font-size: 13px;
+            color: #4e5a6e;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .rec-table td {
+            padding: 10px;
+            font-size: 13px;
+            color: #1a1a2e;
+            border-bottom: 1px solid #f5f5f7;
+        }
+        .rec-status {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        .rec-status.pending { background: #fff4e6; color: #e67e22; }
+        .rec-status.approved { background: #e6f4ff; color: #1a78ff; }
+        .rec-status.done { background: #e6f7eb; color: #1aab67; }
+
+        /* 冻结释放记录 */
+        .frz-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2002;
+        }
+        .frz-overlay.show { display: flex; }
+        .frz-modal {
+            background: #fff;
+            border-radius: 6px;
+            width: 720px;
+            max-width: 94vw;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .frz-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .frz-title { font-size: 15px; font-weight: 600; color: #1a1a2e; }
+        .frz-close { font-size: 22px; color: #86909c; cursor: pointer; line-height: 1; }
+        .frz-stats {
+            display: flex;
+            gap: 12px;
+            padding: 14px 20px;
+            background: #fafbfc;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .frz-stat {
+            flex: 1;
+            background: #fff;
+            border: 1px solid #f0f0f0;
+            border-radius: 6px;
+            padding: 12px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .frz-stat .ls { font-size: 12px; color: #6b7588; }
+        .frz-stat .lv { font-size: 18px; font-weight: 700; }
+        .frz-stat.freeze .lv { color: #e67e22; }
+        .frz-stat.release .lv { color: #1aab67; }
+        .frz-body { padding: 0; overflow: auto; flex: 1; }
+        .frz-table { width: 100%; border-collapse: collapse; }
+        .frz-table th {
+            background: #fafbfc;
+            padding: 10px 16px;
+            text-align: left;
+            font-size: 13px;
+            color: #4e5a6e;
+            font-weight: 500;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .frz-table td {
+            padding: 12px 16px;
+            font-size: 13px;
+            color: #1a1a2e;
+            border-bottom: 1px solid #f5f5f7;
+        }
+        .frz-type {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        .frz-type.freeze { background: #fff4e6; color: #e67e22; }
+        .frz-type.release { background: #e6f7eb; color: #1aab67; }
+        .frz-pager {
+            padding: 12px 20px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: #4e5a6e;
+        }
+        .frz-pager a, .frz-pager span {
+            min-width: 24px;
+            height: 24px;
+            padding: 0 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 3px;
+            cursor: pointer;
+            color: #4e5a6e;
+            text-decoration: none;
+        }
+        .frz-pager a:hover { background: #f5f7fa; }
+        .frz-pager .cur { background: #1a78ff; color: #fff; }
+        .frz-footer {
+            padding: 12px 20px;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+        .frz-btn-default {
+            background: #fff;
+            border: 1px solid #d0d5dd;
+            color: #4e5a6e;
+            padding: 6px 18px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .frz-btn-primary {
+            background: #1a78ff;
+            border: none;
+            color: #fff;
+            padding: 6px 18px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        /* Tab 切换 */
+        .tabs-bar {
+            background: #fff;
+            margin: 12px 12px 0;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            border-radius: 6px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .tab {
+            padding: 12px 0;
+            font-size: 14px;
+            color: #4e5a6e;
+            cursor: pointer;
+            position: relative;
+        }
+        .tab.active { color: #1a78ff; font-weight: 500; }
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: -1px;
+            height: 2px;
+            background: #1a78ff;
+        }
+
+        /* 标注圆点 */
+        .badge {
+            display: inline-block;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 5px;
+            border-radius: 50%;
+            background: #ff2d55;
+            color: #fff;
+            font-size: 12px;
+            line-height: 18px;
+            text-align: center;
+            font-weight: 600;
+            box-shadow: 0 1px 3px rgba(255,45,85,0.3);
+        }
+
+        /* 实际金额标色：收入红、支出绿 */
+        .table td.amt-income { color: #d92d20; font-weight: 700; }
+        .table td.amt-expense { color: #0b9a4f; font-weight: 700; }
+
+        /* ── 功能说明浮窗 ── */
+        .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 560px; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 9999; padding: 24px; display: none; }
+        .f-modal.show { display: block; }
+        .f-modal .fm-title { font-size: 16px; font-weight: 600; color: #1a1a2e; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
+        .f-modal .fm-title:active { cursor: grabbing; }
+        .f-modal .fm-close { width: 28px; height: 28px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; color: #666; border: none; flex-shrink: 0; }
+        .f-modal .fm-close:hover { background: #e8e8e8; }
+        .f-modal .fm-body { font-size: 13px; color: #555; line-height: 1.8; }
+        .f-modal .fm-body h4 { font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 16px 0 8px; }
+        .f-modal .fm-body ul { padding-left: 18px; margin: 0 0 12px; }
+        .f-modal .fm-body li { margin-bottom: 4px; }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <!-- 侧边栏 -->
+    <div class="sidebar">
+        <div class="logo">
+            <div class="logo-icon">深</div>
+        </div>
+        <div class="menu">
+            <a class="menu-item" href="信息查看.html">
+                <span class="icon">📋</span><span>信息查看</span>
+            </a>
+            <a class="menu-item" href="产品管理.html">
+                <span class="icon">📦</span><span>我的产品</span>
+            </a>
+            <div class="menu-group open">
+                <div class="menu-group-title" onclick="this.parentNode.classList.toggle('open')">
+                    <span class="icon">💰</span><span>资金管理</span><span class="arrow">▾</span>
+                </div>
+                <div class="submenu">
+                    <a href="批发资金管理.html">批发资金管理</a>
+                    <a href="运营资金管理.html" class="active">运营资金管理</a>
+                    <span class="sub-note">我的资产（老）<span class="note-tag">新批发商无此菜单</span></span>
+                </div>
+            </div>
+            <a class="menu-item" href="批发市场分账申请.html">
+                <span class="icon">📊</span><span>分佣管理</span>
+            </a>
+            <a class="menu-item" href="#">
+                <span class="icon">📢</span><span>系统公告</span>
+            </a>
+            <a class="menu-item" href="#">
+                <span class="icon">🏷️</span><span>价值管理</span>
+            </a>
+            <a class="menu-item" href="#">
+                <span class="icon">🏭</span><span>仓库管理</span>
+            </a>
+            <a class="menu-item" href="#">
+                <span class="icon">📝</span><span>任务管理</span>
+            </a>
+            <div class="menu-group open">
+                <div class="menu-group-title" onclick="this.parentNode.classList.toggle('open')">
+                    <span class="icon">⚙️</span><span>系统管理</span><span class="arrow">▾</span>
+                </div>
+                <div class="submenu">
+                    <a href="用户管理.html">用户管理</a>
+                    <a href="角色管理.html">角色管理</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主体 -->
+    <div class="main">
+        <div class="topbar">
+            <div class="breadcrumb">
+                <span>首页</span><span class="sep">/</span><span class="active">运营资金管理</span>
+            </div>
+            <div class="topbar-right">
+                <button class="btn-func" onclick="toggleFuncModal()">📖 功能说明</button>
+                <div class="user-chip">
+                    <span class="avatar">👤</span>
+                    <span class="name">批发商：Kevin Li</span>
+                    <span class="arrow">▾</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- 资金汇总卡片 -->
+            <div class="summary-row">
+    <div class="wallet-group">
+        <div class="wallet-title">汇付钱包</div>
+        <div class="wallet-cards">
+            <div class="summary-card">
+                <div class="sc-head">
+                    <div>
+                        <div class="label">总余额</div>
+                        <div class="amount hf">32,865.00</div>
+                    </div>
+                </div>
+                <div class="sc-actions">
+                    <div class="sc-action" onclick="openFrzModal()">冻结释放记录</div>
+                </div>
+            </div>
+            <div class="summary-card">
+                <div class="sc-head">
+                    <div>
+                        <div class="label"><span class="dot"></span>可用余额</div>
+                        <div class="amount avail">24,500.00</div>
+                    </div>
+                    <button class="btn" onclick="openWithdrawModal()">提现</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tab 切换 -->
+<div class="tabs-bar">
+    <div class="tab active" data-tab="all" onclick="selectTab(this)">全部</div>
+    <div class="tab" data-tab="income" onclick="selectTab(this)">收入明细</div>
+    <div class="tab" data-tab="expense" onclick="selectTab(this)">支出明细</div>
+</div>
+
+<!-- 筛选区 -->
+<div class="filter-bar">
+    <div class="filter-item">
+        <span class="filter-label">用途</span>
+        <input class="filter-input" placeholder="请输入用途">
+    </div>
+    <div class="filter-item">
+        <span class="filter-label">类型</span>
+        <select class="filter-select">
+            <option>请选择类型</option>
+            <option>现金奖励</option>
+            <option>推广服务费</option>
+            <option>批发佣金支出</option>
+            <option>运营服务费</option>
+            <option>零售佣金支出</option>
+            <option>提现</option>
+        </select>
+    </div>
+    <div class="filter-item">
+        <span class="filter-label">时间</span>
+        <input class="filter-date-input" placeholder="开始日期">
+        <span class="filter-sep">至</span>
+        <input class="filter-date-input" placeholder="结束日期">
+    </div>
+    <div class="filter-actions">
+        <button class="btn-search">🔍 搜 索</button>
+        <button class="btn-export">📥 导 出</button>
+        <button class="btn-reset">重 置</button>
+    </div>
+</div>
+
+<!-- 表格 -->
+<div class="table-card">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>交易订单编号</th>
+                <th>支付渠道单号</th>
+                <th>收支</th>
+                <th>类型</th>
+                <th>用途</th>
+                <th>支付渠道</th>
+                <th>创建时间 <span class="col-sort">⇅</span></th>
+                <th>收支金额</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+    </table>
+
+    <div class="pagination">
+        <span class="total">共 15660 条</span>
+        <button class="page-btn">‹</button>
+        <button class="page-btn active">1</button>
+        <button class="page-btn">2</button>
+        <button class="page-btn">3</button>
+        <button class="page-btn">4</button>
+        <button class="page-btn">5</button>
+        <span style="color:#9ba6b9;">...</span>
+        <button class="page-btn">1566</button>
+        <button class="page-btn">›</button>
+            <div class="page-jump">10条/页</div>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ====== 功能说明浮窗 ====== -->
+<div class="f-modal" id="funcModal">
+  <div class="fm-title">
+    <span>📖 功能说明</span>
+    <button class="fm-close" onclick="toggleFuncModal()">✕</button>
+  </div>
+  <div style="font-size:13px;font-weight:600;color:#e74c5e;margin:-6px 0 6px;">批发商后台</div>
+  <div style="font-size:12px;color:#666;line-height:1.7;margin:0 0 12px;">这里是批发商所有运营费用的资金管理（包括<b>批发市场20%推广服务费分账</b>、<b>零售市场交易手续费1.2%的分账</b>、<b>批发佣金支出</b>、<b>零售佣金支出</b>、<b>任务现金奖金</b>。提现需要走审批流程）</div>
+  <div class="fm-body">
+    <h4><span class="badge">1</span> <span style="vertical-align:middle;">第三方支付开户统一</span></h4>
+    <ul>
+      <li>这里<b>没有开户流程</b>，开户在<b>批发资金管理</b>已经开户了</li>
+      <li>这里根据批发市场<b>已开户</b>展示对应的<b>支付渠道钱包</b>即可</li>
+      <li>未开户的提示<b>去批发资金管理开户</b></li>
+    </ul>
+    <h4><span class="badge">2</span> <span style="vertical-align:middle;">收支分开</span></h4>
+    <ul>
+      <li>Tab 提供<b>全部</b>、<b>收入明细</b>、<b>支出明细</b>三种视图</li>
+      <li><b>收支</b>列，标识每条记录是<b>收入</b>还是<b>支出</b></li>
+      <li><b>收支金额</b>：收入标<b style="color:#e74c3c;">红</b>、支出标<b style="color:#1aab67;">绿</b>，显示该虚拟账户里<b>实际到账或实际支出</b>的金额</li>
+    </ul>
+    <h4><span class="badge">3</span> <span style="vertical-align:middle;">提现</span></h4>
+    <ul>
+      <li>汇付钱包卡片增加<b>提现</b>按钮</li>
+      <li>提现浮层展示<b>当前可提余额（即可用余额）</b>，填写<b>提现金额</b>和<b>原因</b>后申请</li>
+      <li>浮层提供<b>提现申请记录</b>链接，展示所有渠道的提现记录（状态：待审核、已通过、已提现）</li>
+      <li>交易类型中也增加<b>提现</b></li>
+    </ul>
+    <h4><span class="badge">4</span> <span style="vertical-align:middle;">钱包余额卡片</span></h4>
+    <ul>
+      <li><b>总余额</b>展示账户全部资金，<b>可用余额</b>即当前可提余额</li>
+      <li>可用余额与提现浮层<b>当前可提余额</b>一致（汇付 24,500.00）</li>
+      <li><b>提现</b>按钮位于可用余额卡片，<b>冻结释放记录</b>位于总余额卡片</li>
+    </ul>
+    <h4><span class="badge">5</span> <span style="vertical-align:middle;">提现收支统计报表</span></h4>
+    <ul>
+      <li>提现浮层下方展示<b>收支统计报表</b>，包含<b>产品收入统计</b>与<b>每月支出记录</b></li>
+      <li>产品收入统计按产品列出<b>推广服务费（批发市场分佣）</b>与<b>运营服务费（零售市场手续费）</b>金额</li>
+      <li>每月支出记录按月份列出各月<b>支出金额</b></li>
+      <li>报表汇总<b>推广服务费合计、运营服务费合计、支出合计、累计提现</b></li>
+    </ul>
+    <h4><span class="badge">6</span> <span style="vertical-align:middle;">冻结释放记录</span></h4>
+    <ul>
+      <li>弹窗顶部展示统计：<b>冻结金总计</b>、<b>释放总计</b>，与明细一致</li>
+      <li>表格列：<b>名称、用途、类型、金额、创建时间</b></li>
+      <li>用途仅<b>活动奖金池</b></li>
+      <li>类型区分<b>冻结</b>（橙色）与<b>释放</b>（绿色），按<b>创建时间倒序</b>排列</li>
+      <li>底部支持<b>分页</b>，当前 10 条记录</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+var currentTab = 'all';
+
+var incomeData = [
+    { tradeNo: 'XB-sell260525144513001', payNo: '20260525144512010373000001190726', dir: '收入', type: '推广服务费', total: '124.00', paid: '124.00', pfee: '0', tpfee: '-', purpose: '提前结案-推广服务费', channel: '汇付钱包', time: '2026-05-25 14:45:13' },
+    { tradeNo: 'XB-sell260420100201004', payNo: '20260420100201010373000001189000', dir: '收入', type: '运营服务费', total: '20.50', paid: '20.50', pfee: '0', tpfee: '-', purpose: '运营服务费-平台分成', channel: '汇付钱包', time: '2026-04-20 10:02:01' }
+];
+
+var expenseData = [
+    { tradeNo: 'XB-buy260525144514001', payNo: '20260525144513010373000001190727', dir: '支出', type: '批发佣金支出', total: '186.00', paid: '186.00', pfee: '0', tpfee: '3.72', purpose: '提前结案-批发分佣', channel: '汇付钱包', time: '2026-05-25 14:45:14' },
+    { tradeNo: 'XB-buy260504160404002', payNo: '20260504160404010373000001190100', dir: '支出', type: '现金奖励', total: '500.00', paid: '500.00', pfee: '0', tpfee: '10.00', purpose: '提货任务-现金奖励', channel: '汇付钱包', time: '2026-05-04 16:04:04' },
+    { tradeNo: 'XB-buy260415090759005', payNo: '20260415090759010373000001188665', dir: '支出', type: '零售佣金支出', total: '24.00', paid: '24.00', pfee: '0', tpfee: '0.48', purpose: '印度阿三-零售分佣', channel: '汇付钱包', time: '2026-04-15 09:07:59' },
+    { tradeNo: 'XB-with260702093001', payNo: '20260702093001010373000001190222', dir: '支出', type: '提现', total: '2000.00', paid: '2000.00', pfee: '0', tpfee: '-', purpose: '日常提现-汇付钱包', channel: '汇付钱包', time: '2026-07-02 09:30:01' }
+];
+
+function renderTable() {
+    var data;
+    if (currentTab === 'all') {
+        data = incomeData.concat(expenseData);
+    } else {
+        data = currentTab === 'income' ? incomeData : expenseData;
+    }
+    var html = '';
+    data.forEach(function(o) {
+        var paidVal = o.paid;
+        if ((o.type === '批发佣金支出' || o.type === '零售佣金支出' || o.type === '现金奖励') && o.tpfee !== '-') {
+            paidVal = (parseFloat(o.total) - parseFloat(o.tpfee)).toFixed(2);
+        }
+        var amtCls = o.dir === '收入' ? 'amt-income' : 'amt-expense';
+        html += [
+            '<tr>',
+            '    <td>' + o.tradeNo + '</td>',
+            '    <td>' + o.payNo + '</td>',
+            '    <td>' + o.dir + '</td>',
+            '    <td>' + o.type + '</td>',
+            '    <td>' + o.purpose + '</td>',
+            '    <td>' + o.channel + '</td>',
+            '    <td>' + o.time + '</td>',
+            '    <td class="' + amtCls + '">' + paidVal + '</td>',
+            '</tr>'
+        ].join('');
+    });
+    document.getElementById('tableBody').innerHTML = html;
+    document.querySelector('.pagination .total').textContent = '共 ' + data.length + ' 条';
+}
+
+function selectTab(el) {
+    document.querySelectorAll('.tabs-bar .tab').forEach(function(t) { t.classList.remove('active'); });
+    el.classList.add('active');
+    currentTab = el.dataset.tab;
+    renderTable();
+}
+
+renderTable();
+
+function toggleFuncModal() {
+  var el = document.getElementById('funcModal');
+  el.classList.toggle('show');
+  if (el.classList.contains('show') && !el.dataset.dragged) {
+    el.style.left = '50%'; el.style.top = '50%'; el.style.transform = 'translate(-50%,-50%)';
+  }
+}
+(function() {
+  var modal, titleBar, offX, offY, dragging = false;
+  document.addEventListener('DOMContentLoaded', function() {
+    modal = document.getElementById('funcModal');
+    titleBar = modal.querySelector('.fm-title');
+    titleBar.addEventListener('mousedown', startDrag);
+    titleBar.addEventListener('touchstart', startDragTouch, {passive:true});
+    document.addEventListener('mousemove', onDrag);
+    document.addEventListener('mouseup', endDrag);
+    document.addEventListener('touchmove', onDragTouch, {passive:true});
+    document.addEventListener('touchend', endDrag);
+  });
+  function startDrag(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = e.clientX - rect.left; offY = e.clientY - rect.top; dragging = true; titleBar.style.cursor = 'grabbing'; }
+  function startDragTouch(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; var t = e.touches[0]; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = t.clientX - rect.left; offY = t.clientY - rect.top; dragging = true; }
+  function onDrag(e) { if (!dragging) return; modal.style.left = (e.clientX - offX) + 'px'; modal.style.top = (e.clientY - offY) + 'px'; }
+  function onDragTouch(e) { if (!dragging) return; var t = e.touches[0]; modal.style.left = (t.clientX - offX) + 'px'; modal.style.top = (t.clientY - offY) + 'px'; }
+  function endDrag() { dragging = false; if (titleBar) titleBar.style.cursor = 'grab'; }
+})();
+</script>
+
+<!-- 提现浮层 -->
+<div class="wd-overlay" id="wdOverlay" onclick="if(event.target===this)closeWithdrawModal()">
+    <div class="wd-modal">
+        <div class="wd-header">
+            <span class="wd-title">申请提现</span>
+            <div class="wd-header-right">
+                <span class="wd-link" onclick="openRecords()">提现申请记录 ›</span>
+                <span class="wd-close" onclick="closeWithdrawModal()">×</span>
+            </div>
+        </div>
+        <div class="wd-body">
+            <div class="wd-row">
+                <div class="wd-label">当前可提余额（可用余额）</div>
+                <div style="font-size:20px;font-weight:700;color:#1a78ff;">24,500.00</div>
+            </div>
+            <div class="wd-row">
+                <div class="wd-label">提现金额</div>
+                <input type="number" class="wd-input" id="wdAmount" placeholder="请输入提现金额">
+            </div>
+            <div class="wd-row">
+                <div class="wd-label">填写原因</div>
+                <input type="text" class="wd-input" id="wdReason" placeholder="请输入提现原因">
+            </div>
+            <div class="wd-report">
+                <div class="wr-title">收支统计报表</div>
+                <div class="wr-sum">
+                    <div class="wr-sum-item">
+                        <span>推广服务费合计</span>
+                        <b>¥ 20,050.00</b>
+                    </div>
+                    <div class="wr-sum-item">
+                        <span>运营服务费合计</span>
+                        <b>¥ 3,060.00</b>
+                    </div>
+                    <div class="wr-sum-item">
+                        <span>支出合计</span>
+                        <b>¥ 34,000.00</b>
+                    </div>
+                    <div class="wr-sum-item">
+                        <span>累计提现</span>
+                        <b>¥ 2,000.00</b>
+                    </div>
+                </div>
+                <div class="wr-sub">产品收入统计</div>
+                <table class="wr-table">
+                    <thead>
+                        <tr>
+                            <th>产品</th>
+                            <th style="text-align:right;">推广服务费（批发市场分佣）</th>
+                            <th style="text-align:right;">运营服务费（零售市场手续费）</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1、仙鹤莲池</td>
+                            <td class="money">¥ 8,650.00</td>
+                            <td class="money">¥ 1,320.00</td>
+                        </tr>
+                        <tr>
+                            <td>2、浮休东坡产品</td>
+                            <td class="money">¥ 6,280.00</td>
+                            <td class="money">¥ 960.00</td>
+                        </tr>
+                        <tr>
+                            <td>3、青莲·舒展</td>
+                            <td class="money">¥ 5,120.00</td>
+                            <td class="money">¥ 780.00</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="wr-sub">每月支出记录</div>
+                <table class="wr-table">
+                    <thead>
+                        <tr>
+                            <th>月份</th>
+                            <th style="text-align:right;">支出金额</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>2026-07</td>
+                            <td class="money">¥ 12,680.00</td>
+                        </tr>
+                        <tr>
+                            <td>2026-06</td>
+                            <td class="money">¥ 9,870.00</td>
+                        </tr>
+                        <tr>
+                            <td>2026-05</td>
+                            <td class="money">¥ 11,450.00</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="wd-footer">
+            <button class="wd-btn-default" onclick="closeWithdrawModal()">取消</button>
+            <button class="wd-btn-primary" onclick="applyWithdraw()">申请</button>
+        </div>
+    </div>
+</div>
+
+<!-- 提现申请记录 -->
+<div class="rec-overlay" id="recOverlay" onclick="if(event.target===this)closeRecords()">
+    <div class="rec-modal">
+        <div class="rec-header">
+            <span class="rec-title">提现申请记录</span>
+            <span class="rec-close" onclick="closeRecords()">×</span>
+        </div>
+        <div class="rec-body">
+            <table class="rec-table">
+                <thead>
+                    <tr>
+                        <th>申请时间</th>
+                        <th>支付渠道</th>
+                        <th>提现金额</th>
+                        <th>原因</th>
+                        <th>审核时间</th>
+                        <th>状态</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>2026-07-20 10:30:00</td>
+                        <td>汇付钱包</td>
+                        <td>500.00</td>
+                        <td>日常提现</td>
+                        <td>2026-07-20 11:20:00</td>
+                        <td><span class="rec-status done">已提现</span></td>
+                    </tr>
+                    <tr>
+                        <td>2026-07-10 15:40:00</td>
+                        <td>汇付钱包</td>
+                        <td>1000.00</td>
+                        <td>资金周转</td>
+                        <td>-</td>
+                        <td><span class="rec-status pending">待审核</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- 冻结释放记录 -->
+<div class="frz-overlay" id="frzOverlay" onclick="if(event.target===this)closeFrzModal()">
+    <div class="frz-modal">
+        <div class="frz-header">
+            <span class="frz-title">冻结释放记录</span>
+            <span class="frz-close" onclick="closeFrzModal()">×</span>
+        </div>
+        <div class="frz-stats">
+            <div class="frz-stat freeze">
+                <span class="ls">冻结金总计</span>
+                <span class="lv">¥ 1,280.00</span>
+            </div>
+            <div class="frz-stat release">
+                <span class="ls">释放总计</span>
+                <span class="lv">¥ 530.00</span>
+            </div>
+        </div>
+        <div class="frz-body">
+            <table class="frz-table">
+                <thead>
+                    <tr>
+                        <th>名称</th>
+                        <th>用途</th>
+                        <th>类型</th>
+                        <th>金额</th>
+                        <th>创建时间</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>山水空灵</td>
+                        <td>活动奖金池</td>
+                        <td><span class="frz-type release">释放</span></td>
+                        <td>100.00</td>
+                        <td>2025-04-28 16:44:27</td>
+                    </tr>
+                    <tr>
+                        <td>山水空灵</td>
+                        <td>活动奖金池</td>
+                        <td><span class="frz-type release">释放</span></td>
+                        <td>100.00</td>
+                        <td>2025-04-28 16:44:22</td>
+                    </tr>
+                    <tr>
+                        <td>山水空灵</td>
+                        <td>活动奖金池</td>
+                        <td><span class="frz-type freeze">冻结</span></td>
+                        <td>100.00</td>
+                        <td>2025-04-28 16:44:14</td>
+                    </tr>
+                    <tr>
+                        <td>山水空灵</td>
+                        <td>活动奖金池</td>
+                        <td><span class="frz-type release">释放</span></td>
+                        <td>100.00</td>
+                        <td>2025-04-28 16:43:05</td>
+                    </tr>
+                    <tr>
+                        <td>逸新活动</td>
+                        <td>活动奖金池</td>
+                        <td><span class="frz-type release">释放</span></td>
+                        <td>80.00</td>
+                        <td>2025-04-28 16:00:03</td>
+                    </tr>
+                    <tr>
+                        <td>山水空灵</td>
+                        <td>活动奖金池</td>
+                        <td><span class="frz-type release">释放</span></td>
+                        <td>100.00</td>
+                        <td>2025-04-28 15:43:23</td>
+                    </tr>
+                    <tr>
+                        <td>逸新活动</td>
+                        <td>活动奖金池</td>
+                        <td><span class="frz-type freeze">冻结</span></td>
+                        <td>100.00</td>
+                        <td>2025-04-28 15:04:42</td>
+                    </tr>
+                    <tr>
+                        <td>山水空灵</td>
+                        <td>活动奖金池</td>
+                        <td><span class="frz-type release">释放</span></td>
+                        <td>50.00</td>
+                        <td>2025-04-28 14:43:46</td>
+                    </tr>
+                    <tr>
+                        <td>山水空灵</td>
+                        <td>活动奖金池</td>
+                        <td><span class="frz-type freeze">冻结</span></td>
+                        <td>80.00</td>
+                        <td>2025-04-28 14:40:25</td>
+                    </tr>
+                    <tr>
+                        <td>山水空灵</td>
+                        <td>活动奖金池</td>
+                        <td><span class="frz-type freeze">冻结</span></td>
+                        <td>1,000.00</td>
+                        <td>2025-04-28 14:00:00</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="frz-pager">
+            <span>共 10 条</span>
+            <a>‹</a>
+            <span class="cur">1</span>
+            <a>›</a>
+        </div>
+        <div class="frz-footer">
+            <button class="frz-btn-default" onclick="closeFrzModal()">取消</button>
+            <button class="frz-btn-primary" onclick="closeFrzModal()">确定</button>
+        </div>
+    </div>
+</div>
+
+<script>
+function openFrzModal() {
+    document.getElementById('frzOverlay').classList.add('show');
+}
+function closeFrzModal() {
+    document.getElementById('frzOverlay').classList.remove('show');
+}
+function openWithdrawModal() {
+    document.getElementById('wdOverlay').classList.add('show');
+}
+function closeWithdrawModal() {
+    document.getElementById('wdOverlay').classList.remove('show');
+}
+function applyWithdraw() {
+    var amount = document.getElementById('wdAmount').value;
+    var reason = document.getElementById('wdReason').value;
+    if (!amount || !reason) {
+        alert('请填写提现金额和原因');
+        return;
+    }
+    alert('提现申请已提交\n金额：' + amount + '\n原因：' + reason);
+    closeWithdrawModal();
+}
+function openRecords() {
+    document.getElementById('recOverlay').classList.add('show');
+}
+function closeRecords() {
+    document.getElementById('recOverlay').classList.remove('show');
+}
+</script>
+
+</body>
+</html>

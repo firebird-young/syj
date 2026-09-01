@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>零售市场详情 v2</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+            background: #f0f2f5;
+            color: #1a1a2e;
+            font-size: 14px;
+            min-height: 100vh;
+        }
+        .app-container {
+            max-width: 430px;
+            margin: 0 auto;
+            background: #f0f2f5;
+            min-height: 100vh;
+            position: relative;
+            padding-bottom: 24px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.06);
+        }
+
+        /* 顶部导航 */
+        .header {
+            background: #fff;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            font-size: 16px;
+            font-weight: 500;
+            color: #1a1a2e;
+        }
+        .header .back {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+            color: #1a1a2e;
+            cursor: pointer;
+            padding: 4px 8px;
+        }
+
+        /* 交易信息卡片 */
+        .trade-card {
+            background: #fff;
+            margin: 10px 12px 0;
+            border-radius: 10px;
+            padding: 14px 16px;
+        }
+        .trade-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+        .trade-label {
+            font-size: 13px;
+            color: #4e5a6e;
+        }
+        .trade-time {
+            font-size: 13px;
+            color: #1a1a2e;
+            padding: 4px 10px;
+            border: 1px solid #e74c5e;
+            color: #e74c5e;
+            border-radius: 6px;
+        }
+        .product-info {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            position: relative;
+        }
+        .product-img {
+            width: 76px;
+            height: 76px;
+            border-radius: 8px;
+            background: #fafbfc;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .product-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .product-detail {
+            flex: 1;
+            min-width: 0;
+        }
+        .product-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 4px;
+        }
+        .btn-fav {
+            font-size: 13px;
+            color: #e74c5e;
+            background: #fff;
+            border: 1px solid #e74c5e;
+            padding: 4px 12px;
+            border-radius: 14px;
+            cursor: pointer;
+            margin-left: 8px;
+            vertical-align: 1px;
+        }
+        .btn-fav.on {
+            background: #e74c5e;
+            color: #fff;
+        }
+        .product-code {
+            font-size: 12px;
+            color: #86909c;
+            margin-bottom: 6px;
+        }
+        .product-price {
+            font-size: 18px;
+            font-weight: 700;
+            color: #e74c5e;
+            display: inline-block;
+        }
+        .product-price .unit {
+            font-size: 12px;
+            font-weight: 500;
+            margin-right: 1px;
+        }
+        .product-arrow {
+            color: #c0c8d4;
+            font-size: 18px;
+            margin-left: 4px;
+            align-self: center;
+        }
+
+        /* 批发价/成交笔数 */
+        .price-bar {
+            background: #fbe4e0;
+            margin: 8px 12px 0;
+            border-radius: 10px;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .price-bar .left {
+            color: #e74c5e;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .price-bar .left b {
+            font-size: 16px;
+            font-weight: 700;
+        }
+        .price-bar .right {
+            color: #e74c5e;
+            font-size: 14px;
+        }
+        .price-bar .right b {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        /* 最近订单 */
+        .order-card {
+            background: #fff;
+            margin: 10px 12px 0;
+            border-radius: 10px;
+            padding: 14px 16px;
+        }
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .order-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a1a2e;
+        }
+        .order-arrow {
+            color: #c0c8d4;
+            font-size: 16px;
+        }
+        .order-item {
+            background: #f6f4fa;
+            border-radius: 8px;
+            padding: 10px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #4e5a6e;
+            margin-bottom: 8px;
+        }
+        .order-item:last-child { margin-bottom: 0; }
+        .order-item .time {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .order-item .qty {
+            color: #86909c;
+        }
+        .order-item .price {
+            color: #1a1a2e;
+            font-weight: 600;
+        }
+
+        /* 零售商列表 */
+        .shop-card {
+            background: #fff;
+            margin: 10px 12px 0;
+            border-radius: 10px;
+            padding: 14px 16px;
+        }
+        .shop-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .shop-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a1a2e;
+        }
+        .btn-sell {
+            font-size: 13px;
+            color: #e74c5e;
+            border: 1px solid #e74c5e;
+            padding: 5px 12px;
+            border-radius: 16px;
+            background: #fff;
+            cursor: pointer;
+        }
+        .sort-link {
+            margin-left: auto;
+            font-size: 13px;
+            color: #86909c;
+            cursor: pointer;
+        }
+        .shop-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px dashed #f0f0f5;
+        }
+        .shop-item:last-child { border-bottom: none; }
+        .shop-img {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            background: #fafbfc;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .shop-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .shop-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .shop-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #1a1a2e;
+            margin-bottom: 6px;
+        }
+        .shop-code {
+            font-size: 12px;
+            font-weight: 400;
+            color: #86909c;
+            margin-left: 4px;
+        }
+        .shop-price {
+            font-size: 18px;
+            font-weight: 700;
+            color: #e74c5e;
+        }
+        .shop-price .unit {
+            font-size: 12px;
+            margin-right: 1px;
+            font-weight: 500;
+        }
+        .shop-sold {
+            font-size: 11px;
+            color: #86909c;
+            margin-top: 4px;
+        }
+        .btn-buy {
+            background: #fff;
+            border: 1px solid #e74c5e;
+            color: #e74c5e;
+            padding: 6px 18px;
+            border-radius: 16px;
+            font-size: 14px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .btn-buy:hover { background: #fbe4e0; }
+
+        /* 标注圆点 */
+        .badge {
+            display: inline-block;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 5px;
+            border-radius: 50%;
+            background: #ff2d55;
+            color: #fff;
+            font-size: 12px;
+            line-height: 18px;
+            text-align: center;
+            font-weight: 600;
+            box-shadow: 0 1px 3px rgba(255,45,85,0.3);
+        }
+        .badge.sm {
+            min-width: 16px;
+            height: 16px;
+            font-size: 11px;
+            line-height: 16px;
+        }
+        .fav-badge {
+            position: absolute;
+            top: -7px;
+            right: -7px;
+        }
+
+        /* ── 功能说明浮窗 ── */
+        .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 430px; max-width: 94vw; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 99999; padding: 22px; display: none; }
+        .f-modal.show { display: block; }
+        .f-modal .fm-title { font-size: 15px; font-weight: 600; color: #1a1a2e; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
+        .f-modal .fm-title:active { cursor: grabbing; }
+        .f-modal .fm-close { width: 26px; height: 26px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 13px; color: #666; border: none; flex-shrink: 0; }
+        .f-modal .fm-close:hover { background: #e8e8e8; }
+        .f-modal .fm-body { font-size: 13px; color: #555; line-height: 1.8; }
+        .f-modal .fm-body h4 { font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 14px 0 6px; }
+        .f-modal .fm-body h4:first-child { margin-top: 0; }
+        .f-modal .fm-body ul { padding-left: 18px; margin: 0 0 8px; }
+        .f-modal .fm-body li { margin-bottom: 4px; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+
+    <div class="header">
+        <span class="back">‹</span>
+        永淳·夏日帖
+    </div>
+
+    <!-- 交易信息 -->
+    <div class="trade-card">
+        <div class="trade-top">
+            <span class="trade-label">交易中（单位：元）</span>
+            <span class="trade-time">08/03 10:08:37</span>
+        </div>
+        <div class="product-info">
+            <div class="product-img"><img src="../asset/永淳·夏日帖.png" alt="永淳·夏日帖"></div>
+            <div class="product-detail">
+                <div class="product-name">永淳·夏日帖<span style="position:relative;display:inline-block;"><button class="btn-fav" id="favBtn" onclick="toggleFav()">加为自选</button><span class="badge sm fav-badge">1</span></span></div>
+                <div class="product-code">产品编码 XB000004</div>
+                <div><span class="product-price"><span class="unit">¥</span>130.00</span></div>
+            </div>
+            <span class="product-arrow">›</span>
+        </div>
+    </div>
+
+    <!-- 批发价 / 累积成交笔数 -->
+    <div class="price-bar">
+        <div class="left">批发价 <b>128.00</b></div>
+        <div class="right">累积成交笔数 <b>1435</b></div>
+    </div>
+
+    <!-- 最近订单 -->
+    <div class="order-card">
+        <div class="order-header">
+            <span class="order-title">最近订单</span>
+            <span class="order-arrow">›</span>
+        </div>
+        <div class="order-item">
+            <span class="time">🕒 2026-07-31 14:23:40</span>
+            <span class="qty">×1</span>
+            <span class="price">¥130.00</span>
+        </div>
+        <div class="order-item">
+            <span class="time">🕒 2026-07-30 11:27:23</span>
+            <span class="qty">×1</span>
+            <span class="price">¥130.00</span>
+        </div>
+    </div>
+
+    <!-- 零售商列表 -->
+    <div class="shop-card">
+        <div class="shop-header">
+            <span class="shop-title">零售商列表</span>
+            <button class="btn-sell">我要售卖</button>
+            <span class="sort-link">价格排序 ↗</span>
+        </div>
+        <div class="shop-item">
+            <div class="shop-img"><img src="../asset/永淳·夏日帖.png" alt="永淳·夏日帖"></div>
+            <div class="shop-info">
+                <div class="shop-name">永淳·夏日帖<span class="shop-code">#0002</span></div>
+                <div class="shop-price"><span class="unit">¥</span>10.00</div>
+                <div class="shop-sold">已售 3 次</div>
+            </div>
+            <button class="btn-buy">购买</button>
+        </div>
+        <div class="shop-item">
+            <div class="shop-img"><img src="../asset/永淳·夏日帖.png" alt="永淳·夏日帖"></div>
+            <div class="shop-info">
+                <div class="shop-name">永淳·夏日帖<span class="shop-code">#0012</span></div>
+                <div class="shop-price"><span class="unit">¥</span>20.00</div>
+                <div class="shop-sold">已售 7 次</div>
+            </div>
+            <button class="btn-buy">购买</button>
+        </div>
+        <div class="shop-item">
+            <div class="shop-img"><img src="../asset/永淳·夏日帖.png" alt="永淳·夏日帖"></div>
+            <div class="shop-info">
+                <div class="shop-name">永淳·夏日帖<span class="shop-code">#0020</span></div>
+                <div class="shop-price"><span class="unit">¥</span>30.00</div>
+                <div class="shop-sold">已售 12 次</div>
+            </div>
+            <button class="btn-buy">购买</button>
+        </div>
+        <div class="shop-item">
+            <div class="shop-img"><img src="../asset/永淳·夏日帖.png" alt="永淳·夏日帖"></div>
+            <div class="shop-info">
+                <div class="shop-name">永淳·夏日帖<span class="shop-code">#0035</span></div>
+                <div class="shop-price"><span class="unit">¥</span>45.00</div>
+                <div class="shop-sold">已售 18 次</div>
+            </div>
+            <button class="btn-buy">购买</button>
+        </div>
+        <div class="shop-item">
+            <div class="shop-img"><img src="../asset/永淳·夏日帖.png" alt="永淳·夏日帖"></div>
+            <div class="shop-info">
+                <div class="shop-name">永淳·夏日帖<span class="shop-code">#0048</span></div>
+                <div class="shop-price"><span class="unit">¥</span>55.00</div>
+                <div class="shop-sold">已售 5 次</div>
+            </div>
+            <button class="btn-buy">购买</button>
+        </div>
+        <div class="shop-item">
+            <div class="shop-img"><img src="../asset/永淳·夏日帖.png" alt="永淳·夏日帖"></div>
+            <div class="shop-info">
+                <div class="shop-name">永淳·夏日帖<span class="shop-code">#0062</span></div>
+                <div class="shop-price"><span class="unit">¥</span>68.00</div>
+                <div class="shop-sold">已售 14 次</div>
+            </div>
+            <button class="btn-buy">购买</button>
+        </div>
+        <div class="shop-item">
+            <div class="shop-img"><img src="../asset/永淳·夏日帖.png" alt="永淳·夏日帖"></div>
+            <div class="shop-info">
+                <div class="shop-name">永淳·夏日帖<span class="shop-code">#0079</span></div>
+                <div class="shop-price"><span class="unit">¥</span>82.00</div>
+                <div class="shop-sold">已售 9 次</div>
+            </div>
+            <button class="btn-buy">购买</button>
+        </div>
+        <div class="shop-item">
+            <div class="shop-img"><img src="../asset/永淳·夏日帖.png" alt="永淳·夏日帖"></div>
+            <div class="shop-info">
+                <div class="shop-name">永淳·夏日帖<span class="shop-code">#0091</span></div>
+                <div class="shop-price"><span class="unit">¥</span>95.00</div>
+                <div class="shop-sold">已售 16 次</div>
+            </div>
+            <button class="btn-buy">购买</button>
+        </div>
+        <div class="shop-item">
+            <div class="shop-img"><img src="../asset/永淳·夏日帖.png" alt="永淳·夏日帖"></div>
+            <div class="shop-info">
+                <div class="shop-name">永淳·夏日帖<span class="shop-code">#0100</span></div>
+                <div class="shop-price"><span class="unit">¥</span>100.00</div>
+                <div class="shop-sold">已售 2 次</div>
+            </div>
+            <button class="btn-buy">购买</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+function toggleFav() {
+    var btn = document.getElementById('favBtn');
+    var on = btn.classList.toggle('on');
+    btn.textContent = on ? '已自选' : '加为自选';
+}
+</script>
+
+<!-- 浮动说明按钮（手机框外） -->
+<button onclick="toggleFuncModal()" style="position:fixed;top:12px;right:16px;z-index:99999;background:#fff;color:#666;padding:7px 16px;border-radius:20px;border:1px solid #ddd;font-size:13px;font-weight:500;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.08);font-family:inherit;display:inline-flex;align-items:center;gap:4px;">📖 说明</button>
+
+<!-- ====== 功能说明浮窗 ====== -->
+<div class="f-modal" id="funcModal">
+  <div class="fm-title">
+    <span>📖 功能说明</span>
+    <button class="fm-close" onclick="toggleFuncModal()">✕</button>
+  </div>
+  <div class="fm-body">
+    <h4><span class="badge">1</span> <span style="vertical-align:middle;">加为自选</span></h4>
+    <ul>
+      <li>点击「加为自选」可将该产品加入自选列表，方便后续查看与操作</li>
+      <li>添加成功后按钮变为「已自选」，再次点击可取消自选</li>
+    </ul>
+    <h4><span class="badge">2</span> <span style="vertical-align:middle;">零售商列表</span></h4>
+    <ul>
+      <li>同一款产品多位零售商售卖，价格从 <b>¥10.00</b> 到 <b>¥100.00</b>，每件带<b>编号</b>（如 #0002、#0100）</li>
+      <li>每条展示<b>已售次数</b>（1-20 随机）</li>
+      <li>所有产品均为<b>一份一份</b>出售，无数量限制</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+function toggleFuncModal() {
+  var el = document.getElementById('funcModal');
+  el.classList.toggle('show');
+  if (el.classList.contains('show') && !el.dataset.dragged) {
+    el.style.left = '50%'; el.style.top = '50%'; el.style.transform = 'translate(-50%,-50%)';
+  }
+}
+(function() {
+  var modal, titleBar, offX, offY, dragging = false;
+  document.addEventListener('DOMContentLoaded', function() {
+    modal = document.getElementById('funcModal');
+    titleBar = modal.querySelector('.fm-title');
+    titleBar.addEventListener('mousedown', startDrag);
+    titleBar.addEventListener('touchstart', startDragTouch, {passive:true});
+    document.addEventListener('mousemove', onDrag);
+    document.addEventListener('mouseup', endDrag);
+    document.addEventListener('touchmove', onDragTouch, {passive:true});
+    document.addEventListener('touchend', endDrag);
+  });
+  function startDrag(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = e.clientX - rect.left; offY = e.clientY - rect.top; dragging = true; titleBar.style.cursor = 'grabbing'; }
+  function startDragTouch(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; var t = e.touches[0]; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = t.clientX - rect.left; offY = t.clientY - rect.top; dragging = true; }
+  function onDrag(e) { if (!dragging) return; modal.style.left = (e.clientX - offX) + 'px'; modal.style.top = (e.clientY - offY) + 'px'; }
+  function onDragTouch(e) { if (!dragging) return; var t = e.touches[0]; modal.style.left = (t.clientX - offX) + 'px'; modal.style.top = (t.clientY - offY) + 'px'; }
+  function endDrag() { dragging = false; if (titleBar) titleBar.style.cursor = 'grab'; }
+})();
+</script>
+
+</body>
+</html>

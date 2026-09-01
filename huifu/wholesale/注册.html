@@ -143,9 +143,24 @@
         .footer-tip { text-align: center; font-size: 12px; color: #6b7588; margin-top: 18px; }
         .footer-tip a { color: #a8c4ff; text-decoration: none; }
         .footer-tip a:hover { text-decoration: underline; }
+
+        /* ── 功能说明浮窗 ── */
+        .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 560px; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 9999; padding: 24px; display: none; }
+        .f-modal.show { display: block; }
+        .f-modal .fm-title { font-size: 16px; font-weight: 600; color: #1a1a2e; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
+        .f-modal .fm-title:active { cursor: grabbing; }
+        .f-modal .fm-close { width: 28px; height: 28px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; color: #666; border: none; flex-shrink: 0; }
+        .f-modal .fm-close:hover { background: #e8e8e8; }
+        .f-modal .fm-body { font-size: 13px; color: #555; line-height: 1.8; }
+        .f-modal .fm-body h4 { font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 16px 0 8px; }
+        .f-modal .fm-body h4:first-child { margin-top: 0; }
+        .f-modal .fm-body ul { padding-left: 18px; margin: 0 0 12px; }
+        .f-modal .fm-body li { margin-bottom: 4px; }
     </style>
 </head>
 <body>
+
+<button onclick="toggleFuncModal()" style="position:fixed;top:16px;right:16px;z-index:99999;background:#fff;color:#4e5a6e;padding:7px 16px;border-radius:20px;border:1px solid #d0d5dd;font-size:13px;font-weight:500;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.08);font-family:inherit;display:inline-flex;align-items:center;gap:4px;">📖 功能说明</button>
 
 <div class="reg-wrap">
     <div class="reg-card">
@@ -209,6 +224,35 @@
     <div class="footer-tip">深艺交 文化艺术品交易平台 · <a href="#">帮助中心</a></div>
 </div>
 
+<!-- ====== 功能说明浮窗 ====== -->
+<div class="f-modal" id="funcModal">
+  <div class="fm-title">
+    <span>📖 功能说明</span>
+    <button class="fm-close" onclick="toggleFuncModal()">✕</button>
+  </div>
+  <div style="font-size:13px;font-weight:600;color:#e74c5e;margin:-6px 0 12px;">批发商 · 商户管理平台</div>
+  <div class="fm-body">
+    <h4>一、注册账号信息</h4>
+    <ul>
+      <li><b>手机号（登录账号）</b>：输入 11 位手机号作为登录账号</li>
+      <li><b>短信验证码</b>：点击「<b>获取验证码</b>」接收 6 位验证码（演示环境为 123456）</li>
+      <li><b>企业简称</b>：设置登录时需输入的企业简称，如"华乐博"</li>
+      <li><b>企业全称</b>：填写营业执照上的企业全称</li>
+    </ul>
+    <h4>二、设置登录密码</h4>
+    <ul>
+      <li><b>登录密码</b>：设置 6-20 位密码，区分大小写</li>
+      <li><b>确认密码</b>：再次输入登录密码，系统校验两次是否一致</li>
+    </ul>
+    <h4>三、协议与提交注册</h4>
+    <ul>
+      <li>勾选同意《<b>用户协议</b>》与《<b>隐私政策</b>》后方可注册</li>
+      <li>注册成功后需完成<b>企业资料认证</b>，方可开户交易</li>
+      <li>已有账号可直接「<b>去登录</b>」</li>
+    </ul>
+  </div>
+</div>
+
 <script>
 var codeTimer = null;
 
@@ -255,6 +299,33 @@ function doReg() {
     alert('注册成功！请完成企业资料认证。\n登录账号：' + mobile + '\n企业简称：' + shortName);
     location.href = '企业注册.html';
 }
+
+/* ── 功能说明浮窗 ── */
+function toggleFuncModal() {
+  var el = document.getElementById('funcModal');
+  el.classList.toggle('show');
+  if (el.classList.contains('show') && !el.dataset.dragged) {
+    el.style.left = '50%'; el.style.top = '50%'; el.style.transform = 'translate(-50%,-50%)';
+  }
+}
+(function() {
+  var modal, titleBar, offX, offY, dragging = false;
+  document.addEventListener('DOMContentLoaded', function() {
+    modal = document.getElementById('funcModal');
+    titleBar = modal.querySelector('.fm-title');
+    titleBar.addEventListener('mousedown', startDrag);
+    titleBar.addEventListener('touchstart', startDragTouch, {passive:true});
+    document.addEventListener('mousemove', onDrag);
+    document.addEventListener('mouseup', endDrag);
+    document.addEventListener('touchmove', onDragTouch, {passive:true});
+    document.addEventListener('touchend', endDrag);
+  });
+  function startDrag(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = e.clientX - rect.left; offY = e.clientY - rect.top; dragging = true; titleBar.style.cursor = 'grabbing'; }
+  function startDragTouch(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; var t = e.touches[0]; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = t.clientX - rect.left; offY = t.clientY - rect.top; dragging = true; }
+  function onDrag(e) { if (!dragging) return; modal.style.left = (e.clientX - offX) + 'px'; modal.style.top = (e.clientY - offY) + 'px'; }
+  function onDragTouch(e) { if (!dragging) return; var t = e.touches[0]; modal.style.left = (t.clientX - offX) + 'px'; modal.style.top = (t.clientY - offY) + 'px'; }
+  function endDrag() { dragging = false; if (titleBar) titleBar.style.cursor = 'grab'; }
+})();
 </script>
 
 </body>

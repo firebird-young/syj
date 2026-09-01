@@ -6,273 +6,417 @@
     <title>产品管理</title>
     <style>
         * { margin:0; padding:0; box-sizing:border-box; }
+        :root{
+            --primary:#1a78ff;--primary-hover:#0f6ae8;--primary-bg:#e6f4ff;
+            --brand:#e74c3e;--danger:#e74c5e;
+            --page-bg:#f0f2f5;--card-bg:#fff;--info-bg:#f5f7fa;
+            --ink:#1a1a2e;--ink-muted:#4e5a6e;--ink-subtle:#6b7588;--ink-faint:#9ba6b9;
+            --border:#d0d5dd;--border-light:#f0f0f0;
+            --radius-sm:4px;--radius-md:6px;
+            --font:"-apple-system","BlinkMacSystemFont","PingFang SC","Microsoft YaHei","Helvetica Neue",sans-serif;
+        }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
-            background: #f0f2f5;
-            color: #1a1a2e;
+            font-family: var(--font);
+            background: var(--page-bg);
+            color: var(--ink);
             font-size: 14px;
         }
 
+        /* ── 整体布局 ── */
+        .app { display: flex; min-height: 100vh; }
+
+        /* 侧边栏 */
+        .sidebar { width:200px; background:#1f2c3d; color:#a8b2c0; flex-shrink:0; }
+        .logo {
+            height:56px; display:flex; align-items:center; padding:0 16px;
+            background:#fff; border-bottom:1px solid var(--border-light);
+        }
+        .logo-icon {
+            width:28px; height:28px; background:var(--brand); border-radius:4px;
+            color:#fff; display:flex; align-items:center; justify-content:center;
+            font-weight:700; font-size:14px;
+        }
+        .menu { padding:8px 0; }
+        .menu-item, .menu-group-title {
+            display:flex; align-items:center; height:44px; padding:0 20px;
+            color:#c0c8d4; cursor:pointer; text-decoration:none; font-size:14px;
+            transition:all .15s;
+        }
+        .menu-item:hover, .menu-group-title:hover { background:#2a3849; color:#fff; }
+        .menu-item.active, .menu-group-title.active { color:var(--primary); background:#2a3849; }
+        .menu-item .icon, .menu-group-title .icon { width:20px; margin-right:10px; font-size:16px; text-align:center; }
+        .menu-group-title .arrow { margin-left:auto; font-size:12px; }
+        .menu-group .submenu { display:none; }
+        .menu-group.open .submenu { display:block; }
+        .menu-group .submenu a {
+            display:flex; align-items:center; height:36px; padding:0 20px 0 50px;
+            color:#a8b2c0; cursor:pointer; text-decoration:none; font-size:13px;
+        }
+        .menu-group .submenu a:hover { color:#fff; }
+        .menu-group .submenu a.active { color:var(--primary); }
+
+        /* 主体 */
+        .main { flex:1; display:flex; flex-direction:column; min-width:0; }
+
+        /* 顶栏 */
         .topbar {
-            background: #fff;
-            height: 56px;
-            display: flex;
-            align-items: center;
-            padding: 0 20px;
-            border-bottom: 1px solid #f0f0f0;
+            background:#fff; height:56px; display:flex; align-items:center;
+            padding:0 24px; border-bottom:1px solid var(--border-light);
         }
-        .topbar-left { display: flex; align-items: center; gap: 16px; }
-        .menu-btn {
-            width: 32px; height: 32px;
-            border: 1px solid #d0d5dd;
-            border-radius: 4px;
-            background: #fff;
-            color: #6b7588;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
+        .breadcrumb { font-size:13px; color:var(--ink-subtle); display:flex; align-items:center; gap:6px; }
+        .breadcrumb .sep { color:#c0c8d4; }
+        .breadcrumb .active { color:var(--ink); }
+        .topbar-right { margin-left:auto; display:flex; align-items:center; gap:12px; }
+        .btn-func {
+            padding:6px 14px; border-radius:6px; background:#f5f7fa; color:#333;
+            border:1px solid #e0e4ea; font-size:13px; font-weight:500; cursor:pointer;
+            white-space:nowrap; display:inline-flex; align-items:center; gap:4px;
         }
-        .menu-btn:hover { background: #f5f5f7; }
-        .breadcrumb { font-size: 13px; color: #6b7588; }
-        .breadcrumb .active { color: #1a1a2e; }
-        .topbar-right {
-            margin-left: auto;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
+        .btn-func:hover { border-color:var(--primary); color:var(--primary); }
+        .user-chip { display:flex; align-items:center; gap:8px; cursor:pointer; }
+        .user-chip .avatar {
+            width:32px; height:32px; border-radius:50%; background:#f5deb3;
+            display:flex; align-items:center; justify-content:center; font-size:16px;
         }
-        .topbar-right .avatar {
-            width: 32px; height: 32px;
-            border-radius: 50%;
-            background: #f5deb3;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 16px;
-        }
-        .topbar-right .name { font-size: 13px; }
-        .topbar-right .arrow { color: #9ba6b9; font-size: 12px; }
+        .user-chip .name { font-size:13px; color:var(--ink); }
+        .user-chip .arrow { color:var(--ink-faint); font-size:12px; }
 
-        /* 工具栏 */
-        .toolbar {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin: 16px 0;
-        }
-        .search-input {
-            width: 240px;
-            height: 32px;
-            padding: 0 12px;
-            border: 1px solid #d0d5dd;
-            border-radius: 4px;
-            font-size: 13px;
-            color: #1a1a2e;
-            outline: none;
-        }
-        .search-input:focus { border-color: #1a78ff; }
-        .btn-add {
-            background: #fff;
-            color: #1a78ff;
-            border: 1px solid #1a78ff;
-            padding: 0 16px;
-            height: 32px;
-            border-radius: 4px;
-            font-size: 13px;
-            cursor: pointer;
-        }
-        .btn-add:hover { background: #f5f8ff; }
+        /* 内容区 */
+        .content { flex:1; padding:12px; overflow-y:auto; }
 
-        /* 表格 */
+        /* ── 筛选栏 ── */
+        .filter-bar {
+            background:var(--card-bg); padding:12px 20px;
+            display:flex; align-items:center; flex-wrap:wrap; border-radius:var(--radius-md);
+        }
+        .filter-item { display:flex; align-items:center; margin-right:16px; margin-bottom:4px; }
+        .filter-label { font-size:13px; color:var(--ink-muted); margin-right:8px; white-space:nowrap; }
+        .filter-input {
+            width:220px; height:30px; padding:0 10px;
+            border:1px solid var(--border); border-radius:var(--radius-sm);
+            font-size:13px; color:var(--ink); outline:none;
+        }
+        .filter-input:focus { border-color:var(--primary); }
+        .filter-actions { display:flex; align-items:center; gap:8px; margin-left:auto; }
+
+        /* 按钮 */
+        .btn-search { background:var(--primary); color:#fff; border:none; padding:0 14px; height:30px; border-radius:var(--radius-sm); font-size:13px; cursor:pointer; }
+        .btn-search:hover { background:var(--primary-hover); }
+        .btn-reset { background:#fff; color:var(--ink-muted); border:1px solid var(--border); padding:0 14px; height:30px; border-radius:var(--radius-sm); font-size:13px; cursor:pointer; }
+        .btn-reset:hover { border-color:var(--primary); color:var(--primary); }
+        .btn-add { background:#fff; color:var(--primary); border:1px solid var(--primary); padding:0 14px; height:30px; border-radius:var(--radius-sm); font-size:13px; cursor:pointer; white-space:nowrap; }
+        .btn-add:hover { background:var(--primary-bg); }
+
+        /* ── 表格 ── */
         .table-card {
-            background: #fff;
-            border-radius: 6px;
-            overflow: hidden;
+            background:var(--card-bg); margin-top:12px; border-radius:var(--radius-md);
+            overflow-x:auto;
         }
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-        }
+        .table { width:100%; border-collapse:collapse; }
         .table th {
-            background: #fafbfc;
-            padding: 14px 12px;
-            text-align: left;
-            font-size: 13px;
-            color: #4e5a6e;
-            font-weight: 500;
-            border-bottom: 1px solid #f0f0f0;
+            background:#fafbfc; padding:14px 12px; text-align:left;
+            font-size:13px; color:var(--ink-muted); font-weight:500;
+            border-bottom:1px solid var(--border-light); white-space:nowrap;
         }
         .table td {
-            padding: 14px 12px;
-            font-size: 13px;
-            color: #1a1a2e;
-            border-bottom: 1px solid #f5f5f7;
+            padding:14px 12px; font-size:13px; color:var(--ink);
+            border-bottom:1px solid #f5f5f7;
         }
-        .table tr:last-child td { border-bottom: none; }
-        .table tr:nth-child(odd) { background: #fafbfc; }
+        .table tr:last-child td { border-bottom:none; }
 
         .product-img {
-            width: 60px;
-            height: 60px;
-            border-radius: 4px;
-            background-image: linear-gradient(135deg, #f0e8d8 0%, #c9b88e 100%);
-            display: block;
+            width:60px; height:60px; border-radius:var(--radius-sm);
+            background-image:linear-gradient(135deg,#f0e8d8 0%,#c9b88e 100%); display:block;
         }
-        .product-img.img1 { background-image: linear-gradient(135deg, #d8e0e8 0%, #98a8c4 100%); }
-        .product-img.img2 { background-image: linear-gradient(135deg, #f5e8b8 0%, #c9a04a 100%); }
-        .product-img.img3 { background-image: linear-gradient(135deg, #e8d8a0 0%, #c08830 100%); }
-        .product-img.img4 { background-image: linear-gradient(135deg, #d8b8a0 0%, #a87850 100%); }
-        .product-img.img5 { background-image: linear-gradient(135deg, #d4d8d4 0%, #98a098 100%); }
-        .product-img.img6 { background-image: linear-gradient(135deg, #f7e8d4 0%, #c8a888 100%); }
+        .product-img.img1 { background-image:linear-gradient(135deg,#d8e0e8 0%,#98a8c4 100%); }
+        .product-img.img2 { background-image:linear-gradient(135deg,#f5e8b8 0%,#c9a04a 100%); }
+        .product-img.img3 { background-image:linear-gradient(135deg,#e8d8a0 0%,#c08830 100%); }
+        .product-img.img4 { background-image:linear-gradient(135deg,#d8b8a0 0%,#a87850 100%); }
+        .product-img.img5 { background-image:linear-gradient(135deg,#d4d8d4 0%,#98a098 100%); }
+        .product-img.img6 { background-image:linear-gradient(135deg,#f7e8d4 0%,#c8a888 100%); }
+
+        .product-name { font-weight:600; white-space:nowrap; }
+        .type-cell { color:var(--ink-muted); }
+
+        /* 批发模式标签（可组合） */
+        .mode-cell { white-space:nowrap; }
+        .mode-tag { display:inline-block; padding:2px 8px; border-radius:var(--radius-sm); font-size:11px; margin-right:4px; }
+        .mode-tag.prior { background:#e6f4ff; color:#1a78ff; }
+        .mode-tag.draw  { background:#fdf0e4; color:#e67e22; }
+        .mode-tag.open  { background:#e6f7eb; color:#1aab67; }
+
+        /* 阶段标签 */
+        .stage-cell { white-space:nowrap; }
+        .stage-tag { display:inline-block; padding:3px 10px; border-radius:var(--radius-sm); font-size:12px; }
+        .stage-tag.wholesale { background:#e6f4ff; color:#1a78ff; }
+        .stage-tag.done { background:#e6f7eb; color:#1aab67; }
+        .stage-tag.retail { background:#f3f0ff; color:#6c5ce7; }
+
+        .time-cell { color:var(--ink-subtle); white-space:nowrap; }
 
         .status-tag {
-            display: inline-block;
-            padding: 3px 10px;
-            border-radius: 4px;
-            font-size: 12px;
-            background: #e6f7eb;
-            color: #1aab67;
+            display:inline-block; padding:3px 10px; border-radius:var(--radius-sm); font-size:12px;
+            background:#e6f7eb; color:#1aab67;
         }
-        .actions a {
-            color: #1a78ff;
-            margin-right: 8px;
-            cursor: pointer;
-            text-decoration: none;
-        }
-        .actions a.disabled { color: #9ba6b9; cursor: default; }
-        .actions a.disabled:hover { text-decoration: none; }
-        .actions a:last-child { margin-right: 0; }
-        .actions a:hover { text-decoration: underline; }
 
-        /* 标注圆点 */
-        .badge {
-            display: inline-block;
-            min-width: 18px;
-            height: 18px;
-            padding: 0 5px;
-            border-radius: 50%;
-            background: #ff2d55;
-            color: #fff;
-            font-size: 12px;
-            line-height: 18px;
-            text-align: center;
-            font-weight: 600;
-            box-shadow: 0 1px 3px rgba(255,45,85,0.3);
+        /* 操作列 */
+        .actions { white-space:nowrap; }
+        .actions a {
+            color:var(--primary); margin-right:8px; cursor:pointer;
+            text-decoration:none; font-size:13px;
         }
+        .actions a:last-child { margin-right:0; }
+        .actions a:hover { text-decoration:underline; }
+        .actions a.disabled { color:#c0c8d4; cursor:default; }
+        .actions a.disabled:hover { text-decoration:none; }
+
 
         /* ── 功能说明浮窗 ── */
-        .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 520px; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 9999; padding: 24px; display: none; }
-        .f-modal.show { display: block; }
-        .f-modal .fm-title { font-size: 16px; font-weight: 600; color: #1a1a2e; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
-        .f-modal .fm-title:active { cursor: grabbing; }
-        .f-modal .fm-close { width: 28px; height: 28px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; color: #666; border: none; flex-shrink: 0; }
-        .f-modal .fm-close:hover { background: #e8e8e8; }
-        .f-modal .fm-body { font-size: 13px; color: #555; line-height: 1.8; }
-        .f-modal .fm-body h4 { font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 16px 0 8px; }
-        .f-modal .fm-body ul { padding-left: 18px; margin: 0 0 12px; }
-        .f-modal .fm-body li { margin-bottom: 4px; }
+        .f-modal { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); width:560px; max-height:80vh; overflow-y:auto; background:#fff; border-radius:16px; box-shadow:0 8px 40px rgba(0,0,0,.2); z-index:9999; padding:24px; display:none; }
+        .f-modal.show { display:block; }
+        .f-modal .fm-title { font-size:16px; font-weight:600; color:var(--ink); margin-bottom:16px; display:flex; justify-content:space-between; align-items:center; cursor:grab; }
+        .f-modal .fm-title:active { cursor:grabbing; }
+        .f-modal .fm-close { width:28px; height:28px; border-radius:50%; background:#f5f5f5; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:14px; color:#666; border:none; flex-shrink:0; }
+        .f-modal .fm-close:hover { background:#e8e8e8; }
+        .f-modal .fm-body { font-size:13px; color:#555; line-height:1.8; }
+        .f-modal .fm-body h4 { font-size:14px; font-weight:600; color:var(--ink); margin:16px 0 8px; }
+        .f-modal .fm-body ul { padding-left:18px; margin:0 0 12px; }
+        .f-modal .fm-body li { margin-bottom:4px; }
+        .f-modal .fm-tag { display:inline-block; padding:2px 8px; border-radius:var(--radius-sm); font-size:11px; margin-right:4px; }
     </style>
 </head>
 <body>
 
-<div class="topbar">
-    <div class="topbar-left">
-        <button class="menu-btn">≡</button>
-        <div class="breadcrumb">
-            <span>首页</span> /
-            <span class="active">产品管理</span>
+<div class="app">
+    <!-- 侧边栏 -->
+    <div class="sidebar">
+        <div class="logo">
+            <div class="logo-icon">深</div>
+        </div>
+        <div class="menu">
+            <a class="menu-item" href="信息查看.html">
+                <span class="icon">📋</span><span>信息查看</span>
+            </a>
+            <a class="menu-item active" href="产品管理.html">
+                <span class="icon">📦</span><span>我的产品</span>
+            </a>
+            <a class="menu-item" href="批发资金管理.html">
+                <span class="icon">💰</span><span>资金管理</span>
+            </a>
+            <a class="menu-item" href="批发市场分账申请.html">
+                <span class="icon">📊</span><span>分佣管理</span>
+            </a>
+            <a class="menu-item" href="#">
+                <span class="icon">📢</span><span>系统公告</span>
+            </a>
+            <a class="menu-item" href="#">
+                <span class="icon">🏷️</span><span>价值管理</span>
+            </a>
+            <a class="menu-item" href="#">
+                <span class="icon">🏭</span><span>仓库管理</span>
+            </a>
+            <a class="menu-item" href="#">
+                <span class="icon">📝</span><span>任务管理</span>
+            </a>
+            <div class="menu-group open">
+                <div class="menu-group-title" onclick="this.parentNode.classList.toggle('open')">
+                    <span class="icon">⚙️</span><span>系统管理</span><span class="arrow">▾</span>
+                </div>
+                <div class="submenu">
+                    <a href="用户管理.html">用户管理</a>
+                    <a href="角色管理.html">角色管理</a>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="topbar-right">
-        <button onclick="toggleFuncModal()" style="margin-right:12px;padding:6px 14px;border-radius:6px;background:#f5f7fa;color:#333;border:1px solid #e0e4ea;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:4px;">📖 功能说明</button>
-        <span class="avatar">👤</span>
-        <span class="name">批发商</span>
-        <span class="arrow">▾</span>
+
+    <!-- 主体 -->
+    <div class="main">
+        <div class="topbar">
+            <div class="breadcrumb">
+                <span>首页</span><span class="sep">/</span><span class="active">产品管理</span>
+            </div>
+            <div class="topbar-right">
+                <button class="btn-func" onclick="toggleFuncModal()">📖 功能说明</button>
+                <div class="user-chip">
+                    <span class="avatar">👤</span>
+                    <span class="name">批发商：Kevin Li</span>
+                    <span class="arrow">▾</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- 筛选栏 -->
+            <div class="filter-bar">
+                <div class="filter-item">
+                    <span class="filter-label">产品名称</span>
+                    <input type="text" class="filter-input" id="searchInput" placeholder="请输入产品名称">
+                </div>
+                <div class="filter-item">
+                    <span class="filter-label">阶段</span>
+                    <select class="filter-input" id="stageFilter" style="width:140px;">
+                        <option value="">全部阶段</option>
+                        <option>批发市场</option>
+                        <option>批发完成</option>
+                        <option>零售市场</option>
+                    </select>
+                </div>
+                <div class="filter-actions">
+                    <button class="btn-add">＋ 新增数字艺术品</button>
+                    <button class="btn-search">🔍 搜 索</button>
+                    <button class="btn-reset">↻ 重 置</button>
+                </div>
+            </div>
+
+            <!-- 表格 -->
+            <div class="table-card">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th style="width:80px;">图片</th>
+                            <th>产品名称</th>
+                            <th>产品类型</th>
+                            <th>状态</th>
+                            <th>批发模式</th>
+                            <th>阶段</th>
+                            <th>创建时间</th>
+                            <th>修改时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><img class="product-img img1" src=""></td>
+                            <td><span class="product-name">青莲-初心</span></td>
+                            <td class="type-cell">鉴赏</td>
+                            <td><span class="status-tag">已上货</span></td>
+                            <td class="mode-cell">
+                                <span class="mode-tag draw">抽签购</span><span class="mode-tag open">全民购</span>
+                            </td>
+                            <td class="stage-cell"><span class="stage-tag wholesale">批发市场</span></td>
+                            <td class="time-cell">2026-07-29 13:56:46</td>
+                            <td class="time-cell">2026-07-30 15:38:13</td>
+                            <td class="actions">
+                                <a>产品详情</a>
+                                <a>批发管理</a>
+                                <a>文本价值要素标注</a>
+                                <a>文本价值要素数据集</a>
+                                <a onclick="location.href='批发市场分账申请.html?name='+encodeURIComponent('青莲-初心')+'&price=1562.50&qty=8&sold=6&img=img1'">批发分账申请</a>
+                                <a onclick="location.href='批发冻结金分账管理.html'">批发冻结金分账申请</a>
+                                <a class="disabled">货款提取（已废弃）</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><img class="product-img img2" src=""></td>
+                            <td><span class="product-name">西路财童</span></td>
+                            <td class="type-cell">鉴赏</td>
+                            <td><span class="status-tag">已上货</span></td>
+                            <td class="mode-cell">
+                                <span class="mode-tag prior">优先购</span>
+                            </td>
+                            <td class="stage-cell"><span class="stage-tag done">批发完成</span></td>
+                            <td class="time-cell">2026-07-21 09:51:04</td>
+                            <td class="time-cell">2026-07-22 15:30:19</td>
+                            <td class="actions">
+                                <a>产品详情</a>
+                                <a>批发管理</a>
+                                <a>文本价值要素标注</a>
+                                <a>文本价值要素数据集</a>
+                                <a onclick="location.href='批发市场分账申请.html?name='+encodeURIComponent('西路财童')+'&price=2500&qty=5&sold=5&img=img2'">批发分账申请</a>
+                                <a onclick="location.href='批发冻结金分账管理.html'">批发冻结金分账申请</a>
+                                <a class="disabled">货款提取（已废弃）</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><img class="product-img img3" src=""></td>
+                            <td><span class="product-name">中路财童</span></td>
+                            <td class="type-cell">鉴赏</td>
+                            <td><span class="status-tag">已上货</span></td>
+                            <td class="mode-cell">
+                                <span class="mode-tag draw">抽签购</span>
+                            </td>
+                            <td class="stage-cell"><span class="stage-tag wholesale">批发市场</span></td>
+                            <td class="time-cell">2026-07-14 09:22:25</td>
+                            <td class="time-cell">2026-07-31 08:00:01</td>
+                            <td class="actions">
+                                <a>产品详情</a>
+                                <a>批发管理</a>
+                                <a>文本价值要素标注</a>
+                                <a>文本价值要素数据集</a>
+                                <a onclick="location.href='批发市场分账申请.html?name='+encodeURIComponent('中路财童')+'&price=250&qty=50&sold=40&img=img3'">批发分账申请</a>
+                                <a onclick="location.href='批发冻结金分账管理.html'">批发冻结金分账申请</a>
+                                <a class="disabled">货款提取（已废弃）</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><img class="product-img img4" src=""></td>
+                            <td><span class="product-name">榜样-统一</span></td>
+                            <td class="type-cell">期待</td>
+                            <td><span class="status-tag">已上货</span></td>
+                            <td class="mode-cell">
+                                <span class="mode-tag prior">优先购</span><span class="mode-tag draw">抽签购</span>
+                            </td>
+                            <td class="stage-cell"><span class="stage-tag retail">零售市场</span></td>
+                            <td class="time-cell">2026-07-01 15:49:11</td>
+                            <td class="time-cell">2026-07-13 15:29:54</td>
+                            <td class="actions">
+                                <a>产品详情</a>
+                                <a>批发管理</a>
+                                <a>文本价值要素标注</a>
+                                <a>文本价值要素数据集</a>
+                                <a onclick="location.href='批发市场分账申请.html?name='+encodeURIComponent('榜样-统一')+'&price=1200&qty=20&sold=12&img=img4'">批发分账申请</a>
+                                <a onclick="location.href='批发冻结金分账管理.html'">批发冻结金分账申请</a>
+                                <a class="disabled">货款提取（已废弃）</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><img class="product-img img5" src=""></td>
+                            <td><span class="product-name">青莲-舒展</span></td>
+                            <td class="type-cell">期待</td>
+                            <td><span class="status-tag">已上货</span></td>
+                            <td class="mode-cell">
+                                <span class="mode-tag open">全民购</span>
+                            </td>
+                            <td class="stage-cell"><span class="stage-tag done">批发完成</span></td>
+                            <td class="time-cell">2026-06-30 14:19:34</td>
+                            <td class="time-cell">2026-07-22 09:39:56</td>
+                            <td class="actions">
+                                <a>产品详情</a>
+                                <a>批发管理</a>
+                                <a>文本价值要素标注</a>
+                                <a>文本价值要素数据集</a>
+                                <a onclick="location.href='批发市场分账申请.html?name='+encodeURIComponent('青莲-舒展')+'&price=800&qty=30&sold=25&img=img5'">批发分账申请</a>
+                                <a onclick="location.href='批发冻结金分账管理.html'">批发冻结金分账申请</a>
+                                <a class="disabled">货款提取（已废弃）</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><img class="product-img img6" src=""></td>
+                            <td><span class="product-name">东坡-惜春</span></td>
+                            <td class="type-cell">活动</td>
+                            <td><span class="status-tag">已上货</span></td>
+                            <td class="mode-cell">
+                                <span class="mode-tag prior">优先购</span><span class="mode-tag draw">抽签购</span><span class="mode-tag open">全民购</span>
+                            </td>
+                            <td class="stage-cell"><span class="stage-tag wholesale">批发市场</span></td>
+                            <td class="time-cell">2026-06-12 13:39:55</td>
+                            <td class="time-cell">2026-07-31 08:00:01</td>
+                            <td class="actions">
+                                <a>产品详情</a>
+                                <a>批发管理</a>
+                                <a>文本价值要素标注</a>
+                                <a>文本价值要素数据集</a>
+                                <a onclick="location.href='批发市场分账申请.html?name='+encodeURIComponent('东坡-惜春')+'&price=3000&qty=10&sold=8&img=img6'">批发分账申请</a>
+                                <a onclick="location.href='批发冻结金分账管理.html'">批发冻结金分账申请</a>
+                                <a class="disabled">货款提取（已废弃）</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
-</div>
-
-<div class="container">
-
-    <!-- 工具栏 -->
-    <div class="toolbar">
-        <input type="text" class="search-input" placeholder="搜索">
-        <button class="btn-add">新增数字艺术品</button>
-    </div>
-
-    <!-- 表格 -->
-    <div class="table-card">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th style="width:80px;">图片</th>
-                    <th>产品名称</th>
-                    <th>产品类型</th>
-                    <th>创建时间</th>
-                    <th>修改时间</th>
-                    <th>状态</th>
-                    <th>操作</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><img class="product-img img1" src=""></td>
-                    <td>青莲-初心</td>
-                    <td>鉴赏</td>
-                    <td>2026-07-29 13:56:46</td>
-                    <td>2026-07-30 15:38:13</td>
-                    <td><span class="status-tag">已上架</span></td>
-                    <td class="actions"><a>产品详情</a><a class="disabled">货款提取（已废弃）</a><a onclick="location.href='批发市场分账申请.html?name='+encodeURIComponent('青莲-初心')+'&price=1562.50&qty=8&sold=6&img=img1'">批发分账申请</a><a onclick="location.href='批发冻结金分账管理.html'">批发冻结金分账申请</a></td>
-                </tr>
-                <tr>
-                    <td><img class="product-img img2" src=""></td>
-                    <td>西路财童</td>
-                    <td>鉴赏</td>
-                    <td>2026-07-21 09:51:04</td>
-                    <td>2026-07-22 15:30:19</td>
-                    <td><span class="status-tag">已上架</span></td>
-                    <td class="actions"><a>产品详情</a><a class="disabled">货款提取（已废弃）</a><a onclick="location.href='批发市场分账申请.html?name='+encodeURIComponent('西路财童')+'&price=2500&qty=5&sold=5&img=img2'">批发分账申请</a><a onclick="location.href='批发冻结金分账管理.html'">批发冻结金分账申请</a></td>
-                </tr>
-                <tr>
-                    <td><img class="product-img img3" src=""></td>
-                    <td>中路财童</td>
-                    <td>鉴赏</td>
-                    <td>2026-07-14 09:22:25</td>
-                    <td>2026-07-31 08:00:01</td>
-                    <td><span class="status-tag">已上架</span></td>
-                    <td class="actions"><a>产品详情</a><a class="disabled">货款提取（已废弃）</a><a onclick="location.href='批发市场分账申请.html?name='+encodeURIComponent('中路财童')+'&price=250&qty=50&sold=40&img=img3'">批发分账申请</a><a onclick="location.href='批发冻结金分账管理.html'">批发冻结金分账申请</a></td>
-                </tr>
-                <tr>
-                    <td><img class="product-img img4" src=""></td>
-                    <td>榜样-统一</td>
-                    <td>期待</td>
-                    <td>2026-07-01 15:49:11</td>
-                    <td>2026-07-13 15:29:54</td>
-                    <td><span class="status-tag">已上架</span></td>
-                    <td class="actions"><a>产品详情</a><a class="disabled">货款提取（已废弃）</a><a onclick="location.href='批发市场分账申请.html?name='+encodeURIComponent('榜样-统一')+'&price=1200&qty=20&sold=12&img=img4'">批发分账申请</a><a onclick="location.href='批发冻结金分账管理.html'">批发冻结金分账申请</a></td>
-                </tr>
-                <tr>
-                    <td><img class="product-img img5" src=""></td>
-                    <td>青莲-舒展</td>
-                    <td>期待</td>
-                    <td>2026-06-30 14:19:34</td>
-                    <td>2026-07-22 09:39:56</td>
-                    <td><span class="status-tag">已上架</span></td>
-                    <td class="actions"><a>产品详情</a><a class="disabled">货款提取（已废弃）</a><a onclick="location.href='批发市场分账申请.html?name='+encodeURIComponent('青莲-舒展')+'&price=800&qty=30&sold=25&img=img5'">批发分账申请</a><a onclick="location.href='批发冻结金分账管理.html'">批发冻结金分账申请</a></td>
-                </tr>
-                <tr>
-                    <td><img class="product-img img6" src=""></td>
-                    <td>东坡-惜春</td>
-                    <td>活动</td>
-                    <td>2026-06-12 13:39:55</td>
-                    <td>2026-07-31 08:00:01</td>
-                    <td><span class="status-tag">已上架</span></td>
-                    <td class="actions"><a>产品详情</a><a class="disabled">货款提取（已废弃）</a><a onclick="location.href='批发市场分账申请.html?name='+encodeURIComponent('东坡-惜春')+'&price=3000&qty=10&sold=8&img=img6'">批发分账申请</a><a onclick="location.href='批发冻结金分账管理.html'">批发冻结金分账申请</a></td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-
 </div>
 
 <!-- ====== 功能说明浮窗 ====== -->
@@ -283,9 +427,21 @@
   </div>
   <div style="font-size:13px;font-weight:600;color:#e74c5e;margin:-6px 0 12px;">批发商后台</div>
   <div class="fm-body">
-    <h4><span class="badge">1</span> <span style="vertical-align:middle;">操作按钮</span></h4>
+    <div style="background:#fff7f7;border:1px solid #ffd9d9;border-radius:8px;padding:10px 12px;margin-bottom:14px;font-size:13px;color:#7a2e33;line-height:1.9;">
+      <div style="font-weight:600;color:#e74c5e;margin-bottom:4px;"><span class="badge" style="display:inline-block;min-width:18px;height:18px;padding:0 5px;border-radius:50%;background:#ff2d55;color:#fff;font-size:12px;line-height:18px;text-align:center;font-weight:600;">1</span> <span style="vertical-align:middle;">▎迁移说明：服务商产品管理</span></div>
+      本次将<b>服务商的产品管理功能</b>迁移至批发商后台：<br>
+      ① 新增列：<b>批发模式</b>（优先购 / 抽签购 / 全民购，支持组合）、<b>阶段</b>（批发市场 / 批发完成 / 零售市场）；<br>
+      ② 操作栏新增按钮：<b>批发管理</b>、<b>文本价值要素标注</b>、<b>文本价值要素数据集</b>；<br>
+      功能逻辑沿用之前服务商版本，不做变更。
+    </div>
+    <h4><span class="badge" style="display:inline-block;min-width:18px;height:18px;padding:0 5px;border-radius:50%;background:#ff2d55;color:#fff;font-size:12px;line-height:18px;text-align:center;font-weight:600;">2</span> <span style="vertical-align:middle;">货款提取（已废弃）</span></h4>
     <ul>
-      <li>「<b>货款提取（已废弃）</b>」：老入口已停用，灰色展示、不再开放</li>
+      <li>老入口灰色展示，点开后的数据展示保留</li>
+      <li>只针对之前开通了<b>宝付</b>的企业展示</li>
+      <li>新企业进来不再展示该按钮</li>
+    </ul>
+    <h4><span class="badge" style="display:inline-block;min-width:18px;height:18px;padding:0 5px;border-radius:50%;background:#ff2d55;color:#fff;font-size:12px;line-height:18px;text-align:center;font-weight:600;">3</span> <span style="vertical-align:middle;">新增按钮</span></h4>
+    <ul>
       <li>「<b>批发分账申请</b>」：发起批发货款分账申请</li>
       <li>「<b>批发冻结金分账申请</b>」：进入<b>批发冻结金分账管理</b>，发起冻结金释放申请</li>
     </ul>
