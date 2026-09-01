@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>零售市场支付 v2</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        html { background: #b0b8c6; min-height:100vh; }
+        .page-wrap {
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .phone-frame {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
+            background: #f5f6fa;
+            max-width: 420px;
+            width: 420px;
+            min-height: 100vh;
+            padding-bottom: 84px;
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.04);
+            flex-shrink: 0;
+            position: relative;
+        }
+        .side-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-left: 10px;
+            margin-top: 60px;
+        }
+        .side-btns label {
+            font-size: 13px;
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(255,255,255,0.15);
+            padding: 5px 12px;
+            border-radius: 6px;
+        }
+
+        /* 头部 */
+        .header {
+            background: #fff;
+            padding: 44px 20px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .back-btn {
+            font-size: 22px;
+            color: #1a1a2e;
+            cursor: pointer;
+            line-height: 1;
+        }
+        .header-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: #1a1a2e;
+        }
+        .header-placeholder { width: 22px; }
+
+        /* 商品卡片 */
+        .product-card {
+            background: #fff;
+            border-radius: 12px;
+            margin: 12px 16px 0;
+            padding: 14px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        }
+        .product-top {
+            display: flex;
+            gap: 12px;
+        }
+        .product-img {
+            width: 76px;
+            height: 76px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #d4a574, #8b6f47);
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 24px;
+            overflow: hidden;
+        }
+        .product-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .product-info { flex: 1; min-width: 0; }
+        .product-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a1a2e;
+        }
+        .code-tag {
+            display: inline-block;
+            font-size: 12px;
+            color: #1a78ff;
+            font-weight: 600;
+            background: #e6f4ff;
+            border: 1px solid #b7dcff;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-left: 8px;
+            vertical-align: 1px;
+        }
+        /* 次数达上限提示条 */
+        .warn-bar {
+            display: none;
+            margin: 12px 16px 0;
+            padding: 12px 14px;
+            background: #fff3f3;
+            border: 1px solid #f5c6c6;
+            border-radius: 10px;
+            font-size: 13px;
+            color: #c41e1e;
+            line-height: 1.6;
+            align-items: flex-start;
+            gap: 8px;
+        }
+        .warn-bar.show { display: flex; }
+        .warn-bar .wb-ico {
+            flex-shrink: 0;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #D62828;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 2px;
+        }
+        .product-code {
+            font-size: 12px;
+            color: #9ba6b9;
+            margin-top: 4px;
+        }
+
+        .price-row {
+            display: flex;
+            margin-top: 14px;
+            border-top: 1px solid #f5f5f7;
+            padding-top: 12px;
+        }
+        .price-item {
+            flex: 1;
+            text-align: center;
+            border-right: 1px solid #f0f0f0;
+        }
+        .price-item:last-child { border-right: none; }
+        .price-label {
+            font-size: 12px;
+            color: #6b7588;
+        }
+        .price-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-top: 4px;
+        }
+        .price-value.price-red { color: #D62828; }
+
+        /* 购买设置卡片 */
+        .setting-card {
+            background: #fff;
+            border-radius: 12px;
+            margin: 12px 16px 0;
+            padding: 16px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        }
+        .setting-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 0;
+        }
+        .setting-label {
+            font-size: 14px;
+            color: #4e5a6e;
+        }
+        /* 提货方式 */
+        .delivery-tabs {
+            display: flex;
+            background: #f5f5f7;
+            border-radius: 999px;
+            padding: 4px;
+            margin-top: 8px;
+        }
+        .delivery-tab {
+            flex: 1;
+            height: 36px;
+            border-radius: 999px;
+            background: transparent;
+            border: none;
+            font-size: 13px;
+            color: #6b7588;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .delivery-tab.active {
+            background: #D62828;
+            color: #fff;
+        }
+
+        /* 服务商卡片 */
+        .service-card {
+            background: #fff;
+            border-radius: 12px;
+            margin: 12px 16px 0;
+            padding: 14px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        }
+        .service-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 0;
+        }
+        .service-label {
+            font-size: 13px;
+            color: #4e5a6e;
+        }
+        .service-value {
+            font-size: 13px;
+            color: #1a1a2e;
+            font-weight: 500;
+        }
+        .agree-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 8px;
+            font-size: 12px;
+            color: #6b7588;
+            flex-wrap: wrap;
+        }
+        .agree-check {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #D62828;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            flex-shrink: 0;
+        }
+        .agree-link {
+            color: #D62828;
+            cursor: pointer;
+        }
+
+        /* 底部提交按钮 */
+        .submit-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #fff;
+            border-top: 1px solid #edf0f5;
+            padding: 12px 16px 24px;
+            box-shadow: 0 -4px 12px rgba(0,0,0,0.06);
+            z-index: 10;
+        }
+        .btn-submit {
+            width: 100%;
+            height: 48px;
+            background: #D62828;
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-submit:active {
+            background: #c41e1e;
+        }
+
+        /* ===== 弹窗 ===== */
+        .modal-mask {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            z-index: 99;
+        }
+        .modal-mask.show { display: block; }
+
+        .modal-panel {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            transform: translateY(100%);
+            background: #fff;
+            border-radius: 16px 16px 0 0;
+            z-index: 100;
+            transition: transform 0.3s ease;
+            padding-bottom: 24px;
+        }
+        .modal-panel.show { transform: translateY(0); }
+
+        .modal-title {
+            text-align: center;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a2e;
+            border-bottom: 1px solid #f0f0f0;
+            position: relative;
+        }
+        .modal-close {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: #f5f5f7;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .modal-body {
+            padding: 14px 20px;
+        }
+        .modal-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            font-size: 14px;
+        }
+        .modal-row .label { color: #6b7588; }
+        .modal-row .value { color: #1a1a2e; font-weight: 500; }
+        .modal-divider {
+            height: 1px;
+            background: #f0f0f0;
+            margin: 8px 0;
+        }
+        .modal-section-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 8px;
+        }
+        .pay-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 0;
+            border-bottom: 1px solid #f5f5f7;
+        }
+        .pay-option:last-child { border-bottom: none; }
+        .pay-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        .pay-icon.hui { background: linear-gradient(135deg, #f5a623, #e0941e); color: #fff; }
+        .pay-info { flex: 1; }
+        .pay-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #1a1a2e;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .pay-link {
+            color: #D62828;
+            font-size: 12px;
+            cursor: pointer;
+            text-decoration: underline;
+            display: none;
+        }
+        .pay-link.show { display: inline; }
+        .pay-radio {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid #d0d5dd;
+            flex-shrink: 0;
+        }
+        .pay-radio.checked {
+            border-color: #D62828;
+            background: #D62828;
+            position: relative;
+        }
+        .pay-radio.checked::after {
+            content: '';
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #fff;
+        }
+
+        .pay-provider {
+            text-align: center;
+            font-size: 11px;
+            color: #9ba6b9;
+            margin: 12px 0 16px;
+        }
+
+        .modal-confirm-btn {
+            width: calc(100% - 40px);
+            margin: 0 20px;
+            height: 48px;
+            background: #f0a8a8;
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: not-allowed;
+        }
+        .modal-confirm-btn.active {
+            background: #D62828;
+            cursor: pointer;
+        }
+
+        /* 标注圆点 */
+        .badge {
+            display: inline-block;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 5px;
+            border-radius: 50%;
+            background: #ff2d55;
+            color: #fff;
+            font-size: 12px;
+            line-height: 18px;
+            text-align: center;
+            font-weight: 600;
+            box-shadow: 0 1px 3px rgba(255,45,85,0.3);
+        }
+
+        /* ── 功能说明浮窗 ── */
+        .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 430px; max-width: 94vw; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 99999; padding: 22px; display: none; }
+        .f-modal.show { display: block; }
+        .f-modal .fm-title { font-size: 15px; font-weight: 600; color: #1a1a2e; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
+        .f-modal .fm-title:active { cursor: grabbing; }
+        .f-modal .fm-close { width: 26px; height: 26px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 13px; color: #666; border: none; flex-shrink: 0; }
+        .f-modal .fm-close:hover { background: #e8e8e8; }
+        .f-modal .fm-body { font-size: 13px; color: #555; line-height: 1.8; }
+        .f-modal .fm-body h4 { font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 14px 0 6px; }
+        .f-modal .fm-body ul { padding-left: 18px; margin: 0 0 8px; }
+        .f-modal .fm-body li { margin-bottom: 4px; }
+    </style>
+</head>
+<body>
+
+<div class="page-wrap">
+
+<div class="phone-frame">
+
+    <div class="header">
+        <span class="back-btn" onclick="history.back()">‹</span>
+        <span class="header-title">永淳·夏日帖</span>
+        <span class="header-placeholder"></span>
+    </div>
+
+    <!-- 商品信息 -->
+    <div class="product-card">
+        <div class="product-top">
+            <div class="product-img"><img src="../asset/永淳·夏日帖.png" alt="永淳·夏日帖"></div>
+            <div class="product-info">
+                <div class="product-name">永淳·夏日帖<span class="code-tag">#0002</span></div>
+                <div class="product-code">产品编码 XB000004 · 已交易 3 次</div>
+            </div>
+        </div>
+        <div class="price-row">
+            <div class="price-item">
+                <div class="price-label">零售商</div>
+                <div class="price-value">*******6925</div>
+            </div>
+            <div class="price-item">
+                <div class="price-label">售价</div>
+                <div class="price-value price-red">¥10.00</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 购买设置 -->
+    <div class="setting-card">
+        <div class="setting-row">
+            <span class="setting-label">提货方式</span>
+        </div>
+        <div class="delivery-tabs">
+            <button class="delivery-tab active" onclick="selectDelivery(this, 0)">仓库暂存</button>
+            <button class="delivery-tab" onclick="selectDelivery(this, 1)">立即提货</button>
+        </div>
+    </div>
+
+    <!-- 服务商 -->
+    <div class="service-card">
+        <div class="service-row">
+            <span class="service-label">委托服务商</span>
+            <span class="service-value">四川华泰博文文化艺术发展有限公司</span>
+        </div>
+        <div class="agree-row">
+            <span class="agree-check">✓</span>
+            <span>我已阅读并同意</span>
+            <span class="agree-link">《风险揭示书》</span>
+            <span class="agree-link">《购买须知、购买协议、委托保管协议及提货须知》</span>
+        </div>
+    </div>
+
+    <!-- 次数达上限提示条 -->
+    <div class="warn-bar" id="warnBar">
+        <span class="wb-ico">!</span>
+        <span>该产品当前交易次数已达上限，完成本次交易后必须进行<b>提货</b>。</span>
+    </div>
+
+    <!-- 底部提交 -->
+    <div class="submit-bar">
+        <button class="btn-submit" onclick="openConfirm()">提交订单</button>
+    </div>
+
+    <!-- 确认订单弹窗 -->
+    <div class="modal-panel" id="modalPanel">
+        <div class="modal-title">
+            确认订单
+            <button class="modal-close" onclick="closeConfirm()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="modal-row">
+                <span class="label">产品编号</span>
+                <span class="value">#0002</span>
+            </div>
+            <div class="modal-row">
+                <span class="label">单价</span>
+                <span class="value">¥10.00</span>
+            </div>
+            <div class="modal-row">
+                <span class="label">提货方式</span>
+                <span class="value" id="modalDelivery">仓库暂存</span>
+            </div>
+
+            <div class="modal-divider"></div>
+
+            <div class="modal-section-title">选择支付方式</div>
+
+            <div class="pay-option" onclick="selectPay(this)">
+                <div class="pay-icon hui">💰</div>
+                <div class="pay-info">
+                    <div class="pay-name">汇付钱包 <span class="pay-link" id="payLink" onclick="event.stopPropagation();goRecharge()">去充值</span></div>
+                </div>
+                <div class="pay-radio"></div>
+            </div>
+
+            <button class="modal-confirm-btn" id="modalConfirmBtn">请选择支付方式</button>
+        </div>
+    </div>
+
+</div><!-- /phone-frame -->
+
+<div class="side-btns">
+    <label>
+        <input type="radio" name="walletStatus" value="opened" checked onchange="setWalletStatus('opened')">
+        已开通
+    </label>
+    <label>
+        <input type="radio" name="walletStatus" value="unopened" onchange="setWalletStatus('unopened')">
+        未开通
+    </label>
+    <label>
+        <input type="radio" name="tradeStatus" value="normal" checked onchange="setTradeStatus('normal')">
+        次数充足
+    </label>
+    <label>
+        <input type="radio" name="tradeStatus" value="max" onchange="setTradeStatus('max')">
+        次数即将达到最大
+    </label>
+</div>
+
+</div><!-- /page-wrap -->
+
+<!-- 弹窗遮罩 -->
+<div class="modal-mask" id="modalMask" onclick="closeConfirm()"></div>
+
+<script>
+var deliveryType = 0;
+var walletOpened = true;
+var tradeMaxed = false;
+var unitPrice = 10; // 单价 ¥10.00
+
+function selectDelivery(btn, idx) {
+    document.querySelectorAll('.delivery-tab').forEach(function(el) { el.classList.remove('active'); });
+    btn.classList.add('active');
+    deliveryType = idx;
+}
+
+function openConfirm() {
+    document.getElementById('modalDelivery').textContent = deliveryType === 0 ? '仓库暂存' : '立即提货';
+    document.getElementById('modalMask').classList.add('show');
+    document.getElementById('modalPanel').classList.add('show');
+    updatePayState();
+}
+
+function setTradeStatus(status) {
+    tradeMaxed = (status === 'max');
+    var bar = document.getElementById('warnBar');
+    if (bar) bar.classList.toggle('show', tradeMaxed);
+    var idx = tradeMaxed ? 1 : 0;
+    var tabs = document.querySelectorAll('.delivery-tab');
+    if (tabs.length) selectDelivery(tabs[idx], idx);
+}
+
+function closeConfirm() {
+    document.getElementById('modalMask').classList.remove('show');
+    document.getElementById('modalPanel').classList.remove('show');
+}
+
+function updatePayState() {
+    var btn = document.getElementById('modalConfirmBtn');
+    var link = document.getElementById('payLink');
+
+    if (walletOpened) {
+        link.textContent = '去充值';
+        link.className = 'pay-link show';
+        btn.classList.remove('active');
+        btn.textContent = '请选择支付方式';
+        btn.onclick = null;
+        var opt = document.querySelector('.pay-option');
+        if (opt) selectPay(opt);
+    } else {
+        link.textContent = '去开户';
+        link.className = 'pay-link show';
+        document.querySelectorAll('.pay-option .pay-radio').forEach(function(el) { el.classList.remove('checked'); });
+        btn.classList.remove('active');
+        btn.textContent = '请先开通汇付钱包';
+        btn.onclick = null;
+    }
+}
+
+function selectPay(opt) {
+    if (!walletOpened) {
+        alert('请先开通汇付钱包');
+        return;
+    }
+    document.querySelectorAll('.pay-option').forEach(function(el) {
+        el.querySelector('.pay-radio').classList.remove('checked');
+    });
+    opt.querySelector('.pay-radio').classList.add('checked');
+    var btn = document.getElementById('modalConfirmBtn');
+    btn.classList.add('active');
+    var amount = unitPrice;
+    btn.innerHTML = '去支付 ¥' + amount.toFixed(2);
+    btn.onclick = function() { alert('支付成功！'); };
+}
+
+function goRecharge() {
+    if (walletOpened) {
+        alert('跳转到汇付钱包充值页面');
+    } else {
+        alert('跳转到汇付钱包开户页面');
+    }
+}
+
+function setWalletStatus(status) {
+    walletOpened = (status === 'opened');
+    var mask = document.getElementById('modalMask');
+    if (mask.classList.contains('show')) {
+        updatePayState();
+    }
+}
+</script>
+
+<!-- 浮动说明按钮（手机框外） -->
+<button onclick="toggleFuncModal()" style="position:fixed;top:12px;right:16px;z-index:99999;background:#fff;color:#666;padding:7px 16px;border-radius:20px;border:1px solid #ddd;font-size:13px;font-weight:500;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.08);font-family:inherit;display:inline-flex;align-items:center;gap:4px;">📖 说明</button>
+
+<!-- ====== 功能说明浮窗 ====== -->
+<div class="f-modal" id="funcModal">
+  <div class="fm-title">
+    <span>📖 功能说明</span>
+    <button class="fm-close" onclick="toggleFuncModal()">✕</button>
+  </div>
+  <div class="fm-body">
+    <h4><span class="badge">1</span> <span style="vertical-align:middle;">产品信息</span></h4>
+    <ul>
+      <li>展示产品名称，展示产品编号、产品编码及交易次数</li>
+      <li>售价 ¥10.00 为该产品零售商挂单价格</li>
+    </ul>
+    <h4><span class="badge">2</span> <span style="vertical-align:middle;">交易次数状态切换</span></h4>
+    <ul>
+      <li>次数充足：默认仓库暂存，无提示</li>
+      <li>次数即将达到最大：默认立即提货，并在提交栏上方显示红色提示条「该产品当前交易次数已达上限，完成本次交易后必须进行提货」</li>
+    </ul>
+    <h4><span class="badge">3</span> <span style="vertical-align:middle;">去掉宝付支付</span></h4>
+    <ul>
+      <li>去掉宝付支付，支付仅保留汇付钱包</li>
+      <li>根据卖家寄售时选择的支付渠道进行展示</li>
+      <li>保证买卖双方必须都开通同一个支付渠道</li>
+    </ul>
+    <h4><span class="badge">4</span> <span style="vertical-align:middle;">零售市场分账逻辑</span></h4>
+    <div style="text-align:center;margin-top:6px;">
+      <a href="../asset/零售市场分账逻辑.png" target="_blank" title="点击查看原图">
+        <img src="../asset/零售市场分账逻辑.png" alt="零售市场分账逻辑" style="max-width:100%;border-radius:8px;border:1px solid #f0f0f0;cursor:zoom-in;" onclick="event.stopPropagation();">
+      </a>
+      <div style="font-size:12px;color:#86909c;margin-top:6px;">点击图片查看原图</div>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleFuncModal() {
+  var el = document.getElementById('funcModal');
+  el.classList.toggle('show');
+  if (el.classList.contains('show') && !el.dataset.dragged) {
+    el.style.left = '50%'; el.style.top = '50%'; el.style.transform = 'translate(-50%,-50%)';
+  }
+}
+(function() {
+  var modal, titleBar, offX, offY, dragging = false;
+  document.addEventListener('DOMContentLoaded', function() {
+    modal = document.getElementById('funcModal');
+    titleBar = modal.querySelector('.fm-title');
+    titleBar.addEventListener('mousedown', startDrag);
+    titleBar.addEventListener('touchstart', startDragTouch, {passive:true});
+    document.addEventListener('mousemove', onDrag);
+    document.addEventListener('mouseup', endDrag);
+    document.addEventListener('touchmove', onDragTouch, {passive:true});
+    document.addEventListener('touchend', endDrag);
+  });
+  function startDrag(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = e.clientX - rect.left; offY = e.clientY - rect.top; dragging = true; titleBar.style.cursor = 'grabbing'; }
+  function startDragTouch(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; var t = e.touches[0]; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = t.clientX - rect.left; offY = t.clientY - rect.top; dragging = true; }
+  function onDrag(e) { if (!dragging) return; modal.style.left = (e.clientX - offX) + 'px'; modal.style.top = (e.clientY - offY) + 'px'; }
+  function onDragTouch(e) { if (!dragging) return; var t = e.touches[0]; modal.style.left = (t.clientX - offX) + 'px'; modal.style.top = (t.clientY - offY) + 'px'; }
+  function endDrag() { dragging = false; if (titleBar) titleBar.style.cursor = 'grab'; }
+})();
+</script>
+
+</body>
+</html>

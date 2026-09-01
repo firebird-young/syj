@@ -317,28 +317,41 @@
                     <span class="sub-note">我的资产（老）<span class="note-tag">新批发商无此菜单</span></span>
                 </div>
             </div>
-            <a class="menu-item" href="批发市场分账申请.html">
+            <a class="menu-item" href="分佣管理.html">
                 <span class="icon">📊</span><span>分佣管理</span>
             </a>
             <a class="menu-item" href="#">
                 <span class="icon">📢</span><span>系统公告</span>
             </a>
-            <a class="menu-item" href="#">
-                <span class="icon">🏷️</span><span>价值管理</span>
-            </a>
-            <a class="menu-item" href="#">
-                <span class="icon">🏭</span><span>仓库管理</span>
-            </a>
+            <div class="menu-group">
+                <div class="menu-group-title" onclick="this.parentNode.classList.toggle('open')">
+                    <span class="icon">🏷️</span><span>价值管理</span><span class="arrow">▾</span>
+                </div>
+                <div class="submenu">
+                    <a href="价值注入.html">价值注入</a>
+                    <a href="#">价值字典</a>
+                </div>
+            </div>
+            <div class="menu-group">
+                <div class="menu-group-title" onclick="this.parentNode.classList.toggle('open')">
+                    <span class="icon">🏭</span><span>仓管管理</span><span class="arrow">▾</span>
+                </div>
+                <div class="submenu">
+                    <a href="发货管理.html">发货管理</a>
+                </div>
+            </div>
             <a class="menu-item" href="#">
                 <span class="icon">📝</span><span>任务管理</span>
             </a>
-            <div class="menu-group open">
+            <div class="menu-group">
                 <div class="menu-group-title" onclick="this.parentNode.classList.toggle('open')">
                     <span class="icon">⚙️</span><span>系统管理</span><span class="arrow">▾</span>
                 </div>
                 <div class="submenu">
                     <a href="用户管理.html">用户管理</a>
                     <a href="角色管理.html">角色管理</a>
+                    <a href="业务参数管理.html">业务参数管理</a>
+                    <a href="区块链服务.html">区块链服务管理</a>
                 </div>
             </div>
         </div>

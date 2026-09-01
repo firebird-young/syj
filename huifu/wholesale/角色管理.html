@@ -77,6 +77,14 @@
         }
         .menu-group .submenu a:hover { color: #fff; }
         .menu-group .submenu a.active { color: #1a78ff; }
+        .menu-group .submenu .sub-note {
+            display: flex; align-items: center; height: 36px; padding: 0 20px 0 50px;
+            color: #6b7588; cursor: not-allowed; font-size: 13px;
+        }
+        .menu-group .submenu .sub-note .note-tag {
+            font-size: 11px; color: #8a94a6; margin-left: 6px;
+            background: #2a3849; padding: 1px 6px; border-radius: 3px; white-space: nowrap;
+        }
 
         /* 主体 */
         .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
@@ -389,21 +397,39 @@
             <a class="menu-item" href="产品管理.html">
                 <span class="icon">📦</span><span>我的产品</span>
             </a>
-            <a class="menu-item" href="批发资金管理.html">
-                <span class="icon">💰</span><span>资金管理</span>
-            </a>
-            <a class="menu-item" href="批发市场分账申请.html">
+            <div class="menu-group">
+                <div class="menu-group-title" onclick="this.parentNode.classList.toggle('open')">
+                    <span class="icon">💰</span><span>资金管理</span><span class="arrow">▾</span>
+                </div>
+                <div class="submenu">
+                    <a href="批发资金管理.html">批发资金管理</a>
+                    <a href="运营资金管理.html">运营资金管理</a>
+                    <span class="sub-note">我的资产（老）<span class="note-tag">新批发商无此菜单</span></span>
+                </div>
+            </div>
+            <a class="menu-item" href="分佣管理.html">
                 <span class="icon">📊</span><span>分佣管理</span>
             </a>
             <a class="menu-item" href="#">
                 <span class="icon">📢</span><span>系统公告</span>
             </a>
-            <a class="menu-item" href="#">
-                <span class="icon">🏷️</span><span>价值管理</span>
-            </a>
-            <a class="menu-item" href="#">
-                <span class="icon">🏭</span><span>仓库管理</span>
-            </a>
+            <div class="menu-group">
+                <div class="menu-group-title" onclick="this.parentNode.classList.toggle('open')">
+                    <span class="icon">🏷️</span><span>价值管理</span><span class="arrow">▾</span>
+                </div>
+                <div class="submenu">
+                    <a href="价值注入.html">价值注入</a>
+                    <a href="#">价值字典</a>
+                </div>
+            </div>
+            <div class="menu-group">
+                <div class="menu-group-title" onclick="this.parentNode.classList.toggle('open')">
+                    <span class="icon">🏭</span><span>仓管管理</span><span class="arrow">▾</span>
+                </div>
+                <div class="submenu">
+                    <a href="发货管理.html">发货管理</a>
+                </div>
+            </div>
             <a class="menu-item" href="#">
                 <span class="icon">📝</span><span>任务管理</span>
             </a>
@@ -414,6 +440,8 @@
                 <div class="submenu">
                     <a href="用户管理.html">用户管理</a>
                     <a class="active" href="角色管理.html">角色管理</a>
+                    <a href="业务参数管理.html">业务参数管理</a>
+                    <a href="区块链服务.html">区块链服务管理</a>
                 </div>
             </div>
         </div>

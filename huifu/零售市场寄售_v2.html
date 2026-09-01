@@ -138,6 +138,41 @@
             cursor: pointer;
         }
         .pr-arrow:active { background: #fdecee; }
+        .pr-arrow.disabled {
+            color: #c0c8d4;
+            border-color: #e5e6eb;
+            background: #fafbfc;
+            cursor: not-allowed;
+        }
+        /* 出售条件提示条 */
+        .sell-tip {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            margin: 0 14px 12px;
+            padding: 9px 12px;
+            background: #fff7e6;
+            border: 1px solid #ffe1a8;
+            border-radius: 8px;
+            font-size: 12px;
+            line-height: 1.7;
+            color: #8a5a00;
+        }
+        .sell-tip .st-ico {
+            flex-shrink: 0;
+            width: 16px;
+            height: 16px;
+            margin-top: 2px;
+            border-radius: 50%;
+            background: #e6a23c;
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .sell-tip b { color: #a05c00; }
         /* 标注圆点 */
         .badge {
             display: inline-block;
@@ -414,24 +449,30 @@
     <div class="list-card">
         <div class="list-title">持有详情<span class="count">共 5 份</span></div>
 
-        <div class="product-row" onclick='openSellModal("永淳·夏日帖", "#0025", 3, 95.00)'>
+        <!-- 出售条件提示条 -->
+        <div class="sell-tip">
+            <span class="st-ico">i</span>
+            <span>产品需同时满足两个条件才可出售：<b>① 持有满 T+5 周期</b>；<b>② 已完成价值注入</b>。</span>
+        </div>
+
+        <div class="product-row">
             <div class="pr-img"><img src="../asset/永淳·夏日帖.png" alt="永淳·夏日帖"></div>
             <div class="pr-info">
                 <div class="pr-name">永淳·夏日帖<span class="pr-code">#0025</span></div>
                 <div class="pr-meta">已交易 <b>3</b> 次　上次成交<span class="pr-price">¥95.00</span></div>
                 <div class="pr-time">2026-08-02 16:42:18</div>
             </div>
-            <span class="pr-arrow">出售</span>
+            <span class="pr-arrow disabled">未满足条件</span>
         </div>
 
-        <div class="product-row" onclick='openSellModal("永淳·夏日帖", "#0026", 5, 100.00)'>
+        <div class="product-row">
             <div class="pr-img"><img src="../asset/永淳·夏日帖.png" alt="永淳·夏日帖"></div>
             <div class="pr-info">
                 <div class="pr-name">永淳·夏日帖<span class="pr-code">#0026</span></div>
                 <div class="pr-meta">已交易 <b>5</b> 次　上次成交<span class="pr-price">¥100.00</span></div>
                 <div class="pr-time">2026-08-01 10:20:05</div>
             </div>
-            <span class="pr-arrow">出售</span>
+            <span class="pr-arrow disabled">未满足条件</span>
         </div>
 
         <div class="product-row" onclick='openSellModal("永淳·夏日帖", "#0027", 8, 92.00)'>
@@ -594,7 +635,8 @@ function submitSell() {
     <ul>
       <li>页面顶部展示<b>产品名称</b>，下方为该产品多份持有的<b>详情列表</b>（同一产品名）</li>
       <li>每行展示：产品编号、已交易次数、<b>上次成交价格</b>（玫红色突出显示）、成交时间</li>
-      <li>点击任意一份进入<b>出售数字资产</b>弹窗</li>
+      <li>未满足出售条件的份（<b>持有未满 T+5</b> 或 <b>未完成价值注入</b>）不展示「出售」按钮，显示灰色「未满足条件」</li>
+      <li>满足条件的份点击进入<b>出售数字资产</b>弹窗</li>
     </ul>
     <h4><span class="badge">2</span> <span style="vertical-align:middle;">出售弹窗</span></h4>
     <ul>
