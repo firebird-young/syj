@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注册 - 深艺交</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+            background: linear-gradient(135deg, #16233c 0%, #1a2f4e 55%, #1f3a63 100%);
+            color: #1a1a2e;
+            font-size: 14px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 0;
+        }
+
+        /* 注册卡片 */
+        .reg-wrap { width: 440px; padding: 20px; }
+        .reg-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 36px 36px 28px;
+            box-shadow: 0 12px 48px rgba(0,0,0,.35);
+        }
+        .brand { text-align: center; margin-bottom: 24px; }
+        .brand-logo {
+            width: 48px; height: 48px;
+            background: #e74c3e;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 24px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+        .brand-title { font-size: 19px; font-weight: 700; color: #1a1a2e; letter-spacing: 2px; }
+        .brand-sub { font-size: 13px; color: #9ba6b9; margin-top: 4px; }
+
+        .reg-title { font-size: 16px; font-weight: 600; color: #1a1a2e; margin-bottom: 18px; }
+
+        /* 表单 */
+        .fm-field { margin-bottom: 14px; }
+        .fm-field label { display: block; font-size: 13px; color: #4e5a6e; margin-bottom: 6px; }
+        .fm-field label .req { color: #e74c5e; }
+        .input-wrap { position: relative; }
+        .input-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #c0c8d4;
+            font-size: 15px;
+            pointer-events: none;
+        }
+        .fm-input {
+            width: 100%;
+            height: 40px;
+            padding: 0 12px;
+            border: 1px solid #d0d5dd;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #1a1a2e;
+            outline: none;
+            font-family: inherit;
+            background: #fafbfc;
+            transition: all .15s;
+        }
+        .fm-input:focus { border-color: #1a78ff; background: #fff; box-shadow: 0 0 0 3px rgba(26,120,255,.12); }
+        .fm-input::placeholder { color: #a8b2c0; }
+        .fm-input.pad { padding-left: 38px; }
+
+        /* 验证码行 */
+        .code-row { display: flex; gap: 10px; }
+        .code-row .fm-input { flex: 1; }
+        .btn-code {
+            width: 130px;
+            height: 40px;
+            border: 1px solid #1a78ff;
+            background: #fff;
+            color: #1a78ff;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all .15s;
+        }
+        .btn-code:hover { background: #e6f4ff; }
+        .btn-code.disabled { border-color: #d0d5dd; color: #9ba6b9; cursor: not-allowed; background: #f5f7fa; }
+
+        .btn-reg {
+            width: 100%;
+            height: 42px;
+            border: none;
+            border-radius: 6px;
+            background: #1a78ff;
+            color: #fff;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            letter-spacing: 4px;
+            margin-top: 6px;
+            transition: background .15s;
+        }
+        .btn-reg:hover { background: #0f6ae8; }
+
+        .agreement {
+            display: flex;
+            align-items: flex-start;
+            gap: 6px;
+            font-size: 12px;
+            color: #6b7588;
+            margin-top: 14px;
+            line-height: 1.6;
+        }
+        .agreement input[type="checkbox"] { accent-color: #1a78ff; margin-top: 2px; cursor: pointer; }
+        .agreement a { color: #1a78ff; text-decoration: none; }
+        .agreement a:hover { text-decoration: underline; }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 22px 0 14px;
+            color: #9ba6b9;
+            font-size: 12px;
+        }
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #eef0f4;
+        }
+        .login-tip { text-align: center; font-size: 13px; color: #6b7588; }
+        .login-tip a { color: #1a78ff; text-decoration: none; font-weight: 500; }
+        .login-tip a:hover { text-decoration: underline; }
+
+        .footer-tip { text-align: center; font-size: 12px; color: #6b7588; margin-top: 18px; }
+        .footer-tip a { color: #a8c4ff; text-decoration: none; }
+        .footer-tip a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+<div class="reg-wrap">
+    <div class="reg-card">
+        <div class="brand">
+            <div class="brand-logo">深</div>
+            <div class="brand-title">深艺交</div>
+            <div class="brand-sub">批发商 · 商户管理平台</div>
+        </div>
+
+        <div class="reg-title">注册账号</div>
+
+        <div class="fm-field">
+            <label>手机号（登录账号） <span class="req">*</span></label>
+            <div class="input-wrap">
+                <span class="input-icon">📱</span>
+                <input type="text" class="fm-input pad" id="mobileInput" placeholder="请输入 11 位手机号" maxlength="11">
+            </div>
+        </div>
+
+        <div class="fm-field">
+            <label>短信验证码 <span class="req">*</span></label>
+            <div class="code-row">
+                <input type="text" class="fm-input" id="codeInput" placeholder="请输入 6 位验证码" maxlength="6">
+                <button class="btn-code" id="codeBtn" onclick="sendCode()">获取验证码</button>
+            </div>
+        </div>
+
+        <div class="fm-field">
+            <label>企业简称 <span class="req">*</span></label>
+            <input type="text" class="fm-input" id="shortNameInput" placeholder="请输入企业简称，如：华乐博">
+            <div style="font-size:12px;color:#9ba6b9;margin-top:5px;">登录时需要输入简称</div>
+        </div>
+
+        <div class="fm-field">
+            <label>企业全称 <span class="req">*</span></label>
+            <input type="text" class="fm-input" id="fullNameInput" placeholder="请输入营业执照上的企业全称">
+        </div>
+
+        <div class="fm-field">
+            <label>登录密码 <span class="req">*</span></label>
+            <input type="password" class="fm-input" id="pwdInput" placeholder="请设置登录密码（6-20 位，区分大小写）">
+        </div>
+
+        <div class="fm-field">
+            <label>确认密码 <span class="req">*</span></label>
+            <input type="password" class="fm-input" id="pwd2Input" placeholder="请再次输入登录密码">
+        </div>
+
+        <button class="btn-reg" onclick="doReg()">注 册</button>
+
+        <label class="agreement">
+            <input type="checkbox" id="agreeChk">
+            <span>我已阅读并同意《<a href="#">用户协议</a>》与《<a href="#">隐私政策</a>》，注册成功后需完成企业资料认证方可开户交易</span>
+        </label>
+
+        <div class="divider">已有账号？</div>
+        <div class="login-tip">
+            直接<a href="登录.html">去登录</a>
+        </div>
+    </div>
+    <div class="footer-tip">深艺交 文化艺术品交易平台 · <a href="#">帮助中心</a></div>
+</div>
+
+<script>
+var codeTimer = null;
+
+function sendCode() {
+    var mobile = document.getElementById('mobileInput').value.trim();
+    if (!/^1\d{10}$/.test(mobile)) { alert('请先输入正确的 11 位手机号'); return; }
+    var btn = document.getElementById('codeBtn');
+    var sec = 60;
+    btn.classList.add('disabled');
+    btn.textContent = sec + 's 后重发';
+    btn.disabled = true;
+    codeTimer = setInterval(function() {
+        sec--;
+        if (sec <= 0) {
+            clearInterval(codeTimer);
+            btn.classList.remove('disabled');
+            btn.textContent = '获取验证码';
+            btn.disabled = false;
+        } else {
+            btn.textContent = sec + 's 后重发';
+        }
+    }, 1000);
+    alert('验证码已发送至 ' + mobile + '（演示环境，验证码为 123456）');
+}
+
+function doReg() {
+    var mobile = document.getElementById('mobileInput').value.trim();
+    var code = document.getElementById('codeInput').value.trim();
+    var shortName = document.getElementById('shortNameInput').value.trim();
+    var fullName = document.getElementById('fullNameInput').value.trim();
+    var pwd = document.getElementById('pwdInput').value;
+    var pwd2 = document.getElementById('pwd2Input').value;
+    var agree = document.getElementById('agreeChk').checked;
+
+    if (!/^1\d{10}$/.test(mobile)) { alert('请输入正确的 11 位手机号'); return; }
+    if (!code) { alert('请输入短信验证码'); return; }
+    if (!shortName) { alert('请输入企业简称'); return; }
+    if (!fullName) { alert('请输入企业全称'); return; }
+    if (!pwd) { alert('请设置登录密码'); return; }
+    if (pwd.length < 6 || pwd.length > 20) { alert('登录密码长度需为 6-20 位'); return; }
+    if (pwd !== pwd2) { alert('两次输入的密码不一致'); return; }
+    if (!agree) { alert('请先阅读并同意服务协议与隐私政策'); return; }
+
+    alert('注册成功！请完成企业资料认证。\n登录账号：' + mobile + '\n企业简称：' + shortName);
+    location.href = '企业注册.html';
+}
+</script>
+
+</body>
+</html>

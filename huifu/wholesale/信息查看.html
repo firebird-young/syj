@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>信息查看</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+            background: #f0f2f5;
+            color: #1a1a2e;
+            font-size: 14px;
+        }
+
+        /* 整体布局 */
+        .app { display: flex; min-height: 100vh; }
+
+        /* 侧边栏 */
+        .sidebar {
+            width: 200px;
+            background: #1f2c3d;
+            color: #a8b2c0;
+            flex-shrink: 0;
+        }
+        .logo {
+            height: 56px;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            background: #fff;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .logo-icon {
+            width: 28px; height: 28px;
+            background: #e74c3e;
+            border-radius: 4px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+        }
+        .menu { padding: 8px 0; }
+        .menu-item, .menu-group-title {
+            display: flex;
+            align-items: center;
+            height: 44px;
+            padding: 0 20px;
+            color: #c0c8d4;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all .15s;
+        }
+        .menu-item:hover, .menu-group-title:hover { background: #2a3849; color: #fff; }
+        .menu-item.active, .menu-group-title.active { color: #1a78ff; background: #2a3849; }
+        .menu-item .icon, .menu-group-title .icon {
+            width: 20px;
+            margin-right: 10px;
+            font-size: 16px;
+            text-align: center;
+        }
+        .menu-group-title .arrow { margin-left: auto; font-size: 12px; }
+        .menu-group .submenu { display: none; }
+        .menu-group.open .submenu { display: block; }
+        .menu-group .submenu a {
+            display: flex;
+            align-items: center;
+            height: 36px;
+            padding: 0 20px 0 50px;
+            color: #a8b2c0;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 13px;
+        }
+        .menu-group .submenu a:hover { color: #fff; }
+        .menu-group .submenu a.active { color: #1a78ff; }
+
+        /* 主体 */
+        .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+
+        /* 顶栏 */
+        .topbar {
+            background: #fff;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .breadcrumb { font-size: 13px; color: #6b7588; }
+        .breadcrumb .sep { margin: 0 6px; color: #c0c8d4; }
+        .breadcrumb .active { color: #1a1a2e; }
+        .topbar-right {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        .topbar-right .avatar {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            background: #f5deb3;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px;
+        }
+        .topbar-right .name { font-size: 13px; color: #1a1a2e; }
+        .topbar-right .arrow { color: #9ba6b9; font-size: 12px; }
+
+        /* 内容区 */
+        .content { flex: 1; padding: 12px; overflow-y: auto; }
+
+        /* 信息区块 */
+        .section {
+            background: #fff;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            overflow: hidden;
+        }
+        .section-title {
+            background: #1a78ff;
+            color: #fff;
+            padding: 12px 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .section-body {
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 12px;
+        }
+        .info-card {
+            background: #f5f7fa;
+            border-radius: 6px;
+            padding: 14px 16px;
+            min-height: 80px;
+        }
+        .info-card .label { font-size: 12px; color: #6b7588; margin-bottom: 8px; }
+        .info-card .value { font-size: 14px; color: #1a1a2e; font-weight: 500; word-break: break-all; }
+        .image-cell {
+            height: 50px;
+            background: #fff;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #e74c3e;
+            font-size: 12px;
+            border: 1px dashed #d0d5dd;
+        }
+        .image-cell.placeholder { color: #9ba6b9; }
+
+        @media (max-width: 1280px) {
+            .section-body { grid-template-columns: repeat(4, 1fr); }
+        }
+        @media (max-width: 900px) {
+            .section-body { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <!-- 侧边栏 -->
+    <div class="sidebar">
+        <div class="logo">
+            <div class="logo-icon">深</div>
+        </div>
+        <div class="menu">
+            <a class="menu-item active" href="信息查看.html">
+                <span class="icon">📋</span><span>信息查看</span>
+            </a>
+            <a class="menu-item" href="产品管理.html">
+                <span class="icon">📦</span><span>我的产品</span>
+            </a>
+            <a class="menu-item" href="我的资产.html">
+                <span class="icon">💰</span><span>资金管理</span>
+            </a>
+            <a class="menu-item" href="批发市场分账申请.html">
+                <span class="icon">📊</span><span>分佣管理</span>
+            </a>
+            <a class="menu-item" href="#">
+                <span class="icon">📢</span><span>系统公告</span>
+            </a>
+            <a class="menu-item" href="#">
+                <span class="icon">🏷️</span><span>价值管理</span>
+            </a>
+            <a class="menu-item" href="#">
+                <span class="icon">🏭</span><span>仓库管理</span>
+            </a>
+            <a class="menu-item" href="#">
+                <span class="icon">📝</span><span>任务管理</span>
+            </a>
+            <div class="menu-group open">
+                <div class="menu-group-title" onclick="this.parentNode.classList.toggle('open')">
+                    <span class="icon">⚙️</span><span>系统管理</span><span class="arrow">▾</span>
+                </div>
+                <div class="submenu">
+                    <a href="用户管理.html">用户管理</a>
+                    <a href="角色管理.html">角色管理</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主体 -->
+    <div class="main">
+        <div class="topbar">
+            <div class="breadcrumb">
+                <span>首页</span><span class="sep">/</span><span class="active">信息查看</span>
+            </div>
+            <div class="topbar-right">
+                <span class="avatar">👤</span>
+                <span class="name">批发商</span>
+                <span class="arrow">▾</span>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- 信息查看 -->
+            <div class="section">
+                <div class="section-title">信息查看</div>
+                <div class="section-body">
+                    <div class="info-card">
+                        <div class="label">账号</div>
+                        <div class="value">13800172866</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="label">账户编号</div>
+                        <div class="value">20864851498499055</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="label">企业全称</div>
+                        <div class="value">四川华乐博文化艺术发展有限公司</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="label">企业简称</div>
+                        <div class="value">华乐博文化</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="label">企业类型</div>
+                        <div class="value">一类</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="label">所属行业</div>
+                        <div class="value">文化娱乐</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="label">电子邮箱</div>
+                        <div class="value">359426573@qq.com</div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="label">联系人</div>
+                        <div class="value">曾安华</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="label">联系人手机号</div>
+                        <div class="value">15528430479</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="label">企业证件类型</div>
+                        <div class="value">三证合一</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="label">上传企业证件</div>
+                        <div class="image-cell">营业执照.png</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="label">统一社会信用代码</div>
+                        <div class="value">91510107MA62L1L5N1</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="label">法人身份证人像面拍照</div>
+                        <div class="image-cell">法人身份证人像面.png</div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="label">法人身份证国徽面拍照</div>
+                        <div class="image-cell">法人身份证国徽面.png</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="label">企业法人姓名</div>
+                        <div class="value">曾安华</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="label">企业法人身份证号</div>
+                        <div class="value">510122196801000173</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
