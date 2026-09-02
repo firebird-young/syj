@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>服务商提现审核</title>
+    <title>运营资金提现审核</title>
     <style>
         * { margin:0; padding:0; box-sizing:border-box; }
         body {
@@ -238,7 +238,7 @@
         <div class="breadcrumb">
             <span>首页</span> /
             <span>资金管理</span> /
-            <span class="active">服务商提现审核</span>
+            <span class="active">运营资金提现审核</span>
         </div>
     </div>
     <div class="topbar-right">
@@ -272,8 +272,8 @@
         <input class="filter-input" placeholder="请输入申请单号">
     </div>
     <div class="filter-item">
-        <span class="filter-label">服务商</span>
-        <input class="filter-input" placeholder="请输入服务商名称">
+        <span class="filter-label">批发商</span>
+        <input class="filter-input" placeholder="请输入批发商名称">
     </div>
     <div class="filter-item">
         <span class="filter-label">审核状态</span>
@@ -306,7 +306,7 @@
         <thead>
             <tr>
                 <th>申请单号</th>
-                <th>服务商</th>
+                <th>批发商</th>
                 <th>支付渠道</th>
                 <th>提现金额</th>
                 <th>提现原因</th>
@@ -340,7 +340,7 @@
                 <div class="val" id="auditNo">-</div>
             </div>
             <div class="audit-row">
-                <div class="label">服务商</div>
+                <div class="label">批发商</div>
                 <div class="val" id="auditService">-</div>
             </div>
             <div class="audit-row">
@@ -359,7 +359,7 @@
                 <div class="wr-title">收支统计报表</div>
                 <div class="wr-sum">
                     <div class="wr-sum-item">
-                        <span>服务商推广服务费合计</span>
+                        <span>推广服务费合计</span>
                         <b>¥ 20,050.00</b>
                     </div>
                     <div class="wr-sum-item">
@@ -380,7 +380,7 @@
                     <thead>
                         <tr>
                             <th>产品</th>
-                            <th style="text-align:right;">服务商推广服务费（批发市场分佣）</th>
+                            <th style="text-align:right;">推广服务费（批发市场分佣）</th>
                             <th style="text-align:right;">运营服务费（零售市场手续费）</th>
                         </tr>
                     </thead>
@@ -445,10 +445,10 @@
   <div class="fm-body">
     <h4><span class="badge">1</span> <span style="vertical-align:middle;">提现审核</span></h4>
     <ul>
-      <li>平台审核<b>服务商提现</b>申请（宝付/汇付钱包）</li>
+      <li>平台审核<b>批发商运营资金提现</b>申请</li>
       <li>审核状态：<b>待审核、已通过、已提现</b></li>
       <li>审核操作支持<b>通过</b>和<b>驳回</b></li>
-      <li>审核弹窗展示服务商申请时看到的<b>收支统计报表</b>（产品收入统计 + 每月支出记录 + 费用合计），供审核参考</li>
+      <li>审核弹窗展示批发商申请时看到的<b>收支统计报表</b>（产品收入统计 + 每月支出记录 + 费用合计），供审核参考</li>
     </ul>
   </div>
 </div>
@@ -456,10 +456,10 @@
 <script>
 var data = [
     { no: 'TX-20260801001', service: '四川华泰博文文化艺术发展有限公司', channel: '汇付钱包', amount: '5000.00', time: '2026-08-01 10:20:00', reason: '日常资金提现', status: 'pending', auditTime: '' },
-    { no: 'TX-20260801002', service: '四川世华博源广告传播有限公司', channel: '宝付钱包', amount: '1200.00', time: '2026-08-01 09:45:00', reason: '结算提取', status: 'pending', auditTime: '' },
+    { no: 'TX-20260801002', service: '四川世华博源广告传播有限公司', channel: '汇付钱包', amount: '1200.00', time: '2026-08-01 09:45:00', reason: '结算提取', status: 'pending', auditTime: '' },
     { no: 'TX-20260731003', service: '四川华鑫博文文化艺术发展有限公司', channel: '汇付钱包', amount: '8000.00', time: '2026-07-31 16:30:00', reason: '运营资金周转', status: 'pending', auditTime: '' },
     { no: 'TX-20260731004', service: '四川华泰博文文化艺术发展有限公司', channel: '汇付钱包', amount: '3000.00', time: '2026-07-31 14:10:00', reason: '业务结算', status: 'approved', auditTime: '2026-07-31 15:30:00' },
-    { no: 'TX-20260730005', service: '成都星曜文化传媒有限公司', channel: '宝付钱包', amount: '2000.00', time: '2026-07-30 11:25:00', reason: '日常提现', status: 'done', auditTime: '2026-07-30 12:05:00' },
+    { no: 'TX-20260730005', service: '成都星曜文化传媒有限公司', channel: '汇付钱包', amount: '2000.00', time: '2026-07-30 11:25:00', reason: '日常提现', status: 'done', auditTime: '2026-07-30 12:05:00' },
     { no: 'TX-20260730006', service: '四川世华博源广告传播有限公司', channel: '汇付钱包', amount: '6600.00', time: '2026-07-30 10:05:00', reason: '货款提取', status: 'done', auditTime: '2026-07-30 11:20:00' }
 ];
 
