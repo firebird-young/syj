@@ -99,8 +99,12 @@
             font-size: 13px;
             color: #1a1a2e;
             outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
-        .filter-input:focus { border-color: #1a78ff; }
+        .filter-input:focus {
+            border-color: #1a78ff;
+            box-shadow: 0 0 0 3px rgba(26,120,255,0.12);
+        }
         .filter-select {
             width: 140px;
             height: 30px;
@@ -111,6 +115,11 @@
             color: #1a1a2e;
             outline: none;
             background: #fff;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .filter-select:focus {
+            border-color: #1a78ff;
+            box-shadow: 0 0 0 3px rgba(26,120,255,0.12);
         }
         .filter-date-input {
             width: 130px;
@@ -121,6 +130,11 @@
             font-size: 13px;
             color: #1a1a2e;
             outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .filter-date-input:focus {
+            border-color: #1a78ff;
+            box-shadow: 0 0 0 3px rgba(26,120,255,0.12);
         }
         .filter-sep {
             font-size: 13px;
@@ -142,8 +156,13 @@
             border-radius: 4px;
             font-size: 13px;
             cursor: pointer;
+            transition: background 0.2s, box-shadow 0.2s;
         }
-        .btn-export:hover { background: #e08d04; }
+        .btn-export:hover {
+            background: #e08d04;
+            box-shadow: 0 2px 8px rgba(245,158,11,0.3);
+        }
+        .btn-export:active { transform: translateY(1px); }
         .btn-search {
             background: #1a78ff;
             color: #fff;
@@ -156,8 +175,13 @@
             display: flex;
             align-items: center;
             gap: 4px;
+            transition: background 0.2s, box-shadow 0.2s;
         }
-        .btn-search:hover { background: #0f6ae8; }
+        .btn-search:hover {
+            background: #0f6ae8;
+            box-shadow: 0 2px 8px rgba(26,120,255,0.3);
+        }
+        .btn-search:active { transform: translateY(1px); }
         .btn-reset {
             background: #fff;
             color: #1a78ff;
@@ -170,68 +194,91 @@
             display: flex;
             align-items: center;
             gap: 4px;
+            transition: background 0.2s;
         }
         .btn-reset:hover { background: #f5f8ff; }
+        .btn-reset:active { transform: translateY(1px); }
 
         /* 表格 */
         .table-card {
             background: #fff;
             margin: 12px;
-            border-radius: 6px;
+            border-radius: 8px;
             overflow: hidden;
+            box-shadow: 0 1px 6px rgba(0,0,0,0.05);
         }
         .table {
             width: 100%;
             border-collapse: collapse;
         }
         .table th {
-            background: #fafbfc;
+            background: #f5f7fa;
             padding: 12px 12px;
             text-align: left;
             font-size: 13px;
             color: #4e5a6e;
-            font-weight: 500;
-            border-bottom: 1px solid #f0f0f0;
+            font-weight: 600;
+            border-bottom: 1px solid #eef0f4;
+            white-space: nowrap;
         }
         .table td {
-            padding: 14px 12px;
+            padding: 12px 12px;
             font-size: 13px;
             color: #1a1a2e;
             border-bottom: 1px solid #f5f5f7;
         }
+        .table tbody tr:nth-child(even) td { background: #fbfcfe; }
+        .table tbody tr:hover td { background: #f0f6ff; }
         .table tr:last-child td { border-bottom: none; }
+        .table td.num { text-align: right; font-variant-numeric: tabular-nums; }
         .table .seq {
-            color: #6b7588;
+            color: #9ba6b9;
             text-align: center;
             width: 40px;
         }
         .table .order-no { color: #1a78ff; }
         .table .order-no:hover { text-decoration: underline; cursor: pointer; }
-        .status-tag {
-            display: inline-block;
-            padding: 2px 10px;
-            border-radius: 4px;
+        /* 产品编号：最多展示5个，超出 hover 显示全部 */
+        .table .td-codes {
+            max-width: 240px;
+            color: #1a78ff;
+            line-height: 1.7;
+            cursor: help;
             font-size: 12px;
         }
+        .table .td-codes .more {
+            color: #9ba6b9;
+            margin-left: 2px;
+        }
+        .status-tag {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
         .status-tag.done {
-            background: #e8f5e9;
-            color: #2e7d32;
+            background: #e6f7eb;
+            color: #1aab67;
         }
         .status-tag.canceled {
-            background: #f5f5f5;
+            background: #f2f3f5;
             color: #9ba6b9;
         }
         .status-tag.pending {
-            background: #fff0e0;
+            background: #fff4e6;
             color: #e67e22;
         }
         .amount-tag {
             display: inline-block;
-            background: #e3f2fd;
-            color: #1976d2;
-            padding: 2px 10px;
-            border-radius: 4px;
+            background: #e6f4ff;
+            color: #1a78ff;
+            padding: 3px 12px;
+            border-radius: 10px;
             font-size: 12px;
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
         }
         .table .time {
             color: #6b7588;
@@ -363,6 +410,7 @@
                 <th>订单编号</th>
                 <th>支付渠道订单号</th>
                 <th>产品名称</th>
+                <th>产品编号</th>
                 <th>用户账号</th>
                 <th>认购份数</th>
                 <th>单价</th>
@@ -382,19 +430,34 @@
 
 <script>
 var data = [
-    { id: 1, orderNo: 'XB-first26071505024701', payNo: '1260715135755043262', product: '中路财童', userNo: '1876829699476860930', copies: 1218, price: 1, isPickup: '仓库暂存', fee: 7.31, status: 'done', amount: 1218.00, payProduct: '银行卡', payChannel: '汇付钱包', time: '2026-07-15 13:...' },
-    { id: 2, orderNo: 'XB-first26071505016701', payNo: '1260715135655147498', product: '中路财童', userNo: '1878638327087280130', copies: 1200, price: 1, isPickup: '仓库暂存', fee: 7.2, status: 'done', amount: 1200.00, payProduct: '银行卡', payChannel: '宝付钱包', time: '2026-07-15 13:...' },
-    { id: 3, orderNo: 'XB-first26071504105201', payNo: '20260715112412010373000118115119', product: '中路财童', userNo: '1881547100063838210', copies: 200, price: 1, isPickup: '仓库暂存', fee: 0, status: 'done', amount: 200.00, payProduct: '余额', payChannel: '宝付钱包', time: '2026-07-15 11:...' },
-    { id: 4, orderNo: 'XB-first26071504094101', payNo: '—', product: '中路财童', userNo: '1878638327087280130', copies: 1, price: 1, isPickup: '仓库暂存', fee: 0, status: 'canceled', amount: 1.00, payProduct: '银行卡', payChannel: '汇付钱包', time: '2026-07-15 11:...' },
-    { id: 5, orderNo: 'XB-first26071504026701', payNo: '1260715111146584958', product: '中路财童', userNo: '206166464120323457', copies: 1, price: 1, isPickup: '仓库暂存', fee: 0.01, status: 'done', amount: 1.00, payProduct: '银行卡', payChannel: '宝付钱包', time: '2026-07-15 11:...' },
-    { id: 6, orderNo: 'XB-first26071504025101', payNo: '1260715111046584513', product: '中路财童', userNo: '206166464120323457', copies: 1, price: 1, isPickup: '仓库暂存', fee: 0.01, status: 'done', amount: 1.00, payProduct: '银行卡', payChannel: '宝付钱包', time: '2026-07-15 11:...' },
-    { id: 7, orderNo: 'XB-first26071504008801', payNo: '12607151108465808645', product: '中路财童', userNo: '1881528763372056578', copies: 1200, price: 1, isPickup: '仓库暂存', fee: 7.2, status: 'done', amount: 1200.00, payProduct: '银行卡', payChannel: '汇付钱包', time: '2026-07-15 11:...' },
-    { id: 8, orderNo: 'XB-first26071503906101', payNo: '1260715105145563571', product: '中路财童', userNo: '1908053633580778841', copies: 500, price: 1, isPickup: '仓库暂存', fee: 3, status: 'done', amount: 500.00, payProduct: '银行卡', payChannel: '宝付钱包', time: '2026-07-15 10:...' },
-    { id: 9, orderNo: 'XB-first26071503905001', payNo: '1260715105045597467', product: '中路财童', userNo: '2064183234658099202', copies: 2, price: 1, isPickup: '仓库暂存', fee: 0.02, status: 'done', amount: 2.00, payProduct: '银行卡', payChannel: '汇付钱包', time: '2026-07-15 10:...' },
-    { id: 10, orderNo: 'XB-first26071503857801', payNo: '2026071510425810337300118102530', product: '中路财童', userNo: '1977229438734100253', copies: 600, price: 1, isPickup: '仓库暂存', fee: 0, status: 'done', amount: 600.00, payProduct: '余额', payChannel: '宝付钱包', time: '2026-07-15 10:...' }
+    // ── 汇付钱包（置顶，认购份数 1-99 随机，含产品编号） ──
+    { id: 1, orderNo: 'XB-first26071505024701', payNo: '1260715135755043262', product: '中路财童', codeBase: 100, userNo: '1876829699476860930', copies: 37, price: 1, isPickup: '仓库暂存', fee: 0.22, status: 'done', amount: 37.00, payProduct: '银行卡', payChannel: '汇付钱包', time: '2026-07-15 13:57:24' },
+    { id: 2, orderNo: 'XB-first26071504008801', payNo: '12607151108465808645', product: '中路财童', codeBase: 200, userNo: '1881528763372056578', copies: 52, price: 1, isPickup: '仓库暂存', fee: 0.31, status: 'done', amount: 52.00, payProduct: '银行卡', payChannel: '汇付钱包', time: '2026-07-15 11:24:08' },
+    { id: 3, orderNo: 'XB-first26071503905001', payNo: '1260715105045597467', product: '中路财童', codeBase: 300, userNo: '2064183234658099202', copies: 19, price: 1, isPickup: '仓库暂存', fee: 0.11, status: 'done', amount: 19.00, payProduct: '银行卡', payChannel: '汇付钱包', time: '2026-07-15 10:50:45' },
+    { id: 4, orderNo: 'XB-first26071504094101', payNo: '1260715110941094100', product: '中路财童', userNo: '1878638327087280130', copies: 8, price: 1, isPickup: '仓库暂存', fee: 0, status: 'canceled', amount: 8.00, payProduct: '银行卡', payChannel: '汇付钱包', time: '2026-07-15 11:09:41' },
+    // ── 宝付钱包（置后，无产品编号） ──
+    { id: 5, orderNo: 'XB-first26071505016701', payNo: '1260715135655147498', product: '中路财童', userNo: '1878638327087280130', copies: 1200, price: 1, isPickup: '仓库暂存', fee: 7.2, status: 'done', amount: 1200.00, payProduct: '银行卡', payChannel: '宝付钱包', time: '2026-07-15 13:56:55' },
+    { id: 6, orderNo: 'XB-first26071504105201', payNo: '20260715112412010373000118115119', product: '中路财童', userNo: '1881547100063838210', copies: 200, price: 1, isPickup: '仓库暂存', fee: 0, status: 'done', amount: 200.00, payProduct: '余额', payChannel: '宝付钱包', time: '2026-07-15 11:24:12' },
+    { id: 7, orderNo: 'XB-first26071504026701', payNo: '1260715111146584958', product: '中路财童', userNo: '206166464120323457', copies: 1, price: 1, isPickup: '仓库暂存', fee: 0.01, status: 'done', amount: 1.00, payProduct: '银行卡', payChannel: '宝付钱包', time: '2026-07-15 11:14:58' },
+    { id: 8, orderNo: 'XB-first26071504025101', payNo: '1260715111046584513', product: '中路财童', userNo: '206166464120323457', copies: 1, price: 1, isPickup: '仓库暂存', fee: 0.01, status: 'done', amount: 1.00, payProduct: '银行卡', payChannel: '宝付钱包', time: '2026-07-15 11:10:46' },
+    { id: 9, orderNo: 'XB-first26071503906101', payNo: '1260715105145563571', product: '中路财童', userNo: '1908053633580778841', copies: 500, price: 1, isPickup: '仓库暂存', fee: 3, status: 'done', amount: 500.00, payProduct: '银行卡', payChannel: '宝付钱包', time: '2026-07-15 10:51:45' },
+    { id: 10, orderNo: 'XB-first26071503857801', payNo: '2026071510425810337300118102530', product: '中路财童', userNo: '1977229438734100253', copies: 600, price: 1, isPickup: '仓库暂存', fee: 0, status: 'done', amount: 600.00, payProduct: '余额', payChannel: '宝付钱包', time: '2026-07-15 10:42:58' }
 ];
 
 var statusNames = { done: '已成交', canceled: '已撤销', pending: '待支付' };
+
+function buildCodeCell(o) {
+    // 仅汇付钱包已成交订单含产品编号；宝付钱包 / 已撤销订单无数据
+    if (o.payChannel !== '汇付钱包' || !o.codeBase || o.status === 'canceled') return '<td>—</td>';
+    var base = parseInt(o.codeBase);
+    var codes = [];
+    for (var i = 0; i < o.copies; i++) {
+        codes.push('#' + String(base + i).padStart(4, '0'));
+    }
+    var visible = codes.slice(0, 5).join('、');
+    if (codes.length > 5) visible += '<span class="more"> …等' + codes.length + '个</span>';
+    return '<td class="td-codes" title="' + codes.join('、') + '">' + visible + '</td>';
+}
 
 function renderTable() {
     var html = '';
@@ -405,13 +468,14 @@ function renderTable() {
             '    <td class="order-no">' + o.orderNo + '</td>',
             '    <td>' + o.payNo + '</td>',
             '    <td>' + o.product + '</td>',
+            buildCodeCell(o),
             '    <td>' + o.userNo + '</td>',
-            '    <td>' + o.copies + '</td>',
-            '    <td>' + o.price + '</td>',
+            '    <td class="num">' + o.copies + '</td>',
+            '    <td class="num">' + o.price + '</td>',
             '    <td>' + o.isPickup + '</td>',
-            '    <td>' + o.fee + '</td>',
+            '    <td class="num">' + o.fee + '</td>',
             '    <td><span class="status-tag ' + o.status + '">' + statusNames[o.status] + '</span></td>',
-            '    <td><span class="amount-tag">' + o.amount.toFixed(2) + '</span></td>',
+            '    <td class="num"><span class="amount-tag">' + o.amount.toFixed(2) + '</span></td>',
             '    <td>' + o.payProduct + '</td>',
             '    <td>' + o.payChannel + '</td>',
             '    <td class="time">' + o.time + '</td>',
@@ -443,6 +507,12 @@ renderTable();
     <ul>
       <li>原先的「支付渠道」改为<b>「支付产品」</b>（银行卡和余额）</li>
       <li>作为筛选条件，并在列表中展示</li>
+    </ul>
+    <h4><span class="badge">3</span> <span style="vertical-align:middle;">产品编号</span></h4>
+    <ul>
+      <li>产品名称后新增<b>产品编号</b>列</li>
+      <li><b>汇付钱包</b>已成交订单认购份数为 1-90 份，每份对应一个编号（如 #0100、#0101…）</li>
+      <li>单元格默认最多展示 <b>5</b> 个编号，超出部分以「…等 N 个」提示，<b>鼠标悬停</b>显示全部编号</li>
     </ul>
   </div>
 </div>
