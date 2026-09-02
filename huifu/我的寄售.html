@@ -6,59 +6,55 @@
     <title>我的寄售</title>
     <style>
         * { margin:0; padding:0; box-sizing:border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
-            background: #f0f2f5;
-            color: #1a1a2e;
-            font-size: 14px;
+        html { background: #b0b8c6; min-height:100vh; }
+        .page-wrap {
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
             min-height: 100vh;
         }
-        .app-container {
-            max-width: 430px;
-            margin: 0 auto;
-            background: #f5f5f5;
+        .phone-frame {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+            background: #f5f6fa;
+            max-width: 420px;
+            width: 420px;
             min-height: 100vh;
             position: relative;
-            padding-bottom: 40px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.06);
+            padding-bottom: 24px;
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.04);
+            flex-shrink: 0;
+            color: #1a1a2e;
+            font-size: 14px;
         }
 
         /* 顶部 */
         .header {
             background: #fff;
-            height: 56px;
+            padding: 44px 20px 14px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            position: relative;
+            justify-content: space-between;
             border-bottom: 1px solid #f0f0f0;
         }
         .header .back {
-            position: absolute;
-            left: 14px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 20px;
+            font-size: 22px;
             color: #1a1a2e;
             cursor: pointer;
-            padding: 4px 8px;
+            line-height: 1;
         }
         .header-title {
-            font-size: 15px;
+            font-size: 17px;
             font-weight: 600;
             color: #1a1a2e;
-            max-width: 280px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
         }
+        .header-placeholder { width: 22px; }
 
         /* 统计卡 */
         .stat-card {
-            margin: 10px 12px 0;
+            margin: 12px 16px 0;
             background: #fff;
-            border-radius: 10px;
-            padding: 14px 0;
+            border-radius: 12px;
+            padding: 20px 0;
             display: flex;
             box-shadow: 0 1px 4px rgba(0,0,0,0.04);
         }
@@ -77,35 +73,38 @@
             background: #f0f0f0;
         }
         .stat-num {
-            font-size: 20px;
+            font-size: 22px;
             font-weight: 700;
             color: #1a1a2e;
-            margin-bottom: 2px;
+            margin-bottom: 6px;
+            line-height: 1;
         }
-        .stat-num.red { color: #e74c5e; }
+        .stat-num.red { color: #D62828; }
         .stat-num.green { color: #1aab67; }
         .stat-label { font-size: 12px; color: #86909c; }
 
         /* Tab 切换 */
         .tab-bar {
             display: flex;
-            margin: 10px 12px 0;
+            margin: 12px 16px 0;
             background: #fff;
-            border-radius: 10px;
+            border-radius: 12px;
             padding: 4px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
         }
         .tab-item {
             flex: 1;
             text-align: center;
-            padding: 8px 0;
+            padding: 9px 0;
             font-size: 13px;
-            color: #4e5a6e;
+            color: #6b7588;
             border-radius: 8px;
             cursor: pointer;
             transition: all .15s;
+            font-weight: 500;
         }
         .tab-item.active {
-            background: #e74c5e;
+            background: #D62828;
             color: #fff;
             font-weight: 600;
         }
@@ -113,13 +112,14 @@
         /* 列表 */
         .list-card {
             background: #fff;
-            margin: 10px 12px 0;
-            border-radius: 10px;
+            margin: 12px 16px 0;
+            border-radius: 12px;
             overflow: hidden;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
         }
         .list-title {
-            padding: 12px 14px;
-            font-size: 14px;
+            padding: 14px 16px;
+            font-size: 15px;
             font-weight: 600;
             color: #1a1a2e;
             display: flex;
@@ -127,12 +127,19 @@
             align-items: center;
             border-bottom: 1px solid #f5f5f7;
         }
-        .list-title .count { font-size: 12px; font-weight: 400; color: #86909c; }
+        .list-title .count {
+            font-size: 12px;
+            font-weight: 500;
+            color: #D62828;
+            background: #fbe4e0;
+            padding: 2px 10px;
+            border-radius: 10px;
+        }
         .sell-row {
             display: flex;
             gap: 12px;
             align-items: center;
-            padding: 14px;
+            padding: 16px 16px;
             border-bottom: 1px solid #f5f5f7;
         }
         .sell-row:last-child { border-bottom: none; }
@@ -140,7 +147,7 @@
             width: 64px;
             height: 64px;
             border-radius: 8px;
-            background: #f5f7fa;
+            background: #fafbfc;
             flex-shrink: 0;
             overflow: hidden;
         }
@@ -155,10 +162,11 @@
             font-size: 15px;
             font-weight: 600;
             color: #1a1a2e;
-            margin-bottom: 5px;
+            margin-bottom: 10px;
             display: flex;
             align-items: center;
             gap: 6px;
+            line-height: 1.3;
         }
         .sr-code {
             font-size: 11px;
@@ -168,51 +176,56 @@
             border: 1px solid #b7dcff;
             padding: 2px 8px;
             border-radius: 4px;
+            flex-shrink: 0;
         }
-        .sr-meta { font-size: 12px; color: #4e5a6e; margin-bottom: 3px; }
-        .sr-meta .price { color: #e74c5e; font-weight: 700; font-size: 16px; }
+        .sr-meta { font-size: 12px; color: #4e5a6e; margin-bottom: 6px; line-height: 1.4; }
+        .sr-meta:last-child { margin-bottom: 0; }
+        .sr-meta .price { color: #D62828; font-weight: 700; font-size: 16px; margin-left: 2px; }
         .sr-meta .price.green { color: #1aab67; }
-        .sr-time { font-size: 11px; color: #86909c; }
+        .sr-meta .fee { color: #86909c; }
+        .sr-time { font-size: 11px; color: #9ba6b9; line-height: 1.4; }
         .sr-right {
             flex-shrink: 0;
             display: flex;
             flex-direction: column;
             align-items: flex-end;
-            gap: 8px;
+            gap: 10px;
         }
 
         /* 状态标签 */
         .status-tag {
             font-size: 12px;
-            padding: 3px 10px;
+            padding: 4px 12px;
             border-radius: 12px;
             font-weight: 500;
             white-space: nowrap;
         }
-        .status-tag.selling { color: #e74c5e; background: #fdecee; }
+        .status-tag.selling { color: #D62828; background: #fbe4e0; }
         .status-tag.sold { color: #1aab67; background: #e8f8f0; }
         .status-tag.off { color: #86909c; background: #f2f3f5; }
 
         /* 操作按钮 */
         .btn-outline {
             background: #fff;
-            border: 1px solid #e74c5e;
-            color: #e74c5e;
+            border: 1px solid #D62828;
+            color: #D62828;
             font-size: 13px;
             font-weight: 500;
-            padding: 6px 16px;
-            border-radius: 17px;
+            padding: 7px 18px;
+            border-radius: 12px;
             cursor: pointer;
+            font-family: inherit;
         }
-        .btn-outline:active { background: #fdecee; }
+        .btn-outline:active { background: #fbe4e0; }
         .btn-gray {
             background: #fafbfc;
             border: 1px solid #e5e6eb;
             color: #86909c;
             font-size: 13px;
-            padding: 6px 16px;
-            border-radius: 17px;
+            padding: 7px 18px;
+            border-radius: 12px;
             cursor: default;
+            font-family: inherit;
         }
 
         /* 剩余天数 */
@@ -221,20 +234,21 @@
             color: #e6a23c;
             background: #fff7e6;
             border: 1px solid #ffe1a8;
-            padding: 2px 8px;
+            padding: 3px 9px;
             border-radius: 10px;
+            white-space: nowrap;
         }
 
         /* 空状态 */
         .empty {
-            padding: 48px 0;
+            padding: 56px 0;
             text-align: center;
             color: #9ba6b9;
             font-size: 13px;
         }
         .empty .empty-ico {
-            font-size: 40px;
-            margin-bottom: 10px;
+            font-size: 44px;
+            margin-bottom: 12px;
             opacity: .5;
         }
 
@@ -243,8 +257,8 @@
             display: flex;
             align-items: flex-start;
             gap: 8px;
-            margin: 0 14px 0;
-            padding: 9px 12px;
+            margin: 12px 14px;
+            padding: 10px 12px;
             background: #fff7e6;
             border: 1px solid #ffe1a8;
             border-radius: 8px;
@@ -302,7 +316,7 @@
             left: 50%;
             transform: translateX(-50%);
             width: 100%;
-            max-width: 430px;
+            max-width: 420px;
             background: #fff;
             border-radius: 16px 16px 0 0;
             padding: 16px 16px calc(20px + env(safe-area-inset-bottom));
@@ -358,48 +372,78 @@
             color: #4e5a6e;
             line-height: 1.8;
         }
-        .cancel-note b { color: #e74c5e; }
+        .cancel-note b { color: #D62828; }
         .btn-submit {
             width: 100%;
-            height: 46px;
-            background: #e74c5e;
+            height: 48px;
+            background: #D62828;
             color: #fff;
             border: none;
-            border-radius: 23px;
-            font-size: 15px;
+            border-radius: 12px;
+            font-size: 16px;
             font-weight: 600;
             cursor: pointer;
             margin-top: 6px;
             font-family: inherit;
         }
-        .btn-submit:active { background: #d43d4e; }
+        .btn-submit:active { background: #c41e1e; }
         .btn-submit.plain {
             background: #f5f5f5;
             color: #4e5a6e;
             margin-top: 10px;
         }
 
-        /* ── 功能说明浮窗 ── */
-        .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 430px; max-width: 94vw; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 99999; padding: 22px; display: none; }
-        .f-modal.show { display: block; }
-        .f-modal .fm-title { font-size: 15px; font-weight: 600; color: #1a1a2e; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
-        .f-modal .fm-title:active { cursor: grabbing; }
-        .f-modal .fm-close { width: 26px; height: 26px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 13px; color: #666; border: none; flex-shrink: 0; }
-        .f-modal .fm-close:hover { background: #e8e8e8; }
-        .f-modal .fm-body { font-size: 13px; color: #555; line-height: 1.8; }
-        .f-modal .fm-body h4 { font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 14px 0 6px; }
-        .f-modal .fm-body h4:first-child { margin-top: 0; }
-        .f-modal .fm-body ul { padding-left: 18px; margin: 0 0 8px; }
-        .f-modal .fm-body li { margin-bottom: 4px; }
+        /* ── 功能说明面板（固定在手机框右侧） ── */
+        .f-panel {
+            position: fixed;
+            top: 24px;
+            left: calc(50vw + 210px + 24px);
+            width: 320px;
+            max-height: calc(100vh - 48px);
+            overflow-y: auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0,0,0,.08);
+            padding: 20px;
+            border: 1px solid #eef0f3;
+        }
+        .f-panel .fp-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .f-panel .fp-body { font-size: 13px; color: #555; line-height: 1.75; }
+        .f-panel .fp-body h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin: 16px 0 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .f-panel .fp-body h4:first-child { margin-top: 0; }
+        .f-panel .fp-body ul { padding-left: 18px; margin: 0 0 8px; }
+        .f-panel .fp-body li { margin-bottom: 4px; }
+        @media (max-width: 800px) { .f-panel { display: none; } }
     </style>
 </head>
 <body>
 
-<div class="app-container">
+<div class="page-wrap">
+
+<div class="phone-frame">
 
     <div class="header">
-        <span class="back">‹</span>
+        <span class="back" onclick="history.back()">‹</span>
         <span class="header-title">我的寄售</span>
+        <span class="header-placeholder"></span>
     </div>
 
     <!-- 统计卡 -->
@@ -442,7 +486,9 @@
         </div>
     </div>
 
-</div>
+</div><!-- /phone-frame -->
+
+</div><!-- /page-wrap -->
 
 <!-- ====== 撤销寄售弹窗（底部 sheet） ====== -->
 <div class="sheet" id="cancelSheet">
@@ -471,33 +517,27 @@
   </div>
 </div>
 
-<!-- 浮动说明按钮（手机框外） -->
-<button onclick="toggleFuncModal()" style="position:fixed;top:12px;right:16px;z-index:99999;background:#fff;color:#666;padding:7px 16px;border-radius:20px;border:1px solid #ddd;font-size:13px;font-weight:500;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.08);font-family:inherit;display:inline-flex;align-items:center;gap:4px;">📖 说明</button>
-
-<!-- ====== 功能说明浮窗 ====== -->
-<div class="f-modal" id="funcModal">
-  <div class="fm-title">
-    <span>📖 功能说明</span>
-    <button class="fm-close" onclick="toggleFuncModal()">✕</button>
-  </div>
-  <div class="fm-body">
-    <h4><span class="badge">1</span> <span style="vertical-align:middle;">顶部统计</span></h4>
+<!-- ====== 功能说明面板（固定显示在手机框右侧） ====== -->
+<div class="f-panel">
+  <div class="fp-title">📖 功能说明</div>
+  <div class="fp-body">
+    <h4><span class="badge">1</span> 顶部统计</h4>
     <ul>
       <li>展示<b>寄售中</b>件数、<b>已售出</b>件数、<b>累计成交金额</b>三个统计项</li>
     </ul>
-    <h4><span class="badge">2</span> <span style="vertical-align:middle;">状态 Tab</span></h4>
+    <h4><span class="badge">2</span> 状态 Tab</h4>
     <ul>
       <li>支持按<b>全部 / 寄售中 / 已售出 / 已下架</b>切换查看寄售记录</li>
       <li>列表标题实时显示当前分类下的<b>记录条数</b></li>
     </ul>
-    <h4><span class="badge">3</span> <span style="vertical-align:middle;">寄售记录</span></h4>
+    <h4><span class="badge">3</span> 寄售记录</h4>
     <ul>
-      <li>每行展示：产品图、产品名称、产品编号、<b>挂单价格</b>（玫红突出）、挂单时间</li>
+      <li>每行展示：产品图、产品名称、产品编号、<b>挂单价格</b>（深红突出）、挂单时间</li>
       <li><b>寄售中</b>：展示剩余挂单天数（黄色标签），可点击「撤销」下架该产品</li>
-      <li><b>已售出</b>：展示成交价（绿色）、成交时间与收取的交易服务费</li>
+      <li><b>已售出</b>：展示成交价（绿色）、成交时间与收取的交易手续费</li>
       <li><b>已下架</b>：展示下架时间，无操作按钮</li>
     </ul>
-    <h4><span class="badge">4</span> <span style="vertical-align:middle;">撤销寄售</span></h4>
+    <h4><span class="badge">4</span> 撤销寄售</h4>
     <ul>
       <li>点击「撤销」弹出底部确认弹窗，展示产品信息与挂单价格</li>
       <li>确认后该产品状态变为<b>已下架</b>，寄售中件数与统计同步更新</li>
@@ -553,7 +593,8 @@ function render() {
                 '<div class="sr-img"><img src="../asset/' + it.img + '" alt="' + it.name + '"></div>' +
                 '<div class="sr-info">' +
                     '<div class="sr-name">' + it.name + '<span class="sr-code">' + it.code + '</span></div>' +
-                    '<div class="sr-meta">成交价<span class="price green">¥' + fmt(it.deal) + '</span>　服务费 ¥' + fmt(it.fee) + '</div>' +
+                    '<div class="sr-meta">成交价<span class="price green">¥' + fmt(it.deal) + '</span></div>' +
+                    '<div class="sr-meta">交易手续费 <span class="fee">¥' + fmt(it.fee) + '</span></div>' +
                     '<div class="sr-time">成交 ' + it.time + '</div>' +
                 '</div>' +
                 '<div class="sr-right">' +
@@ -571,8 +612,7 @@ function render() {
                     '<div class="sr-time">下架 ' + it.time + '</div>' +
                 '</div>' +
                 '<div class="sr-right">' +
-                    '<span class="status-tag off">已下架</span>' +
-                    '<span class="btn-gray">已结束</span>' +
+                    '<span class="status-tag off">已下架</span>' 
                 '</div>' +
             '</div>';
         }
@@ -618,34 +658,6 @@ function confirmCancel() {
 
 // 初始化
 render();
-</script>
-
-<script>
-function toggleFuncModal() {
-  var el = document.getElementById('funcModal');
-  el.classList.toggle('show');
-  if (el.classList.contains('show') && !el.dataset.dragged) {
-    el.style.left = '50%'; el.style.top = '50%'; el.style.transform = 'translate(-50%,-50%)';
-  }
-}
-(function() {
-  var modal, titleBar, offX, offY, dragging = false;
-  document.addEventListener('DOMContentLoaded', function() {
-    modal = document.getElementById('funcModal');
-    titleBar = modal.querySelector('.fm-title');
-    titleBar.addEventListener('mousedown', startDrag);
-    titleBar.addEventListener('touchstart', startDragTouch, {passive:true});
-    document.addEventListener('mousemove', onDrag);
-    document.addEventListener('mouseup', endDrag);
-    document.addEventListener('touchmove', onDragTouch, {passive:true});
-    document.addEventListener('touchend', endDrag);
-  });
-  function startDrag(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = e.clientX - rect.left; offY = e.clientY - rect.top; dragging = true; titleBar.style.cursor = 'grabbing'; }
-  function startDragTouch(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; var t = e.touches[0]; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = t.clientX - rect.left; offY = t.clientY - rect.top; dragging = true; }
-  function onDrag(e) { if (!dragging) return; modal.style.left = (e.clientX - offX) + 'px'; modal.style.top = (e.clientY - offY) + 'px'; }
-  function onDragTouch(e) { if (!dragging) return; var t = e.touches[0]; modal.style.left = (t.clientX - offX) + 'px'; modal.style.top = (t.clientY - offY) + 'px'; }
-  function endDrag() { dragging = false; if (titleBar) titleBar.style.cursor = 'grab'; }
-})();
 </script>
 
 </body>
