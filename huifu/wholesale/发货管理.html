@@ -327,6 +327,18 @@
         /* 提货时间：未发货为灰色占位 */
         .pick-time.none { color: var(--ink-faint); }
 
+        /* 提货类型 */
+        .pick-type {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 10px;
+            font-size: 12px;
+            line-height: 18px;
+            font-weight: 500;
+        }
+        .pick-type.self { background: var(--primary-bg); color: var(--primary); }
+        .pick-type.auto { background: #fff4e6; color: #e67e22; }
+
         /* 产品编号：多值省略 + 悬浮展示 + 复制 */
         .prod-no-cell { position: relative; max-width: 160px; }
         .prod-no-text {
@@ -506,21 +518,29 @@
             <div class="filter-bar">
                 <div class="filter-item">
                     <span class="filter-label">提货单编号</span>
-                    <input type="text" class="filter-input" placeholder="请输入提货单编号">
+                    <input type="text" class="filter-input" id="filter-bill" placeholder="请输入提货单编号">
                 </div>
                 <div class="filter-item">
                     <span class="filter-label">产品名称</span>
-                    <input type="text" class="filter-input" placeholder="请输入产品名称">
+                    <input type="text" class="filter-input" id="filter-name" placeholder="请输入产品名称">
                 </div>
                 <div class="filter-item">
                     <span class="filter-label">产品编号</span>
-                    <input type="text" class="filter-input" placeholder="请输入产品编号">
+                    <input type="text" class="filter-input" id="filter-no" placeholder="请输入产品编号">
                     <span class="filter-tip">※ 按照产品编号查询时必须加上产品名称</span>
+                </div>
+                <div class="filter-item">
+                    <span class="filter-label">提货类型</span>
+                    <select class="filter-input" id="filter-type" style="width:120px;">
+                        <option value="">全部</option>
+                        <option value="self">用户自提</option>
+                        <option value="auto">到期自发</option>
+                    </select>
                 </div>
                 <div class="filter-actions">
                     <button class="btn-export" onclick="exportData()">📥 导 出</button>
-                    <button class="btn-search">🔍 搜 索</button>
-                    <button class="btn-reset">↻ 重 置</button>
+                    <button class="btn-search" onclick="doSearch()">🔍 搜 索</button>
+                    <button class="btn-reset" onclick="resetSearch()">↻ 重 置</button>
                 </div>
             </div>
 
@@ -540,6 +560,7 @@
                             <th style="width:80px;">图片</th>
                             <th>产品名</th>
                             <th>提货单号</th>
+                            <th>提货类型</th>
                             <th>产品编号</th>
                             <th>提货数量</th>
                             <th>所属企业</th>
@@ -555,11 +576,12 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr data-status="pending">
+                        <tr data-status="pending" data-type="auto">
                             <td class="seq">1</td>
                             <td><img class="product-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Crect width='80' height='80' fill='%23d4af37'/%3E%3Ctext x='40' y='44' font-size='10' text-anchor='middle' fill='%23fff'%3E青莲·舒展%3C/text%3E%3C/svg%3E"></td>
                             <td>青莲-舒展</td>
                             <td>3245917488617277</td>
+                            <td><span class="pick-type auto">到期自发</span></td>
                             <td class="prod-no-cell" data-nos="#001,#002,#003,#004,#005">#001,#002,#003,...</td>
                             <td>5</td>
                             <td>成都市天府新区明昌博物馆</td>
@@ -573,11 +595,12 @@
                             <td class="pick-time none">—</td>
                             <td class="actions"><a>处理</a><a>查看详情</a><a class="danger">撤销</a></td>
                         </tr>
-                        <tr data-status="shipped">
+                        <tr data-status="shipped" data-type="self">
                             <td class="seq">2</td>
                             <td><img class="product-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Crect width='80' height='80' fill='%23d4af37'/%3E%3Ctext x='40' y='44' font-size='10' text-anchor='middle' fill='%23fff'%3E青莲·舒展%3C/text%3E%3C/svg%3E"></td>
                             <td>青莲-舒展</td>
                             <td>7854336430886062</td>
+                            <td><span class="pick-type self">用户自提</span></td>
                             <td class="prod-no-cell" data-nos="#006,#007,#008,#009">#006,#007,#008,...</td>
                             <td>4</td>
                             <td>成都市天府新区明昌博物馆</td>
@@ -591,11 +614,12 @@
                             <td>2026-07-22 14:30:00</td>
                             <td class="actions"><a>查看详情</a></td>
                         </tr>
-                        <tr data-status="shipped">
+                        <tr data-status="shipped" data-type="auto">
                             <td class="seq">3</td>
                             <td><img class="product-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Crect width='80' height='80' fill='%23d4af37'/%3E%3Ctext x='40' y='44' font-size='10' text-anchor='middle' fill='%23fff'%3E青莲·舒展%3C/text%3E%3C/svg%3E"></td>
                             <td>青莲-舒展</td>
                             <td>197377991264931</td>
+                            <td><span class="pick-type auto">到期自发</span></td>
                             <td class="prod-no-cell" data-nos="#010,#011,#012">#010,#011,#012</td>
                             <td>3</td>
                             <td>成都市天府新区明昌博物馆</td>
@@ -609,11 +633,12 @@
                             <td>2026-07-22 13:05:20</td>
                             <td class="actions"><a>查看详情</a></td>
                         </tr>
-                        <tr data-status="shipped">
+                        <tr data-status="shipped" data-type="self">
                             <td class="seq">4</td>
                             <td><img class="product-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Crect width='80' height='80' fill='%23d4af37'/%3E%3Ctext x='40' y='44' font-size='10' text-anchor='middle' fill='%23fff'%3E青莲·舒展%3C/text%3E%3C/svg%3E"></td>
                             <td>青莲-舒展</td>
                             <td>7482868364783633</td>
+                            <td><span class="pick-type self">用户自提</span></td>
                             <td class="prod-no-cell" data-nos="#013,#014,#015,#016,#017,#018">#013,#014,#015,...</td>
                             <td>6</td>
                             <td>成都市天府新区明昌博物馆</td>
@@ -627,11 +652,12 @@
                             <td>2026-07-23 16:40:00</td>
                             <td class="actions"><a>查看详情</a></td>
                         </tr>
-                        <tr data-status="shipped">
+                        <tr data-status="shipped" data-type="auto">
                             <td class="seq">5</td>
                             <td><img class="product-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Crect width='80' height='80' fill='%23d4af37'/%3E%3Ctext x='40' y='44' font-size='10' text-anchor='middle' fill='%23fff'%3E青莲·舒展%3C/text%3E%3C/svg%3E"></td>
                             <td>青莲-舒展</td>
                             <td>9065460812978898</td>
+                            <td><span class="pick-type auto">到期自发</span></td>
                             <td class="prod-no-cell" data-nos="#019">#019</td>
                             <td>1</td>
                             <td>成都市天府新区明昌博物馆</td>
@@ -645,11 +671,12 @@
                             <td>2026-07-23 10:15:30</td>
                             <td class="actions"><a>查看详情</a></td>
                         </tr>
-                        <tr data-status="shipped">
+                        <tr data-status="shipped" data-type="self">
                             <td class="seq">6</td>
                             <td><img class="product-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Crect width='80' height='80' fill='%23d4af37'/%3E%3Ctext x='40' y='44' font-size='10' text-anchor='middle' fill='%23fff'%3E青莲·舒展%3C/text%3E%3C/svg%3E"></td>
                             <td>青莲-舒展</td>
                             <td>9975703152356489</td>
+                            <td><span class="pick-type self">用户自提</span></td>
                             <td class="prod-no-cell" data-nos="#020">#020</td>
                             <td>1</td>
                             <td>成都市天府新区明昌博物馆</td>
@@ -663,11 +690,12 @@
                             <td>2026-07-24 09:20:00</td>
                             <td class="actions"><a>查看详情</a></td>
                         </tr>
-                        <tr data-status="shipped">
+                        <tr data-status="shipped" data-type="auto">
                             <td class="seq">7</td>
                             <td><img class="product-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Crect width='80' height='80' fill='%23d4af37'/%3E%3Ctext x='40' y='44' font-size='10' text-anchor='middle' fill='%23fff'%3E青莲·舒展%3C/text%3E%3C/svg%3E"></td>
                             <td>青莲-舒展</td>
                             <td>0191839233733074</td>
+                            <td><span class="pick-type auto">到期自发</span></td>
                             <td class="prod-no-cell" data-nos="#021">#021</td>
                             <td>1</td>
                             <td>成都市天府新区明昌博物馆</td>
@@ -681,11 +709,12 @@
                             <td>2026-07-24 10:45:00</td>
                             <td class="actions"><a>查看详情</a></td>
                         </tr>
-                        <tr data-status="shipped">
+                        <tr data-status="shipped" data-type="self">
                             <td class="seq">8</td>
                             <td><img class="product-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Crect width='80' height='80' fill='%23d4af37'/%3E%3Ctext x='40' y='44' font-size='10' text-anchor='middle' fill='%23fff'%3E青莲·舒展%3C/text%3E%3C/svg%3E"></td>
                             <td>青莲-舒展</td>
                             <td>4462861094304195</td>
+                            <td><span class="pick-type self">用户自提</span></td>
                             <td class="prod-no-cell" data-nos="#022,#023">#022,#023</td>
                             <td>2</td>
                             <td>成都市天府新区明昌博物馆</td>
@@ -723,7 +752,7 @@ function exportData() {
         visible.push(row);
     });
     if (!visible.length) { alert('暂无可导出的数据'); return; }
-    var headers = ['序号','产品名','提货单号','产品编号','提货数量','所属企业','所属仓库','用户账号','用户姓名','收货地址','状态','创建时间','提货时间','发货时间'];
+    var headers = ['序号','产品名','提货单号','提货类型','产品编号','提货数量','所属企业','所属仓库','用户账号','用户姓名','收货地址','状态','创建时间','提货时间','发货时间'];
     var csv = '\uFEFF' + headers.join(',') + '\n';
     visible.forEach(function(row) {
         var cells = row.querySelectorAll('td');
@@ -733,8 +762,8 @@ function exportData() {
             cells[0].textContent.trim(),
             cells[2].textContent.trim(),
             cells[3].textContent.trim(),
+            cells[4].textContent.trim(),
             nos,
-            cells[5].textContent.trim(),
             cells[6].textContent.trim(),
             cells[7].textContent.trim(),
             cells[8].textContent.trim(),
@@ -743,7 +772,8 @@ function exportData() {
             cells[11].textContent.trim(),
             cells[12].textContent.trim(),
             cells[13].textContent.trim(),
-            cells[14].textContent.trim()
+            cells[14].textContent.trim(),
+            cells[15].textContent.trim()
         ];
         csv += vals.map(function(v) { return '"' + String(v).replace(/"/g, '""') + '"'; }).join(',') + '\n';
     });
@@ -758,16 +788,50 @@ function exportData() {
     URL.revokeObjectURL(url);
 }
 
+var currentTab = 'all';
+
 function switchTab(el, key) {
     document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
     el.classList.add('active');
+    currentTab = key;
+    applyFilter();
+}
+
+/* ── 组合筛选：状态标签页 + 提货类型 + 关键字 ── */
+function applyFilter() {
+    var kwBill = (document.getElementById('filter-bill') || {value:''}).value.trim();
+    var kwName = (document.getElementById('filter-name') || {value:''}).value.trim();
+    var kwNo = (document.getElementById('filter-no') || {value:''}).value.trim();
+    var type = document.getElementById('filter-type').value;
     var rows = document.querySelectorAll('tbody tr');
     rows.forEach(function(row) {
         var s = row.getAttribute('data-status');
-        if (key === 'all') { row.style.display = ''; }
-        else if (key === 'pending') { row.style.display = (s === 'pending') ? '' : 'none'; }
-        else if (key === 'shipped') { row.style.display = (s === 'shipped') ? '' : 'none'; }
+        var t = row.getAttribute('data-type') || '';
+        var show = true;
+        if (currentTab === 'pending' && s !== 'pending') show = false;
+        else if (currentTab === 'shipped' && s !== 'shipped') show = false;
+        if (!show) { row.style.display = 'none'; return; }
+        if (type && t !== type) { row.style.display = 'none'; return; }
+        var cells = row.querySelectorAll('td');
+        var bill = cells[3].textContent.trim();
+        var name = cells[2].textContent.trim();
+        var noCell = row.querySelector('.prod-no-cell');
+        var nos = noCell ? (noCell.getAttribute('data-nos') || '') : '';
+        if (kwBill && bill.indexOf(kwBill) === -1) show = false;
+        if (kwName && name.indexOf(kwName) === -1) show = false;
+        if (kwNo && nos.indexOf(kwNo) === -1) show = false;
+        row.style.display = show ? '' : 'none';
     });
+}
+
+function doSearch() { applyFilter(); }
+
+function resetSearch() {
+    document.getElementById('filter-bill').value = '';
+    document.getElementById('filter-name').value = '';
+    document.getElementById('filter-no').value = '';
+    document.getElementById('filter-type').value = '';
+    applyFilter();
 }
 
 /* ── 产品编号：多值省略 + 悬浮展示 + 复制 ── */
@@ -849,6 +913,7 @@ function switchTab(el, key) {
     <ul>
       <li>展示当前批发商的<b>发货记录</b>，支持<b>全部 / 待发货 / 已发货</b>标签页切换</li>
       <li><b>状态</b>：待发货（橙）、已发货（蓝）</li>
+      <li>新增<b>提货类型</b>列：<b>用户自提</b>（用户主动发起提货）、<b>到期自发</b>（持有到期后系统自动发起）</li>
     </ul>
     <h4><span class="badge">2</span> <span style="vertical-align:middle;">产品编号悬浮操作</span></h4>
     <ul>
@@ -858,7 +923,8 @@ function switchTab(el, key) {
     </ul>
     <h4><span class="badge">3</span> <span style="vertical-align:middle;">筛选查询</span></h4>
     <ul>
-      <li>筛选条件：<b>提货单编号</b>、<b>产品名称</b>、<b>产品编号</b></li>
+      <li>筛选条件：<b>提货单编号</b>、<b>产品名称</b>、<b>产品编号</b>、<b>提货类型</b></li>
+      <li><b>提货类型</b>支持下拉筛选：<b>全部 / 用户自提 / 到期自发</b></li>
       <li>按产品编号查询时<b>必须同时填写产品名称</b>，否则无法查询</li>
     </ul>
     <h4><span class="badge">4</span> <span style="vertical-align:middle;">导出数据</span></h4>

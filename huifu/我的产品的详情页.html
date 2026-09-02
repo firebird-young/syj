@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>持有详情</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+            background: #f0f2f5;
+            color: #1a1a2e;
+            font-size: 14px;
+            min-height: 100vh;
+        }
+        .app-container {
+            max-width: 430px;
+            margin: 0 auto;
+            background: #f5f5f5;
+            min-height: 100vh;
+            position: relative;
+            padding-bottom: 40px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.06);
+        }
+
+        /* 顶部 */
+        .header {
+            background: #fff;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .header .back {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 22px;
+            color: #1a1a2e;
+            cursor: pointer;
+            padding: 4px 8px;
+            line-height: 1;
+        }
+        .header-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a1a2e;
+        }
+
+        /* 产品信息卡 */
+        .product-info {
+            background: #fff;
+            margin: 10px 12px 0;
+            padding: 16px 14px 14px;
+            border-radius: 10px;
+        }
+        .pi-name {
+            font-size: 17px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 8px;
+        }
+        .pi-code {
+            display: inline-block;
+            font-size: 11px;
+            color: #1a78ff;
+            font-weight: 600;
+            background: #e6f4ff;
+            border: 1px solid #b7dcff;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        /* 数量卡 */
+        .hold-card {
+            background: #f0f0f3;
+            margin: 10px 12px 0;
+            padding: 14px;
+            border-radius: 10px;
+        }
+        .hold-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .hold-label {
+            font-size: 13px;
+            color: #4e5a6e;
+        }
+        .hold-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+
+        /* 列表 */
+        .list-card {
+            background: #fff;
+            margin: 10px 12px 0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .list-head {
+            display: flex;
+            align-items: center;
+            background: #f5f5f7;
+            padding: 10px 14px;
+            font-size: 13px;
+            color: #4e5a6e;
+            font-weight: 500;
+        }
+        .list-head .col-no { width: 80px; }
+        .list-head .col-cert { flex: 1; text-align: center; }
+        .list-head .col-op { width: 78px; text-align: right; }
+
+        .list-row {
+            display: flex;
+            align-items: center;
+            padding: 12px 14px;
+            border-bottom: 1px solid #f5f5f7;
+            font-size: 13px;
+            color: #1a1a2e;
+        }
+        .list-row:last-child { border-bottom: none; }
+        .list-row .col-no { width: 80px; }
+        .list-row .col-cert {
+            flex: 1;
+            font-family: "Consolas", "Monaco", monospace;
+            font-size: 12px;
+            color: #4e5a6e;
+            text-align: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            padding: 0 6px;
+        }
+        .cert-btn {
+            flex-shrink: 0;
+            color: #e74c5e;
+            background: #fff;
+            border: 1px solid #e74c5e;
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-left: 8px;
+        }
+        .cert-btn:active { background: #fdecee; }
+
+        /* ── 功能说明面板（手机框右侧） ── */
+        .page-wrap { display: flex; justify-content: center; align-items: flex-start; gap: 24px; max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .page-wrap .app-container { margin: 0; }
+        .doc-panel { width: 560px; background: #fff; border-radius: 16px; box-shadow: 0 2px 20px rgba(0,0,0,.08); padding: 24px 28px; max-height: calc(100vh - 40px); overflow-y: auto; font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', Arial, sans-serif; line-height: 1.7; font-size: 14px; color: #333; }
+        .doc-panel::-webkit-scrollbar { width: 5px; }
+        .doc-panel::-webkit-scrollbar-thumb { background: #d0d5e0; border-radius: 3px; }
+        .doc-panel .doc-title { font-size: 20px; font-weight: 700; color: #1F3864; border-bottom: 2px solid #2E75B6; padding-bottom: 10px; margin-bottom: 16px; }
+        .doc-panel h3 { font-size: 16px; font-weight: 600; color: #2E75B6; margin: 16px 0 8px; }
+        .doc-panel p { font-size: 13px; color: #555; margin-bottom: 6px; }
+        .doc-panel ul { padding-left: 20px; margin: 4px 0 8px; }
+        .doc-panel li { margin-bottom: 3px; font-size: 13px; color: #555; }
+        @media (max-width: 1100px) { .page-wrap { flex-direction: column; align-items: center; } .doc-panel { width: 100%; max-width: 430px; max-height: none; } }
+    </style>
+</head>
+<body>
+
+<div class="page-wrap">
+
+<div class="app-container">
+
+    <!-- 顶部 -->
+    <div class="header">
+        <span class="back" onclick="history.back()">‹</span>
+        <span class="header-title">详情</span>
+    </div>
+
+    <!-- 产品信息 -->
+    <div class="product-info">
+        <div class="pi-name">永淳·夏日帖</div>
+        <span class="pi-code">XB000002</span>
+    </div>
+
+    <!-- 持有数量 -->
+    <div class="hold-card">
+        <div class="hold-row">
+            <span class="hold-label">数量</span>
+            <span class="hold-value">30</span>
+        </div>
+    </div>
+
+    <!-- 数字存证列表 -->
+    <div class="list-card">
+        <div class="list-head">
+            <div class="col-no">编号</div>
+            <div class="col-cert">数字存证</div>
+            <div class="col-op">操作</div>
+        </div>
+        <div class="list-row">
+            <div class="col-no">51016</div>
+            <div class="col-cert">0xdba6…fec1</div>
+            <button class="cert-btn" onclick="viewCert('0xdba6…fec1')">查看证书</button>
+        </div>
+        <div class="list-row">
+            <div class="col-no">51017</div>
+            <div class="col-cert">0xcd2f…bbbe</div>
+            <button class="cert-btn" onclick="viewCert('0xcd2f…bbbe')">查看证书</button>
+        </div>
+        <div class="list-row">
+            <div class="col-no">51018</div>
+            <div class="col-cert">0xef56…1882</div>
+            <button class="cert-btn" onclick="viewCert('0xef56…1882')">查看证书</button>
+        </div>
+        <div class="list-row">
+            <div class="col-no">51019</div>
+            <div class="col-cert">0x31cf…de10</div>
+            <button class="cert-btn" onclick="viewCert('0x31cf…de10')">查看证书</button>
+        </div>
+        <div class="list-row">
+            <div class="col-no">51020</div>
+            <div class="col-cert">0xa50b…a414</div>
+            <button class="cert-btn" onclick="viewCert('0xa50b…a414')">查看证书</button>
+        </div>
+        <div class="list-row">
+            <div class="col-no">51021</div>
+            <div class="col-cert">0x3a55…c1ed</div>
+            <button class="cert-btn" onclick="viewCert('0x3a55…c1ed')">查看证书</button>
+        </div>
+        <div class="list-row">
+            <div class="col-no">51022</div>
+            <div class="col-cert">0x6ff2…7929</div>
+            <button class="cert-btn" onclick="viewCert('0x6ff2…7929')">查看证书</button>
+        </div>
+        <div class="list-row">
+            <div class="col-no">51023</div>
+            <div class="col-cert">0xdb17…5ac9</div>
+            <button class="cert-btn" onclick="viewCert('0xdb17…5ac9')">查看证书</button>
+        </div>
+        <div class="list-row">
+            <div class="col-no">51024</div>
+            <div class="col-cert">0x59ac…b2aa</div>
+            <button class="cert-btn" onclick="viewCert('0x59ac…b2aa')">查看证书</button>
+        </div>
+        <div class="list-row">
+            <div class="col-no">51025</div>
+            <div class="col-cert">0xc689…5346</div>
+            <button class="cert-btn" onclick="viewCert('0xc689…5346')">查看证书</button>
+        </div>
+        <div class="list-row">
+            <div class="col-no">51094</div>
+            <div class="col-cert">0xb930…1538</div>
+            <button class="cert-btn" onclick="viewCert('0xb930…1538')">查看证书</button>
+        </div>
+    </div>
+
+</div>
+
+<div class="doc-panel">
+    <div class="doc-title">持有详情 - 功能说明</div>
+    <div class="doc-section">
+        <h3>1. 调整说明</h3>
+        <p>去掉原先的指导价相关信息。</p>
+    </div>
+</div>
+
+</div>
+
+<script>
+function viewCert(addr) {
+    alert('查看证书：' + addr + '（演示）');
+}
+</script>
+
+</body>
+</html>

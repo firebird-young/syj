@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>产品提取</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+            background: #f0f2f5;
+            color: #1a1a2e;
+            font-size: 14px;
+            min-height: 100vh;
+        }
+        .app-container {
+            max-width: 430px;
+            margin: 0 auto;
+            background: #f5f5f5;
+            min-height: 100vh;
+            position: relative;
+            padding-bottom: 40px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.06);
+        }
+
+        /* 顶部 */
+        .header {
+            background: #fff;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .header .back {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 22px;
+            color: #1a1a2e;
+            cursor: pointer;
+            padding: 4px 8px;
+            line-height: 1;
+        }
+        .header-title { font-size: 16px; font-weight: 600; color: #1a1a2e; }
+
+        /* Tab 切换 */
+        .tabs {
+            display: flex;
+            gap: 8px;
+            padding: 12px 12px 0;
+            background: #fff;
+        }
+        .tab {
+            flex: 1;
+            height: 42px;
+            line-height: 42px;
+            text-align: center;
+            font-size: 15px;
+            font-weight: 600;
+            color: #4e5a6e;
+            background: #fff;
+            border: 1px solid #f0f0f3;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all .2s;
+        }
+        .tab.active {
+            background: #e74c5e;
+            color: #fff;
+            border-color: #e74c5e;
+        }
+
+        .tab-pane { background: #fff; padding: 12px 0 16px; }
+
+        /* 列表卡片 */
+        .record-list { padding: 0 12px; display: flex; flex-direction: column; gap: 12px; }
+        .record-card {
+            background: #fff;
+            border-radius: 10px;
+            padding: 14px;
+            border: 1px solid #e6e8ee;
+            box-shadow: 0 2px 8px rgba(31, 41, 55, .07);
+        }
+        .rc-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+        .rc-tags { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+        .rc-tag {
+            font-size: 12px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 500;
+            background: #e6f4ff;
+            color: #1a78ff;
+            border: 1px solid #b7dcff;
+            white-space: nowrap;
+        }
+        .rc-time { font-size: 13px; color: #4e5a6e; }
+        .rc-status {
+            font-size: 12px;
+            padding: 2px 10px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        .rc-status.pending {
+            background: #fff7e6;
+            color: #e67e22;
+            border: 1px solid #ffd591;
+        }
+        .rc-status.shipped {
+            background: #e6f7ed;
+            color: #1aab67;
+            border: 1px solid #b3e5c4;
+        }
+        .rc-divider { height: 1px; background: #f0f0f3; margin: 10px 0; }
+        .rc-body { display: flex; align-items: center; gap: 12px; }
+        .rc-img {
+            width: 56px;
+            height: 56px;
+            border-radius: 8px;
+            flex-shrink: 0;
+            background: linear-gradient(135deg, #fff5d6, #fde2c0);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        .rc-info { flex: 1; min-width: 0; }
+        .rc-name { font-size: 14px; font-weight: 600; color: #1a1a2e; margin-bottom: 2px; }
+        .rc-code { font-size: 12px; color: #86909c; }
+        .rc-qty { font-size: 14px; color: #4e5a6e; flex-shrink: 0; }
+
+        /* ── 功能说明面板（手机框右侧） ── */
+        .page-wrap { display: flex; justify-content: center; align-items: flex-start; gap: 24px; max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .page-wrap .app-container { margin: 0; }
+        .doc-panel { width: 560px; background: #fff; border-radius: 16px; box-shadow: 0 2px 20px rgba(0,0,0,.08); padding: 24px 28px; max-height: calc(100vh - 40px); overflow-y: auto; font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', Arial, sans-serif; line-height: 1.7; font-size: 14px; color: #333; }
+        .doc-panel::-webkit-scrollbar { width: 5px; }
+        .doc-panel::-webkit-scrollbar-thumb { background: #d0d5e0; border-radius: 3px; }
+        .doc-panel .doc-title { font-size: 20px; font-weight: 700; color: #1F3864; border-bottom: 2px solid #2E75B6; padding-bottom: 10px; margin-bottom: 16px; }
+        .doc-panel h3 { font-size: 16px; font-weight: 600; color: #2E75B6; margin: 16px 0 8px; }
+        .doc-panel p { font-size: 13px; color: #555; margin-bottom: 6px; }
+        .doc-panel ul { padding-left: 20px; margin: 4px 0 8px; }
+        .doc-panel li { margin-bottom: 3px; font-size: 13px; color: #555; }
+        @media (max-width: 1100px) { .page-wrap { flex-direction: column; align-items: center; } .doc-panel { width: 100%; max-width: 430px; max-height: none; } }
+    </style>
+</head>
+<body>
+
+<div class="page-wrap">
+
+<div class="app-container">
+
+    <div class="header">
+        <span class="back" onclick="history.back()">‹</span>
+        <span class="header-title">产品提取</span>
+    </div>
+
+    <div class="tabs">
+        <div class="tab" data-tab="product">产品</div>
+        <div class="tab active" data-tab="record">提取记录</div>
+    </div>
+
+    <div class="tab-pane">
+        <div class="record-list">
+
+            <div class="record-card">
+                <div class="rc-head">
+                    <span class="rc-time">2026-09-01 14:20:00</span>
+                    <div class="rc-tags">
+                        <span class="rc-tag">到期自动发货</span>
+                        <span class="rc-status pending">待发货</span>
+                    </div>
+                </div>
+                <div class="rc-divider"></div>
+                <div class="rc-body">
+                    <div class="rc-img">📜</div>
+                    <div class="rc-info">
+                        <div class="rc-name">永淳·夏日帖</div>
+                        <div class="rc-code">XB000002</div>
+                    </div>
+                    <div class="rc-qty">X1</div>
+                </div>
+            </div>
+
+            <div class="record-card">
+                <div class="rc-head">
+                    <span class="rc-time">2026-08-15 10:35:00</span>
+                    <span class="rc-status shipped">已发货</span>
+                </div>
+                <div class="rc-divider"></div>
+                <div class="rc-body">
+                    <div class="rc-img">📜</div>
+                    <div class="rc-info">
+                        <div class="rc-name">永淳·夏日帖</div>
+                        <div class="rc-code">XB000002</div>
+                    </div>
+                    <div class="rc-qty">X1</div>
+                </div>
+            </div>
+
+            <div class="record-card">
+                <div class="rc-head">
+                    <span class="rc-time">2026-07-22 16:48:00</span>
+                    <span class="rc-status shipped">已发货</span>
+                </div>
+                <div class="rc-divider"></div>
+                <div class="rc-body">
+                    <div class="rc-img">📜</div>
+                    <div class="rc-info">
+                        <div class="rc-name">永淳·夏日帖</div>
+                        <div class="rc-code">XB000002</div>
+                    </div>
+                    <div class="rc-qty">X1</div>
+                </div>
+            </div>
+
+            <div class="record-card">
+                <div class="rc-head">
+                    <span class="rc-time">2026-06-10 09:12:00</span>
+                    <span class="rc-status shipped">已发货</span>
+                </div>
+                <div class="rc-divider"></div>
+                <div class="rc-body">
+                    <div class="rc-img">📜</div>
+                    <div class="rc-info">
+                        <div class="rc-name">永淳·夏日帖</div>
+                        <div class="rc-code">XB000002</div>
+                    </div>
+                    <div class="rc-qty">X1</div>
+                </div>
+            </div>
+
+            <div class="record-card">
+                <div class="rc-head">
+                    <span class="rc-time">2026-05-28 09:37:15</span>
+                    <span class="rc-status shipped">已发货</span>
+                </div>
+                <div class="rc-divider"></div>
+                <div class="rc-body">
+                    <div class="rc-img">📜</div>
+                    <div class="rc-info">
+                        <div class="rc-name">永淳·夏日帖</div>
+                        <div class="rc-code">XB000002</div>
+                    </div>
+                    <div class="rc-qty">X1</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<div class="doc-panel">
+    <div class="doc-title">产品提取 - 功能说明</div>
+    <div class="doc-section">
+        <h3>1. 自动提货规则</h3>
+        <p>根据交易规则，产品持有时间超过 <b>X 天</b>后，系统<b>自动发起提货订单</b>，用户无需手动操作。</p>
+    </div>
+    <div class="doc-section">
+        <h3>2. 定时任务处理</h3>
+        <p>以<b>定时任务</b>方式运行，每天<b>凌晨自动执行</b>：</p>
+        <ul>
+            <li>自动扫描全部在库产品，抽出满足发货条件（持有时间超 X 天）的产品</li>
+            <li>批量发起提货订单，进入发货流程</li>
+        </ul>
+    </div>
+    <div class="doc-section">
+        <h3>3. 合并发货</h3>
+        <p>当<b>同一用户</b>持有<b>同一产品</b>的多份数字存证，且均满足发货条件时，系统自动<b>合并为一个提货订单</b>统一发货，减少重复包裹、降低物流成本。</p>
+    </div>
+    <div class="doc-section">
+        <h3>4. 页面状态</h3>
+        <ul>
+            <li><b>待发货</b>：产品已满足条件，系统已自动发起提货订单，等待发货</li>
+            <li><b>已发货</b>：产品已完成发货，可在记录中查看</li>
+        </ul>
+    </div>
+</div>
+
+</div>
+
+<script>
+document.querySelectorAll('.tab').forEach(function(t) {
+    t.addEventListener('click', function() {
+        document.querySelectorAll('.tab').forEach(function(x) { x.classList.remove('active'); });
+        t.classList.add('active');
+    });
+});
+</script>
+
+</body>
+</html>
