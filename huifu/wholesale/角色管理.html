@@ -487,7 +487,6 @@
                         <tr>
                             <th class="seq">序号</th>
                             <th>角色名称</th>
-                            <th>角色编码</th>
                             <th>角色描述</th>
                             <th>菜单权限</th>
                             <th>创建时间</th>
@@ -499,7 +498,6 @@
                         <tr data-name="系统管理员">
                             <td class="seq">1</td>
                             <td class="role-name">系统管理员<span class="tag builtin">内置</span></td>
-                            <td>ADMIN</td>
                             <td>平台最高权限，拥有全部菜单权限</td>
                             <td><a class="perm-link" onclick="openPerm('系统管理员')">全部菜单（内置）</a></td>
                             <td>2026-07-01 09:00:00</td>
@@ -513,7 +511,6 @@
                         <tr data-name="运营管理员">
                             <td class="seq">2</td>
                             <td class="role-name">运营管理员</td>
-                            <td>OPERATOR</td>
                             <td>负责产品运营与批发分账申请</td>
                             <td><a class="perm-link" onclick="openPerm('运营管理员')">11 项菜单</a></td>
                             <td>2026-07-05 10:20:00</td>
@@ -527,7 +524,6 @@
                         <tr data-name="财务专员">
                             <td class="seq">3</td>
                             <td class="role-name">财务专员</td>
-                            <td>FINANCE</td>
                             <td>负责资产查看与资金分账管理</td>
                             <td><a class="perm-link" onclick="openPerm('财务专员')">5 项菜单</a></td>
                             <td>2026-07-08 14:05:00</td>
@@ -541,7 +537,6 @@
                         <tr data-name="产品管理员">
                             <td class="seq">4</td>
                             <td class="role-name">产品管理员</td>
-                            <td>PRODUCT</td>
                             <td>负责数字艺术品与区块链服务</td>
                             <td><a class="perm-link" onclick="openPerm('产品管理员')">6 项菜单</a></td>
                             <td>2026-07-12 09:30:00</td>
@@ -555,7 +550,6 @@
                         <tr data-name="普通成员">
                             <td class="seq">5</td>
                             <td class="role-name">普通成员</td>
-                            <td>MEMBER</td>
                             <td>仅可查看首页信息与批发资金管理</td>
                             <td><a class="perm-link" onclick="openPerm('普通成员')">2 项菜单</a></td>
                             <td>2026-07-20 16:45:00</td>
@@ -589,10 +583,6 @@
     <div class="fm-field">
         <label>角色名称 <span class="req">*</span></label>
         <input type="text" id="roleNameInput" placeholder="请输入角色名称，如：客服专员">
-    </div>
-    <div class="fm-field">
-        <label>角色编码 <span class="req">*</span></label>
-        <input type="text" id="roleCodeInput" placeholder="如：SERVICE，唯一不可重复">
     </div>
     <div class="fm-field">
         <label>角色描述</label>
@@ -693,7 +683,7 @@
     </ul>
     <h4><span class="badge">2</span> <span style="vertical-align:middle;">新建角色</span></h4>
     <ul>
-      <li>点击「<b>＋ 新建角色</b>」填写<b>角色名称</b>、<b>角色编码</b>（唯一）、描述与状态</li>
+      <li>点击「<b>＋ 新建角色</b>」填写<b>角色名称</b>、描述与状态</li>
       <li>新建成功后，需在「<b>分配权限</b>」中为该角色配置可访问的菜单</li>
     </ul>
     <h4><span class="badge">3</span> <span style="vertical-align:middle;">分配菜单权限</span></h4>
@@ -718,14 +708,12 @@ function openRoleModal(type, el) {
     document.getElementById('roleModalTitle').textContent = editingRow ? '✏️ 编辑角色' : '＋ 新建角色';
     if (editingRow) {
         var tds = editingRow.querySelectorAll('td');
-        document.getElementById('roleNameInput').value = tds[1].textContent.replace('内置', '').trim();
-        document.getElementById('roleCodeInput').value = tds[2].textContent.trim();
-        document.getElementById('roleDescInput').value = tds[3].textContent.trim();
+        document.getElementById('roleNameInput').value = tds[1].textContent.replace('内置', '').replace('自定义', '').trim();
+        document.getElementById('roleDescInput').value = tds[2].textContent.trim();
         var st = editingRow.querySelector('.status-tag');
         document.getElementById('roleStatusInput').value = st.classList.contains('on') ? 'on' : 'off';
     } else {
         document.getElementById('roleNameInput').value = '';
-        document.getElementById('roleCodeInput').value = '';
         document.getElementById('roleDescInput').value = '';
         document.getElementById('roleStatusInput').value = 'on';
     }
@@ -740,9 +728,7 @@ function closeRoleModal() {
 
 function saveRole() {
     var name = document.getElementById('roleNameInput').value.trim();
-    var code = document.getElementById('roleCodeInput').value.trim();
     if (!name) { alert('请输入角色名称'); return; }
-    if (!code) { alert('请输入角色编码'); return; }
     var desc = document.getElementById('roleDescInput').value.trim() || '—';
     var status = document.getElementById('roleStatusInput').value;
     var statusHtml = status === 'on'
@@ -751,9 +737,8 @@ function saveRole() {
     if (editingRow) {
         var tds = editingRow.querySelectorAll('td');
         tds[1].innerHTML = '<span class="role-name">' + name + '</span><span class="tag normal">自定义</span>';
-        tds[2].textContent = code;
-        tds[3].textContent = desc;
-        tds[6].innerHTML = statusHtml;
+        tds[2].textContent = desc;
+        tds[5].innerHTML = statusHtml;
         editingRow.setAttribute('data-name', name);
         alert('角色信息已更新');
     } else {
@@ -766,7 +751,6 @@ function saveRole() {
         tr.innerHTML =
             '<td class="seq">' + roleSeq + '</td>' +
             '<td class="role-name">' + name + '<span class="tag normal">自定义</span></td>' +
-            '<td>' + code + '</td>' +
             '<td>' + desc + '</td>' +
             '<td><a class="perm-link" onclick="openPerm(\'' + name + '\')">0 项菜单</a></td>' +
             '<td>' + timeStr + '</td>' +
