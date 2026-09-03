@@ -579,8 +579,8 @@
         <button class="md-close" onclick="closeUserModal()">✕</button>
     </div>
     <div class="fm-field">
-        <label>用户账号（英文） <span class="req">*</span></label>
-        <input type="text" id="userAccInput" placeholder="请输入英文账号，如：kevin.li">
+        <label>用户账号 <span class="req">*</span></label>
+        <input type="text" id="userAccInput" placeholder="请输入账号（英文或中文，不支持手机号）">
     </div>
     <div class="fm-field">
         <label>用户姓名（中文） <span class="req">*</span></label>
@@ -653,7 +653,7 @@
     </ul>
     <h4><span class="badge">2</span> <span style="vertical-align:middle;">新建用户</span></h4>
     <ul>
-      <li>点击「<b>＋ 新建用户</b>」填写<b>用户账号（英文）</b>、<b>姓名（中文）</b>、设置<b>登录密码</b>并<b>分配角色</b></li>
+      <li>点击「<b>＋ 新建用户</b>」填写<b>用户账号（英文或中文，不支持手机号）</b>、<b>姓名（中文）</b>、设置<b>登录密码</b>并<b>分配角色</b></li>
       <li>登录密码仅新建时设置，编辑用户时不显示；权限由所属角色的<b>菜单权限</b>决定</li>
     </ul>
     <h4><span class="badge">3</span> <span style="vertical-align:middle;">角色分配</span></h4>
@@ -715,8 +715,8 @@ function saveUser() {
     var name = document.getElementById('userNameInput').value.trim();
     var role = document.getElementById('userRoleInput').value;
     var pwd = document.getElementById('userPwdInput').value;
-    if (!acc) { alert('请输入用户账号（英文）'); return; }
-    if (!/^[a-zA-Z][a-zA-Z0-9._-]{2,19}$/.test(acc)) { alert('用户账号需以英文字母开头，可包含字母、数字、点、下划线、短横线，3-20 位'); return; }
+    if (!acc) { alert('请输入用户账号'); return; }
+    if (!/^(?!\d+$)[a-zA-Z\u4e00-\u9fa5][a-zA-Z0-9._\-\u4e00-\u9fa5]{1,19}$/.test(acc)) { alert('用户账号需以英文字母或中文开头，可包含中英文、数字、点、下划线、短横线，2-20 位，不支持手机号'); return; }
     if (!name) { alert('请输入用户姓名（中文）'); return; }
     if (!role) { alert('请选择所属角色'); return; }
     if (!editingRow) {

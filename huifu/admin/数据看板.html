@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据看板</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+            background: #f0f2f5;
+            color: #1a1a2e;
+            font-size: 14px;
+        }
+
+        /* 顶部 */
+        .topbar {
+            background: #fff;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            border-bottom: 1px solid #f0f0f0;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .topbar-left { display: flex; align-items: center; gap: 16px; }
+        .menu-btn {
+            width: 32px; height: 32px;
+            border: 1px solid #d0d5dd;
+            border-radius: 4px;
+            background: #fff;
+            color: #6b7588;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px;
+        }
+        .menu-btn:hover { background: #f5f5f7; }
+        .breadcrumb { font-size: 13px; color: #6b7588; }
+        .breadcrumb .active { color: #1a1a2e; }
+        .topbar-right {
+            margin-left: auto;
+            display: flex; align-items: center; gap: 8px;
+            cursor: pointer;
+        }
+        .topbar-right .avatar {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            background: #f5deb3;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px;
+        }
+        .topbar-right .name { font-size: 13px; }
+        .topbar-right .arrow { color: #9ba6b9; font-size: 12px; }
+
+        /* 工具条 */
+        .toolbar {
+            background: #fff;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .page-title { font-size: 16px; font-weight: 600; color: #1a1a2e; }
+        .page-sub { font-size: 12px; color: #9ba6b9; margin-left: 8px; }
+        .range-group {
+            margin-left: auto;
+            display: inline-flex;
+            background: #f5f7fa;
+            border-radius: 6px;
+            padding: 3px;
+            gap: 2px;
+        }
+        .range-group button {
+            border: none;
+            background: transparent;
+            color: #6b7588;
+            font-size: 13px;
+            padding: 5px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .range-group button.active {
+            background: #fff;
+            color: #1a78ff;
+            font-weight: 600;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+        .refresh-btn {
+            margin-left: 10px;
+            border: 1px solid #e0e6ed;
+            background: #fff;
+            color: #4e5a6e;
+            font-size: 13px;
+            padding: 6px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: inline-flex; align-items: center; gap: 4px;
+            transition: all 0.2s;
+        }
+        .refresh-btn:hover { border-color: #1a78ff; color: #1a78ff; }
+
+        /* 主体 */
+        .container { padding: 16px 20px; }
+
+        /* KPI 卡片 */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+        .kpi-card {
+            background: #fff;
+            border-radius: 8px;
+            padding: 18px 20px;
+            box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+            position: relative;
+            overflow: hidden;
+        }
+        .kpi-card .accent {
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 4px;
+        }
+        .kpi-card .kpi-label {
+            font-size: 13px;
+            color: #6b7588;
+            margin-bottom: 8px;
+            margin-left: 6px;
+        }
+        .kpi-card .kpi-value {
+            font-size: 26px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-left: 6px;
+            font-variant-numeric: tabular-nums;
+            line-height: 1.2;
+        }
+        .kpi-card .kpi-unit {
+            font-size: 13px;
+            font-weight: 500;
+            color: #9ba6b9;
+            margin-left: 4px;
+        }
+        .kpi-card .kpi-delta {
+            font-size: 12px;
+            margin-top: 8px;
+            margin-left: 6px;
+            color: #9ba6b9;
+        }
+        .kpi-card .kpi-delta b { font-weight: 600; }
+        .delta-up { color: #1aab67; }
+        .delta-down { color: #e74c5e; }
+
+        /* 区块 */
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        .row.full { grid-template-columns: 1fr; }
+        .panel {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+            padding: 18px 20px 20px;
+        }
+        .panel-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+        .panel-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a1a2e;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .panel-title::before {
+            content: '';
+            width: 3px; height: 14px;
+            background: #1a78ff;
+            border-radius: 2px;
+        }
+        .legend { display: flex; gap: 14px; }
+        .legend span {
+            font-size: 12px;
+            color: #6b7588;
+            display: inline-flex; align-items: center; gap: 5px;
+        }
+        .legend i {
+            width: 10px; height: 10px;
+            border-radius: 2px;
+            display: inline-block;
+        }
+        .chart-box { width: 100%; }
+
+        /* 排行榜 */
+        .rank-list { display: flex; flex-direction: column; gap: 12px; }
+        .rank-item { display: flex; align-items: center; gap: 12px; }
+        .rank-no {
+            width: 22px; height: 22px;
+            border-radius: 50%;
+            background: #eef0f4;
+            color: #9ba6b9;
+            font-size: 12px;
+            font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .rank-item.top1 .rank-no { background: #fff4e6; color: #f59e0b; }
+        .rank-item.top2 .rank-no { background: #eef0f4; color: #9ba6b9; }
+        .rank-item.top3 .rank-no { background: #ffe9e0; color: #e67e22; }
+        .rank-name {
+            width: 90px;
+            font-size: 13px;
+            color: #1a1a2e;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex-shrink: 0;
+        }
+        .rank-bar-wrap {
+            flex: 1;
+            height: 18px;
+            background: #f5f7fa;
+            border-radius: 9px;
+            overflow: hidden;
+        }
+        .rank-bar {
+            height: 100%;
+            border-radius: 9px;
+            transition: width 0.6s ease;
+        }
+        .rank-val {
+            width: 76px;
+            text-align: right;
+            font-size: 13px;
+            font-weight: 600;
+            color: #1a1a2e;
+            font-variant-numeric: tabular-nums;
+            flex-shrink: 0;
+        }
+        .rank-val small { font-size: 11px; color: #9ba6b9; font-weight: 400; margin-left: 2px; }
+
+        @media (max-width: 1200px) {
+            .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+            .row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- 顶部 -->
+<div class="topbar">
+    <div class="topbar-left">
+        <button class="menu-btn">≡</button>
+        <div class="breadcrumb">
+            <span>首页</span> /
+            <span>数据中心</span> /
+            <span class="active">数据看板</span>
+        </div>
+    </div>
+    <div class="topbar-right">
+        <span class="avatar">👤</span>
+        <span class="name">系统管理员</span>
+        <span class="arrow">▾</span>
+    </div>
+</div>
+
+<!-- 工具条 -->
+<div class="toolbar">
+    <span class="page-title">数据看板</span>
+    <span class="page-sub">更新时间：2026-09-01 09:00</span>
+    <div class="range-group">
+        <button>今日</button>
+        <button>近7天</button>
+        <button class="active">近30天</button>
+        <button>近12周</button>
+    </div>
+    <button class="refresh-btn">⟳ 刷新</button>
+</div>
+
+<div class="container">
+
+    <!-- KPI -->
+    <div class="kpi-grid">
+        <div class="kpi-card"><div class="accent" style="background:#1a78ff"></div>
+            <div class="kpi-label">批发商数量</div>
+            <div class="kpi-value">86<span class="kpi-unit">家</span></div>
+            <div class="kpi-delta">较上期 <b class="delta-up">↑ 5 家</b> · +6.2%</div>
+        </div>
+        <div class="kpi-card"><div class="accent" style="background:#1aab67"></div>
+            <div class="kpi-label">注册用户数</div>
+            <div class="kpi-value">12,580<span class="kpi-unit">人</span></div>
+            <div class="kpi-delta">较上期 <b class="delta-up">↑ 730 人</b> · +6.2%</div>
+        </div>
+        <div class="kpi-card"><div class="accent" style="background:#f59e0b"></div>
+            <div class="kpi-label">批发市场交易笔数</div>
+            <div class="kpi-value">3,247<span class="kpi-unit">笔</span></div>
+            <div class="kpi-delta">较上期 <b class="delta-up">↑ 412 笔</b> · +14.5%</div>
+        </div>
+        <div class="kpi-card"><div class="accent" style="background:#e74c5e"></div>
+            <div class="kpi-label">零售市场交易笔数</div>
+            <div class="kpi-value">18,960<span class="kpi-unit">笔</span></div>
+            <div class="kpi-delta">较上期 <b class="delta-up">↑ 1,260 笔</b> · +7.1%</div>
+        </div>
+        <div class="kpi-card"><div class="accent" style="background:#7c5cff"></div>
+            <div class="kpi-label">累计交易金额</div>
+            <div class="kpi-value">483.27<span class="kpi-unit">万元</span></div>
+            <div class="kpi-delta">较上期 <b class="delta-up">↑ 31.28 万</b> · +6.9%</div>
+        </div>
+    </div>
+
+    <!-- 批发商发行排行 + 走势 -->
+    <div class="row">
+        <div class="panel">
+            <div class="panel-head">
+                <div class="panel-title">批发商发行排行</div>
+                <span style="font-size:12px;color:#9ba6b9;">单位：份</span>
+            </div>
+            <div class="rank-list" id="rankWholesaler"></div>
+        </div>
+        <div class="panel">
+            <div class="panel-head">
+                <div class="panel-title">批发商发行走势</div>
+                <span style="font-size:12px;color:#9ba6b9;">近12周 · 单位：份</span>
+            </div>
+            <div class="chart-box" id="trendWholesaler"></div>
+        </div>
+    </div>
+
+    <!-- 批发市场交易走势 -->
+    <div class="row">
+        <div class="panel">
+            <div class="panel-head">
+                <div class="panel-title">批发市场交易笔数走势</div>
+                <span style="font-size:12px;color:#9ba6b9;">近12周 · 单位：笔</span>
+            </div>
+            <div class="chart-box" id="trendWholeCount"></div>
+        </div>
+        <div class="panel">
+            <div class="panel-head">
+                <div class="panel-title">批发市场交易金额走势</div>
+                <span style="font-size:12px;color:#9ba6b9;">近12周 · 单位：万元</span>
+            </div>
+            <div class="chart-box" id="trendWholeAmount"></div>
+        </div>
+    </div>
+
+    <!-- 零售市场交易走势 -->
+    <div class="row">
+        <div class="panel">
+            <div class="panel-head">
+                <div class="panel-title">零售市场交易笔数走势</div>
+                <span style="font-size:12px;color:#9ba6b9;">近12周 · 单位：笔</span>
+            </div>
+            <div class="chart-box" id="trendRetailCount"></div>
+        </div>
+        <div class="panel">
+            <div class="panel-head">
+                <div class="panel-title">零售市场交易金额走势</div>
+                <span style="font-size:12px;color:#9ba6b9;">近12周 · 单位：万元</span>
+            </div>
+            <div class="chart-box" id="trendRetailAmount"></div>
+        </div>
+    </div>
+
+    <!-- 产品发货排行 + 走势 -->
+    <div class="row">
+        <div class="panel">
+            <div class="panel-head">
+                <div class="panel-title">产品发货排行</div>
+                <span style="font-size:12px;color:#9ba6b9;">单位：件</span>
+            </div>
+            <div class="rank-list" id="rankProduct"></div>
+        </div>
+        <div class="panel">
+            <div class="panel-head">
+                <div class="panel-title">产品发货走势</div>
+                <span style="font-size:12px;color:#9ba6b9;">近12周 · 单位：件</span>
+            </div>
+            <div class="chart-box" id="trendProduct"></div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+// ── 数据 ──
+var weekLabels = ['W1','W2','W3','W4','W5','W6','W7','W8','W9','W10','W11','W12'];
+
+var wholesalerRank = [
+    { name: '华乐博文化', value: 1283, color: '#1a78ff' },
+    { name: '雅昌艺术',   value: 986,  color: '#3d8bff' },
+    { name: '中艺典藏',   value: 754,  color: '#5e9eff' },
+    { name: '荣宝斋',     value: 612,  color: '#7eb2ff' },
+    { name: '朵云轩',     value: 489,  color: '#9bc4ff' },
+    { name: '西泠印社',   value: 376,  color: '#b6d4ff' },
+    { name: '嘉德在线',   value: 268,  color: '#cfe3ff' },
+    { name: '保利拍卖',   value: 193,  color: '#e3eeff' }
+];
+
+var productRank = [
+    { name: '中路财童', value: 8640, color: '#e74c5e' },
+    { name: '唐三彩马', value: 5230, color: '#ec6d7e' },
+    { name: '青花瓷瓶', value: 3890, color: '#f08e9b' },
+    { name: '汝窑茶盏', value: 2740, color: '#f3a5b0' },
+    { name: '紫砂壶',   value: 2180, color: '#f6bcc4' },
+    { name: '翡翠挂件', value: 1560, color: '#f8d2d8' },
+    { name: '和田玉佩', value: 1120, color: '#fae0e4' },
+    { name: '字画立轴', value: 860,  color: '#fcecef' }
+];
+
+// 各走势数据
+var dataTrendWholesaler  = [412,468,520,498,610,642,588,720,780,820,860,910];
+var dataWholeCount       = [180,210,240,225,280,310,295,340,380,410,420,460];
+var dataWholeAmount      = [86,98,115,108,132,148,140,162,180,196,205,228];
+var dataRetailCount      = [980,1050,1180,1120,1320,1450,1380,1620,1780,1920,2050,2240];
+var dataRetailAmount     = [42,48,56,52,64,71,68,79,88,96,104,118];
+var dataTrendProduct     = [1860,1980,2120,2050,2380,2520,2480,2780,2980,3120,3240,3480];
+
+// ── 折线图 ──
+function niceCeil(n) {
+    if (n <= 0) return 10;
+    var mag = Math.pow(10, Math.floor(Math.log10(n)));
+    var r = n / mag;
+    var nice;
+    if (r <= 1) nice = 1;
+    else if (r <= 2) nice = 2;
+    else if (r <= 2.5) nice = 2.5;
+    else if (r <= 5) nice = 5;
+    else nice = 10;
+    return nice * mag;
+}
+
+function lineChart(series, opt) {
+    opt = opt || {};
+    var w = 620, h = 220, pad = { l: 40, r: 16, t: 16, b: 30 };
+    var iw = w - pad.l - pad.r, ih = h - pad.t - pad.b;
+    var all = [];
+    series.forEach(function(s){ all = all.concat(s.data); });
+    var max = Math.max.apply(null, all);
+    var niceMax = niceCeil(max * 1.1);
+    var n = series[0].data.length;
+    var x = function(i){ return pad.l + (n <= 1 ? 0 : iw * i / (n - 1)); };
+    var y = function(v){ return pad.t + ih - ih * v / niceMax; };
+    var grid = '', dots = '', paths = '';
+    for (var g = 0; g <= 4; g++) {
+        var gy = pad.t + ih * g / 4;
+        grid += '<line x1="'+pad.l+'" y1="'+gy+'" x2="'+(w-pad.r)+'" y2="'+gy+'" stroke="#eef0f4"/>';
+        var gv = Math.round(niceMax - niceMax * g / 4);
+        grid += '<text x="'+(pad.l-8)+'" y="'+(gy+3)+'" text-anchor="end" fill="#9ba6b9" font-size="10">'+ (opt.formatY ? opt.formatY(gv) : gv) +'</text>';
+    }
+    opt.labels.forEach(function(lb, i){
+        grid += '<text x="'+x(i)+'" y="'+(h-pad.b+18)+'" text-anchor="middle" fill="#9ba6b9" font-size="10">'+lb+'</text>';
+    });
+    series.forEach(function(s){
+        var d = s.data.map(function(v, i){ return (i ? 'L' : 'M') + x(i) + ' ' + y(v); }).join(' ');
+        paths += '<path d="'+d+' L'+x(n-1)+' '+(pad.t+ih)+' L'+x(0)+' '+(pad.t+ih)+' Z" fill="'+s.color+'" opacity="0.08"/>';
+        paths += '<path d="'+d+'" fill="none" stroke="'+s.color+'" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>';
+        s.data.forEach(function(v, i){
+            dots += '<circle cx="'+x(i)+'" cy="'+y(v)+'" r="2.8" fill="#fff" stroke="'+s.color+'" stroke-width="1.6"><title>'+opt.labels[i]+' : '+(opt.formatY?opt.formatY(v):v)+'</title></circle>';
+        });
+    });
+    return '<svg viewBox="0 0 '+w+' '+h+'" width="100%" height="'+h+'" preserveAspectRatio="xMidYMid meet">'+grid+paths+dots+'</svg>';
+}
+
+// ── 排行榜 ──
+function rankList(items, unit) {
+    var max = Math.max.apply(null, items.map(function(i){ return i.value; }));
+    var html = '';
+    items.forEach(function(it, i){
+        var cls = i === 0 ? 'top1' : (i === 1 ? 'top2' : (i === 2 ? 'top3' : ''));
+        var pct = Math.max(4, (it.value / max * 100));
+        html += '<div class="rank-item '+cls+'">'
+              + '<div class="rank-no">'+(i+1)+'</div>'
+              + '<div class="rank-name" title="'+it.name+'">'+it.name+'</div>'
+              + '<div class="rank-bar-wrap"><div class="rank-bar" style="width:'+pct+'%;background:'+it.color+';"></div></div>'
+              + '<div class="rank-val">'+it.value.toLocaleString()+'<small>'+unit+'</small></div>'
+              + '</div>';
+    });
+    return html;
+}
+
+// ── 渲染 ──
+document.getElementById('rankWholesaler').innerHTML = rankList(wholesalerRank, '份');
+document.getElementById('rankProduct').innerHTML = rankList(productRank, '件');
+
+document.getElementById('trendWholesaler').innerHTML = lineChart(
+    [{ name:'发行量', color:'#1a78ff', data: dataTrendWholesaler }],
+    { labels: weekLabels }
+);
+document.getElementById('trendWholeCount').innerHTML = lineChart(
+    [{ name:'笔数', color:'#f59e0b', data: dataWholeCount }],
+    { labels: weekLabels }
+);
+document.getElementById('trendWholeAmount').innerHTML = lineChart(
+    [{ name:'金额', color:'#7c5cff', data: dataWholeAmount }],
+    { labels: weekLabels, formatY: function(v){ return v+'万'; } }
+);
+document.getElementById('trendRetailCount').innerHTML = lineChart(
+    [{ name:'笔数', color:'#e74c5e', data: dataRetailCount }],
+    { labels: weekLabels }
+);
+document.getElementById('trendRetailAmount').innerHTML = lineChart(
+    [{ name:'金额', color:'#1aab67', data: dataRetailAmount }],
+    { labels: weekLabels, formatY: function(v){ return v+'万'; } }
+);
+document.getElementById('trendProduct').innerHTML = lineChart(
+    [{ name:'发货量', color:'#e74c5e', data: dataTrendProduct }],
+    { labels: weekLabels }
+);
+
+// 时间范围切换（视觉）
+document.querySelectorAll('.range-group button').forEach(function(btn){
+    btn.addEventListener('click', function(){
+        document.querySelectorAll('.range-group button').forEach(function(b){ b.classList.remove('active'); });
+        btn.classList.add('active');
+    });
+});
+</script>
+</body>
+</html>

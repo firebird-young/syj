@@ -181,7 +181,7 @@
                 <label>账号 <span class="req">*</span></label>
                 <div class="input-wrap">
                     <span class="input-icon">👤</span>
-                    <input type="text" class="fm-input" id="accInput" placeholder="请输入手机号或英文账户名" autocomplete="username">
+                    <input type="text" class="fm-input" id="accInput" placeholder="请输入管理员手机号或子账号登录名" autocomplete="username">
                 </div>
             </div>
             <div class="fm-field">
@@ -213,7 +213,7 @@
         </div>
 
         <div class="row-between" style="justify-content:flex-end;">
-            <a class="forgot" href="#" onclick="toggleLoginMode(); return false;" id="switchLink">短信校验码登录</a>
+            <a class="forgot" href="#" onclick="toggleLoginMode(); return false;" id="switchLink">短信校验码登录（管理员登录）</a>
         </div>
 
         <button class="btn-login" onclick="doLogin()">登 录</button>
@@ -266,13 +266,13 @@ function toggleLoginMode() {
     if (isSms) {
         smsMode.style.display = 'none';
         pwdMode.style.display = '';
-        link.textContent = '短信校验码登录';
+        link.textContent = '短信校验码登录（管理员登录）';
         title.textContent = '账号登录';
     } else {
         pwdMode.style.display = 'none';
         smsMode.style.display = '';
         link.textContent = '密码登录';
-        title.textContent = '短信校验码登录';
+        title.textContent = '短信校验码登录（管理员登录）';
     }
 }
 
