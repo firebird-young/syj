@@ -361,6 +361,24 @@
         .perm-node input { margin-right: 8px; accent-color: #1a78ff; cursor: pointer; }
         .perm-children .perm-node { font-weight: 400; }
         .perm-note { font-size: 12px; color: #9ba6b9; margin-top: 10px; }
+        /* —— 按钮权限层 —— */
+        .menu-block { padding: 2px 0; }
+        .btn-line {
+            display: flex; flex-wrap: wrap; gap: 6px 8px;
+            margin: 4px 0 6px 34px; padding: 6px 8px 6px 10px;
+            border-left: 1px dashed #dce3ee; background: #fafbfd; border-radius: 0 6px 6px 0;
+        }
+        .btn-line.empty-line { display: none; }
+        .btn-label {
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 11px; color: #5a6478; background: #fff; border: 1px solid #e0e6ef;
+            border-radius: 12px; padding: 2px 9px; cursor: pointer; user-select: none; line-height: 1.6;
+        }
+        .btn-label:hover { background: #eef5ff; border-color: #bcd9ff; }
+        .btn-label input { margin: 0; accent-color: #1a78ff; cursor: pointer; flex-shrink: 0; }
+        .btn-label.on { background: #e9f2ff; border-color: #bcd9ff; color: #1a78ff; font-weight: 500; }
+        .perm-tree input:disabled { opacity: .45; cursor: not-allowed; }
+        .perm-tree .perm-node.disabled-node { color: #b8c0cc; }
 
         /* 标注圆点 */
         .badge { display: inline-block; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 50%; background: #ff2d55; color: #fff; font-size: 12px; line-height: 18px; text-align: center; font-weight: 600; box-shadow: 0 1px 3px rgba(255,45,85,0.3); }
@@ -485,7 +503,7 @@
                             <th class="seq">序号</th>
                             <th>角色名称</th>
                             <th>角色描述</th>
-                            <th>菜单权限</th>
+                            <th>菜单 / 按钮权限</th>
                             <th>创建时间</th>
                             <th>状态</th>
                             <th style="width:180px;">操作</th>
@@ -496,7 +514,7 @@
                             <td class="seq">1</td>
                             <td class="role-name">系统管理员<span class="tag builtin">内置</span></td>
                             <td>平台最高权限，拥有全部菜单权限</td>
-                            <td>全部菜单（内置）</td>
+                            <td>全部菜单与按钮（内置）</td>
                             <td>2026-07-01 09:00:00</td>
                             <td><span class="status-tag on">启用</span></td>
                             <td class="actions">
@@ -509,7 +527,7 @@
                             <td class="seq">2</td>
                             <td class="role-name">运营管理员</td>
                             <td>负责产品运营与批发分账申请</td>
-                            <td>11 项菜单</td>
+                            <td>11 项菜单 · 30 个按钮</td>
                             <td>2026-07-05 10:20:00</td>
                             <td><span class="status-tag on">启用</span></td>
                             <td class="actions">
@@ -522,7 +540,7 @@
                             <td class="seq">3</td>
                             <td class="role-name">财务专员</td>
                             <td>负责资产查看与资金分账管理</td>
-                            <td>5 项菜单</td>
+                            <td>4 项菜单 · 10 个按钮</td>
                             <td>2026-07-08 14:05:00</td>
                             <td><span class="status-tag on">启用</span></td>
                             <td class="actions">
@@ -535,7 +553,7 @@
                             <td class="seq">4</td>
                             <td class="role-name">产品管理员</td>
                             <td>负责数字艺术品与区块链服务</td>
-                            <td>6 项菜单</td>
+                            <td>5 项菜单 · 15 个按钮</td>
                             <td>2026-07-12 09:30:00</td>
                             <td><span class="status-tag on">启用</span></td>
                             <td class="actions">
@@ -548,7 +566,7 @@
                             <td class="seq">5</td>
                             <td class="role-name">普通成员</td>
                             <td>仅可查看首页信息与批发资金管理</td>
-                            <td>2 项菜单</td>
+                            <td>2 项菜单 · 2 个按钮</td>
                             <td>2026-07-20 16:45:00</td>
                             <td><span class="status-tag on">启用</span></td>
                             <td class="actions">
@@ -598,67 +616,20 @@
     </div>
 </div>
 
-<!-- 分配菜单权限浮层 -->
+<!-- 分配菜单与按钮权限浮层 -->
 <div class="mask" id="permMask" onclick="closePerm()"></div>
 <div class="modal perm-modal" id="permModal">
     <div class="md-title">
-        <span>🔐 分配菜单权限 — <b id="permRoleName">-</b></span>
+        <span>🔐 分配菜单与按钮权限 — <b id="permRoleName">-</b></span>
         <button class="md-close" onclick="closePerm()">✕</button>
     </div>
     <div class="perm-head">
-        <span>勾选该角色可访问的菜单，父级菜单勾选后自动联动其子菜单</span>
+        <span>勾选该角色可访问的<b>菜单</b>及其可用<b>操作按钮</b>；勾选菜单自动开放其全部按钮，可单独取消个别按钮</span>
         <span class="sel-all" id="selAllBtn" onclick="toggleSelectAll()">☑ 全选 / 取消全选</span>
     </div>
-    <div class="perm-tree" id="permTree">
-        <div class="perm-group">
-            <div class="perm-node"><input type="checkbox" data-group="info" onchange="syncGroup(this)">信息查看</div>
-        </div>
-        <div class="perm-group">
-            <div class="perm-node"><input type="checkbox" data-group="product" onchange="syncGroup(this)">我的产品</div>
-        </div>
-        <div class="perm-group">
-            <div class="perm-node"><input type="checkbox" data-group="fund" onchange="syncGroup(this)">资金管理</div>
-            <div class="perm-children">
-                <div class="perm-node"><input type="checkbox" data-item="fund-wholesale" onchange="syncChildren()">批发资金管理</div>
-                <div class="perm-node"><input type="checkbox" data-item="fund-operation" onchange="syncChildren()">运营资金管理</div>
-            </div>
-        </div>
-        <div class="perm-group">
-            <div class="perm-node"><input type="checkbox" data-group="commission" onchange="syncGroup(this)">分佣管理</div>
-        </div>
-        <div class="perm-group">
-            <div class="perm-node"><input type="checkbox" data-group="notice" onchange="syncGroup(this)">系统公告</div>
-        </div>
-        <div class="perm-group">
-            <div class="perm-node"><input type="checkbox" data-group="value" onchange="syncGroup(this)">价值管理</div>
-            <div class="perm-children">
-                <div class="perm-node"><input type="checkbox" data-item="value-inject" onchange="syncChildren()">价值注入</div>
-                <div class="perm-node"><input type="checkbox" data-item="value-dict" onchange="syncChildren()">价值字典</div>
-            </div>
-        </div>
-        <div class="perm-group">
-            <div class="perm-node"><input type="checkbox" data-group="warehouse" onchange="syncGroup(this)">仓管管理</div>
-            <div class="perm-children">
-                <div class="perm-node"><input type="checkbox" data-item="warehouse-ship" onchange="syncChildren()">发货管理</div>
-            </div>
-        </div>
-        <div class="perm-group">
-            <div class="perm-node"><input type="checkbox" data-group="task" onchange="syncGroup(this)">任务管理</div>
-        </div>
-        <div class="perm-group">
-            <div class="perm-node"><input type="checkbox" data-group="statistics" onchange="syncGroup(this)">运营数据统计</div>
-        </div>
-        <div class="perm-group">
-            <div class="perm-node"><input type="checkbox" data-group="sys" onchange="syncGroup(this)">系统管理</div>
-            <div class="perm-children">
-                <div class="perm-node"><input type="checkbox" data-item="sys-user" onchange="syncChildren()">用户管理</div>
-                <div class="perm-node"><input type="checkbox" data-item="sys-role" onchange="syncChildren()">角色管理</div>
-                <div class="perm-node"><input type="checkbox" data-item="sys-param" onchange="syncChildren()">业务参数管理</div>
-                <div class="perm-node"><input type="checkbox" data-item="sys-blockchain" onchange="syncChildren()">区块链服务管理</div>
-            </div>
-        </div>
+    <div class="perm-tree" id="permTree"><!-- 由 buildPermTree() 数据驱动渲染 -->
     </div>
-    <div class="perm-note">共 <b id="permCount">0</b> 项菜单已勾选（系统管理员为内置角色，始终拥有全部权限）</div>
+    <div class="perm-note">已选 <b id="permMenuCount">0</b> 项菜单 · <b id="permBtnCount">0</b> 个按钮（系统管理员为内置角色，始终拥有全部权限）</div>
     <div class="fm-actions">
         <button class="btn-cancel" onclick="closePerm()">取 消</button>
         <button class="btn-submit" onclick="savePerm()">保 存</button>
@@ -676,17 +647,17 @@
     <h4><span class="badge">1</span> <span style="vertical-align:middle;">角色列表</span></h4>
     <ul>
       <li>展示平台角色，<b>系统管理员</b>为内置角色，拥有<b>最高权限</b>，不可编辑、不可删除</li>
-      <li><b>菜单权限</b>列为纯文本展示（含"自定义角色"及未勾选菜单数量）；在操作列点击「<b>分配权限</b>」可查看并调整该角色的菜单权限</li>
+      <li><b>菜单 / 按钮权限</b>列为纯文本展示（含未勾选数量统计）；在操作列点击「<b>分配权限</b>」可查看并调整该角色的菜单与按钮权限</li>
     </ul>
     <h4><span class="badge">2</span> <span style="vertical-align:middle;">新建角色</span></h4>
     <ul>
       <li>点击「<b>＋ 新建角色</b>」填写<b>角色名称</b>、描述与状态</li>
-      <li>新建成功后，需在「<b>分配权限</b>」中为该角色配置可访问的菜单</li>
+      <li>新建成功后，需在「<b>分配权限</b>」中为该角色配置可访问的<b>菜单及其按钮</b></li>
     </ul>
-    <h4><span class="badge">3</span> <span style="vertical-align:middle;">分配菜单权限</span></h4>
+    <h4><span class="badge">3</span> <span style="vertical-align:middle;">分配菜单与按钮权限</span></h4>
     <ul>
-      <li>勾选该角色可访问的菜单，<b>父级菜单</b>勾选后自动联动其<b>子菜单</b>，支持一键全选/取消</li>
-      <li>保存后，分配给该角色的用户登录后仅能看到已勾选的菜单</li>
+      <li>三级结构：<b>目录 → 菜单 → 按钮</b>；勾选目录 / 菜单会<b>自动开放其下级全部按钮</b>，也可单独取消个别按钮，支持一键全选/取消</li>
+      <li>按钮权限<b>已启用</b>：保存后，该角色登录端只能访问已勾选<b>菜单</b>，且仅可使用已开放的<b>操作按钮</b></li>
     </ul>
     <h4><span class="badge">4</span> <span style="vertical-align:middle;">编辑与删除</span></h4>
     <ul>
@@ -749,7 +720,7 @@ function saveRole() {
             '<td class="seq">' + roleSeq + '</td>' +
             '<td class="role-name">' + name + '<span class="tag normal">自定义</span></td>' +
             '<td>' + desc + '</td>' +
-            '<td>0 项菜单</td>' +
+            '<td>0 项菜单 · 0 个按钮</td>' +
             '<td>' + timeStr + '</td>' +
             '<td>' + statusHtml + '</td>' +
             '<td class="actions">' +
@@ -758,7 +729,7 @@ function saveRole() {
             '<a class="danger" onclick="delRole(this)">删除</a>' +
             '</td>';
         document.getElementById('roleTbody').appendChild(tr);
-        alert('角色创建成功，请分配菜单权限');
+        alert('角色创建成功，请为其分配菜单与按钮权限');
     }
     closeRoleModal();
 }
@@ -775,31 +746,190 @@ function resetSearch() {
     document.querySelectorAll('#roleTbody tr').forEach(function(r) { r.style.display = ''; });
 }
 
-/* 权限分配 */
+/* 权限分配：目录 → 菜单 → 按钮 三级 */
 var permRoleName = '';
-var presets = {
-    '系统管理员': ['info', 'product', 'fund', 'fund-wholesale', 'fund-operation', 'commission', 'notice', 'value', 'value-inject', 'value-dict', 'warehouse', 'warehouse-ship', 'task', 'statistics', 'sys', 'sys-user', 'sys-role', 'sys-param', 'sys-blockchain'],
-    '运营管理员': ['info', 'product', 'fund-wholesale', 'fund-operation', 'commission', 'value-inject', 'value-dict', 'task', 'statistics'],
-    '财务专员': ['info', 'fund-wholesale', 'fund-operation', 'statistics'],
-    '产品管理员': ['info', 'product', 'value-inject', 'value-dict', 'sys-blockchain'],
-    '普通成员': ['info', 'fund-wholesale']
+
+/* 按钮资源（与「菜单管理」的“菜单 → 按钮”模型对应） */
+var BTN_NAMES = {
+    list: '查看', detail: '查看明细', add: '新增', edit: '编辑', delete: '删除',
+    online: '发布上线', offline: '下架', withdraw: '提现', apply: '申请分账',
+    ship: '发货', logistics: '查看物流', export: '导出',
+    assignRole: '分配角色', assignPerm: '分配权限', resetPwd: '重置密码', query: '交易查询'
 };
+
+/* 菜单资源树：目录(kids) 下挂子菜单；顶级菜单(无 kids)直接挂按钮；每个菜单均有可用按钮 */
+var PERM_TREE = [
+    { k: 'info', name: '信息查看', btns: ['list'] },
+    { k: 'product', name: '我的产品', btns: ['list', 'online', 'offline', 'edit'] },
+    { k: 'fund', name: '资金管理', kids: [
+        { k: 'fund-wholesale', name: '批发资金管理', btns: ['list', 'withdraw', 'apply', 'export'] },
+        { k: 'fund-operation', name: '运营资金管理', btns: ['list', 'withdraw', 'export'] }
+    ]},
+    { k: 'commission', name: '分佣管理', btns: ['list', 'detail', 'export'] },
+    { k: 'notice', name: '系统公告', btns: ['list', 'add', 'edit', 'delete'] },
+    { k: 'value', name: '价值管理', kids: [
+        { k: 'value-inject', name: '价值注入', btns: ['list', 'add', 'edit', 'delete'] },
+        { k: 'value-dict', name: '价值字典', btns: ['list', 'add', 'edit', 'delete'] }
+    ]},
+    { k: 'warehouse', name: '仓管管理', kids: [
+        { k: 'warehouse-ship', name: '发货管理', btns: ['list', 'ship', 'logistics', 'export'] }
+    ]},
+    { k: 'task', name: '任务管理', btns: ['list', 'add', 'edit', 'delete', 'export'] },
+    { k: 'statistics', name: '运营数据统计', btns: ['list', 'export'] },
+    { k: 'sys', name: '系统管理', kids: [
+        { k: 'sys-user', name: '用户管理', btns: ['list', 'add', 'edit', 'delete', 'assignRole', 'resetPwd'] },
+        { k: 'sys-role', name: '角色管理', btns: ['list', 'add', 'edit', 'delete', 'assignPerm'] },
+        { k: 'sys-param', name: '业务参数管理', btns: ['list', 'add', 'edit', 'delete'] },
+        { k: 'sys-blockchain', name: '区块链服务管理', btns: ['list', 'query'] }
+    ]}
+];
+
+/* 各角色权限预设：menus 为勾选的菜单/目录；btns 为按菜单开放的按钮。
+   未显式给出 btns 时，默认开放该角色已勾选菜单的全部按钮（存盘时写入具体值）。 */
+var presets = {
+    '运营管理员': { menus: ['info', 'product', 'fund-wholesale', 'fund-operation', 'commission', 'value-inject', 'value-dict', 'task', 'statistics'] },
+    '财务专员': { menus: ['info', 'fund-wholesale', 'fund-operation', 'statistics'] },
+    '产品管理员': { menus: ['info', 'product', 'value-inject', 'value-dict', 'sys-blockchain'] },
+    '普通成员': { menus: ['info', 'fund-wholesale'], btns: { info: ['list'], 'fund-wholesale': ['list'] } }
+};
+
+/* 渲染：目录 / 顶级菜单 → 子菜单 → 按钮 */
+function btnLine(menuK, btns) {
+    var h = '<div class="btn-line">';
+    btns.forEach(function(b) {
+        h += '<label class="btn-label"><input type="checkbox" class="p-btn" data-m="' + menuK + '" data-k="' + b + '" onchange="onBtnChange(this)">' + (BTN_NAMES[b] || b) + '</label>';
+    });
+    return h + '</div>';
+}
+
+function buildPermTree() {
+    var html = '';
+    PERM_TREE.forEach(function(node) {
+        var isDir = !!(node.kids && node.kids.length);
+        html += '<div class="perm-group" data-node="' + node.k + '">';
+        html += '<div class="perm-node">' +
+            '<label style="display:flex;align-items:center;gap:8px;cursor:pointer;min-width:0;">' +
+            '<input type="checkbox" class="' + (isDir ? 'p-dir' : 'p-menu') + '" data-k="' + node.k + '" onchange="' + (isDir ? 'onDirChange(this)' : 'onMenuChange(this)') + '">' +
+            '<span>' + node.name + '</span>' +
+            '</label></div>';
+        html += '<div class="perm-children">';
+        if (isDir) {
+            node.kids.forEach(function(menu) {
+                html += '<div class="menu-block">' +
+                    '<div class="perm-node"><label style="display:flex;align-items:center;gap:8px;cursor:pointer;">' +
+                    '<input type="checkbox" class="p-menu" data-k="' + menu.k + '" onchange="onMenuChange(this)">' +
+                    '<span>' + menu.name + '</span></label></div>' +
+                    btnLine(menu.k, menu.btns) +
+                    '</div>';
+            });
+        } else {
+            html += btnLine(node.k, node.btns);
+        }
+        html += '</div></div>';
+    });
+    document.getElementById('permTree').innerHTML = html;
+}
+
+/* 联动：目录 ↔ 子菜单 ↔ 按钮 */
+function onDirChange(cb) {
+    // 勾选/取消目录 → 整组子菜单与按钮一并联动
+    cb.closest('.perm-group').querySelectorAll('input[type="checkbox"]').forEach(function(c) { c.checked = cb.checked; });
+    refreshStates();
+}
+
+function onMenuChange(cb) {
+    // 勾选菜单 → 开放其全部按钮；取消菜单 → 关闭其按钮
+    var host = cb.closest('.menu-block') || cb.closest('.perm-group');
+    var line = host.querySelector('.btn-line');
+    if (line) {
+        line.querySelectorAll('input[type="checkbox"]').forEach(function(c) { c.checked = cb.checked; });
+    }
+    refreshStates();
+}
+
+function onBtnChange() {
+    refreshStates();
+}
+
+function refreshStates() {
+    // 目录半选/全选状态由其下子菜单决定
+    document.querySelectorAll('#permTree .perm-group').forEach(function(g) {
+        var topCb = g.querySelector(':scope > .perm-node input[type="checkbox"]');
+        if (!topCb || !topCb.classList.contains('p-dir')) return;
+        var menuCbs = g.querySelectorAll('.menu-block > .perm-node input.p-menu');
+        var on = 0;
+        menuCbs.forEach(function(m) { if (m.checked) on++; });
+        topCb.checked = menuCbs.length > 0 && on === menuCbs.length;
+        topCb.indeterminate = on > 0 && on < menuCbs.length;
+    });
+    // 按钮标签高亮
+    document.querySelectorAll('#permTree .btn-label').forEach(function(l) {
+        var i = l.querySelector('input');
+        l.classList.toggle('on', !!(i && i.checked));
+    });
+    refreshCount();
+}
+
+function refreshCount() {
+    var menus = document.querySelectorAll('#permTree input.p-menu:checked, #permTree input.p-dir:checked').length;
+    var btns = document.querySelectorAll('#permTree input.p-btn:checked').length;
+    document.getElementById('permMenuCount').textContent = menus;
+    document.getElementById('permBtnCount').textContent = btns;
+}
+
+function toggleSelectAll() {
+    var cbs = document.querySelectorAll('#permTree input[type="checkbox"]');
+    var allOn = cbs.length === document.querySelectorAll('#permTree input[type="checkbox"]:checked').length;
+    cbs.forEach(function(cb) { cb.checked = !allOn; });
+    refreshStates();
+}
 
 function openPerm(name) {
     permRoleName = name;
     document.getElementById('permRoleName').textContent = name;
-    var checked = presets[name] || [];
+    var p = presets[name];
+    var isAdmin = (name === '系统管理员');
     document.querySelectorAll('#permTree input[type="checkbox"]').forEach(function(cb) {
-        var key = cb.getAttribute('data-group') || cb.getAttribute('data-item');
-        if (cb.getAttribute('data-group')) cb.checked = checked.indexOf(key) >= 0;
-        else cb.checked = checked.indexOf(key) >= 0;
+        cb.checked = false; cb.indeterminate = false;
     });
-    syncChildren();
-    updatePermCount();
-    // 系统管理员内置角色：权限树只读提示
-    document.getElementById('selAllBtn').style.visibility = (name === '系统管理员') ? 'hidden' : 'visible';
+    if (isAdmin) {
+        // 内置角色：拥有全部菜单与按钮
+        document.querySelectorAll('#permTree input[type="checkbox"]').forEach(function(cb) { cb.checked = true; });
+    } else {
+        p = p || { menus: [], btns: {} };
+        p.menus.forEach(function(k) {
+            var cb = document.querySelector('#permTree input[data-k="' + k + '"]');
+            if (cb && cb.classList.contains('p-menu')) { cb.checked = true; onMenuChange(cb); }
+            else if (cb) { cb.checked = true; }
+        });
+        // 按钮回显：已配置则按其开放，未配置则该菜单全部开放（仅针对已勾选菜单）
+        PERM_TREE.forEach(function(node) {
+            if (node.kids) node.kids.forEach(function(m) { applyBtns(m.k, p.btns ? p.btns[m.k] : undefined); });
+            else applyBtns(node.k, p.btns ? p.btns[node.k] : undefined);
+        });
+    }
+    refreshStates();
+    // 系统管理员内置角色：只读
+    var locked = isAdmin;
+    document.querySelectorAll('#permTree input[type="checkbox"]').forEach(function(cb) { cb.disabled = locked; });
+    document.querySelectorAll('#permTree .perm-node').forEach(function(n) {
+        n.classList.toggle('disabled-node', locked);
+    });
+    document.getElementById('selAllBtn').style.visibility = locked ? 'hidden' : 'visible';
     document.getElementById('permModal').classList.add('show');
     document.getElementById('permMask').classList.add('show');
+}
+
+function applyBtns(menuK, codes) {
+    var cbs = document.querySelectorAll('#permTree input.p-btn[data-m="' + menuK + '"]');
+    var menuCb = document.querySelector('#permTree input[data-k="' + menuK + '"]');
+    if (!cbs.length) return;
+    var menuOn = menuCb && menuCb.checked;
+    cbs.forEach(function(cb) {
+        if (!menuOn) cb.checked = false;
+        else if (codes === undefined) cb.checked = true;
+        else cb.checked = codes.indexOf(cb.getAttribute('data-k')) >= 0;
+    });
 }
 
 function closePerm() {
@@ -807,67 +937,32 @@ function closePerm() {
     document.getElementById('permMask').classList.remove('show');
 }
 
-function allKeys() {
-    var keys = [];
-    document.querySelectorAll('#permTree input[type="checkbox"]').forEach(function(cb) {
-        keys.push(cb.getAttribute('data-group') || cb.getAttribute('data-item'));
-    });
-    return keys;
-}
-
-function syncGroup(cb) {
-    var val = cb.checked;
-    var groupEl = cb.closest('.perm-group');
-    if (groupEl) {
-        groupEl.querySelectorAll(':scope > .perm-children input[type="checkbox"]').forEach(function(c) {
-            c.checked = val;
-        });
-    }
-    syncChildren();
-    updatePermCount();
-}
-
-function syncChildren() {
-    document.querySelectorAll('.perm-group').forEach(function(g) {
-        var groupCb = g.querySelector(':scope > .perm-node input[type="checkbox"]');
-        if (!groupCb) return;
-        var childCbs = g.querySelectorAll('.perm-children input[type="checkbox"]');
-        if (childCbs.length === 0) return;
-        groupCb.checked = Array.prototype.every.call(childCbs, function(c) { return c.checked; });
-    });
-    updatePermCount();
-}
-
-function toggleSelectAll() {
-    var allOn = document.querySelectorAll('#permTree input[type="checkbox"]').length === document.querySelectorAll('#permTree input[type="checkbox"]:checked').length;
-    document.querySelectorAll('#permTree input[type="checkbox"]').forEach(function(cb) { cb.checked = !allOn; });
-    syncChildren();
-    updatePermCount();
-}
-
-function updatePermCount() {
-    var n = document.querySelectorAll('#permTree input[type="checkbox"]:checked').length;
-    document.getElementById('permCount').textContent = n;
-}
-
 function savePerm() {
-    var keys = [];
-    document.querySelectorAll('#permTree input[type="checkbox"]:checked').forEach(function(cb) {
-        keys.push(cb.getAttribute('data-group') || cb.getAttribute('data-item'));
+    if (permRoleName === '系统管理员') { alert('系统管理员为内置角色，权限不可修改'); return; }
+    var menus = [], btns = {};
+    document.querySelectorAll('#permTree input.p-menu:checked, #permTree input.p-dir:checked').forEach(function(cb) {
+        menus.push(cb.getAttribute('data-k'));
     });
-    presets[permRoleName] = keys;
-    // 更新表格中的菜单权限数字（第 4 列，非链接纯文本）
+    document.querySelectorAll('#permTree input.p-btn:checked').forEach(function(cb) {
+        var m = cb.getAttribute('data-m'), k = cb.getAttribute('data-k');
+        (btns[m] = btns[m] || []).push(k);
+    });
+    presets[permRoleName] = { menus: menus, btns: btns };
+    var menuCount = menus.length;
+    var btnCount = Object.keys(btns).reduce(function(n, key) { return n + btns[key].length; }, 0);
+    // 更新表格中的「菜单/按钮权限」列（第 4 列）
     document.querySelectorAll('#roleTbody tr').forEach(function(r) {
         if (r.getAttribute('data-name') === permRoleName) {
             var tds = r.querySelectorAll('td');
-            if (tds.length > 3 && permRoleName !== '系统管理员') {
-                tds[3].textContent = keys.length + ' 项菜单';
-            }
+            if (tds.length > 3) tds[3].textContent = menuCount + ' 项菜单 · ' + btnCount + ' 个按钮';
         }
     });
     closePerm();
-    alert('角色「' + permRoleName + '」菜单权限已保存');
+    alert('角色「' + permRoleName + '」权限已保存：' + menuCount + ' 项菜单 · ' + btnCount + ' 个按钮');
 }
+
+/* 初始渲染权限树 */
+buildPermTree();
 
 /* 功能说明浮窗 */
 function toggleFuncModal() {
