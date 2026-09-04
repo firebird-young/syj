@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>我的卖单列表</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        html, body { height: 100%; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", "Microsoft YaHei", sans-serif;
+            background: #e9eaec;
+            color: #1a1a2e;
+            font-size: 14px;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+        .page-wrap {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 36px;
+            padding: 24px 20px;
+            min-height: 100vh;
+        }
+        .app {
+            width: 375px;
+            flex-shrink: 0;
+            background: #f2f3f5;
+            border-radius: 24px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, .10);
+            overflow: hidden;
+        }
+
+        /* iOS 状态栏 */
+        .status-bar {
+            height: 44px; padding: 0 22px 0 24px;
+            display: flex; align-items: center; justify-content: space-between;
+            font-size: 15px; font-weight: 600;
+            color: #1a1a2e;
+        }
+        .status-bar .right { display: flex; align-items: center; gap: 5px; }
+        .status-bar svg { display: block; }
+        .battery {
+            display: inline-block; border: 1px solid #1a1a2e; border-radius: 3px;
+            padding: 1px 3px; font-size: 11px; font-weight: 500;
+            position: relative; line-height: 1;
+        }
+        .battery::after {
+            content: ''; position: absolute; right: -3px; top: 50%;
+            transform: translateY(-50%);
+            width: 2px; height: 6px; background: #1a1a2e; border-radius: 0 1px 1px 0;
+        }
+
+        /* 顶部导航 + 搜索框 */
+        .nav {
+            padding: 4px 12px 12px;
+            background: #f2f3f5;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .nav .back {
+            width: 32px; height: 32px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; flex-shrink: 0;
+        }
+        .search {
+            flex: 1; height: 36px;
+            background: #fff; border-radius: 8px;
+            display: flex; align-items: center;
+            padding: 0 12px; gap: 8px;
+        }
+        .search svg { flex-shrink: 0; }
+        .search input {
+            flex: 1; border: none; outline: none; background: transparent;
+            font-size: 13px; color: #1a1a2e;
+        }
+        .search input::placeholder { color: #a8aeb8; }
+
+        /* 卡片 */
+        .card {
+            background: #fff;
+            margin: 8px 12px;
+            border-radius: 8px;
+            padding: 14px;
+            cursor: pointer;
+        }
+        .card-top {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        .time {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 12px; color: #8a8f99;
+        }
+        .time .clock {
+            width: 14px; height: 14px;
+            border: 1.3px solid #8a8f99; border-radius: 50%;
+            position: relative; flex-shrink: 0;
+        }
+        .time .clock::before,
+        .time .clock::after {
+            content: ''; position: absolute;
+            background: #8a8f99; border-radius: 1px;
+        }
+        .time .clock::before {
+            left: 50%; top: 50%; width: 1.1px; height: 3px;
+            transform: translate(-50%, -100%);
+            transform-origin: bottom center;
+        }
+        .time .clock::after {
+            left: 50%; top: 50%; width: 1.1px; height: 4.5px;
+            transform: translate(-50%, -100%) rotate(60deg);
+            transform-origin: bottom center;
+        }
+        .status-pill {
+            display: inline-block;
+            background: #e8f5ec; color: #16a34a;
+            font-size: 12px; padding: 2px 8px; border-radius: 4px;
+        }
+
+        /* 产品行 */
+        .prod {
+            display: flex; align-items: center; gap: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .thumb {
+            width: 60px; height: 60px;
+            border-radius: 4px; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            position: relative; overflow: hidden;
+        }
+        .thumb::before {
+            font-family: "STKaiti", "KaiTi", "Songti SC", serif;
+            font-size: 22px; color: rgba(255,255,255,0.9);
+        }
+        .thumb-1 { background: linear-gradient(135deg, #d4c4a8 0%, #8b7355 100%); }
+        .thumb-1::before { content: "永"; }
+        .thumb-2 { background: linear-gradient(135deg, #f3dfa0 0%, #b08010 100%); }
+        .thumb-2::before { content: "金"; }
+        .thumb-3 { background: linear-gradient(135deg, #c4dde9 0%, #4f7eaa 100%); }
+        .thumb-3::before { content: "伞"; }
+        .thumb-4 { background: linear-gradient(135deg, #e8c98a 0%, #8a6a2a 100%); }
+        .thumb-4::before { content: "币"; }
+
+        .prod-info { flex: 1; min-width: 0; }
+        .prod-name {
+            font-size: 15px; font-weight: 600; color: #1a1a2e;
+            margin-bottom: 4px;
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+        .prod-id { font-size: 12px; color: #8a8f99; margin-bottom: 2px; }
+        .prod-no { font-size: 12px; color: #8a8f99; }
+        .prod-no span { color: #1a1a2e; font-weight: 600; }
+        .prod-right { text-align: right; flex-shrink: 0; }
+        .prod-price { font-size: 17px; font-weight: 600; color: #1a1a2e; margin-bottom: 4px; }
+        .prod-qty { font-size: 13px; color: #8a8f99; }
+
+        /* 底部金额行 */
+        .card-foot {
+            display: flex; align-items: center; justify-content: space-between;
+            padding-top: 12px;
+            font-size: 13px;
+        }
+        .fee { color: #8a8f99; }
+        .fee b { color: #16a34a; font-weight: 600; }
+        .income { color: #1a1a2e; font-weight: 600; }
+
+        /* ── 功能说明面板 ── */
+        .doc-panel {
+            width: 560px;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, .08);
+            padding: 24px 28px;
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', Arial, sans-serif;
+            line-height: 1.7;
+            font-size: 14px;
+            color: #333;
+        }
+        .doc-panel::-webkit-scrollbar { width: 5px; }
+        .doc-panel::-webkit-scrollbar-thumb { background: #d0d5e0; border-radius: 3px; }
+        .doc-panel .doc-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1F3864;
+            border-bottom: 2px solid #2E75B6;
+            padding-bottom: 10px;
+            margin-bottom: 16px;
+        }
+        .doc-panel h3 { font-size: 16px; font-weight: 600; color: #2E75B6; margin: 16px 0 8px; }
+        .doc-panel p { font-size: 13px; color: #555; margin-bottom: 6px; }
+        .doc-panel ul { padding-left: 20px; margin: 4px 0 8px; }
+        .doc-panel li { margin-bottom: 3px; font-size: 13px; color: #555; }
+        @media (max-width: 1100px) {
+            .page-wrap { flex-direction: column; align-items: center; }
+            .doc-panel { width: 100%; max-width: 375px; max-height: none; }
+        }
+    </style>
+</head>
+<body>
+<div class="page-wrap">
+
+    <!-- 手机原型 -->
+    <div class="app">
+
+        <!-- iOS 状态栏 -->
+        <div class="status-bar">
+            <span>10:28</span>
+            <div class="right">
+                <svg width="16" height="11" viewBox="0 0 16 11">
+                    <rect x="0" y="7" width="3" height="4" fill="#1a1a2e" rx="0.5"/>
+                    <rect x="4.5" y="5" width="3" height="6" fill="#1a1a2e" rx="0.5"/>
+                    <rect x="9" y="2.5" width="3" height="8.5" fill="#1a1a2e" rx="0.5"/>
+                    <rect x="13.5" y="0" width="3" height="11" fill="#1a1a2e" rx="0.5"/>
+                </svg>
+                <svg width="14" height="11" viewBox="0 0 14 11">
+                    <path d="M0 7h2v3H0zM3 5h2v5H3zM6 3h2v7H6zM9 1h2v9H9z" fill="#1a1a2e"/>
+                </svg>
+                <svg width="16" height="11" viewBox="0 0 16 11">
+                    <path d="M8 1.5C5.4 1.5 3 2.7 1 4.6l1.4 1.4C4 4.5 5.9 3.5 8 3.5s4 1 5.6 2.5L15 4.6C13 2.7 10.6 1.5 8 1.5z" fill="#1a1a2e"/>
+                    <path d="M8 4.8c-1.7 0-3.3.6-4.5 1.7L5 8c.8-.7 1.9-1.2 3-1.2s2.2.5 3 1.2l1.5-1.5C11.3 5.4 9.7 4.8 8 4.8z" fill="#1a1a2e"/>
+                    <path d="M8 8.2c-.7 0-1.4.3-1.9.7L8 11l1.9-2.1c-.5-.4-1.2-.7-1.9-.7z" fill="#1a1a2e"/>
+                </svg>
+                <span class="battery">27</span>
+            </div>
+        </div>
+
+        <!-- 顶部导航 + 搜索 -->
+        <div class="nav">
+            <div class="back" onclick="history.back()">
+                <svg width="11" height="18" viewBox="0 0 11 18" fill="none">
+                    <path d="M10 1L1 9l9 8" stroke="#1a1a2e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <div class="search">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                    <circle cx="6" cy="6" r="4.5" stroke="#8a8f99" stroke-width="1.4"/>
+                    <path d="M9.5 9.5L13 13" stroke="#8a8f99" stroke-width="1.4" stroke-linecap="round"/>
+                </svg>
+                <input type="text" placeholder="搜索我的寄售">
+            </div>
+        </div>
+
+        <!-- 卖单列表 -->
+        <div class="list">
+
+            <div class="card">
+                <div class="card-top">
+                    <div class="time"><span class="clock"></span>2025-11-14 10:31:08</div>
+                    <div class="status-pill">已成交</div>
+                </div>
+                <div class="prod">
+                    <div class="thumb thumb-1"></div>
+                    <div class="prod-info">
+                        <div class="prod-name">永淳·夏日帖</div>
+                        <div class="prod-id">XB000004</div>
+                        <div class="prod-no">产品编号：<span>#0002</span></div>
+                    </div>
+                    <div class="prod-right">
+                        <div class="prod-price">¥70.00</div>
+                        <div class="prod-qty">x1</div>
+                    </div>
+                </div>
+                <div class="card-foot">
+                    <div class="fee">手续费：<b>¥2.52</b></div>
+                    <div class="income">¥67.48</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-top">
+                    <div class="time"><span class="clock"></span>2025-08-12 14:26:22</div>
+                    <div class="status-pill">已成交</div>
+                </div>
+                <div class="prod">
+                    <div class="thumb thumb-2"></div>
+                    <div class="prod-info">
+                        <div class="prod-name">仙鹤莲池</div>
+                        <div class="prod-id">XB000002</div>
+                        <div class="prod-no">产品编号：<span>#0001</span></div>
+                    </div>
+                    <div class="prod-right">
+                        <div class="prod-price">¥375.00</div>
+                        <div class="prod-qty">x1</div>
+                    </div>
+                </div>
+                <div class="card-foot">
+                    <div class="fee">手续费：<b>¥13.50</b></div>
+                    <div class="income">¥361.50</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-top">
+                    <div class="time"><span class="clock"></span>2025-03-12 10:27:49</div>
+                    <div class="status-pill">已成交</div>
+                </div>
+                <div class="prod">
+                    <div class="thumb thumb-3"></div>
+                    <div class="prod-info">
+                        <div class="prod-name">山水空灵</div>
+                        <div class="prod-id">XB000001</div>
+                        <div class="prod-no">产品编号：<span>#0003</span></div>
+                    </div>
+                    <div class="prod-right">
+                        <div class="prod-price">¥247.00</div>
+                        <div class="prod-qty">x1</div>
+                    </div>
+                </div>
+                <div class="card-foot">
+                    <div class="fee">手续费：<b>¥8.89</b></div>
+                    <div class="income">¥238.11</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-top">
+                    <div class="time"><span class="clock"></span>2025-01-03 13:37:01</div>
+                    <div class="status-pill">已成交</div>
+                </div>
+                <div class="prod">
+                    <div class="thumb thumb-4"></div>
+                    <div class="prod-info">
+                        <div class="prod-name">东坡东坡</div>
+                        <div class="prod-id">TS000006</div>
+                        <div class="prod-no">产品编号：<span>#0004</span></div>
+                    </div>
+                    <div class="prod-right">
+                        <div class="prod-price">¥2.00</div>
+                        <div class="prod-qty">x1</div>
+                    </div>
+                </div>
+                <div class="card-foot">
+                    <div class="fee">手续费：<b>¥0.07</b></div>
+                    <div class="income">¥1.93</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-top">
+                    <div class="time"><span class="clock"></span>2024-12-30 14:03:25</div>
+                    <div class="status-pill">已成交</div>
+                </div>
+                <div class="prod">
+                    <div class="thumb thumb-4"></div>
+                    <div class="prod-info">
+                        <div class="prod-name">东坡东坡</div>
+                        <div class="prod-id">TS000005</div>
+                        <div class="prod-no">产品编号：<span>#0005</span></div>
+                    </div>
+                    <div class="prod-right">
+                        <div class="prod-price">¥2.00</div>
+                        <div class="prod-qty">x1</div>
+                    </div>
+                </div>
+                <div class="card-foot">
+                    <div class="fee">手续费：<b>¥0.07</b></div>
+                    <div class="income">¥1.93</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- 功能说明面板（常驻展示） -->
+    <div class="doc-panel">
+        <div class="doc-title">我的卖单列表 - 功能说明</div>
+        <h3>1. 交易手续费</h3>
+        <p>每笔卖单仅收取一笔<b>交易手续费</b>，不再另行展示/收取第三方支付费用。</p>
+        <ul>
+            <li><b>计算方式</b>：手续费 = 成交总金额 × 3.6%（成交总金额 = 成交单价 × 成交数量）</li>
+            <li><b>示例</b>：¥70.00 × 1 × 3.6% = ¥2.52</li>
+            <li><b>实际到手</b>：成交总金额 − 交易手续费，即 ¥70.00 − ¥2.52 = ¥67.48</li>
+        </ul>
+        <h3>2. 成交数量</h3>
+        <p>列表中每笔卖单的成交数量均为 <b>1</b>（卡片右上角以 <b>x1</b> 标识）。</p>
+        <h3>3. 卡片字段说明</h3>
+        <p>每张卡片自上而下展示：成交时间与状态、商品缩略图/名称/商品编号/产品编号（# 编号）、成交单价与数量，以及底部的<b>交易手续费</b>与<b>实际到手金额</b>。</p>
+    </div>
+
+</div>
+</body>
+</html>
