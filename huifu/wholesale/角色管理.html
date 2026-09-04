@@ -229,9 +229,6 @@
         .status-tag.on { background: #e6f7eb; color: #1aab67; }
         .status-tag.off { background: #f0f2f5; color: #9ba6b9; }
 
-        .perm-link { color: #1a78ff; cursor: pointer; text-decoration: none; }
-        .perm-link:hover { text-decoration: underline; }
-
         .actions a {
             color: #1a78ff;
             margin-right: 8px;
@@ -499,7 +496,7 @@
                             <td class="seq">1</td>
                             <td class="role-name">系统管理员<span class="tag builtin">内置</span></td>
                             <td>平台最高权限，拥有全部菜单权限</td>
-                            <td><a class="perm-link" onclick="openPerm('系统管理员')">全部菜单（内置）</a></td>
+                            <td>全部菜单（内置）</td>
                             <td>2026-07-01 09:00:00</td>
                             <td><span class="status-tag on">启用</span></td>
                             <td class="actions">
@@ -512,7 +509,7 @@
                             <td class="seq">2</td>
                             <td class="role-name">运营管理员</td>
                             <td>负责产品运营与批发分账申请</td>
-                            <td><a class="perm-link" onclick="openPerm('运营管理员')">11 项菜单</a></td>
+                            <td>11 项菜单</td>
                             <td>2026-07-05 10:20:00</td>
                             <td><span class="status-tag on">启用</span></td>
                             <td class="actions">
@@ -525,7 +522,7 @@
                             <td class="seq">3</td>
                             <td class="role-name">财务专员</td>
                             <td>负责资产查看与资金分账管理</td>
-                            <td><a class="perm-link" onclick="openPerm('财务专员')">5 项菜单</a></td>
+                            <td>5 项菜单</td>
                             <td>2026-07-08 14:05:00</td>
                             <td><span class="status-tag on">启用</span></td>
                             <td class="actions">
@@ -538,7 +535,7 @@
                             <td class="seq">4</td>
                             <td class="role-name">产品管理员</td>
                             <td>负责数字艺术品与区块链服务</td>
-                            <td><a class="perm-link" onclick="openPerm('产品管理员')">6 项菜单</a></td>
+                            <td>6 项菜单</td>
                             <td>2026-07-12 09:30:00</td>
                             <td><span class="status-tag on">启用</span></td>
                             <td class="actions">
@@ -551,7 +548,7 @@
                             <td class="seq">5</td>
                             <td class="role-name">普通成员</td>
                             <td>仅可查看首页信息与批发资金管理</td>
-                            <td><a class="perm-link" onclick="openPerm('普通成员')">2 项菜单</a></td>
+                            <td>2 项菜单</td>
                             <td>2026-07-20 16:45:00</td>
                             <td><span class="status-tag on">启用</span></td>
                             <td class="actions">
@@ -679,7 +676,7 @@
     <h4><span class="badge">1</span> <span style="vertical-align:middle;">角色列表</span></h4>
     <ul>
       <li>展示平台角色，<b>系统管理员</b>为内置角色，拥有<b>最高权限</b>，不可编辑、不可删除</li>
-      <li>点击角色下<b>菜单权限</b>数字，可查看并调整该角色的菜单权限</li>
+      <li><b>菜单权限</b>列为纯文本展示（含"自定义角色"及未勾选菜单数量）；在操作列点击「<b>分配权限</b>」可查看并调整该角色的菜单权限</li>
     </ul>
     <h4><span class="badge">2</span> <span style="vertical-align:middle;">新建角色</span></h4>
     <ul>
@@ -752,7 +749,7 @@ function saveRole() {
             '<td class="seq">' + roleSeq + '</td>' +
             '<td class="role-name">' + name + '<span class="tag normal">自定义</span></td>' +
             '<td>' + desc + '</td>' +
-            '<td><a class="perm-link" onclick="openPerm(\'' + name + '\')">0 项菜单</a></td>' +
+            '<td>0 项菜单</td>' +
             '<td>' + timeStr + '</td>' +
             '<td>' + statusHtml + '</td>' +
             '<td class="actions">' +
@@ -859,12 +856,12 @@ function savePerm() {
         keys.push(cb.getAttribute('data-group') || cb.getAttribute('data-item'));
     });
     presets[permRoleName] = keys;
-    // 更新表格中的菜单权限数字
+    // 更新表格中的菜单权限数字（第 4 列，非链接纯文本）
     document.querySelectorAll('#roleTbody tr').forEach(function(r) {
         if (r.getAttribute('data-name') === permRoleName) {
-            var link = r.querySelector('.perm-link');
-            if (link && permRoleName !== '系统管理员') {
-                link.textContent = keys.length + ' 项菜单';
+            var tds = r.querySelectorAll('td');
+            if (tds.length > 3 && permRoleName !== '系统管理员') {
+                tds[3].textContent = keys.length + ' 项菜单';
             }
         }
     });
