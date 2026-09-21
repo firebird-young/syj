@@ -49,6 +49,11 @@
                 { name: '批发市场分账审核',   href: '批发市场分账审核.html' },
                 { name: '冻结金分账申请审核', href: '冻结金分账申请审核.html' },
                 { name: '批发商提现审核',     href: '批发商提现审核.html' },
+            ]
+        },
+        {
+            group: '平台统计',
+            items: [
                 { name: '平台产品销售报表',   href: '平台产品销售报表.html' }
             ]
         },
@@ -58,7 +63,7 @@
                 { name: '批发商菜单管理',     href: '批发商菜单管理.html' },
                 { name: '业务参数配置',       href: '业务参数配置.html' },
                 { name: '区块链服务管理',     href: '区块链服务管理.html' },
-                { name: '钱包后台',           href: 'wallet-admin.html' }
+                { name: '钱包管理',           href: 'wallet-admin.html' }
             ]
         }
     ];

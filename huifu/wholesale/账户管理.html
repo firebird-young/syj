@@ -118,10 +118,11 @@
     .table td.amount-pos { color: #d92d20; font-weight: 700; }
     .table td.amount-neg { color: #0b9a4f; font-weight: 700; }
 
-    /* 分账类型标签 */
+    /* 类型标签 */
     .sub-tag { display: inline-block; padding: 2px 8px; border-radius: var(--radius-sm); font-size: 11px; }
     .sub-tag.pf { background: var(--primary-bg); color: var(--primary); }
     .sub-tag.th { background: #fdf0e4; color: #e67e22; }
+    .sub-tag.cash { background: #fdeaf2; color: #d6336c; }
     .sub-tag.empty { color: var(--ink-faint); }
 
     /* 分页 */
@@ -363,9 +364,10 @@
                     </div>
                     <div class="filter-item">
                         <select class="filter-input" id="fSubType" style="width:120px;">
-                            <option value="">分账类型</option>
+                            <option value="">类型</option>
                             <option>批发分账</option>
                             <option>提货分账</option>
+                            <option>现金奖励</option>
                         </select>
                     </div>
                     <div class="filter-actions">
@@ -557,7 +559,7 @@
         </div>
         <div class="fp-body">
             <div class="fp-role">批发商</div>
-            <p>服务商后台<strong>账户管理</strong>，只管理<strong>批发市场 25% 分账</strong>、<strong>提货分账（每次分账记录）</strong>、<strong>提现</strong>三类数据，支持发起提现申请。</p>
+            <p>服务商后台<strong>账户管理</strong>，管理<strong>批发市场分账</strong>、<strong>提货分账（每次分账记录）</strong>、<strong>提现</strong>、<strong>拉新现金奖励</strong>等数据，表现的是批发商账户的收支明细，支持发起提现申请。</p>
 
             <h4><span class="badge">1</span> <span style="vertical-align:middle;">第三方支付开户统一汇总</span></h4>
             <ul>
@@ -569,7 +571,7 @@
 
             <h4><span class="badge">2</span> <span style="vertical-align:middle;">增加筛选项</span></h4>
             <ul>
-                <li>支持按<strong>产品名称、阶段、订单编号、支付渠道、分账类型</strong>筛选。</li>
+                <li>支持按<strong>产品名称、阶段、订单编号、支付渠道、类型</strong>筛选。</li>
                 <li>提供<strong>搜索</strong>与<strong>重置</strong>。</li>
             </ul>
 
@@ -579,26 +581,15 @@
                 <li><strong>收支（¥）</strong>列标色：收入<strong style="color:#d92d20;">红</strong>、支出<strong style="color:#0b9a4f;">绿</strong>，其他列保持黑色。</li>
             </ul>
 
-            <h4><span class="badge">4</span> <span style="vertical-align:middle;">分账类型</span></h4>
-            <ul>
-                <li>仅<strong>汇付钱包</strong>的流水展示<strong>分账类型</strong>：<strong>批发分账</strong>、<strong>提货分账</strong>。</li>
-            </ul>
-
-            <h4><span class="badge">5</span> <span style="vertical-align:middle;">阶段说明</span></h4>
-            <ul>
-                <li><strong>批发分账</strong>均发生在<strong>批发市场</strong>。</li>
-                <li><strong>提货分账</strong>的阶段取决于当前产品状态：<strong>上零售市场之前</strong>发生的提货为<strong>批发市场</strong>，<strong>之后</strong>发生的提货为<strong>零售市场</strong>。</li>
-            </ul>
-
-            <h4><span class="badge">6</span> <span style="vertical-align:middle;">提现提交审核流程</span></h4>
+            <h4><span class="badge">4</span> <span style="vertical-align:middle;">提现提交审核流程</span></h4>
             <ul>
                 <li>点击<strong>提现按钮</strong>弹出<strong>申请提现</strong>浮层。</li>
                 <li>填写<strong>提现金额</strong>与<strong>提现原因</strong>后提交，等待平台审核。</li>
                 <li>提交后进入<strong>待审核</strong>状态，由平台在<strong>批发商提现审核</strong>页面处理。</li>
-                <li>点击<strong>提现申请记录</strong>可查看历史申请状态（待审核 / 已通过 / 已提现）。</li>
+                <li>点击<strong>提现申请记录</strong>可查看历史申请状态（待审核 / 已通过 / 已提现 / 已驳回）。</li>
             </ul>
 
-            <h4><span class="badge">7</span> <span style="vertical-align:middle;">汇付钱包开户流程</span></h4>
+            <h4><span class="badge">5</span> <span style="vertical-align:middle;">汇付钱包开户流程</span></h4>
             <ul>
                 <li>汇付钱包未开户时默认展示<strong>开户</strong>按钮。</li>
                 <li>点击<strong>开户</strong>弹出浮层，填写<strong>开户银行账户名、开户银行账号、开户银行省份、开户银行地区、开户银行</strong>，并<strong>上传开户银行许可证信息附件</strong>后提交。</li>
@@ -621,6 +612,7 @@ var incomeData = [
 ];
 
 var expenseData = [
+    { product: '-', stage: '-', purpose: '提货任务-现金奖励', subType: '现金奖励', orderNo: 'XB-buy260504160404002', tradeAmount: '500.00', fee: '10.00', createTime: '2026-05-04 16:04:04', updateTime: '2026-05-04 16:04:04', amount: '-490.00', channel: '汇付钱包' },
     { product: '提现', stage: '提现', createTime: '2026-07-20 14:30:00', updateTime: '2026-07-20 14:30:00', amount: '-500.00', channel: '汇付钱包' }
 ];
 
@@ -631,7 +623,8 @@ function renderHead() {
         '<tr>',
         '    <th>产品名称</th>',
         '    <th>阶段</th>',
-        '    <th>分账类型</th>',
+        '    <th>类型</th>',
+        '    <th>用途</th>',
         '    <th>订单编号</th>',
         '    <th>交易金额</th>',
         '    <th>手续费</th>',
@@ -645,7 +638,7 @@ function renderHead() {
 
 function subTypeHtml(subType) {
     if (!subType) return '<span class="sub-tag empty">-</span>';
-    var cls = subType === '批发分账' ? 'pf' : 'th';
+    var cls = subType === '批发分账' ? 'pf' : (subType === '现金奖励' ? 'cash' : 'th');
     return '<span class="sub-tag ' + cls + '">' + subType + '</span>';
 }
 
@@ -683,6 +676,7 @@ function renderTable() {
             '    <td>' + o.product + '</td>',
             '    <td>' + o.stage + '</td>',
             '    <td>' + subTypeHtml(o.subType) + '</td>',
+            '    <td>' + (o.purpose || '-') + '</td>',
             '    <td>' + (o.orderNo || '-') + '</td>',
             '    <td>' + (o.tradeAmount || '-') + '</td>',
             '    <td>' + (o.fee || '-') + '</td>',
