@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>批发商提现审核 · 深艺交管理后台</title>
+<link rel="stylesheet" href="asset/admin-sidebar.css">
+<style>
+    :root {
+        --accent: #1a78ff;
+        --accent-hover: #0f6ae8;
+        --accent-bg: #e6f4ff;
+        --green: #1aab67;
+        --orange: #e67e22;
+        --red: #e74c5e;
+        --ink: #1d1d1f;
+        --ink-muted: #3f424b;
+        --ink-subtle: #86868b;
+        --ink-faint: #9ba6b9;
+        --border: #e0e0e0;
+        --page-bg: #f5f5f7;
+        --radius-pill: 9999px;
+        --radius-card: 18px;
+        --radius-sm: 6px;
+        --shadow-card: 0 0 0 1px rgba(0,0,0,.06);
+        --font: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        font-family: var(--font);
+        background: var(--page-bg);
+        min-height: 100vh;
+        color: var(--ink);
+        font-size: 14px;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── 页面结构：左侧公用目录（asset/admin-sidebar.js 注入）+ 中间内容 + 右侧功能说明 ── */
+
+    /* 面包屑 */
+    .breadcrumb { padding: 16px 24px 0; font-size: 13px; color: var(--ink-subtle); }
+    .breadcrumb .sep { color: #c0c8d4; }
+    .breadcrumb .current { color: var(--ink); font-weight: 500; }
+
+    /* 内容区 */
+    .main { padding: 16px 24px 40px; }
+    .page-header {
+        display: flex; align-items: center; justify-content: space-between;
+        gap: 16px; margin: 4px 0 16px; flex-wrap: wrap;
+    }
+    .page-header h2 { font-size: 20px; font-weight: 600; }
+    .page-header .hint { font-size: 13px; color: var(--ink-subtle); }
+
+    /* 统计卡片 */
+    .summary-row { display: flex; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
+    .summary-card {
+        flex: 1 1 180px; background: #fff; border-radius: var(--radius-card);
+        padding: 18px 24px; box-shadow: var(--shadow-card);
+    }
+    .summary-card .label { font-size: 13px; color: var(--ink-subtle); margin-bottom: 8px; }
+    .summary-card .value { font-size: 26px; font-weight: 700; line-height: 1.2; }
+    .summary-card .value.pending { color: var(--orange); }
+    .summary-card .value.approved { color: var(--accent); }
+    .summary-card .value.done { color: var(--green); }
+    .summary-card .value.total { color: var(--ink); }
+
+    /* 搜索卡片 */
+    .search-area {
+        background: #fff; border-radius: var(--radius-card);
+        padding: 20px 24px; margin-bottom: 16px; box-shadow: var(--shadow-card);
+    }
+    .search-row { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: flex-end; }
+    .search-item { display: flex; flex-direction: column; gap: 6px; min-width: 170px; flex: 0 0 auto; }
+    .search-item label { font-size: 12px; color: var(--ink-subtle); font-weight: 500; }
+    .search-item input, .search-item select {
+        height: 36px; padding: 0 12px; border: 1px solid var(--border);
+        border-radius: var(--radius-pill); font-size: 13px; color: var(--ink);
+        background: #fff; outline: none; font-family: inherit;
+    }
+    .search-item input:focus, .search-item select:focus { border-color: var(--accent); }
+    .search-item .date-range { display: flex; align-items: center; gap: 8px; }
+    .search-item .date-range .to { color: var(--ink-faint); font-size: 13px; }
+    .search-actions { display: flex; gap: 10px; align-items: flex-end; margin-left: auto; flex: 0 0 auto; }
+    .search-actions .btn {
+        height: 36px; padding: 0 20px; border-radius: var(--radius-pill);
+        font-size: 13px; cursor: pointer; border: none; font-family: inherit; font-weight: 500;
+    }
+    .search-actions .btn-search { background: var(--accent); color: #fff; }
+    .search-actions .btn-search:hover { background: var(--accent-hover); }
+    .search-actions .btn-reset { background: #f5f5f7; color: var(--ink-subtle); border: 1px solid var(--border); }
+    .search-actions .btn-reset:hover { color: var(--accent); border-color: var(--accent); }
+
+    /* 表格卡片 */
+    .table-wrap {
+        background: #fff; border-radius: var(--radius-card);
+        box-shadow: var(--shadow-card); overflow: hidden;
+    }
+    .table-scroll { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 1080px; }
+    thead th {
+        font-size: 12px; font-weight: 600; color: var(--ink-subtle);
+        text-align: left; padding: 14px 16px; white-space: nowrap;
+        border-bottom: 1px solid var(--border); background: #fafafc;
+    }
+    tbody td { font-size: 13px; padding: 14px 16px; border-bottom: 1px solid #f5f5f5; vertical-align: middle; }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: #fafbff; }
+    .seq-cell { color: var(--ink-subtle); text-align: center; width: 60px; }
+
+    /* 申请单号 */
+    .app-no { color: var(--accent); cursor: pointer; text-decoration: none; }
+    .app-no:hover { text-decoration: underline; }
+
+    /* 支付渠道（仅汇付） */
+    .channel-tag {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 3px 12px; border-radius: var(--radius-pill);
+        background: var(--accent-bg); color: var(--accent); font-size: 12px; white-space: nowrap;
+    }
+    .channel-tag::before {
+        content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor;
+    }
+
+    /* 提现金额 */
+    .t-amt { color: var(--orange); font-weight: 600; white-space: nowrap; }
+    .t-amt .unit { font-size: 12px; font-weight: 400; color: var(--ink-faint); margin-left: 4px; }
+
+    /* 状态标签 */
+    .status-tag { display: inline-block; padding: 3px 12px; border-radius: var(--radius-pill); font-size: 12px; white-space: nowrap; }
+    .status-tag.pending { background: #fff4e6; color: var(--orange); }
+    .status-tag.approved { background: var(--accent-bg); color: var(--accent); }
+    .status-tag.done { background: #e6f7eb; color: var(--green); }
+    .status-tag.rejected { background: #fdecee; color: var(--red); }
+
+    /* 操作 */
+    .actions { white-space: nowrap; }
+    .actions a { color: var(--accent); margin-right: 12px; cursor: pointer; text-decoration: none; font-size: 13px; }
+    .actions a:last-child { margin-right: 0; }
+    .actions a:hover { text-decoration: underline; }
+
+    /* 分页 */
+    .pagination {
+        display: flex; align-items: center; justify-content: flex-end;
+        gap: 8px; padding: 14px 16px; border-top: 1px solid #f5f5f5;
+        font-size: 13px; color: var(--ink-muted);
+    }
+    .pagination-info { margin-right: auto; color: var(--ink-subtle); }
+    .pagination button {
+        min-width: 28px; height: 28px; padding: 0 8px;
+        border: 1px solid var(--border); border-radius: var(--radius-sm);
+        background: #fff; color: var(--ink-muted); cursor: pointer;
+        display: inline-flex; align-items: center; justify-content: center;
+        font-size: 13px; font-family: inherit;
+    }
+    .pagination button:hover { border-color: var(--accent); color: var(--accent); }
+    .pagination button.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .pagination button:disabled { background: #f5f5f7; color: #c0c8d4; cursor: not-allowed; border-color: var(--border); }
+    .pagination .page-size { margin-left: 12px; }
+    .pagination .page-size select {
+        height: 28px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+        padding: 0 6px; font-size: 13px; outline: none; font-family: inherit;
+    }
+
+    /* 弹层公共 */
+    .overlay {
+        position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+        display: none; align-items: center; justify-content: center; z-index: 2000;
+    }
+    .overlay.show { display: flex; }
+    .modal { background: #fff; border-radius: var(--radius-card); max-width: 94vw; }
+    .modal-header {
+        padding: 18px 24px; border-bottom: 1px solid #f0f1f4;
+        display: flex; align-items: center; justify-content: space-between;
+    }
+    .modal-title { font-size: 16px; font-weight: 600; }
+    .modal-close {
+        width: 28px; height: 28px; border: none; background: #f5f5f7; border-radius: 50%;
+        color: var(--ink-subtle); cursor: pointer; font-size: 14px; line-height: 1;
+        display: flex; align-items: center; justify-content: center;
+    }
+    .modal-close:hover { color: var(--red); }
+    .modal-body { padding: 20px 24px; max-height: 68vh; overflow-y: auto; }
+    .modal-footer {
+        padding: 14px 24px; border-top: 1px solid #f0f1f4;
+        display: flex; justify-content: flex-end; gap: 10px;
+    }
+
+    /* 审核弹窗 */
+    .audit-modal { width: 520px; }
+    .audit-row { margin-bottom: 16px; }
+    .audit-row .label { font-size: 12px; color: var(--ink-subtle); margin-bottom: 6px; }
+    .audit-row .val { font-size: 14px; color: var(--ink); font-weight: 500; }
+    .audit-row .val .sub { font-size: 12px; font-weight: 400; color: var(--ink-faint); margin-left: 8px; }
+    .audit-row .val.amount { font-size: 22px; font-weight: 700; color: var(--orange); }
+    .audit-row textarea {
+        width: 100%; height: 76px; padding: 10px 12px;
+        border: 1px solid var(--border); border-radius: var(--radius-sm);
+        font-size: 13px; color: var(--ink); outline: none;
+        resize: vertical; font-family: inherit;
+    }
+    .audit-row textarea:focus { border-color: var(--accent); }
+    .audit-flow {
+        background: #f5f7fa; border-radius: 12px; padding: 12px 16px;
+        font-size: 12px; color: var(--ink-subtle); line-height: 1.8;
+    }
+
+    /* 按钮 */
+    .btn-default {
+        background: #fff; border: 1px solid var(--border); color: var(--ink-muted);
+        padding: 8px 22px; border-radius: var(--radius-pill);
+        font-size: 13px; cursor: pointer; font-family: inherit;
+    }
+    .btn-default:hover { color: var(--accent); border-color: var(--accent); }
+    .btn-primary {
+        background: var(--accent); border: none; color: #fff;
+        padding: 8px 22px; border-radius: var(--radius-pill);
+        font-size: 13px; cursor: pointer; font-family: inherit; font-weight: 500;
+    }
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-reject {
+        background: var(--red); border: none; color: #fff;
+        padding: 8px 22px; border-radius: var(--radius-pill);
+        font-size: 13px; cursor: pointer; font-family: inherit; font-weight: 500;
+    }
+    .btn-reject:hover { background: #d63f52; }
+
+    /* ===== 右侧功能说明面板 ===== */
+    .func-panel {
+        position: fixed; top: 0; right: 0; bottom: 0;
+        width: 340px; z-index: 890;
+        background: #fff; border-left: 1px solid #e3e6eb;
+        box-shadow: -1px 0 12px rgba(20, 30, 60, 0.04);
+        display: flex; flex-direction: column;
+    }
+    .func-panel .fp-inner { display: flex; flex-direction: column; height: 100%; min-width: 0; }
+    .func-panel .fp-header {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 15px 14px 13px 18px; border-bottom: 1px solid #f0f1f4; flex-shrink: 0;
+    }
+    .func-panel .fp-title { display: flex; align-items: center; gap: 9px; font-size: 15px; font-weight: 700; color: var(--ink); }
+    .func-panel .fp-title::before {
+        content: ''; width: 8px; height: 8px; border-radius: 50%;
+        background: var(--accent); box-shadow: 0 0 0 4px rgba(26, 120, 255, 0.12);
+    }
+    .func-panel .fp-fold-btn {
+        width: 28px; height: 28px; border: 1px solid var(--border); background: #fff;
+        border-radius: 50%; color: var(--ink-subtle); font-size: 15px; line-height: 1;
+        cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .2s;
+    }
+    .func-panel .fp-fold-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .func-panel .fp-body { flex: 1; overflow-y: auto; padding: 4px 18px 40px; font-size: 13px; color: #555; line-height: 1.85; }
+    .func-panel .fp-body h4 { font-size: 14px; font-weight: 600; color: var(--ink); margin: 18px 0 6px; }
+    .func-panel .fp-body h4:first-child { margin-top: 12px; }
+    .func-panel .fp-body ul { padding-left: 18px; margin: 0 0 8px; }
+    .func-panel .fp-body li { margin-bottom: 6px; }
+    .func-panel .fp-body strong { color: #333; }
+    .func-panel .fp-body p { margin: 6px 0; }
+    .func-panel .fp-body .fp-role { font-size: 13px; font-weight: 600; color: var(--accent); margin-bottom: 8px; }
+    .func-panel .fp-open {
+        display: none; position: absolute; top: 0; bottom: 0; left: 0; right: 0;
+        border: none; background: transparent; cursor: pointer;
+        writing-mode: vertical-rl; text-orientation: upright;
+        font-size: 13px; font-weight: 600; letter-spacing: 6px; color: var(--ink-subtle);
+        align-items: center; justify-content: center; font-family: inherit; transition: all .2s;
+    }
+    .func-panel .fp-open:hover { color: var(--accent); background: #fafbfc; }
+
+    /* 标注圆点 */
+    .badge {
+        display: inline-block; min-width: 18px; height: 18px; padding: 0 5px;
+        border-radius: 50%; background: #ff2d55; color: #fff; font-size: 12px;
+        line-height: 18px; text-align: center; font-weight: 600;
+        box-shadow: 0 1px 3px rgba(255,45,85,0.3);
+    }
+
+    /* 轻提示 */
+    .toast {
+        position: fixed; top: 80px; left: 50%;
+        transform: translateX(-50%) translateY(-16px);
+        background: #1d1d1f; color: #fff; padding: 10px 22px;
+        border-radius: var(--radius-pill); font-size: 13px;
+        opacity: 0; pointer-events: none; transition: all .25s; z-index: 9998;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    @media (min-width: 1024px) {
+        .main, .breadcrumb { margin-right: 340px; }
+        body.fp-collapsed .main,
+        body.fp-collapsed .breadcrumb { margin-right: 40px; }
+        body.fp-collapsed .func-panel { width: 40px; }
+        body.fp-collapsed .fp-inner { display: none; }
+        body.fp-collapsed .fp-open { display: flex; }
+    }
+    @media (max-width: 1023.98px) {
+        .func-panel { display: none; }
+        .main, .breadcrumb { margin-right: 0; }
+    }
+    @media (max-width: 800px) {
+        .search-actions { margin-left: 0; }
+    }
+</style>
+</head>
+<body>
+
+<div class="breadcrumb">
+    <span>首页</span><span class="sep"> / </span>
+    <span>分账提现管理</span><span class="sep"> / </span>
+    <span class="current">批发商提现审核</span>
+</div>
+
+<div class="main">
+    <div class="page-header">
+        <h2>批发商提现审核</h2>
+    </div>
+
+    <!-- 统计卡片 -->
+    <div class="summary-row">
+        <div class="summary-card">
+            <div class="label">待审核</div>
+            <div class="value pending" id="sumPending">0</div>
+        </div>
+        <div class="summary-card">
+            <div class="label">已通过（待出款）</div>
+            <div class="value approved" id="sumApproved">0</div>
+        </div>
+        <div class="summary-card">
+            <div class="label">已提现</div>
+            <div class="value done" id="sumDone">0</div>
+        </div>
+        <div class="summary-card">
+            <div class="label">提现金额合计</div>
+            <div class="value total" id="sumAmt">¥0.00</div>
+        </div>
+    </div>
+
+    <!-- 筛选区 -->
+    <div class="search-area">
+        <div class="search-row">
+            <div class="search-item">
+                <label>申请单号</label>
+                <input type="text" id="fNo" placeholder="请输入申请单号">
+            </div>
+            <div class="search-item">
+                <label>批发商</label>
+                <input type="text" id="fService" placeholder="请输入批发商名称">
+            </div>
+            <div class="search-item">
+                <label>支付渠道</label>
+                <select id="fChannel" disabled>
+                    <option>汇付</option>
+                </select>
+            </div>
+            <div class="search-item">
+                <label>审核状态</label>
+                <select id="fStatus">
+                    <option value="">全部</option>
+                    <option value="pending">待审核</option>
+                    <option value="approved">已通过（待出款）</option>
+                    <option value="done">已提现</option>
+                    <option value="rejected">已驳回</option>
+                </select>
+            </div>
+            <div class="search-item" style="min-width:auto;">
+                <label>申请时间</label>
+                <div class="date-range">
+                    <input type="date" id="fStart" style="width:150px;">
+                    <span class="to">至</span>
+                    <input type="date" id="fEnd" style="width:150px;">
+                </div>
+            </div>
+            <div class="search-actions">
+                <button class="btn btn-search" onclick="filterTable()">🔍 搜索</button>
+                <button class="btn btn-reset" onclick="resetFilter()">↻ 重置</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 表格 -->
+    <div class="table-wrap">
+        <div class="table-scroll">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width:60px;">序号</th>
+                        <th>申请单号</th>
+                        <th>批发商</th>
+                        <th>支付渠道</th>
+                        <th>提现金额</th>
+                        <th style="width:170px;">申请时间</th>
+                        <th>审核状态</th>
+                        <th style="width:140px;">操作</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+        <div class="pagination">
+            <div class="pagination-info" id="totalCount">共 0 条</div>
+            <button disabled>&lt;</button>
+            <button class="active">1</button>
+            <button>&gt;</button>
+            <div class="page-size">
+                <select>
+                    <option>10条/页</option>
+                    <option>20条/页</option>
+                    <option>50条/页</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 审核弹窗 -->
+<div class="overlay" id="auditOverlay" onclick="if(event.target===this)closeAudit()">
+    <div class="modal audit-modal">
+        <div class="modal-header">
+            <span class="modal-title" id="auditTitle">批发商提现审核</span>
+            <button class="modal-close" onclick="closeAudit()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="audit-row">
+                <div class="label">申请单号</div>
+                <div class="val" id="auditNo">-</div>
+            </div>
+            <div class="audit-row">
+                <div class="label">批发商</div>
+                <div class="val" id="auditService">-</div>
+            </div>
+            <div class="audit-row">
+                <div class="label">支付渠道</div>
+                <div class="val"><span class="channel-tag">汇付</span><span class="sub">平台唯一提现渠道</span></div>
+            </div>
+            <div class="audit-row">
+                <div class="label">提现金额</div>
+                <div class="val amount" id="auditAmount">-</div>
+            </div>
+            <div class="audit-row">
+                <div class="label">申请时间</div>
+                <div class="val" id="auditTime">-</div>
+            </div>
+            <div class="audit-row">
+                <div class="label">提现原因</div>
+                <div class="val" id="auditReason">-</div>
+            </div>
+            <div class="audit-row" id="auditRemarkRow">
+                <div class="label">审核备注 <span style="color:#e74c5e;">*</span>（驳回时必填）</div>
+                <textarea id="auditRemark" placeholder="请输入审核备注，驳回时必须填写驳回原因"></textarea>
+            </div>
+            <div class="audit-flow" id="auditFlow">
+                审核流程：提交申请 → 平台审核 → 汇付出款 → 状态更新为「已提现」
+            </div>
+        </div>
+        <div class="modal-footer" id="auditFooter"></div>
+    </div>
+</div>
+
+<!-- 右侧功能说明 -->
+<aside class="func-panel">
+    <div class="fp-inner">
+        <div class="fp-header">
+            <div class="fp-title">功能说明</div>
+            <button class="fp-fold-btn" onclick="toggleFuncPanel()">›</button>
+        </div>
+        <div class="fp-body">
+            <div class="fp-role">平台</div>
+            <h4><span class="badge">1/span> <span style="vertical-align:middle;">提现申请（批发商端）</span></h4>
+            <ul>
+                <li>批发商在<strong>资金管理</strong>中发起提现，填写提现金额与提现原因后提交。</li>
+                <li>提交成功后生成<strong>申请单号</strong>，状态为「待审核」，同时冻结对应提现金额。</li>
+            </ul>
+            <h4><span class="badge">2</span> <span style="vertical-align:middle;">平台审核</span></h4>
+            <ul>
+                <li>本页面汇总全部批发商提现申请，支持按申请单号 / 批发商 / 审核状态 / 申请时间筛选。</li>
+                <li>点击<strong>审核</strong>查看提现信息，可执行<strong>通过</strong>或<strong>驳回</strong>，驳回时必须填写审核备注。</li>
+                <li><strong>通过</strong>：提交汇付完成出款，出款成功后状态变为「已提现」；<strong>驳回</strong>：解冻金额，批发商可重新发起提现。</li>
+            </ul>
+            <h4><span class="badge">3</span> <span style="vertical-align:middle;">状态与查看</span></h4>
+            <ul>
+                <li>状态流转：<strong>待审核 → 已通过（待出款）→ 已提现</strong>，被拒绝的记录标记为「已驳回」。</li>
+                <li>非待审核记录操作列仅提供<strong>查看</strong>，弹窗以只读方式展示提现明细。</li>
+            </ul>
+        </div>
+    </div>
+    <button class="fp-open" onclick="toggleFuncPanel()">功能说明</button>
+</aside>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ===== 提现申请数据（支付渠道仅有汇付） ===== */
+var data = [
+    { no: 'TX-20260810001', service: '深圳市恒润贸易有限公司',     channel: '汇付', amount: 2000.00, time: '2026-08-10 10:30:00', reason: '日常提现', status: 'pending' },
+    { no: 'TX-20260809002', service: '广州市博雅文化传播有限公司', channel: '汇付', amount: 1500.00, time: '2026-08-09 15:20:00', reason: '结算提取', status: 'pending' },
+    { no: 'TX-20260809003', service: '东莞市德丰商贸有限公司',     channel: '汇付', amount: 3600.00, time: '2026-08-09 09:45:00', reason: '资金周转', status: 'pending' },
+    { no: 'TX-20260801004', service: '深圳市华彩印刷包装有限公司', channel: '汇付', amount: 800.00,  time: '2026-08-01 11:10:00', reason: '货款提取', status: 'approved' },
+    { no: 'TX-20260720005', service: '佛山市顺泰贸易有限公司',     channel: '汇付', amount: 500.00,  time: '2026-07-20 14:30:00', reason: '日常提现', status: 'done' },
+    { no: 'TX-20260710006', service: '深圳市恒润贸易有限公司',     channel: '汇付', amount: 300.00,  time: '2026-07-01 14:20:00', reason: '运营资金', status: 'done' }
+];
+
+var statusMap = { pending: '待审核', approved: '已通过（待出款）', done: '已提现', rejected: '已驳回' };
+
+function money(n) {
+    return '¥' + Number(n).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+
+function renderTable(list) {
+    var rows = list || data;
+    var html = '';
+    rows.forEach(function (o, i) {
+        var actions = o.status === 'pending'
+            ? '<a onclick="openAudit(\'' + o.no + '\', false)">审核</a>'
+            : '<a onclick="openAudit(\'' + o.no + '\', true)">查看</a>';
+        html += '<tr data-no="' + o.no + '">' +
+            '<td class="seq-cell">' + (i + 1) + '</td>' +
+            '<td><a class="app-no" onclick="openAudit(\'' + o.no + '\', ' + (o.status === 'pending' ? 'false' : 'true') + ')">' + o.no + '</a></td>' +
+            '<td>' + o.service + '</td>' +
+            '<td><span class="channel-tag">' + o.channel + '</span></td>' +
+            '<td class="t-amt">' + money(o.amount) + '</td>' +
+            '<td>' + o.time + '</td>' +
+            '<td><span class="status-tag ' + o.status + '">' + statusMap[o.status] + '</span></td>' +
+            '<td class="actions">' + actions + '</td>' +
+        '</tr>';
+    });
+    document.getElementById('tableBody').innerHTML = html;
+    document.getElementById('totalCount').textContent = '共 ' + rows.length + ' 条';
+    updateSummary();
+}
+
+function updateSummary() {
+    var n = function (s) { return data.filter(function (o) { return o.status === s; }).length; };
+    document.getElementById('sumPending').textContent = n('pending');
+    document.getElementById('sumApproved').textContent = n('approved');
+    document.getElementById('sumDone').textContent = n('done');
+    var sum = data.reduce(function (t, o) { return t + o.amount; }, 0);
+    document.getElementById('sumAmt').textContent = money(sum);
+}
+
+/* ===== 筛选 ===== */
+function filterTable() {
+    var no = document.getElementById('fNo').value.trim();
+    var service = document.getElementById('fService').value.trim();
+    var status = document.getElementById('fStatus').value;
+    var start = document.getElementById('fStart').value;
+    var end = document.getElementById('fEnd').value;
+    var list = data.filter(function (o) {
+        if (no && o.no.indexOf(no) === -1) return false;
+        if (service && o.service.indexOf(service) === -1) return false;
+        if (status && o.status !== status) return false;
+        var d = o.time.slice(0, 10);
+        if (start && d < start) return false;
+        if (end && d > end) return false;
+        return true;
+    });
+    renderTable(list);
+    showToast('共筛选出 ' + list.length + ' 条提现申请');
+}
+
+function resetFilter() {
+    document.getElementById('fNo').value = '';
+    document.getElementById('fService').value = '';
+    document.getElementById('fStatus').value = '';
+    document.getElementById('fStart').value = '';
+    document.getElementById('fEnd').value = '';
+    renderTable();
+}
+
+/* ===== 审核 / 查看 ===== */
+var currentRow = null;
+function openAudit(no, readonly) {
+    currentRow = data.filter(function (o) { return o.no === no; })[0];
+    if (!currentRow) return;
+    document.getElementById('auditTitle').textContent = readonly ? '提现申请详情' : '批发商提现审核';
+    document.getElementById('auditNo').textContent = currentRow.no;
+    document.getElementById('auditService').textContent = currentRow.service;
+    document.getElementById('auditAmount').textContent = money(currentRow.amount);
+    document.getElementById('auditTime').textContent = currentRow.time;
+    document.getElementById('auditReason').textContent = currentRow.reason;
+    document.getElementById('auditRemark').value = '';
+    document.getElementById('auditRemarkRow').style.display = readonly ? 'none' : '';
+    document.getElementById('auditFlow').style.display = readonly ? 'none' : '';
+    document.getElementById('auditFooter').innerHTML = readonly
+        ? '<button class="btn-default" onclick="closeAudit()">关闭</button>'
+        : '<button class="btn-reject" onclick="rejectAudit()">驳回</button>' +
+          '<button class="btn-default" onclick="closeAudit()">取消</button>' +
+          '<button class="btn-primary" onclick="approveAudit()">通过</button>';
+    document.getElementById('auditOverlay').classList.add('show');
+}
+
+function closeAudit() {
+    document.getElementById('auditOverlay').classList.remove('show');
+}
+
+function approveAudit() {
+    if (!currentRow) return;
+    currentRow.status = 'approved';
+    closeAudit();
+    renderTable();
+    showToast('已通过提现申请，正在提交汇付出款');
+}
+
+function rejectAudit() {
+    var remark = document.getElementById('auditRemark').value.trim();
+    if (!remark) { showToast('驳回时必须填写审核备注'); return; }
+    if (!currentRow) return;
+    currentRow.status = 'rejected';
+    closeAudit();
+    renderTable();
+    showToast('已驳回提现申请，提现金额已解冻');
+}
+
+/* ===== 轻提示 ===== */
+var toastTimer;
+function showToast(msg) {
+    var el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { el.classList.remove('show'); }, 2400);
+}
+
+/* ===== 右侧功能说明折叠 ===== */
+function toggleFuncPanel() {
+    document.body.classList.toggle('fp-collapsed');
+}
+
+renderTable();
+</script>
+
+<script src="asset/admin-sidebar.js"></script>
+
+</body>
+</html>

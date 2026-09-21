@@ -30,7 +30,7 @@
         {
             group: '资金管理',
             items: [
-                { name: '批发资金管理',       href: '批发资金管理.html' },
+                { name: '账户管理',           href: '账户管理.html' },
                 { name: '运营资金管理',       href: '运营资金管理.html' },
                 { name: '批发冻结金分账管理', href: '批发冻结金分账管理.html' },
                 { name: '批发市场分账申请',   href: '批发市场分账申请.html' }

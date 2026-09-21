@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>账户管理</title>
+<link rel="stylesheet" href="asset/admin-sidebar.css">
+<style>
+    :root{
+      --primary:#1a78ff;--primary-hover:#0f6ae8;--primary-bg:#e6f4ff;
+      --brand:#e74c3e;--danger:#e74c5e;
+      --page-bg:#f0f2f5;--card-bg:#fff;--info-bg:#f5f7fa;
+      --ink:#1a1a2e;--ink-muted:#4e5a6e;--ink-subtle:#6b7588;--ink-faint:#9ba6b9;
+      --border:#d0d5dd;--border-light:#f0f0f0;
+      --radius-sm:4px;--radius-md:6px;
+      --font:"-apple-system","BlinkMacSystemFont","PingFang SC","Microsoft YaHei","Helvetica Neue",sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        font-family: var(--font);
+        background: var(--page-bg);
+        color: var(--ink);
+        font-size: 14px;
+    }
+
+    /* ── 页面结构：左侧目录（asset/admin-sidebar.js 公用注入）+ 中间内容 + 右侧功能说明 ── */
+
+    /* 面包屑（页面最上方） */
+    .breadcrumb {
+        padding: 16px 24px 0; font-size: 13px; color: var(--ink-subtle);
+        display: flex; align-items: center; gap: 6px;
+    }
+    .breadcrumb .sep { color: #c0c8d4; }
+    .breadcrumb .active { color: var(--ink); font-weight: 500; }
+    .breadcrumb .user-chip { margin-left: auto; display: flex; align-items: center; gap: 8px; cursor: pointer; }
+    .breadcrumb .user-chip .avatar {
+        width: 30px; height: 30px; border-radius: 50%; background: #f5deb3;
+        display: flex; align-items: center; justify-content: center; font-size: 15px;
+    }
+    .breadcrumb .user-chip .name { font-size: 13px; color: var(--ink); }
+    .breadcrumb .user-chip .arrow { color: var(--ink-faint); font-size: 12px; }
+
+    /* 内容区 */
+    .content { padding: 12px 24px 40px; }
+
+    /* ── 资金汇总卡片 ── */
+    .summary-row { display: flex; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
+    .summary-card {
+        flex: 1; background: var(--card-bg); border-radius: var(--radius-md);
+        padding: 16px 18px; box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    }
+    .summary-card .head {
+        display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;
+    }
+    .summary-card .label { font-size: 14px; color: var(--ink-muted); font-weight: 500; }
+    .summary-card .amount { font-size: 22px; font-weight: 700; }
+    .summary-card .amount.hf { color: #4f7cff; }
+    .summary-card .channel-tag {
+        display: inline-block; padding: 2px 8px; border-radius: var(--radius-sm);
+        font-size: 11px; background: var(--primary-bg); color: var(--primary); margin-left: 8px;
+        vertical-align: middle;
+    }
+    .summary-card .btn {
+        background: var(--primary); color: #fff; border: none;
+        padding: 5px 16px; border-radius: var(--radius-sm); font-size: 13px; cursor: pointer;
+    }
+    .summary-card .btn:hover { background: var(--primary-hover); }
+
+    /* ── 面板（Tab + 筛选） ── */
+    .panel { background: var(--card-bg); border-radius: var(--radius-md); margin-bottom: 12px; overflow: hidden; }
+
+    /* Tab */
+    .tabs { display: flex; border-bottom: 1px solid var(--border-light); padding: 0 16px; }
+    .tab {
+        padding: 14px 16px; font-size: 14px; color: var(--ink-subtle);
+        cursor: pointer; position: relative; font-weight: 500;
+    }
+    .tab.active { color: var(--ink); font-weight: 600; }
+    .tab.active::after {
+        content: ''; position: absolute; bottom: 0; left: 50%;
+        transform: translateX(-50%); width: 24px; height: 3px;
+        background: var(--primary); border-radius: 2px;
+    }
+
+    /* 筛选栏 */
+    .filter-bar { padding: 12px 20px; display: flex; align-items: center; flex-wrap: wrap; }
+    .filter-item { display: flex; align-items: center; margin-right: 12px; margin-bottom: 4px; }
+    .filter-label { font-size: 13px; color: var(--ink-muted); margin-right: 8px; white-space: nowrap; }
+    .filter-input {
+        width: 150px; height: 30px; padding: 0 10px;
+        border: 1px solid var(--border); border-radius: var(--radius-sm);
+        font-size: 13px; color: var(--ink); outline: none; background: #fff;
+        font-family: inherit;
+    }
+    .filter-input:focus { border-color: var(--primary); }
+    .filter-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+    .btn-search { background: var(--primary); color: #fff; border: none; padding: 0 14px; height: 30px; border-radius: var(--radius-sm); font-size: 13px; cursor: pointer; font-family: inherit; }
+    .btn-search:hover { background: var(--primary-hover); }
+    .btn-reset { background: #fff; color: var(--ink-muted); border: 1px solid var(--border); padding: 0 14px; height: 30px; border-radius: var(--radius-sm); font-size: 13px; cursor: pointer; font-family: inherit; }
+    .btn-reset:hover { border-color: var(--primary); color: var(--primary); }
+
+    /* ── 表格 ── */
+    .table-card { background: var(--card-bg); border-radius: var(--radius-md); overflow: hidden; }
+    .table-scroll { overflow-x: auto; }
+    .table { width: 100%; min-width: 1180px; border-collapse: collapse; }
+    .table th {
+        background: #fafbfc; padding: 14px 16px; text-align: left;
+        font-size: 13px; color: var(--ink-muted); font-weight: 500;
+        border-bottom: 1px solid var(--border-light); white-space: nowrap;
+    }
+    .table td {
+        padding: 14px 16px; font-size: 13px; color: var(--ink);
+        border-bottom: 1px solid #f5f5f7; white-space: nowrap;
+    }
+    .table tr:last-child td { border-bottom: none; }
+    .table tbody tr:hover { background: #fafbfc; }
+    .col-sort { display: inline-block; margin-left: 4px; color: #c0c8d4; cursor: pointer; }
+    .table td.amount-pos { color: #d92d20; font-weight: 700; }
+    .table td.amount-neg { color: #0b9a4f; font-weight: 700; }
+
+    /* 分账类型标签 */
+    .sub-tag { display: inline-block; padding: 2px 8px; border-radius: var(--radius-sm); font-size: 11px; }
+    .sub-tag.pf { background: var(--primary-bg); color: var(--primary); }
+    .sub-tag.th { background: #fdf0e4; color: #e67e22; }
+    .sub-tag.empty { color: var(--ink-faint); }
+
+    /* 分页 */
+    .pagination {
+        background: var(--card-bg); padding: 12px 20px; display: flex; align-items: center;
+        justify-content: flex-end; gap: 8px; font-size: 13px; color: var(--ink-muted);
+        border-top: 1px solid #f5f5f7;
+    }
+    .pagination .total { margin-right: 16px; }
+    .page-btn {
+        min-width: 28px; height: 28px; padding: 0 8px; background: #fff;
+        border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px;
+        color: var(--ink-muted); cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+        font-family: inherit;
+    }
+    .page-btn:hover { color: var(--primary); border-color: var(--primary); }
+    .page-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .page-jump { display: inline-flex; align-items: center; gap: 4px; margin-left: 12px; }
+    .page-jump input {
+        width: 48px; height: 28px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+        text-align: center; font-size: 13px; outline: none; font-family: inherit;
+    }
+
+    /* ── 弹层公共 ── */
+    .wd-overlay {
+        position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+        display: none; align-items: center; justify-content: center; z-index: 2000;
+    }
+    .wd-overlay.show { display: flex; }
+    .wd-modal {
+        background: #fff; border-radius: 8px; width: 440px; max-width: 94vw;
+        max-height: 90vh; display: flex; flex-direction: column;
+    }
+    .wd-header {
+        padding: 16px 20px; border-bottom: 1px solid var(--border-light);
+        display: flex; align-items: center; justify-content: space-between;
+    }
+    .wd-title { font-size: 16px; font-weight: 600; color: var(--ink); }
+    .wd-close {
+        width: 28px; height: 28px; border-radius: 50%; background: #f5f5f7; border: none;
+        color: var(--ink-subtle); cursor: pointer; font-size: 14px; line-height: 1;
+        display: flex; align-items: center; justify-content: center;
+    }
+    .wd-close:hover { color: var(--danger); }
+    .wd-body { padding: 20px; overflow-y: auto; flex: 1; }
+    .wd-row { margin-bottom: 16px; }
+    .wd-label { font-size: 13px; color: var(--ink); margin-bottom: 6px; }
+    .wd-input {
+        width: 100%; height: 36px; padding: 0 12px; border: 1px solid var(--border);
+        border-radius: var(--radius-sm); font-size: 13px; color: var(--ink); outline: none; background: #fff;
+        font-family: inherit;
+    }
+    .wd-input:focus { border-color: var(--primary); }
+    .wd-upload-box {
+        height: 110px; border: 1px dashed var(--border); border-radius: var(--radius-md);
+        background: #fafbfc; display: flex; flex-direction: column; align-items: center;
+        justify-content: center; gap: 8px; cursor: pointer; text-align: center; transition: border-color .2s;
+    }
+    .wd-upload-box:hover { border-color: var(--primary); }
+    .wd-upload-icon { font-size: 26px; color: #c0c8d4; line-height: 1; }
+    .wd-upload-text { font-size: 13px; color: var(--ink-muted); }
+    .wd-upload-tip { font-size: 12px; color: #86909c; margin-top: 6px; }
+    .wd-link { font-size: 13px; color: var(--primary); cursor: pointer; margin-top: 4px; display: inline-block; }
+    .wd-link:hover { text-decoration: underline; }
+    .wd-footer {
+        padding: 12px 20px; border-top: 1px solid var(--border-light);
+        display: flex; justify-content: flex-end; gap: 8px;
+    }
+    .wd-btn-default {
+        background: #fff; border: 1px solid var(--border); color: var(--ink-muted);
+        padding: 7px 20px; border-radius: var(--radius-sm); font-size: 13px; cursor: pointer; font-family: inherit;
+    }
+    .wd-btn-default:hover { border-color: var(--primary); color: var(--primary); }
+    .wd-btn-primary {
+        background: var(--primary); border: none; color: #fff; padding: 7px 20px;
+        border-radius: var(--radius-sm); font-size: 13px; cursor: pointer; font-family: inherit;
+    }
+    .wd-btn-primary:hover { background: var(--primary-hover); }
+    .wd-balance { font-size: 20px; font-weight: 700; color: var(--primary); }
+
+    /* 提现申请记录 */
+    .rec-overlay {
+        position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+        display: none; align-items: center; justify-content: center; z-index: 2001;
+    }
+    .rec-overlay.show { display: flex; }
+    .rec-modal {
+        background: #fff; border-radius: 8px; width: 600px; max-width: 94vw;
+        max-height: 80vh; display: flex; flex-direction: column;
+    }
+    .rec-header {
+        padding: 16px 20px; border-bottom: 1px solid var(--border-light);
+        display: flex; align-items: center; justify-content: space-between;
+    }
+    .rec-title { font-size: 16px; font-weight: 600; color: var(--ink); }
+    .rec-body { padding: 16px 20px; overflow-y: auto; flex: 1; }
+    .rec-table { width: 100%; border-collapse: collapse; }
+    .rec-table th {
+        background: #fafbfc; padding: 10px; text-align: left; font-size: 13px;
+        color: var(--ink-muted); border-bottom: 1px solid var(--border-light); white-space: nowrap;
+    }
+    .rec-table td {
+        padding: 10px; font-size: 13px; color: var(--ink); border-bottom: 1px solid #f5f5f7; white-space: nowrap;
+    }
+    .rec-status { display: inline-block; padding: 2px 8px; border-radius: var(--radius-sm); font-size: 12px; }
+    .rec-status.pending { background: #fff4e6; color: #e67e22; }
+    .rec-status.approved { background: var(--primary-bg); color: var(--primary); }
+    .rec-status.done { background: #e6f7eb; color: #1aab67; }
+
+    /* 标注圆点 */
+    .badge {
+        display: inline-block; min-width: 18px; height: 18px; padding: 0 5px;
+        border-radius: 50%; background: var(--primary); color: #fff; font-size: 12px;
+        line-height: 18px; text-align: center; font-weight: 600; box-shadow: 0 1px 3px rgba(26,120,255,0.3);
+    }
+
+    /* 轻提示 */
+    .toast {
+        position: fixed; top: 80px; left: 50%;
+        transform: translateX(-50%) translateY(-16px);
+        background: #1a1a2e; color: #fff; padding: 10px 22px;
+        border-radius: 6px; font-size: 13px;
+        opacity: 0; pointer-events: none; transition: all .25s; z-index: 9998;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ===== 右侧功能说明面板 ===== */
+    .func-panel {
+        position: fixed; top: 0; right: 0; bottom: 0;
+        width: 340px; z-index: 890;
+        background: #fff; border-left: 1px solid #e3e6eb;
+        box-shadow: -1px 0 12px rgba(20, 30, 60, 0.04);
+        display: flex; flex-direction: column;
+    }
+    .func-panel .fp-inner { display: flex; flex-direction: column; height: 100%; min-width: 0; }
+    .func-panel .fp-header {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 15px 14px 13px 18px; border-bottom: 1px solid #f0f1f4; flex-shrink: 0;
+    }
+    .func-panel .fp-title { display: flex; align-items: center; gap: 9px; font-size: 15px; font-weight: 700; color: var(--ink); }
+    .func-panel .fp-title::before {
+        content: ''; width: 8px; height: 8px; border-radius: 50%;
+        background: var(--primary); box-shadow: 0 0 0 4px rgba(26, 120, 255, 0.12);
+    }
+    .func-panel .fp-fold-btn {
+        width: 28px; height: 28px; border: 1px solid var(--border); background: #fff;
+        border-radius: 50%; color: var(--ink-subtle); font-size: 15px; line-height: 1;
+        cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .2s;
+    }
+    .func-panel .fp-fold-btn:hover { border-color: var(--primary); color: var(--primary); }
+    .func-panel .fp-body { flex: 1; overflow-y: auto; padding: 4px 18px 40px; font-size: 13px; color: #555; line-height: 1.85; }
+    .func-panel .fp-body h4 { font-size: 14px; font-weight: 600; color: var(--ink); margin: 18px 0 6px; }
+    .func-panel .fp-body h4:first-child { margin-top: 12px; }
+    .func-panel .fp-body ul { padding-left: 18px; margin: 0 0 8px; }
+    .func-panel .fp-body li { margin-bottom: 6px; }
+    .func-panel .fp-body strong { color: #333; }
+    .func-panel .fp-body p { margin: 6px 0; }
+    .func-panel .fp-body .fp-role { font-size: 13px; font-weight: 600; color: var(--primary); margin-bottom: 8px; }
+    .func-panel .fp-open {
+        display: none; position: absolute; top: 0; bottom: 0; left: 0; right: 0;
+        border: none; background: transparent; cursor: pointer;
+        writing-mode: vertical-rl; text-orientation: upright;
+        font-size: 13px; font-weight: 600; letter-spacing: 6px; color: var(--ink-subtle);
+        align-items: center; justify-content: center; font-family: inherit; transition: all .2s;
+    }
+    .func-panel .fp-open:hover { color: var(--primary); background: #fafbfc; }
+
+    @media (min-width: 1024px) {
+        .main, .breadcrumb { margin-right: 340px; }
+        body.fp-collapsed .main,
+        body.fp-collapsed .breadcrumb { margin-right: 40px; }
+        body.fp-collapsed .func-panel { width: 40px; }
+        body.fp-collapsed .fp-inner { display: none; }
+        body.fp-collapsed .fp-open { display: flex; }
+    }
+    @media (max-width: 1023.98px) {
+        .func-panel { display: none; }
+        .main, .breadcrumb { margin-right: 0; }
+    }
+    @media (max-width: 900px) {
+        .filter-actions { margin-left: 0; }
+    }
+</style>
+</head>
+<body>
+
+<div class="breadcrumb">
+    <span>首页</span><span class="sep">/</span>
+    <span>资金管理</span><span class="sep">/</span>
+    <span class="active">账户管理</span>
+    <div class="user-chip">
+        <span class="avatar">👤</span>
+        <span class="name">批发商：李文轩</span>
+        <span class="arrow">▾</span>
+    </div>
+</div>
+
+<div class="app">
+    <div class="main">
+        <div class="content">
+
+            <!-- 资金汇总卡片 -->
+            <div class="summary-row">
+                <div class="summary-card">
+                    <div class="head">
+                        <span class="label">汇付钱包余额<span class="channel-tag">汇付</span></span>
+                        <button class="btn" id="hfBtn" onclick="openAccModal()">开户</button>
+                    </div>
+                    <span class="amount hf" id="hfAmount">0.00</span>
+                </div>
+            </div>
+
+            <!-- Tab + 筛选 -->
+            <div class="panel">
+                <div class="tabs">
+                    <div class="tab active" data-tab="all" onclick="selectTab(this)">全部</div>
+                    <div class="tab" data-tab="income" onclick="selectTab(this)">收入明细</div>
+                    <div class="tab" data-tab="expense" onclick="selectTab(this)">支出明细</div>
+                </div>
+                <div class="filter-bar">
+                    <div class="filter-item">
+                        <input type="text" class="filter-input" id="fProduct" placeholder="产品名称">
+                    </div>
+                    <div class="filter-item">
+                        <select class="filter-input" id="fStage" style="width:120px;">
+                            <option value="">阶段</option>
+                            <option>批发市场</option>
+                            <option>零售市场</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <input type="text" class="filter-input" id="fOrderNo" placeholder="订单编号">
+                    </div>
+                    <div class="filter-item">
+                        <select class="filter-input" id="fChannel" style="width:120px;">
+                            <option value="">支付渠道</option>
+                            <option>汇付钱包</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <select class="filter-input" id="fSubType" style="width:120px;">
+                            <option value="">分账类型</option>
+                            <option>批发分账</option>
+                            <option>提货分账</option>
+                        </select>
+                    </div>
+                    <div class="filter-actions">
+                        <button class="btn-search" onclick="applyFilter()">🔍 搜索</button>
+                        <button class="btn-reset" onclick="resetFilter()">↻ 重置</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 表格 -->
+            <div class="table-card">
+                <div class="table-scroll">
+                    <table class="table" id="tableEl">
+                        <thead id="tableHead"></thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+                </div>
+
+                <div class="pagination">
+                    <span class="total" id="totalText"></span>
+                    <button class="page-btn">‹</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn">2</button>
+                    <button class="page-btn">3</button>
+                    <button class="page-btn">4</button>
+                    <button class="page-btn">5</button>
+                    <span style="color:#9ba6b9;">...</span>
+                    <button class="page-btn">9</button>
+                    <button class="page-btn">›</button>
+                    <div class="page-jump">前往 <input type="text" value="1"> 页</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 提现浮层 -->
+<div class="wd-overlay" id="wdOverlay" onclick="if(event.target===this)closeWithdrawModal()">
+    <div class="wd-modal">
+        <div class="wd-header">
+            <span class="wd-title">申请提现</span>
+            <button class="wd-close" onclick="closeWithdrawModal()">✕</button>
+        </div>
+        <div class="wd-body">
+            <div class="wd-row">
+                <div class="wd-label">当前可提余额</div>
+                <div class="wd-balance" id="wdBalance">0.00</div>
+            </div>
+            <div class="wd-row">
+                <div class="wd-label">提现金额</div>
+                <input type="number" class="wd-input" id="wdAmount" placeholder="请输入提现金额">
+            </div>
+            <div class="wd-row">
+                <div class="wd-label">填写原因</div>
+                <input type="text" class="wd-input" id="wdReason" placeholder="请输入提现原因">
+            </div>
+            <div class="wd-row" style="margin-bottom:0;">
+                <span class="wd-link" onclick="openRecords()">提现申请记录 ›</span>
+            </div>
+        </div>
+        <div class="wd-footer">
+            <button class="wd-btn-default" onclick="closeWithdrawModal()">取消</button>
+            <button class="wd-btn-primary" onclick="applyWithdraw()">申请</button>
+        </div>
+    </div>
+</div>
+
+<!-- 汇付钱包开户浮层 -->
+<div class="wd-overlay" id="accOverlay" onclick="if(event.target===this)closeAccModal()">
+    <div class="wd-modal" style="width:520px;">
+        <div class="wd-header">
+            <span class="wd-title">汇付钱包开户</span>
+            <button class="wd-close" onclick="closeAccModal()">✕</button>
+        </div>
+        <div class="wd-body">
+            <div class="wd-row">
+                <div class="wd-label">开户银行账户名</div>
+                <input type="text" class="wd-input" id="accName" placeholder="请输入开户银行账户名">
+            </div>
+            <div class="wd-row">
+                <div class="wd-label">开户银行账号</div>
+                <input type="text" class="wd-input" id="accNo" placeholder="请输入开户银行账号">
+            </div>
+            <div class="wd-row">
+                <div class="wd-label">开户银行省份</div>
+                <select class="wd-input" id="accProvince" onchange="updateAccCity()">
+                    <option value="">请选择省份</option>
+                    <option value="广东">广东</option>
+                    <option value="北京">北京</option>
+                    <option value="上海">上海</option>
+                    <option value="四川">四川</option>
+                    <option value="浙江">浙江</option>
+                    <option value="江苏">江苏</option>
+                </select>
+            </div>
+            <div class="wd-row">
+                <div class="wd-label">开户银行地区</div>
+                <select class="wd-input" id="accCity">
+                    <option value="">请选择地区</option>
+                </select>
+            </div>
+            <div class="wd-row">
+                <div class="wd-label">开户银行</div>
+                <select class="wd-input" id="accBank">
+                    <option value="">请选择开户银行</option>
+                    <option value="中国工商银行">中国工商银行</option>
+                    <option value="中国农业银行">中国农业银行</option>
+                    <option value="中国银行">中国银行</option>
+                    <option value="中国建设银行">中国建设银行</option>
+                    <option value="交通银行">交通银行</option>
+                    <option value="招商银行">招商银行</option>
+                    <option value="平安银行">平安银行</option>
+                    <option value="广东发展银行">广东发展银行</option>
+                    <option value="浦发银行">浦发银行</option>
+                    <option value="兴业银行">兴业银行</option>
+                </select>
+            </div>
+            <div class="wd-row">
+                <div class="wd-label">开户银行许可证信息</div>
+                <div class="wd-upload">
+                    <input type="file" id="accLic" accept="image/png,image/jpeg,application/pdf" style="display:none;">
+                    <div class="wd-upload-box" onclick="document.getElementById('accLic').click()">
+                        <span class="wd-upload-icon">⬆</span>
+                        <span class="wd-upload-text">将文件拖到此处，或<span style="color:#1a78ff;">点击上传</span></span>
+                    </div>
+                    <div class="wd-upload-tip">只能上传png/jpg/pdf文件，且不超过5MB</div>
+                </div>
+            </div>
+        </div>
+        <div class="wd-footer">
+            <button class="wd-btn-default" onclick="closeAccModal()">取消</button>
+            <button class="wd-btn-primary" onclick="applyAccount()">提交开户</button>
+        </div>
+    </div>
+</div>
+
+<!-- 提现申请记录 -->
+<div class="rec-overlay" id="recOverlay" onclick="if(event.target===this)closeRecords()">
+    <div class="rec-modal">
+        <div class="rec-header">
+            <span class="rec-title">提现申请记录</span>
+            <button class="wd-close" onclick="closeRecords()">✕</button>
+        </div>
+        <div class="rec-body">
+            <table class="rec-table">
+                <thead>
+                    <tr>
+                        <th>申请时间</th>
+                        <th>支付渠道</th>
+                        <th>提现金额</th>
+                        <th>原因</th>
+                        <th>状态</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>2026-08-10 10:30:00</td>
+                        <td>汇付钱包</td>
+                        <td>2,000.00</td>
+                        <td>日常提现</td>
+                        <td><span class="rec-status pending">待审核</span></td>
+                    </tr>
+                    <tr>
+                        <td>2026-07-20 14:30:00</td>
+                        <td>汇付钱包</td>
+                        <td>500.00</td>
+                        <td>货款提取</td>
+                        <td><span class="rec-status approved">已通过</span></td>
+                    </tr>
+                    <tr>
+                        <td>2026-07-01 14:20:00</td>
+                        <td>汇付钱包</td>
+                        <td>300.00</td>
+                        <td>运营资金</td>
+                        <td><span class="rec-status done">已提现</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- 右侧功能说明 -->
+<aside class="func-panel">
+    <div class="fp-inner">
+        <div class="fp-header">
+            <div class="fp-title">功能说明</div>
+            <button class="fp-fold-btn" onclick="toggleFuncPanel()">›</button>
+        </div>
+        <div class="fp-body">
+            <div class="fp-role">批发商</div>
+            <p>服务商后台<strong>账户管理</strong>，只管理<strong>批发市场 25% 分账</strong>、<strong>提货分账（每次分账记录）</strong>、<strong>提现</strong>三类数据，支持发起提现申请。</p>
+
+            <h4><span class="badge">1</span> <span style="vertical-align:middle;">第三方支付开户统一汇总</span></h4>
+            <ul>
+                <li>原认证流程里<strong>去掉输入信息自动调用第三方支付平台开户的流程</strong>，全部统一汇总到<strong>账户管理</strong>页面。</li>
+                <li>顶部展示已经接入的<strong>第三方支付（汇付）</strong>。</li>
+                <li>未开通时展示<strong>开户按钮</strong>，点击调用第三方支付平台进行开户。</li>
+                <li>开通后展示<strong>余额</strong>和<strong>提现按钮</strong>。</li>
+            </ul>
+
+            <h4><span class="badge">2</span> <span style="vertical-align:middle;">增加筛选项</span></h4>
+            <ul>
+                <li>支持按<strong>产品名称、阶段、订单编号、支付渠道、分账类型</strong>筛选。</li>
+                <li>提供<strong>搜索</strong>与<strong>重置</strong>。</li>
+            </ul>
+
+            <h4><span class="badge">3</span> <span style="vertical-align:middle;">Tab 三种视图</span></h4>
+            <ul>
+                <li>提供<strong>全部、收入明细、支出明细</strong>三种视图。</li>
+                <li><strong>收支（¥）</strong>列标色：收入<strong style="color:#d92d20;">红</strong>、支出<strong style="color:#0b9a4f;">绿</strong>，其他列保持黑色。</li>
+            </ul>
+
+            <h4><span class="badge">4</span> <span style="vertical-align:middle;">分账类型</span></h4>
+            <ul>
+                <li>仅<strong>汇付钱包</strong>的流水展示<strong>分账类型</strong>：<strong>批发分账</strong>、<strong>提货分账</strong>。</li>
+            </ul>
+
+            <h4><span class="badge">5</span> <span style="vertical-align:middle;">阶段说明</span></h4>
+            <ul>
+                <li><strong>批发分账</strong>均发生在<strong>批发市场</strong>。</li>
+                <li><strong>提货分账</strong>的阶段取决于当前产品状态：<strong>上零售市场之前</strong>发生的提货为<strong>批发市场</strong>，<strong>之后</strong>发生的提货为<strong>零售市场</strong>。</li>
+            </ul>
+
+            <h4><span class="badge">6</span> <span style="vertical-align:middle;">提现提交审核流程</span></h4>
+            <ul>
+                <li>点击<strong>提现按钮</strong>弹出<strong>申请提现</strong>浮层。</li>
+                <li>填写<strong>提现金额</strong>与<strong>提现原因</strong>后提交，等待平台审核。</li>
+                <li>提交后进入<strong>待审核</strong>状态，由平台在<strong>批发商提现审核</strong>页面处理。</li>
+                <li>点击<strong>提现申请记录</strong>可查看历史申请状态（待审核 / 已通过 / 已提现）。</li>
+            </ul>
+
+            <h4><span class="badge">7</span> <span style="vertical-align:middle;">汇付钱包开户流程</span></h4>
+            <ul>
+                <li>汇付钱包未开户时默认展示<strong>开户</strong>按钮。</li>
+                <li>点击<strong>开户</strong>弹出浮层，填写<strong>开户银行账户名、开户银行账号、开户银行省份、开户银行地区、开户银行</strong>，并<strong>上传开户银行许可证信息附件</strong>后提交。</li>
+                <li>提交后进入<strong>等待审核</strong>，审核通过后展示<strong>余额</strong>与<strong>提现按钮</strong>。</li>
+            </ul>
+        </div>
+    </div>
+    <button class="fp-open" onclick="toggleFuncPanel()">功能说明</button>
+</aside>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var incomeData = [
+    { product: '中路财童', stage: '零售市场', subType: '提货分账', orderNo: 'HB-pf202608010001', tradeAmount: '2000.00', fee: '12.00', createTime: '2026-08-03 15:20:00', updateTime: '2026-08-03 15:20:00', amount: '+200.00', channel: '汇付钱包' },
+    { product: '中路财童', stage: '零售市场', subType: '提货分账', orderNo: 'HB-pf202608010001', tradeAmount: '2000.00', fee: '12.00', createTime: '2026-08-03 15:18:00', updateTime: '2026-08-03 15:18:00', amount: '+200.00', channel: '汇付钱包' },
+    { product: '中路财童', stage: '零售市场', subType: '提货分账', orderNo: 'HB-pf202608010001', tradeAmount: '2000.00', fee: '12.00', createTime: '2026-08-03 15:15:00', updateTime: '2026-08-03 15:15:00', amount: '+200.00', channel: '汇付钱包' },
+    { product: '中路财童', stage: '批发市场', subType: '提货分账', orderNo: 'HB-pf202608010001', tradeAmount: '2000.00', fee: '12.00', createTime: '2026-08-02 11:00:00', updateTime: '2026-08-02 11:00:00', amount: '+200.00', channel: '汇付钱包' },
+    { product: '中路财童', stage: '批发市场', subType: '批发分账', orderNo: 'HB-pf202608010001', tradeAmount: '2000.00', fee: '12.00', createTime: '2026-08-01 09:30:00', updateTime: '2026-08-01 09:30:00', amount: '+488.00', channel: '汇付钱包' }
+];
+
+var expenseData = [
+    { product: '提现', stage: '提现', createTime: '2026-07-20 14:30:00', updateTime: '2026-07-20 14:30:00', amount: '-500.00', channel: '汇付钱包' }
+];
+
+var currentTab = 'all';
+
+function renderHead() {
+    document.getElementById('tableHead').innerHTML = [
+        '<tr>',
+        '    <th>产品名称</th>',
+        '    <th>阶段</th>',
+        '    <th>分账类型</th>',
+        '    <th>订单编号</th>',
+        '    <th>交易金额</th>',
+        '    <th>手续费</th>',
+        '    <th>创建时间 <span class="col-sort">⇅</span></th>',
+        '    <th>修改时间 <span class="col-sort">⇅</span></th>',
+        '    <th>支付渠道</th>',
+        '    <th>收支（¥）</th>',
+        '</tr>'
+    ].join('');
+}
+
+function subTypeHtml(subType) {
+    if (!subType) return '<span class="sub-tag empty">-</span>';
+    var cls = subType === '批发分账' ? 'pf' : 'th';
+    return '<span class="sub-tag ' + cls + '">' + subType + '</span>';
+}
+
+function getFilteredData() {
+    var data = currentTab === 'all'
+        ? incomeData.concat(expenseData)
+        : (currentTab === 'income' ? incomeData : expenseData);
+    var fProduct = document.getElementById('fProduct').value.trim();
+    var fStage = document.getElementById('fStage').value;
+    var fOrderNo = document.getElementById('fOrderNo').value.trim();
+    var fChannel = document.getElementById('fChannel').value;
+    var fSubType = document.getElementById('fSubType').value;
+    return data.filter(function(o) {
+        if (fProduct && o.product.indexOf(fProduct) < 0) return false;
+        if (fStage && o.stage !== fStage) return false;
+        if (fOrderNo && (o.orderNo || '').indexOf(fOrderNo) < 0) return false;
+        if (fChannel && o.channel !== fChannel) return false;
+        if (fSubType && o.subType !== fSubType) return false;
+        return true;
+    });
+}
+
+function renderTable() {
+    renderHead();
+    var data = getFilteredData();
+    data.sort(function(a, b) {
+        return a.createTime < b.createTime ? 1 : (a.createTime > b.createTime ? -1 : 0);
+    });
+    var html = '';
+    data.forEach(function(o) {
+        var isIncome = o.amount.charAt(0) === '+';
+        var amountClass = isIncome ? 'amount-pos' : 'amount-neg';
+        html += [
+            '<tr>',
+            '    <td>' + o.product + '</td>',
+            '    <td>' + o.stage + '</td>',
+            '    <td>' + subTypeHtml(o.subType) + '</td>',
+            '    <td>' + (o.orderNo || '-') + '</td>',
+            '    <td>' + (o.tradeAmount || '-') + '</td>',
+            '    <td>' + (o.fee || '-') + '</td>',
+            '    <td>' + o.createTime + '</td>',
+            '    <td>' + o.updateTime + '</td>',
+            '    <td>' + o.channel + '</td>',
+            '    <td class="' + amountClass + '">' + o.amount + '</td>',
+            '</tr>'
+        ].join('');
+    });
+    document.getElementById('tableBody').innerHTML = html;
+    document.getElementById('totalText').textContent = '共 ' + data.length + ' 条';
+}
+
+function selectTab(el) {
+    document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+    el.classList.add('active');
+    currentTab = el.dataset.tab;
+    renderTable();
+}
+
+function applyFilter() {
+    renderTable();
+    showToast('已按条件筛选，共 ' + getFilteredData().length + ' 条');
+}
+
+function resetFilter() {
+    document.getElementById('fProduct').value = '';
+    document.getElementById('fStage').value = '';
+    document.getElementById('fOrderNo').value = '';
+    document.getElementById('fChannel').value = '';
+    document.getElementById('fSubType').value = '';
+    renderTable();
+}
+
+renderTable();
+
+/* ── 汇付钱包开户流程 ── */
+var cityMap = {
+    '广东': ['深圳市','广州市','珠海市'],
+    '北京': ['北京市'],
+    '上海': ['上海市'],
+    '四川': ['成都市','绵阳市'],
+    '浙江': ['杭州市','宁波市'],
+    '江苏': ['南京市','苏州市']
+};
+function openAccModal() {
+    document.getElementById('accOverlay').classList.add('show');
+}
+document.addEventListener('change', function(e) {
+    if (e.target && e.target.id === 'accLic' && e.target.files.length) {
+        var fileName = e.target.files[0].name;
+        var box = e.target.parentElement.querySelector('.wd-upload-box');
+        box.querySelector('.wd-upload-text').innerHTML = '已选择文件：<b style="color:#1a78ff;">' + fileName + '</b>';
+        box.style.borderColor = '#1a78ff';
+    }
+});
+function closeAccModal() {
+    document.getElementById('accOverlay').classList.remove('show');
+}
+function updateAccCity() {
+    var p = document.getElementById('accProvince').value;
+    var sel = document.getElementById('accCity');
+    sel.innerHTML = '<option value="">请选择地区</option>';
+    (cityMap[p] || []).forEach(function(c) {
+        var opt = document.createElement('option');
+        opt.value = c;
+        opt.textContent = c;
+        sel.appendChild(opt);
+    });
+}
+function applyAccount() {
+    closeAccModal();
+    var btn = document.getElementById('hfBtn');
+    btn.textContent = '提现';
+    btn.onclick = openWithdrawModal;
+    document.getElementById('hfAmount').textContent = '3,286.50';
+    showToast('开户成功！汇付钱包已开通，当前余额 3,286.50');
+}
+
+/* ── 提现提交审核流程 ── */
+function openWithdrawModal() {
+    var hf = (document.getElementById('hfAmount').textContent || '0').replace(/,/g, '');
+    var total = parseFloat(hf || 0);
+    document.getElementById('wdBalance').textContent = total.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    document.getElementById('wdOverlay').classList.add('show');
+}
+function closeWithdrawModal() {
+    document.getElementById('wdOverlay').classList.remove('show');
+}
+function applyWithdraw() {
+    var amount = document.getElementById('wdAmount').value;
+    var reason = document.getElementById('wdReason').value.trim();
+    if (!amount || !reason) {
+        showToast('请填写提现金额和原因');
+        return;
+    }
+    closeWithdrawModal();
+    showToast('提现申请已提交，等待平台审核：' + amount + ' 元（' + reason + '）');
+}
+function openRecords() {
+    document.getElementById('recOverlay').classList.add('show');
+}
+function closeRecords() {
+    document.getElementById('recOverlay').classList.remove('show');
+}
+
+/* ===== 轻提示 ===== */
+var toastTimer;
+function showToast(msg) {
+    var el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function() { el.classList.remove('show'); }, 2400);
+}
+
+/* ===== 右侧功能说明折叠 ===== */
+function toggleFuncPanel() {
+    document.body.classList.toggle('fp-collapsed');
+}
+</script>
+
+<script src="asset/admin-sidebar.js"></script>
+
+</body>
+</html>
