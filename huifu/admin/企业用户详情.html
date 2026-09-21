@@ -3,221 +3,168 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>企业认证详情</title>
+    <title>企业用户详情 · 深艺交管理后台</title>
+    <link rel="stylesheet" href="asset/admin-sidebar.css">
     <style>
-        * { margin:0; padding:0; box-sizing:border-box; }
+        :root {
+            --bg: #ffffff;
+            --accent: #1a78ff;
+            --accent-hover: #0f6ae8;
+            --ink: #1d1d1f;
+            --ink-muted: #3f424b;
+            --ink-subtle: #86868b;
+            --border: #e0e0e0;
+            --radius-pill: 9999px;
+            --radius-card: 18px;
+            --shadow-card: 0 0 0 1px rgba(0,0,0,.06);
+            --font: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
-            background: #f0f2f5;
-            color: #1a1a2e;
-            font-size: 14px;
+            font-family: var(--font);
+            background: #f5f5f7;
+            min-height: 100vh;
+            color: var(--ink);
+            -webkit-font-smoothing: antialiased;
         }
+        .breadcrumb { padding: 16px 24px 0; font-size: 13px; color: var(--ink-subtle); }
+        .breadcrumb a { color: var(--ink-subtle); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--accent); }
+        .breadcrumb .current { color: var(--ink); font-weight: 500; }
 
-        /* 顶部 */
-        .topbar {
-            background: #fff;
-            height: 56px;
-            display: flex;
-            align-items: center;
-            padding: 0 20px;
-            border-bottom: 1px solid #f0f0f0;
-            position: sticky;
-            top: 0;
-            z-index: 10;
+        .main { padding: 16px 24px 40px; }
+        .page-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin: 4px 0 16px;
         }
-        .topbar-left {
-            display: flex;
-            align-items: center;
-            gap: 16px;
+        .page-header h2 { font-size: 20px; font-weight: 600; }
+        .page-header .back-link {
+            font-size: 13px; color: var(--accent); text-decoration: none;
         }
-        .menu-btn {
-            width: 32px;
-            height: 32px;
-            border: 1px solid #d0d5dd;
-            border-radius: 4px;
-            background: #fff;
-            color: #6b7588;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-        }
-        .menu-btn:hover { background: #f5f5f7; }
-        .breadcrumb {
-            font-size: 13px;
-            color: #6b7588;
-        }
-        .breadcrumb .active {
-            color: #1a1a2e;
-        }
-        .topbar-right {
-            margin-left: auto;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-        }
-        .topbar-right .avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: #f5deb3;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-        }
-        .topbar-right .name {
-            font-size: 13px;
-            color: #1a1a2e;
-        }
-        .topbar-right .arrow {
-            color: #9ba6b9;
-            font-size: 12px;
-        }
+        .page-header .back-link:hover { text-decoration: underline; }
 
-        /* 内容区 */
-        .container {
-            padding: 16px;
+        /* 详情卡片 */
+        .detail-card {
+            background: #fff; border-radius: var(--radius-card);
+            box-shadow: var(--shadow-card); margin-bottom: 16px; overflow: hidden;
         }
-        .section {
-            background: #fff;
-            border-radius: 6px;
-            margin-bottom: 12px;
-            overflow: hidden;
+        .detail-card .card-title {
+            padding: 16px 20px; font-size: 15px; font-weight: 600;
+            border-bottom: 1px solid #f5f5f5;
         }
-        .section-title {
-            padding: 14px 20px;
-            font-size: 15px;
-            font-weight: 600;
-            color: #1a1a2e;
-            border-bottom: 1px solid #f5f5f7;
+        .detail-table { width: 100%; border-collapse: collapse; }
+        .detail-table tr { border-bottom: 1px solid #f5f5f5; }
+        .detail-table tr:last-child { border-bottom: none; }
+        .detail-table td {
+            padding: 14px 20px; font-size: 13px; vertical-align: top; line-height: 1.5;
         }
-        .table {
-            width: 100%;
-            border-collapse: collapse;
+        .detail-table td.label {
+            color: var(--ink-subtle); width: 16%; background: #fafafc; white-space: nowrap;
         }
-        .table tr {
-            border-bottom: 1px solid #f5f5f7;
-        }
-        .table tr:last-child { border-bottom: none; }
-        .table td {
-            padding: 12px 20px;
-            font-size: 14px;
-            color: #1a1a2e;
-            vertical-align: top;
-        }
-        .table td.label {
-            color: #6b7588;
-            width: 16%;
-        }
-        .table td.value {
-            width: 34%;
-        }
-        .table td.label-half {
-            color: #6b7588;
-            width: 12%;
-        }
-        .table td.value-half {
-            width: 21%;
-        }
-        .wallet-open-time {
-            font-size: 12px;
-            color: #6b7588;
-            margin-left: 8px;
-        }
+        .detail-table td.value { color: var(--ink); width: 34%; }
 
         /* 证件图片 */
         .cert-img {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: #f7f8fc;
-            border: 1px solid #e8ecf5;
-            border-radius: 4px;
-            padding: 4px 8px;
-            font-size: 12px;
-            color: #4e5a6e;
+            display: inline-flex; align-items: center; gap: 6px;
+            background: #f7f8fc; border: 1px solid #e8ecf5;
+            border-radius: 8px; padding: 6px 10px; font-size: 12px; color: var(--ink-muted);
         }
         .cert-img .icon {
-            width: 24px;
-            height: 24px;
-            background: #fff;
-            border-radius: 3px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #D62828;
-            font-size: 14px;
-        }
-        .cert-img .name {
-            font-size: 12px;
+            width: 24px; height: 24px; background: #fff;
+            border-radius: 4px; display: flex; align-items: center; justify-content: center;
+            color: #D62828; font-size: 14px;
         }
 
-        /* 资产信息行 */
-        .empty-hint {
-            text-align: center;
-            padding: 40px 0;
-            color: #9ba6b9;
-            font-size: 13px;
+        /* 钱包开户时间 */
+        .wallet-open-time {
+            font-size: 12px; color: var(--ink-subtle); margin-left: 8px;
         }
+
+        /* 历史记录空态 */
+        .empty-hint {
+            text-align: center; padding: 40px 0; color: var(--ink-subtle); font-size: 13px;
+        }
+
+        /* ===== 右侧功能说明面板 ===== */
+        .func-panel {
+            position: fixed; top: 0; right: 0; bottom: 0;
+            width: 340px; z-index: 890;
+            background: #fff; border-left: 1px solid #e3e6eb;
+            box-shadow: -1px 0 12px rgba(20, 30, 60, 0.04);
+            display: flex; flex-direction: column;
+        }
+        .func-panel .fp-inner { display: flex; flex-direction: column; height: 100%; min-width: 0; }
+        .func-panel .fp-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 15px 14px 13px 18px; border-bottom: 1px solid #f0f1f4; flex-shrink: 0;
+        }
+        .func-panel .fp-title { display: flex; align-items: center; gap: 9px; font-size: 15px; font-weight: 700; color: var(--ink); }
+        .func-panel .fp-title::before {
+            content: ''; width: 8px; height: 8px; border-radius: 50%;
+            background: var(--accent); box-shadow: 0 0 0 4px rgba(26, 120, 255, 0.12);
+        }
+        .func-panel .fp-fold-btn {
+            width: 28px; height: 28px; border: 1px solid var(--border); background: #fff;
+            border-radius: 50%; color: var(--ink-subtle); font-size: 15px; line-height: 1;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .2s;
+        }
+        .func-panel .fp-fold-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .func-panel .fp-body { flex: 1; overflow-y: auto; padding: 4px 18px 40px; font-size: 13px; color: #555; line-height: 1.85; }
+        .func-panel .fp-body h4 { font-size: 14px; font-weight: 600; color: var(--ink); margin: 18px 0 6px; }
+        .func-panel .fp-body h4:first-child { margin-top: 12px; }
+        .func-panel .fp-body ul { padding-left: 18px; margin: 0 0 8px; }
+        .func-panel .fp-body li { margin-bottom: 6px; }
+        .func-panel .fp-body strong { color: #333; }
+        .func-panel .fp-open {
+            display: none; position: absolute; top: 0; bottom: 0; left: 0; right: 0;
+            border: none; background: transparent; cursor: pointer;
+            writing-mode: vertical-rl; text-orientation: upright;
+            font-size: 13px; font-weight: 600; letter-spacing: 6px; color: var(--ink-subtle);
+            align-items: center; justify-content: center; font-family: inherit; transition: all .2s;
+        }
+        .func-panel .fp-open:hover { color: var(--accent); background: #fafbfc; }
 
         /* 标注圆点 */
         .badge {
-            display: inline-block;
-            min-width: 18px;
-            height: 18px;
-            padding: 0 5px;
-            border-radius: 50%;
-            background: #ff2d55;
-            color: #fff;
-            font-size: 12px;
-            line-height: 18px;
-            text-align: center;
-            font-weight: 600;
+            display: inline-block; min-width: 18px; height: 18px; padding: 0 5px;
+            border-radius: 50%; background: #ff2d55; color: #fff; font-size: 12px;
+            line-height: 18px; text-align: center; font-weight: 600;
             box-shadow: 0 1px 3px rgba(255,45,85,0.3);
         }
 
-        /* ── 功能说明浮窗 ── */
-        .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 540px; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 9999; padding: 24px; display: none; }
-        .f-modal.show { display: block; }
-        .f-modal .fm-title { font-size: 16px; font-weight: 600; color: #1a1a2e; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
-        .f-modal .fm-title:active { cursor: grabbing; }
-        .f-modal .fm-close { width: 28px; height: 28px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; color: #666; border: none; flex-shrink: 0; }
-        .f-modal .fm-close:hover { background: #e8e8e8; }
-        .f-modal .fm-body { font-size: 13px; color: #555; line-height: 1.8; }
-        .f-modal .fm-body h4 { font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 16px 0 8px; }
-        .f-modal .fm-body ul { padding-left: 18px; margin: 0 0 12px; }
-        .f-modal .fm-body li { margin-bottom: 4px; }
+        @media (min-width: 1024px) {
+            .main, .breadcrumb { margin-right: 340px; }
+            body.fp-collapsed .main,
+            body.fp-collapsed .breadcrumb { margin-right: 40px; }
+            body.fp-collapsed .func-panel { width: 40px; }
+            body.fp-collapsed .fp-inner { display: none; }
+            body.fp-collapsed .fp-open { display: flex; }
+        }
+        @media (max-width: 1023.98px) {
+            .func-panel { display: none; }
+            .main, .breadcrumb { margin-right: 0; }
+        }
     </style>
 </head>
 <body>
 
-<!-- 顶部 -->
-<div class="topbar">
-    <div class="topbar-left">
-        <button class="menu-btn">≡</button>
-        <div class="breadcrumb">
-            <span>首页</span> /
-            <span>认证管理</span> /
-            <span class="active">企业认证详情</span>
-        </div>
-    </div>
-    <div class="topbar-right">
-        <button onclick="toggleFuncModal()" style="margin-right:12px;padding:6px 14px;border-radius:6px;background:#f5f7fa;color:#333;border:1px solid #e0e4ea;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:4px;">📖 功能说明</button>
-        <span class="avatar">👤</span>
-        <span class="name">系统参数设置</span>
-        <span class="arrow">▾</span>
-    </div>
+<div class="breadcrumb">
+    <a href="../index.html">首页</a> <span> &gt; </span>
+    <a href="#">会员中心</a> <span> &gt; </span>
+    <a href="企业用户管理.html">企业用户管理</a> <span> &gt; </span>
+    <span class="current">企业用户详情</span>
 </div>
 
-<div class="container">
+<div class="main">
+    <div class="page-header">
+        <h2>企业用户详情</h2>
+        <a class="back-link" href="企业用户管理.html">← 返回企业用户管理</a>
+    </div>
 
     <!-- 企业信息 -->
-    <div class="section">
-        <div class="section-title">企业信息</div>
-        <table class="table">
+    <div class="detail-card">
+        <div class="card-title">企业信息</div>
+        <table class="detail-table">
             <tr>
                 <td class="label">账号</td>
                 <td class="value">13800172866</td>
@@ -283,9 +230,9 @@
     </div>
 
     <!-- 资产信息 -->
-    <div class="section">
-        <div class="section-title">资产信息</div>
-        <table class="table">
+    <div class="detail-card">
+        <div class="card-title">资产信息</div>
+        <table class="detail-table">
             <tr>
                 <td class="label">区块链地址</td>
                 <td class="value" colspan="3">RvKkE0DYDj35i6mY8lxC7Ndc54t4o3PNK</td>
@@ -300,9 +247,9 @@
     </div>
 
     <!-- 历史记录 -->
-    <div class="section">
-        <div class="section-title">历史记录</div>
-        <table class="table">
+    <div class="detail-card">
+        <div class="card-title">历史记录</div>
+        <table class="detail-table">
             <tr>
                 <td class="label">时间</td>
                 <td class="label">操作人</td>
@@ -312,58 +259,41 @@
         </table>
         <div class="empty-hint">暂无历史记录</div>
     </div>
-
 </div>
 
-<!-- ====== 功能说明浮窗 ====== -->
-<div class="f-modal" id="funcModal">
-  <div class="fm-title">
-    <span>📖 功能说明</span>
-    <button class="fm-close" onclick="toggleFuncModal()">✕</button>
-  </div>
-  <div style="font-size:13px;font-weight:600;color:#e74c5e;margin:-6px 0 12px;">平台</div>
-  <div class="fm-body">
-    <h4><span class="badge">1</span> <span style="vertical-align:middle;">钱包余额展示</span></h4>
-    <ul>
-      <li>在<b>批发商</b>和<b>服务商</b>资产信息中，增加展示<b>已开通钱包的余额</b></li>
-      <li>展示开通的钱包（宝付钱包余额、汇付钱包余额）</li>
-    </ul>
-    <h4><span class="badge">2</span> <span style="vertical-align:middle;">信息展示说明</span></h4>
-    <ul>
-      <li><b>批发商</b>和<b>服务商</b>展示的信息相同</li>
-      <li>已去掉<b>银行卡信息</b>，不再展示企业银行对公账户、开户银行等银行卡相关内容</li>
-      <li>在<b>企业信息</b>中增加法人相关信息：企业法人姓名、身份证号、身份证国徽面彩色照、身份证人像面彩色照</li>
-    </ul>
-  </div>
-</div>
+<!-- 右侧功能说明 -->
+<aside class="func-panel">
+    <div class="fp-inner">
+        <div class="fp-header">
+            <div class="fp-title">功能说明</div>
+            <button class="fp-fold-btn" onclick="toggleFuncPanel()">›</button>
+        </div>
+        <div class="fp-body">
+            <div style="font-size:13px;font-weight:600;color:#e74c5e;margin-bottom:8px;">平台</div>
+            <h4><span class="badge">1</span> <span style="vertical-align:middle;">钱包余额展示</span></h4>
+            <ul>
+                <li>在<b>批发商</b>资产信息中，增加展示<b>已开通钱包的余额</b>。</li>
+                <li>展示开通的钱包（汇付钱包余额）。</li>
+            </ul>
+            <h4><span class="badge">2</span> <span style="vertical-align:middle;">信息展示说明</span></h4>
+            <ul>
+                <li>已去掉<b>银行卡信息</b>，不再展示企业银行对公账户、开户银行等银行卡相关内容。</li>
+                <li>在<b>企业信息</b>中增加法人相关信息：企业法人姓名、身份证号、身份证国徽面彩色照、身份证人像面彩色照。</li>
+            </ul>
+            <h4>页面操作</h4>
+            <ul>
+                <li>点击<strong>返回企业用户管理</strong>可回到列表页。</li>
+            </ul>
+        </div>
+    </div>
+    <button class="fp-open" onclick="toggleFuncPanel()">功能说明</button>
+</aside>
 
+<script src="asset/admin-sidebar.js"></script>
 <script>
-function toggleFuncModal() {
-  var el = document.getElementById('funcModal');
-  el.classList.toggle('show');
-  if (el.classList.contains('show') && !el.dataset.dragged) {
-    el.style.left = '50%'; el.style.top = '50%'; el.style.transform = 'translate(-50%,-50%)';
-  }
-}
-(function() {
-  var modal, titleBar, offX, offY, dragging = false;
-  document.addEventListener('DOMContentLoaded', function() {
-    modal = document.getElementById('funcModal');
-    titleBar = modal.querySelector('.fm-title');
-    titleBar.addEventListener('mousedown', startDrag);
-    titleBar.addEventListener('touchstart', startDragTouch, {passive:true});
-    document.addEventListener('mousemove', onDrag);
-    document.addEventListener('mouseup', endDrag);
-    document.addEventListener('touchmove', onDragTouch, {passive:true});
-    document.addEventListener('touchend', endDrag);
-  });
-  function startDrag(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = e.clientX - rect.left; offY = e.clientY - rect.top; dragging = true; titleBar.style.cursor = 'grabbing'; }
-  function startDragTouch(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; var t = e.touches[0]; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = t.clientX - rect.left; offY = t.clientY - rect.top; dragging = true; }
-  function onDrag(e) { if (!dragging) return; modal.style.left = (e.clientX - offX) + 'px'; modal.style.top = (e.clientY - offY) + 'px'; }
-  function onDragTouch(e) { if (!dragging) return; var t = e.touches[0]; modal.style.left = (t.clientX - offX) + 'px'; modal.style.top = (t.clientY - offY) + 'px'; }
-  function endDrag() { dragging = false; if (titleBar) titleBar.style.cursor = 'grab'; }
-})();
+    function toggleFuncPanel() {
+        document.body.classList.toggle('fp-collapsed');
+    }
 </script>
-
 </body>
 </html>

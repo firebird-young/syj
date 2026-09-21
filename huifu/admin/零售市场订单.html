@@ -3,415 +3,386 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>零售市场订单</title>
+    <title>零售市场订单 · 深艺交管理后台</title>
+    <link rel="stylesheet" href="asset/admin-sidebar.css">
     <style>
-        * { margin:0; padding:0; box-sizing:border-box; }
+        :root {
+            --bg: #ffffff;
+            --accent: #1a78ff;
+            --accent-hover: #0f6ae8;
+            --ink: #1d1d1f;
+            --ink-muted: #3f424b;
+            --ink-subtle: #86868b;
+            --border: #e0e0e0;
+            --radius-pill: 9999px;
+            --radius-card: 18px;
+            --shadow-card: 0 0 0 1px rgba(0,0,0,.06);
+            --font: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
-            background: #f0f2f5;
-            color: #1a1a2e;
-            font-size: 14px;
+            font-family: var(--font);
+            background: #f5f5f7;
+            min-height: 100vh;
+            color: var(--ink);
+            -webkit-font-smoothing: antialiased;
+        }
+        .breadcrumb {
+            padding: 16px 24px 0;
+            font-size: 13px; color: var(--ink-subtle);
+        }
+        .breadcrumb a { color: var(--ink-subtle); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--accent); }
+        .breadcrumb .current { color: var(--ink); font-weight: 500; }
+
+        .main { padding: 16px 24px 40px; }
+        .page-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin: 4px 0 16px;
+        }
+        .page-header h2 { font-size: 20px; font-weight: 600; }
+        .page-header .hint { font-size: 12px; color: var(--ink-subtle); }
+        .market-tag {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 4px 12px; border-radius: var(--radius-pill);
+            background: #eaf3ff; color: var(--accent);
+            font-size: 12px; font-weight: 600;
+        }
+        .market-tag::before {
+            content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
         }
 
-        .topbar {
-            background: #fff;
-            height: 56px;
-            display: flex;
-            align-items: center;
-            padding: 0 20px;
-            border-bottom: 1px solid #f0f0f0;
-            position: sticky;
-            top: 0;
-            z-index: 10;
+        /* 搜索区 */
+        .search-area {
+            background: #fff; border-radius: var(--radius-card);
+            padding: 20px 24px; margin-bottom: 16px; box-shadow: var(--shadow-card);
         }
-        .topbar-left {
-            display: flex;
-            align-items: center;
-            gap: 16px;
+        .search-row { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: flex-end; }
+        .search-item { display: flex; flex-direction: column; gap: 6px; min-width: 160px; flex: 0 0 auto; }
+        .search-item label { font-size: 12px; color: var(--ink-subtle); font-weight: 500; }
+        .search-item input, .search-item select {
+            height: 36px; padding: 0 12px; border: 1px solid var(--border);
+            border-radius: var(--radius-pill); font-size: 13px; color: var(--ink);
+            background: #fff; outline: none; font-family: inherit;
         }
-        .menu-btn {
-            width: 32px; height: 32px;
-            border: 1px solid #d0d5dd;
-            border-radius: 4px;
-            background: #fff;
-            color: #6b7588;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
+        .search-item .date-pair { display: flex; align-items: center; gap: 6px; }
+        .search-item .date-pair span { color: var(--ink-subtle); font-size: 12px; }
+        .search-actions {
+            display: flex; gap: 10px; align-items: flex-end; margin-left: auto; flex: 0 0 auto;
         }
-        .menu-btn:hover { background: #f5f5f7; }
-        .breadcrumb { font-size: 13px; color: #6b7588; }
-        .breadcrumb .active { color: #1a1a2e; }
-        .topbar-right {
-            margin-left: auto;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
+        .search-actions .btn {
+            height: 36px; padding: 0 20px; border-radius: var(--radius-pill);
+            font-size: 13px; cursor: pointer; border: none; font-weight: 500; font-family: inherit;
         }
-        .topbar-right .avatar {
-            width: 32px; height: 32px;
-            border-radius: 50%;
-            background: #f5deb3;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 16px;
-        }
-        .topbar-right .name { font-size: 13px; }
-        .topbar-right .arrow { color: #9ba6b9; font-size: 12px; }
-
-        /* 二级面包屑 */
-        .subnav {
-            background: #fff;
-            padding: 12px 20px;
-            border-bottom: 1px solid #f0f0f0;
-            font-size: 13px;
-            color: #6b7588;
-        }
-        .subnav .tab {
-            display: inline-block;
-            padding: 6px 14px;
-            background: #f5f7fc;
-            color: #4e5a6e;
-            border-radius: 4px;
-            margin-right: 8px;
-            cursor: pointer;
-        }
-        .subnav .tab.active {
-            background: #1a78ff;
-            color: #fff;
-        }
-
-        /* 筛选区 */
-        .filter-bar {
-            background: #fff;
-            padding: 12px 20px;
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            border-bottom: 1px solid #f0f0f0;
-        }
-        .filter-item {
-            display: flex;
-            align-items: center;
-            margin-right: 16px;
-            margin-bottom: 4px;
-        }
-        .filter-label {
-            font-size: 13px;
-            color: #4e5a6e;
-            margin-right: 8px;
-            white-space: nowrap;
-        }
-        .filter-input {
-            width: 160px;
-            height: 30px;
-            padding: 0 10px;
-            border: 1px solid #d0d5dd;
-            border-radius: 4px;
-            font-size: 13px;
-            color: #1a1a2e;
-            outline: none;
-        }
-        .filter-input:focus { border-color: #1a78ff; }
-        .filter-select {
-            width: 140px;
-            height: 30px;
-            padding: 0 10px;
-            border: 1px solid #d0d5dd;
-            border-radius: 4px;
-            font-size: 13px;
-            color: #1a1a2e;
-            outline: none;
-            background: #fff;
-        }
-        .filter-date-input {
-            width: 110px;
-            height: 30px;
-            padding: 0 10px;
-            border: 1px solid #d0d5dd;
-            border-radius: 4px;
-            font-size: 13px;
-            color: #1a1a2e;
-            outline: none;
-        }
-        .filter-sep {
-            font-size: 13px;
-            color: #9ba6b9;
-            margin: 0 6px;
-        }
-        .filter-actions {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-left: auto;
-        }
-        .btn-export {
-            background: #f59e0b;
-            color: #fff;
-            border: none;
-            padding: 0 14px;
-            height: 30px;
-            border-radius: 4px;
-            font-size: 13px;
-            cursor: pointer;
-        }
-        .btn-export:hover { background: #e08d04; }
-        .btn-search {
-            background: #1a78ff;
-            color: #fff;
-            border: none;
-            padding: 0 14px;
-            height: 30px;
-            border-radius: 4px;
-            font-size: 13px;
-            cursor: pointer;
-        }
-        .btn-search:hover { background: #0f6ae8; }
-        .btn-reset {
-            background: #fff;
-            color: #1a78ff;
-            border: 1px solid #1a78ff;
-            padding: 0 14px;
-            height: 30px;
-            border-radius: 4px;
-            font-size: 13px;
-            cursor: pointer;
-        }
-        .btn-reset:hover { background: #f5f8ff; }
+        .search-actions .btn-search { background: var(--accent); color: #fff; }
+        .search-actions .btn-search:hover { background: var(--accent-hover); }
+        .search-actions .btn-reset { background: #f5f5f7; color: var(--ink-subtle); border: 1px solid var(--border); }
+        .search-actions .btn-export { background: #fff; color: var(--accent); border: 1px solid var(--accent); }
+        .search-actions .btn-export:hover { background: #f5f8ff; }
 
         /* 表格 */
-        .table-card {
-            background: #fff;
-            margin: 12px;
-            border-radius: 6px;
-            overflow: hidden;
+        .table-wrap {
+            background: #fff; border-radius: var(--radius-card);
+            box-shadow: var(--shadow-card); overflow: hidden;
         }
-        .table {
-            width: 100%;
-            border-collapse: collapse;
+        .table-scroll { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 1780px; }
+        thead th {
+            font-size: 12px; font-weight: 600; color: var(--ink-muted);
+            text-align: left; padding: 14px 12px; white-space: nowrap;
+            border-bottom: 1px solid var(--border); background: #fafafc;
         }
-        .table th {
-            background: #fafbfc;
-            padding: 12px 10px;
-            text-align: left;
-            font-size: 13px;
-            color: #4e5a6e;
-            font-weight: 500;
-            border-bottom: 1px solid #f0f0f0;
+        tbody td { font-size: 13px; padding: 12px; border-bottom: 1px solid #f5f5f5; vertical-align: top; }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: #fafbff; }
+        .order-no { color: var(--accent); cursor: pointer; }
+        .order-no:hover { text-decoration: underline; }
+        .td-code {
+            max-width: 130px; overflow: hidden;
+            text-overflow: ellipsis; white-space: nowrap;
+            color: var(--accent); cursor: help;
         }
-        .table td {
-            padding: 14px 10px;
-            font-size: 13px;
-            color: #1a1a2e;
-            border-bottom: 1px solid #f5f5f7;
-        }
-        .table tr:last-child td { border-bottom: none; }
-        .table .order-no { color: #1a78ff; }
-        .table .order-no:hover { text-decoration: underline; cursor: pointer; }
-        /* 产品编号：超长截断，hover 显示全文 */
-        .table .td-code {
-            max-width: 130px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            color: #1a78ff;
-            cursor: help;
-        }
+        .td-code.empty { color: var(--ink-subtle); font-style: italic; }
+        .time { color: var(--ink-muted); font-size: 12px; }
+        .col-sort { display: inline-block; margin-left: 4px; color: #c0c8d4; cursor: pointer; }
+
+        /* 状态标签 */
         .status-tag {
-            display: inline-block;
-            padding: 2px 10px;
-            border-radius: 4px;
-            font-size: 12px;
+            display: inline-block; padding: 3px 10px;
+            border-radius: var(--radius-pill);
+            font-size: 12px; font-weight: 500; white-space: nowrap;
         }
-        .status-tag.done {
-            background: #e8f5e9;
-            color: #2e7d32;
-        }
-        .status-tag.canceled {
-            background: #f5f5f5;
-            color: #9ba6b9;
-        }
-        .table .time {
-            color: #6b7588;
-            font-size: 12px;
-        }
-        .col-sort {
-            display: inline-block;
-            margin-left: 4px;
-            color: #c0c8d4;
-            cursor: pointer;
-        }
+        .status-tag.done { background: #e6f7eb; color: #1aab67; }
+        .status-tag.canceled { background: #f2f3f5; color: #9ba6b9; }
 
-        /* 标注圆点 */
-        .badge {
-            display: inline-block;
-            min-width: 18px;
-            height: 18px;
-            padding: 0 5px;
-            border-radius: 50%;
-            background: #ff2d55;
-            color: #fff;
-            font-size: 12px;
-            line-height: 18px;
-            text-align: center;
-            font-weight: 600;
-            box-shadow: 0 1px 3px rgba(255,45,85,0.3);
+        /* 分页 */
+        .table-foot {
+            padding: 14px 24px; display: flex; align-items: center; justify-content: flex-end;
+            gap: 8px; font-size: 13px; color: var(--ink-muted);
+            border-top: 1px solid #f0f0f0;
         }
-        .badge.sm {
-            min-width: 16px;
-            height: 16px;
-            font-size: 11px;
-            line-height: 16px;
+        .table-foot .total { margin-right: 16px; }
+        .page-btn {
+            min-width: 32px; height: 32px; padding: 0 10px;
+            border: 1px solid var(--border); border-radius: var(--radius-pill);
+            background: #fff; color: var(--ink-muted); font-size: 12px;
+            cursor: pointer; font-family: inherit;
         }
+        .page-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .page-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
 
-        /* ── 功能说明浮窗 ── */
-        .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 560px; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 9999; padding: 24px; display: none; }
-        .f-modal.show { display: block; }
-        .f-modal .fm-title { font-size: 16px; font-weight: 600; color: #1a1a2e; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
-        .f-modal .fm-title:active { cursor: grabbing; }
-        .f-modal .fm-close { width: 28px; height: 28px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; color: #666; border: none; flex-shrink: 0; }
-        .f-modal .fm-close:hover { background: #e8e8e8; }
-        .f-modal .fm-body { font-size: 13px; color: #555; line-height: 1.8; }
-        .f-modal .fm-body h4 { font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 16px 0 8px; }
-        .f-modal .fm-body h4:first-child { margin-top: 0; }
-        .f-modal .fm-body ul { padding-left: 18px; margin: 0 0 12px; }
-        .f-modal .fm-body li { margin-bottom: 4px; }
+        /* ===== 右侧功能说明面板 ===== */
+        .func-panel {
+            position: fixed; top: 0; right: 0; bottom: 0;
+            width: 340px; z-index: 890;
+            background: #fff; border-left: 1px solid #e3e6eb;
+            box-shadow: -1px 0 12px rgba(20,30,60,.04);
+            display: flex; flex-direction: column;
+        }
+        .func-panel .fp-inner { display: flex; flex-direction: column; height: 100%; min-width: 0; }
+        .func-panel .fp-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 15px 14px 13px 18px; border-bottom: 1px solid #f0f1f4; flex-shrink: 0;
+        }
+        .func-panel .fp-title { display: flex; align-items: center; gap: 9px; font-size: 15px; font-weight: 700; color: var(--ink); }
+        .func-panel .fp-title::before {
+            content: ''; width: 8px; height: 8px; border-radius: 50%;
+            background: var(--accent); box-shadow: 0 0 0 4px rgba(26,120,255,.18);
+        }
+        .func-panel .fp-fold-btn {
+            width: 28px; height: 28px; border: 1px solid var(--border); background: #fff;
+            border-radius: 50%; color: var(--ink-subtle); font-size: 15px; line-height: 1;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .2s;
+        }
+        .func-panel .fp-fold-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .func-panel .fp-body { flex: 1; overflow-y: auto; padding: 4px 18px 40px; font-size: 13px; color: #555; line-height: 1.85; }
+        .func-panel .fp-body h4 { font-size: 14px; font-weight: 600; color: var(--ink); margin: 18px 0 6px; }
+        .func-panel .fp-body h4:first-child { margin-top: 12px; }
+        .func-panel .fp-body ul { padding-left: 18px; margin: 0 0 8px; }
+        .func-panel .fp-body li { margin-bottom: 6px; }
+        .func-panel .fp-body strong { color: #333; }
+        .func-panel .fp-body .formula {
+            display: block; padding: 10px 12px; margin: 6px 0 10px;
+            background: #fafafc; border-left: 3px solid var(--accent);
+            border-radius: 4px; font-size: 12px; color: var(--ink-muted);
+            line-height: 1.9;
+        }
+        .func-panel .fp-open {
+            display: none; position: absolute; top: 0; bottom: 0; left: 0; right: 0;
+            border: none; background: transparent; cursor: pointer;
+            writing-mode: vertical-rl; text-orientation: upright;
+            font-size: 13px; font-weight: 600; letter-spacing: 6px; color: var(--ink-subtle);
+            align-items: center; justify-content: center; font-family: inherit; transition: all .2s;
+        }
+        .func-panel .fp-open:hover { color: var(--accent); background: #fafbfc; }
+        @media (min-width: 1024px) {
+            .main, .breadcrumb { margin-right: 340px; }
+            body.fp-collapsed .main,
+            body.fp-collapsed .breadcrumb { margin-right: 40px; }
+            body.fp-collapsed .func-panel { width: 40px; }
+            body.fp-collapsed .fp-inner { display: none; }
+            body.fp-collapsed .fp-open { display: flex; }
+        }
+        @media (max-width: 1023.98px) {
+            .func-panel { display: none; }
+            .main, .breadcrumb { margin-right: 0; }
+        }
     </style>
 </head>
 <body>
 
-<!-- 顶部 -->
-<div class="topbar">
-    <div class="topbar-left">
-        <button class="menu-btn">≡</button>
-        <div class="breadcrumb">
-            <span>首页</span> /
-            <span>交易记录管理</span> /
-            <span class="active">零售市场</span>
+<div class="breadcrumb">
+    <a href="数据看板.html">首页</a> <span> &gt; </span>
+    <a href="#">交易记录管理</a> <span> &gt; </span>
+    <span class="current">零售市场订单</span>
+</div>
+
+<div class="main">
+    <div class="page-header">
+        <h2>零售市场订单</h2>
+        <span class="market-tag">零售市场</span>
+    </div>
+
+    <div class="search-area">
+        <div class="search-row">
+            <div class="search-item">
+                <label>产品名称</label>
+                <input type="text" placeholder="请输入产品名称">
+            </div>
+            <div class="search-item">
+                <label>买家账号</label>
+                <input type="text" placeholder="请输入买家账号">
+            </div>
+            <div class="search-item">
+                <label>卖家账号</label>
+                <input type="text" placeholder="请输入卖家账号">
+            </div>
+            <div class="search-item">
+                <label>订单编号</label>
+                <input type="text" placeholder="请输入订单编号">
+            </div>
+            <div class="search-item">
+                <label>订单状态</label>
+                <select>
+                    <option>请选择订单状态</option>
+                    <option>全部</option>
+                    <option>待成交</option>
+                    <option>已成交</option>
+                    <option>已撤销</option>
+                    <option>撤销部分成交</option>
+                    <option>异常订单</option>
+                </select>
+            </div>
+            <div class="search-item">
+                <label>时间范围</label>
+                <div class="date-pair">
+                    <input type="text" placeholder="开始日期" style="width:130px;">
+                    <span>至</span>
+                    <input type="text" placeholder="结束日期" style="width:130px;">
+                </div>
+            </div>
+            <div class="search-item">
+                <label>支付渠道</label>
+                <select>
+                    <option>请选择支付渠道</option>
+                    <option>宝付钱包</option>
+                    <option>汇付钱包</option>
+                </select>
+            </div>
+            <div class="search-actions">
+                <button class="btn btn-search">🔍 搜索</button>
+                <button class="btn btn-reset">↻ 重置</button>
+                <button class="btn btn-export">⇣ 导出</button>
+            </div>
         </div>
     </div>
-    <div class="topbar-right">
-        <button onclick="toggleFuncModal()" style="margin-right:12px;padding:6px 14px;border-radius:6px;background:#f5f7fa;color:#333;border:1px solid #e0e4ea;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:4px;">📖 功能说明</button>
-        <span class="avatar">👤</span>
-        <span class="name">系统参数设置</span>
-        <span class="arrow">▾</span>
+
+    <div class="table-wrap">
+        <div class="table-scroll">
+            <table>
+                <thead>
+                    <tr>
+                        <th>订单编号</th>
+                        <th>支付渠道订单号</th>
+                        <th>产品名称</th>
+                        <th>产品编号</th>
+                        <th>买家账号</th>
+                        <th>卖家账号</th>
+                        <th>数量</th>
+                        <th>单价</th>
+                        <th>买家实付</th>
+                        <th>买家手续费</th>
+                        <th>卖家手续费</th>
+                        <th>第三方支付手续费</th>
+                        <th>平台交易手续费</th>
+                        <th>服务商手续费</th>
+                        <th>卖家所得金额</th>
+                        <th>订单状态</th>
+                        <th>是否提货</th>
+                        <th>服务商</th>
+                        <th>支付产品</th>
+                        <th>支付渠道</th>
+                        <th>时间 <span class="col-sort">⇅</span></th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+        <div class="table-foot">
+            <span class="total">共 8 条</span>
+            <button class="page-btn">‹</button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn">›</button>
+        </div>
     </div>
 </div>
 
-<!-- 二级面包屑 -->
-<div class="subnav">
-    <span>返回</span>
-    <span class="tab active">零售市场</span>
-</div>
-
-<!-- 筛选区 -->
-<div class="filter-bar">
-    <div class="filter-item">
-        <span class="filter-label">产品名称</span>
-        <input class="filter-input" placeholder="请输入产品名称">
+<!-- ===== 右侧功能说明面板 ===== -->
+<aside class="func-panel">
+    <div class="fp-inner">
+        <div class="fp-header">
+            <span class="fp-title">功能说明</span>
+            <button class="fp-fold-btn" onclick="toggleFuncPanel()" title="收起功能说明">›</button>
+        </div>
+        <div class="fp-body">
+            <h4>一、页面定位</h4>
+            <ul>
+                <li>展示平台「<strong>零售市场订单</strong>」明细，支持按订单编号、买家/卖家账号、产品名称、订单状态等维度筛选</li>
+                <li>覆盖 <strong>宝付钱包</strong> 与 <strong>汇付钱包</strong> 两个支付渠道的订单记录</li>
+            </ul>
+            <h4>二、字段说明</h4>
+            <ul>
+                <li>基础字段：<strong>订单编号、支付渠道订单号、产品名称、产品编号、买家/卖家账号、数量、单价</strong></li>
+                <li>金额字段：<strong>买家实付、买家手续费、卖家手续费、第三方支付手续费、平台交易手续费、服务商手续费、卖家所得金额</strong></li>
+                <li>状态与归属：<strong>订单状态（待成交 / 已成交 / 已撤销 / 撤销部分成交 / 异常订单）、是否提货、服务商、支付产品、支付渠道、时间</strong></li>
+                <li><strong>支付渠道</strong>：宝付 / 汇付</li>
+                <li><strong>支付产品</strong>：原"支付渠道"重命名而来（银行卡 / 余额）</li>
+            </ul>
+            <h4>三、产品编号</h4>
+            <ul>
+                <li>产品名称后新增 <strong>产品编号</strong> 列，仅 <strong>汇付钱包</strong> 订单填写（每笔订单对应 1 个编号）</li>
+                <li><strong>宝付钱包</strong> 订单产品编号留空，显示 <strong>—</strong></li>
+                <li>编号过长时单元格自动截断显示省略号，<strong>鼠标悬停</strong> 显示完整编号</li>
+            </ul>
+            <h4>四、金额计算规则（按支付渠道区分）</h4>
+            <ul>
+                <li><strong>汇付支付：</strong>买家实付 = 单价 × 数量；卖家实付 = 单价 × 数量（与买家实付一致）；买家手续费 = 0</li>
+            </ul>
+            <div class="formula">
+                ① 卖家手续费 = 买家实付 × <strong>1.6%</strong>（向上取整到分）<br>
+                ② 第三方支付手续费 = 买家实付 × 0.6%（向上取整到分）<br>
+                ④ 平台交易手续费 = 卖家手续费 − 第三方支付手续费<br>
+                ⑥ <strong>服务商手续费 = 卖家手续费 − 平台交易手续费</strong>（<strong>仅宝付钱包</strong>订单有数据，属历史遗留字段；汇付钱包订单展示 —）<br>
+                卖家所得 = 买家实付 − 卖家手续费
+            </div>
+            <ul>
+                <li><strong>宝付支付：</strong>保留宝付原真实数据，列表字段值与支付渠道后台一致</li>
+            </ul>
+        </div>
     </div>
-    <div class="filter-item">
-        <span class="filter-label">买家账号</span>
-        <input class="filter-input" placeholder="请输入买家账号">
-    </div>
-    <div class="filter-item">
-        <span class="filter-label">卖家账号</span>
-        <input class="filter-input" placeholder="请输入卖家账号">
-    </div>
-    <div class="filter-item">
-        <span class="filter-label">订单编号</span>
-        <input class="filter-input" placeholder="请输入订单编号">
-    </div>
-    <div class="filter-item">
-        <span class="filter-label">订单状态</span>
-        <select class="filter-select">
-            <option>请选择订单状态</option>
-            <option>全部</option>
-            <option>待成交</option>
-            <option>已成交</option>
-            <option>已撤销</option>
-            <option>撤销部分成交</option>
-            <option>异常订单</option>
-        </select>
-    </div>
-    <div class="filter-item">
-        <span class="filter-label">时间范围</span>
-        <input class="filter-date-input" placeholder="开始日期">
-        <span class="filter-sep">至</span>
-        <input class="filter-date-input" placeholder="结束日期">
-    </div>
-    <div class="filter-item">
-        <span class="filter-label">支付渠道</span>
-        <select class="filter-select">
-            <option>请选择支付渠道</option>
-            <option>宝付钱包</option>
-            <option>汇付钱包</option>
-        </select>
-    </div>
-    <div class="filter-actions">
-        <button class="btn-export">导 出</button>
-        <button class="btn-search">🔍 搜 索</button>
-        <button class="btn-reset">↻ 重 置</button>
-    </div>
-</div>
-
-<!-- 表格 -->
-<div class="table-card">
-    <table class="table">
-        <thead>
-            <tr>
-                <th>订单编号</th>
-                <th>支付渠道订单号</th>
-                <th>产品名称</th>
-                <th>产品编号</th>
-                <th>买家账号</th>
-                <th>卖家账号</th>
-                <th>数量</th>
-                <th>单价</th>
-                <th>买家实付</th>
-                <th>买家手续费</th>
-                <th>卖家手续费</th>
-                <th>第三方支付手续费</th>
-                <th>卖家所得金额</th>
-                <th>订单状态</th>
-                <th>是否提货</th>
-                <th>平台交易手续费</th>
-                <th>运营服务费</th>
-                <th>服务商</th>
-                <th>支付产品</th>
-                <th>支付渠道</th>
-                <th>时间 <span class="col-sort">⇅</span></th>
-            </tr>
-        </thead>
-        <tbody id="tableBody"></tbody>
-    </table>
-</div>
+    <button class="fp-open" onclick="toggleFuncPanel()" title="展开功能说明">功能说明‹</button>
+</aside>
 
 <script>
+/* ===== 数据：零售市场订单 ===== */
 var data = [
-    { id: 1, orderNo: 'XB-txbuy26072004034301', payNo: '1260720111244892128', product: '诺亚宝', productCode: '#0002', buyer: '153019...', seller: '132952...', qty: 1, price: 4, buyerPay: 4, buyerFee: 0, sellerFee: 0.15, payFee: 0.03, sellerIncome: 3.85, status: 'done', isPickup: '仓库暂存', platformFee: 0.08, serviceFee: 0.04, service: '四川华泰博文文化艺术发展有限公司', payProduct: '银行卡', payChannel: '汇付钱包', time: '2026-07-20 11:12:41' },
-    { id: 2, orderNo: 'XB-txbuy26071703998401', payNo: '1260717110665197510', product: '东坡佛春', productCode: '#0025', buyer: '153019...', seller: '138413...', qty: 1, price: 7, buyerPay: 7, buyerFee: 0, sellerFee: 0.26, payFee: 0.05, sellerIncome: 6.74, status: 'done', isPickup: '仓库暂存', platformFee: 0.13, serviceFee: 0.08, service: '四川华泰博文文化艺术发展有限公司', payProduct: '银行卡', payChannel: '汇付钱包', time: '2026-07-17 11:06:43' },
+    // ── 汇付支付（按 1.6% 计算规则重新计算：sellerFee / platformFee / serviceFee / sellerIncome） ──
+    { id: 1, orderNo: 'XB-txbuy26072004034301', payNo: '1260720111244892128', product: '诺亚宝', productCode: '#0002', buyer: '153019...', seller: '132952...', qty: 1, price: 4, buyerPay: 4, buyerFee: 0, sellerFee: 0.07, payFee: 0.03, sellerIncome: 3.93, status: 'done', isPickup: '仓库暂存', platformFee: 0.03, serviceFee: 0.01, service: '四川华泰博文文化艺术发展有限公司', payProduct: '银行卡', payChannel: '汇付钱包', time: '2026-07-20 11:12:41' },
+    { id: 2, orderNo: 'XB-txbuy26071703998401', payNo: '1260717110665197510', product: '东坡佛春', productCode: '#0025', buyer: '153019...', seller: '138413...', qty: 1, price: 7, buyerPay: 7, buyerFee: 0, sellerFee: 0.12, payFee: 0.05, sellerIncome: 6.88, status: 'done', isPickup: '仓库暂存', platformFee: 0.05, serviceFee: 0.02, service: '四川华泰博文文化艺术发展有限公司', payProduct: '银行卡', payChannel: '汇付钱包', time: '2026-07-17 11:06:43' },
+    // ── 宝付支付（保留宝付原真实数据） ──
     { id: 3, orderNo: 'XB-txbuy26072004046001', payNo: '1260720111445095227', product: '东坡万里', productCode: '', buyer: '153019...', seller: '153563...', qty: 1, price: 9.9, buyerPay: 9.96, buyerFee: 0.06, sellerFee: 0.3, payFee: 0.06, sellerIncome: 9.6, status: 'done', isPickup: '仓库暂存', platformFee: 0.18, serviceFee: 0.12, service: '四川华泰博文文化艺术发展有限公司', payProduct: '银行卡', payChannel: '宝付钱包', time: '2026-07-20 11:14:37' },
     { id: 4, orderNo: 'XB-txbuy26071704007801', payNo: '1260717110765289498', product: '招财财', productCode: '', buyer: '153019...', seller: '131356...', qty: 1, price: 30, buyerPay: 30.18, buyerFee: 0.18, sellerFee: 0.91, payFee: 0.18, sellerIncome: 29.09, status: 'done', isPickup: '仓库暂存', platformFee: 0.55, serviceFee: 0.36, service: '四川华泰博文文化艺术发展有限公司', payProduct: '银行卡', payChannel: '宝付钱包', time: '2026-07-17 11:08:14' },
     { id: 5, orderNo: 'XB-txbuy26071703962401', payNo: '1260717110064894877', product: '招财财', productCode: '', buyer: '153019...', seller: '187321...', qty: 2, price: 29, buyerPay: 58.36, buyerFee: 0.36, sellerFee: 1.75, payFee: 0.36, sellerIncome: 56.25, status: 'done', isPickup: '仓库暂存', platformFee: 1.05, serviceFee: 0.7, service: '四川华泰博文文化艺术发展有限公司', payProduct: '银行卡', payChannel: '宝付钱包', time: '2026-07-17 11:00:44' },
     { id: 6, orderNo: 'XB-txbuy26081705190101', payNo: '1260817142501848223', product: '桧杉', productCode: '', buyer: '15817670339', seller: '18106056520', qty: 1, price: 12, buyerPay: 12.08, buyerFee: 0.08, sellerFee: 0.36, payFee: 0.08, sellerIncome: 11.64, status: 'done', isPickup: '仓库暂存', platformFee: 0.22, serviceFee: 0.14, service: '四川华泰博文文化艺术发展有限公司', payProduct: '银行卡', payChannel: '宝付钱包', time: '2026-08-17 14:30:00' },
     { id: 7, orderNo: 'XB-txbuy26081305368501', payNo: '1260813145431632287', product: '2026 龙马精神', productCode: '', buyer: '13500062965', seller: '18206063601', qty: 3, price: 20, buyerPay: 60.36, buyerFee: 0.36, sellerFee: 1.8, payFee: 0.36, sellerIncome: 58.2, status: 'done', isPickup: '仓库暂存', platformFee: 1.08, serviceFee: 0.72, service: '四川华泰博文文化艺术发展有限公司', payProduct: '银行卡', payChannel: '宝付钱包', time: '2026-08-13 14:30:00' },
+    // ── 已撤销 ──
     { id: 8, orderNo: 'XB-txbuy26072003711901', payNo: '—', product: '诺亚宝', productCode: '', buyer: '153019...', seller: '132952...', qty: 3, price: 4, buyerPay: 0, buyerFee: 0, sellerFee: 0, payFee: 0, sellerIncome: 0, status: 'canceled', isPickup: '仓库暂存', platformFee: 0.21, serviceFee: 0.15, service: '四川华泰博文文化艺术发展有限公司', payProduct: '/', payChannel: '/', time: '2026-07-20 09:32:15' }
 ];
 
 var statusNames = { done: '已成交', canceled: '已撤销' };
 
+/* ===== 渲染表格 ===== */
 function renderTable() {
     var html = '';
     data.forEach(function(o) {
+        var codeHtml;
+        if (o.productCode) {
+            codeHtml = '<td class="td-code" title="' + o.productCode + '">' + o.productCode + '</td>';
+        } else {
+            codeHtml = '<td class="td-code empty">—</td>';
+        }
+        /* 服务商手续费：仅宝付钱包有真实数据 = 卖家手续费 − 平台交易手续费；汇付钱包显示 — */
+        var providerFeeHtml = '<td class="td-code empty">—</td>';
+        if (o.payChannel === '宝付钱包') {
+            var pf = Math.round((o.sellerFee - o.platformFee) * 100) / 100;
+            providerFeeHtml = '<td>' + pf.toFixed(2) + '</td>';
+        }
         html += [
             '<tr>',
             '    <td class="order-no">' + o.orderNo + '</td>',
             '    <td>' + o.payNo + '</td>',
             '    <td>' + o.product + '</td>',
-            '    <td class="td-code" title="' + (o.productCode || '') + '">' + (o.productCode || '—') + '</td>',
+            codeHtml,
             '    <td>' + o.buyer + '</td>',
             '    <td>' + o.seller + '</td>',
             '    <td>' + o.qty + '</td>',
@@ -420,11 +391,11 @@ function renderTable() {
             '    <td>' + o.buyerFee + '</td>',
             '    <td>' + o.sellerFee + '</td>',
             '    <td>' + o.payFee + '</td>',
+            '    <td>' + ((Math.round((o.sellerFee - o.payFee) * 100) / 100).toFixed(2)) + '</td>',
+            providerFeeHtml,
             '    <td>' + o.sellerIncome + '</td>',
             '    <td><span class="status-tag ' + o.status + '">' + statusNames[o.status] + '</span></td>',
             '    <td>' + o.isPickup + '</td>',
-            '    <td>' + o.platformFee + '</td>',
-            '    <td>' + o.serviceFee + '</td>',
             '    <td>' + o.service + '</td>',
             '    <td>' + o.payProduct + '</td>',
             '    <td>' + o.payChannel + '</td>',
@@ -436,67 +407,12 @@ function renderTable() {
 }
 
 renderTable();
-</script>
 
-<!-- ====== 功能说明浮窗 ====== -->
-<div class="f-modal" id="funcModal">
-  <div class="fm-title">
-    <span>📖 功能说明</span>
-    <button class="fm-close" onclick="toggleFuncModal()">✕</button>
-  </div>
-  <div style="font-size:13px;font-weight:600;color:#e74c5e;margin:-6px 0 12px;">平台</div>
-  <div class="fm-body">
-    <h4><span class="badge">1</span> <span style="vertical-align:middle;">支付渠道</span></h4>
-    <ul>
-      <li>增加<b>支付渠道</b>字段（宝付钱包 / 汇付钱包），作为筛选条件并在列表中展示</li>
-    </ul>
-    <h4><span class="badge">2</span> <span style="vertical-align:middle;">支付产品</span></h4>
-    <ul>
-      <li>原<b>支付渠道</b>改为<b>支付产品</b>（银行卡 / 余额）</li>
-      <li>作为筛选条件并在列表中展示</li>
-    </ul>
-    <h4><span class="badge">3</span> <span style="vertical-align:middle;">产品编号</span></h4>
-    <ul>
-      <li>产品名称后新增<b>产品编号</b>列，仅<b>汇付钱包</b>订单填写（数量均为 1，对应 1 个编号）</li>
-      <li><b>宝付钱包</b>订单产品编号留空（显示 —）</li>
-      <li>编号过长时单元格自动截断显示省略号，<b>鼠标悬停</b>显示完整编号</li>
-    </ul>
-    <h4><span class="badge">4</span> <span style="vertical-align:middle;">金额计算规则（按支付渠道区分）</span></h4>
-    <ul>
-      <li><b>汇付支付：</b>买家实付 = 单价 × 数量；卖家实付 = 单价 × 数量（与买家实付一致）；买家手续费 = 0</li>
-      <li style="list-style:none;padding-left:14px;color:#6b7588;">　① 卖家手续费 = 买家实付 × 3.6%（向上取整）；② 第三方支付手续费 = 买家实付 × 0.6%（向上取整）；③ 平台交易手续费 =（卖家手续费 − 第三方支付手续费）× 60%（向上取整）；④ 运营服务费 =（卖家手续费 − 第三方支付手续费）− 平台交易手续费；卖家所得 = 买家实付 − 卖家手续费</li>
-      <li><b>宝付支付：</b>保留宝付原真实数据</li>
-    </ul>
-  </div>
-</div>
-
-<script>
-function toggleFuncModal() {
-  var el = document.getElementById('funcModal');
-  el.classList.toggle('show');
-  if (el.classList.contains('show') && !el.dataset.dragged) {
-    el.style.left = '50%'; el.style.top = '50%'; el.style.transform = 'translate(-50%,-50%)';
-  }
+/* ===== 右侧功能说明面板：收起 / 展开 ===== */
+function toggleFuncPanel() {
+    document.body.classList.toggle('fp-collapsed');
 }
-(function() {
-  var modal, titleBar, offX, offY, dragging = false;
-  document.addEventListener('DOMContentLoaded', function() {
-    modal = document.getElementById('funcModal');
-    titleBar = modal.querySelector('.fm-title');
-    titleBar.addEventListener('mousedown', startDrag);
-    titleBar.addEventListener('touchstart', startDragTouch, {passive:true});
-    document.addEventListener('mousemove', onDrag);
-    document.addEventListener('mouseup', endDrag);
-    document.addEventListener('touchmove', onDragTouch, {passive:true});
-    document.addEventListener('touchend', endDrag);
-  });
-  function startDrag(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = e.clientX - rect.left; offY = e.clientY - rect.top; dragging = true; titleBar.style.cursor = 'grabbing'; }
-  function startDragTouch(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; var t = e.touches[0]; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = t.clientX - rect.left; offY = t.clientY - rect.top; dragging = true; }
-  function onDrag(e) { if (!dragging) return; modal.style.left = (e.clientX - offX) + 'px'; modal.style.top = (e.clientY - offY) + 'px'; }
-  function onDragTouch(e) { if (!dragging) return; var t = e.touches[0]; modal.style.left = (t.clientX - offX) + 'px'; modal.style.top = (t.clientY - offY) + 'px'; }
-  function endDrag() { dragging = false; if (titleBar) titleBar.style.cursor = 'grab'; }
-})();
 </script>
-
+<script src="asset/admin-sidebar.js"></script>
 </body>
 </html>

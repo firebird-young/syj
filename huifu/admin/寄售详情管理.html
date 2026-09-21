@@ -3,271 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>寄售详情管理</title>
+    <title>寄售详情管理 · 深艺交管理后台</title>
+    <link rel="stylesheet" href="asset/admin-sidebar.css">
     <style>
-        * { margin:0; padding:0; box-sizing:border-box; }
+        :root {
+            --bg: #ffffff;
+            --accent: #1a78ff;
+            --accent-hover: #0f6ae8;
+            --ink: #1d1d1f;
+            --ink-muted: #3f424b;
+            --ink-subtle: #86868b;
+            --border: #e0e0e0;
+            --radius-pill: 9999px;
+            --radius-card: 18px;
+            --shadow-card: 0 0 0 1px rgba(0,0,0,.06);
+            --font: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
-            background: #f0f2f5;
-            color: #1a1a2e;
-            font-size: 14px;
+            font-family: var(--font);
+            background: #f5f5f7;
+            min-height: 100vh;
+            color: var(--ink);
+            -webkit-font-smoothing: antialiased;
         }
+        .breadcrumb {
+            padding: 16px 24px 0;
+            font-size: 13px; color: var(--ink-subtle);
+        }
+        .breadcrumb a { color: var(--ink-subtle); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--accent); }
+        .breadcrumb .current { color: var(--ink); font-weight: 500; }
 
-        /* 顶部 */
-        .topbar {
-            background: #fff;
-            height: 56px;
-            display: flex;
-            align-items: center;
-            padding: 0 20px;
-            border-bottom: 1px solid #f0f0f0;
-            position: sticky;
-            top: 0;
-            z-index: 10;
+        .main { padding: 16px 24px 40px; }
+        .page-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin: 4px 0 16px;
         }
-        .topbar-left { display: flex; align-items: center; gap: 16px; }
-        .menu-btn {
-            width: 32px; height: 32px;
-            border: 1px solid #d0d5dd;
-            border-radius: 4px;
-            background: #fff;
-            color: #6b7588;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
+        .page-header h2 { font-size: 20px; font-weight: 600; }
+        .market-tag {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 4px 12px; border-radius: var(--radius-pill);
+            background: #eaf3ff; color: var(--accent);
+            font-size: 12px; font-weight: 600;
         }
-        .menu-btn:hover { background: #f5f5f7; }
-        .breadcrumb { font-size: 13px; color: #6b7588; }
-        .breadcrumb .active { color: #1a1a2e; }
-        .topbar-right {
-            margin-left: auto;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-        }
-        .topbar-right .btn-func {
-            margin-right: 12px;
-            padding: 6px 14px;
-            border-radius: 6px;
-            background: #f5f7fa;
-            color: #333;
-            border: 1px solid #e0e4ea;
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            white-space: nowrap;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-        .topbar-right .btn-func:hover { border-color: #1a78ff; color: #1a78ff; }
-        .topbar-right .avatar {
-            width: 32px; height: 32px;
-            border-radius: 50%;
-            background: #f5deb3;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 16px;
-        }
-        .topbar-right .name { font-size: 13px; }
-        .topbar-right .arrow { color: #9ba6b9; font-size: 12px; }
-
-        /* 二级面包屑 */
-        .subnav {
-            background: #fff;
-            padding: 12px 20px;
-            border-bottom: 1px solid #f0f0f0;
-            font-size: 13px;
-            color: #6b7588;
-        }
-        .subnav .tab {
-            display: inline-block;
-            padding: 6px 14px;
-            background: #f5f7fc;
-            color: #4e5a6e;
-            border-radius: 4px;
-            margin-right: 8px;
-            cursor: pointer;
-        }
-        .subnav .tab.active {
-            background: #1a78ff;
-            color: #fff;
+        .market-tag::before {
+            content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
         }
 
         /* 统计卡 */
         .stat-card {
-            margin: 12px 20px 0;
-            background: #fff;
-            border-radius: 6px;
-            padding: 16px 0;
+            background: #fff; border-radius: var(--radius-card);
+            box-shadow: var(--shadow-card);
+            padding: 18px 0; margin-bottom: 16px;
             display: flex;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
         }
-        .stat-item {
-            flex: 1;
-            text-align: center;
-            position: relative;
-        }
+        .stat-item { flex: 1; text-align: center; position: relative; }
         .stat-item + .stat-item::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 15%;
-            height: 70%;
-            width: 1px;
+            content: ''; position: absolute;
+            left: 0; top: 20%; height: 60%; width: 1px;
             background: #f0f0f0;
         }
-        .stat-num { font-size: 22px; font-weight: 700; color: #1a1a2e; margin-bottom: 4px; }
+        .stat-num { font-size: 22px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
         .stat-num.red { color: #e74c5e; }
         .stat-num.green { color: #1aab67; }
-        .stat-label { font-size: 13px; color: #86909c; }
+        .stat-label { font-size: 12px; color: var(--ink-subtle); }
 
-        /* 筛选区 */
-        .filter-bar {
-            background: #fff;
-            margin: 12px 20px 0;
-            padding: 12px 16px;
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            border-radius: 6px;
+        /* 搜索区 */
+        .search-area {
+            background: #fff; border-radius: var(--radius-card);
+            padding: 20px 24px; margin-bottom: 16px; box-shadow: var(--shadow-card);
         }
-        .filter-item {
-            display: flex;
-            align-items: center;
-            margin-right: 16px;
-            margin-bottom: 4px;
+        .search-row { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: flex-end; }
+        .search-item { display: flex; flex-direction: column; gap: 6px; min-width: 160px; flex: 0 0 auto; }
+        .search-item label { font-size: 12px; color: var(--ink-subtle); font-weight: 500; }
+        .search-item input, .search-item select {
+            height: 36px; padding: 0 12px; border: 1px solid var(--border);
+            border-radius: var(--radius-pill); font-size: 13px; color: var(--ink);
+            background: #fff; outline: none; font-family: inherit;
         }
-        .filter-label {
-            font-size: 13px;
-            color: #4e5a6e;
-            margin-right: 8px;
-            white-space: nowrap;
+        .search-item .date-pair { display: flex; align-items: center; gap: 6px; }
+        .search-item .date-pair span { color: var(--ink-subtle); font-size: 12px; }
+        .search-actions {
+            display: flex; gap: 10px; align-items: flex-end; margin-left: auto; flex: 0 0 auto;
         }
-        .filter-input {
-            width: 170px;
-            height: 30px;
-            padding: 0 10px;
-            border: 1px solid #d0d5dd;
-            border-radius: 4px;
-            font-size: 13px;
-            color: #1a1a2e;
-            outline: none;
+        .search-actions .btn {
+            height: 36px; padding: 0 20px; border-radius: var(--radius-pill);
+            font-size: 13px; cursor: pointer; border: none; font-weight: 500; font-family: inherit;
         }
-        .filter-input:focus { border-color: #1a78ff; }
-        .filter-select {
-            width: 130px;
-            height: 30px;
-            padding: 0 10px;
-            border: 1px solid #d0d5dd;
-            border-radius: 4px;
-            font-size: 13px;
-            color: #1a1a2e;
-            outline: none;
-            background: #fff;
-        }
-        .filter-date-input {
-            width: 110px;
-            height: 30px;
-            padding: 0 10px;
-            border: 1px solid #d0d5dd;
-            border-radius: 4px;
-            font-size: 13px;
-            color: #1a1a2e;
-            outline: none;
-        }
-        .filter-sep {
-            font-size: 13px;
-            color: #9ba6b9;
-            margin: 0 6px;
-        }
-        .filter-actions {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-left: auto;
-        }
-        .btn-export {
-            background: #f59e0b;
-            color: #fff;
-            border: none;
-            padding: 0 14px;
-            height: 30px;
-            border-radius: 4px;
-            font-size: 13px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-        .btn-export:hover { background: #e08d04; }
-        .btn-search {
-            background: #1a78ff;
-            color: #fff;
-            border: none;
-            padding: 0 14px;
-            height: 30px;
-            border-radius: 4px;
-            font-size: 13px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-        .btn-search:hover { background: #0f6ae8; }
-        .btn-reset {
-            background: #fff;
-            color: #1a78ff;
-            border: 1px solid #1a78ff;
-            padding: 0 14px;
-            height: 30px;
-            border-radius: 4px;
-            font-size: 13px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-        .btn-reset:hover { background: #f5f8ff; }
+        .search-actions .btn-search { background: var(--accent); color: #fff; }
+        .search-actions .btn-search:hover { background: var(--accent-hover); }
+        .search-actions .btn-reset { background: #f5f5f7; color: var(--ink-subtle); border: 1px solid var(--border); }
+        .search-actions .btn-export { background: #fff; color: var(--accent); border: 1px solid var(--accent); }
+        .search-actions .btn-export:hover { background: #f5f8ff; }
 
         /* 表格 */
-        .table-card {
-            background: #fff;
-            margin: 12px 20px;
-            border-radius: 6px;
-            overflow: hidden;
+        .table-wrap {
+            background: #fff; border-radius: var(--radius-card);
+            box-shadow: var(--shadow-card); overflow: hidden;
         }
-        .table {
-            width: 100%;
-            border-collapse: collapse;
+        .table-scroll { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 1100px; }
+        thead th {
+            font-size: 12px; font-weight: 600; color: var(--ink-muted);
+            text-align: left; padding: 14px 12px; white-space: nowrap;
+            border-bottom: 1px solid var(--border); background: #fafafc;
         }
-        .table th {
-            background: #fafbfc;
-            padding: 14px 14px;
-            text-align: left;
-            font-size: 13px;
-            color: #4e5a6e;
-            font-weight: 500;
-            border-bottom: 1px solid #f0f0f0;
-            white-space: nowrap;
-        }
-        .table td {
-            padding: 14px 14px;
-            font-size: 13px;
-            color: #1a1a2e;
-            border-bottom: 1px solid #f5f5f7;
-        }
-        .table tr:last-child td { border-bottom: none; }
+        tbody td { font-size: 13px; padding: 14px 12px; border-bottom: 1px solid #f5f5f5; vertical-align: middle; }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: #fafbff; }
 
         .product-img {
-            width: 50px;
-            height: 50px;
-            border-radius: 6px;
-            object-fit: cover;
-            background: linear-gradient(135deg,#f0e8d8 0%,#c9b88e 100%);
+            width: 48px; height: 48px;
+            border-radius: 8px;
             display: block;
+            background: linear-gradient(135deg,#f0e8d8 0%,#c9b88e 100%);
         }
         .product-img.img1 { background-image: linear-gradient(135deg,#d8e0e8 0%,#98a8c4 100%); }
         .product-img.img2 { background-image: linear-gradient(135deg,#f5e8b8 0%,#c9a04a 100%); }
@@ -277,237 +127,294 @@
         .product-img.img6 { background-image: linear-gradient(135deg,#f7e8d4 0%,#c8a888 100%); }
 
         .product-name { font-weight: 600; white-space: nowrap; }
-        .product-no { font-size: 12px; color: #9ba6b9; margin-top: 3px; white-space: nowrap; }
-
+        .product-no { font-size: 12px; color: var(--ink-subtle); margin-top: 3px; white-space: nowrap; }
         .phone-cell { font-variant-numeric: tabular-nums; white-space: nowrap; }
         .amount-cell { color: #e74c3e; font-weight: 600; white-space: nowrap; }
         .amount-cell.green { color: #1aab67; }
-        .time-cell { color: #6b7588; white-space: nowrap; }
+        .time-cell { color: var(--ink-muted); white-space: nowrap; }
 
         .status-tag {
-            display: inline-block;
-            padding: 2px 10px;
-            border-radius: 4px;
-            font-size: 12px;
-            white-space: nowrap;
+            display: inline-block; padding: 3px 10px;
+            border-radius: var(--radius-pill);
+            font-size: 12px; font-weight: 500; white-space: nowrap;
         }
         .status-tag.selling { background: #fdecee; color: #e74c5e; }
         .status-tag.sold { background: #e8f8f0; color: #1aab67; }
         .status-tag.off { background: #f2f3f5; color: #86909c; }
 
         .remain-tag {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 4px;
+            display: inline-block; padding: 3px 10px;
+            border-radius: var(--radius-pill);
             font-size: 12px;
-            background: #fff7e6;
-            color: #e67e22;
-            white-space: nowrap;
+            background: #fff7e6; color: #e67e22; white-space: nowrap;
         }
+
         .order-link {
             display: inline-block;
-            color: #1a78ff;
-            text-decoration: none;
-            font-size: 12px;
-            cursor: pointer;
-            white-space: nowrap;
-            margin-bottom: 3px;
+            color: var(--accent); text-decoration: none;
+            font-size: 12px; cursor: pointer;
+            white-space: nowrap; margin-bottom: 3px;
         }
         .order-link:hover { text-decoration: underline; }
 
         .actions { white-space: nowrap; }
         .actions a {
-            color: #1a78ff;
-            text-decoration: none;
-            font-size: 13px;
-            cursor: pointer;
+            color: var(--accent); text-decoration: none;
+            font-size: 13px; cursor: pointer;
         }
         .actions a:hover { text-decoration: underline; }
 
         /* 详情弹窗 */
         .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.5);
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.45);
             display: none;
-            align-items: center;
-            justify-content: center;
+            align-items: center; justify-content: center;
             z-index: 1000;
+            backdrop-filter: blur(2px);
         }
         .modal-overlay.show { display: flex; }
         .modal-box {
-            background: #fff;
-            border-radius: 6px;
-            width: 560px;
-            max-width: 94vw;
-            max-height: 86vh;
-            display: flex;
-            flex-direction: column;
+            background: #fff; border-radius: 18px;
+            width: 580px; max-width: 94vw; max-height: 86vh;
+            display: flex; flex-direction: column;
             overflow: hidden;
-            box-shadow: 0 8px 40px rgba(0,0,0,0.25);
+            box-shadow: 0 12px 48px rgba(0,0,0,.25);
         }
         .modal-header {
-            display: flex;
-            align-items: center;
-            padding: 16px 20px;
-            border-bottom: 1px solid #f0f0f0;
+            display: flex; align-items: center;
+            padding: 18px 24px; border-bottom: 1px solid #f0f0f0;
         }
-        .modal-title { font-size: 16px; font-weight: 600; color: #1a1a2e; }
-        .modal-sub { margin-left: 10px; font-size: 12px; color: #6b7588; font-weight: 400; }
+        .modal-title { font-size: 16px; font-weight: 600; color: var(--ink); }
+        .modal-sub { margin-left: 10px; font-size: 12px; color: var(--ink-muted); font-weight: 400; }
         .modal-close {
             margin-left: auto;
-            font-size: 20px;
-            color: #999;
-            cursor: pointer;
-            padding: 0 8px;
+            width: 28px; height: 28px;
+            border-radius: 50%; background: #f5f5f5;
+            color: #666; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px;
         }
-        .modal-close:hover { color: #666; }
-        .modal-body { padding: 16px 20px; overflow-y: auto; }
-
+        .modal-close:hover { background: #e8e8e8; }
+        .modal-body { padding: 18px 24px 22px; overflow-y: auto; }
         .d-product {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding-bottom: 14px;
+            display: flex; align-items: center;
+            gap: 14px; padding-bottom: 14px;
             border-bottom: 1px solid #f5f5f7;
-            margin-bottom: 12px;
+            margin-bottom: 14px;
         }
         .d-info { flex: 1; min-width: 0; }
-        .d-name { font-size: 15px; font-weight: 600; color: #1a1a2e; display: flex; align-items: center; gap: 8px; }
+        .d-name { font-size: 15px; font-weight: 600; color: var(--ink); display: flex; align-items: center; gap: 8px; }
         .d-code {
-            font-size: 11px; color: #1a78ff; font-weight: 600;
+            font-size: 11px; color: var(--accent); font-weight: 600;
             background: #e6f4ff; border: 1px solid #b7dcff;
             padding: 2px 8px; border-radius: 4px;
         }
         .d-status { margin-top: 6px; }
-
         .detail-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            row-gap: 12px;
+            row-gap: 14px;
             column-gap: 16px;
         }
-        .detail-grid .dg-item {}
-        .detail-grid .dg-label { font-size: 12px; color: #9ba6b9; margin-bottom: 3px; }
-        .detail-grid .dg-value { font-size: 14px; color: #1a1a2e; }
+        .detail-grid .dg-label { font-size: 12px; color: var(--ink-subtle); margin-bottom: 4px; }
+        .detail-grid .dg-value { font-size: 14px; color: var(--ink); }
         .detail-grid .dg-value.red { color: #e74c3e; font-weight: 600; }
         .detail-grid .dg-value.green { color: #1aab67; font-weight: 600; }
 
-        /* ── 功能说明浮窗 ── */
-        .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 560px; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 9999; padding: 24px; display: none; }
-        .f-modal.show { display: block; }
-        .f-modal .fm-title { font-size: 16px; font-weight: 600; color: #1a1a2e; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
-        .f-modal .fm-title:active { cursor: grabbing; }
-        .f-modal .fm-close { width: 28px; height: 28px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; color: #666; border: none; flex-shrink: 0; }
-        .f-modal .fm-close:hover { background: #e8e8e8; }
-        .f-modal .fm-body { font-size: 13px; color: #555; line-height: 1.8; }
-        .f-modal .fm-body h4 { font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 16px 0 8px; }
-        .f-modal .fm-body h4:first-child { margin-top: 0; }
-        .f-modal .fm-body ul { padding-left: 18px; margin: 0 0 12px; }
-        .f-modal .fm-body li { margin-bottom: 4px; }
-        .badge { display: inline-block; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 50%; background: #ff2d55; color: #fff; font-size: 12px; line-height: 18px; text-align: center; font-weight: 600; box-shadow: 0 1px 3px rgba(255,45,85,0.3); }
+        /* 交易服务费明细小表格 */
+        .mini-table {
+            margin-top: 16px;
+            border: 1px solid #e8eaed;
+            border-radius: 12px;
+            overflow-x: auto;
+            background: #fff;
+        }
+        .mini-table .mt-title {
+            padding: 10px 14px;
+            font-size: 13px; font-weight: 600;
+            color: var(--ink);
+            border-bottom: 1px solid #e8eaed;
+            background: #fafbfc;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .mini-table .mt-title::before {
+            content: ''; width: 4px; height: 14px;
+            background: var(--accent); border-radius: 2px;
+        }
+        .mini-table table {
+            width: 100%;
+            min-width: 460px;
+            border-collapse: collapse;
+        }
+        .mini-table th {
+            text-align: center;
+            font-size: 12px; font-weight: 500;
+            color: var(--ink-subtle);
+            padding: 9px 14px;
+            border-bottom: 1px solid #f0f0f0;
+            white-space: nowrap;
+            background: #fff;
+            min-width: 90px;
+        }
+        .mini-table td {
+            padding: 11px 14px;
+            font-size: 14px; font-weight: 600;
+            color: var(--ink);
+            border-bottom: 1px solid #f5f5f7;
+            white-space: nowrap;
+            text-align: center;
+        }
+        .mini-table tr:last-child td { border-bottom: none; }
+        .mini-table td.amt { font-variant-numeric: tabular-nums; }
+
+        /* ===== 右侧功能说明面板 ===== */
+        .func-panel {
+            position: fixed; top: 0; right: 0; bottom: 0;
+            width: 340px; z-index: 890;
+            background: #fff; border-left: 1px solid #e3e6eb;
+            box-shadow: -1px 0 12px rgba(20,30,60,.04);
+            display: flex; flex-direction: column;
+        }
+        .func-panel .fp-inner { display: flex; flex-direction: column; height: 100%; min-width: 0; }
+        .func-panel .fp-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 15px 14px 13px 18px; border-bottom: 1px solid #f0f1f4; flex-shrink: 0;
+        }
+        .func-panel .fp-title { display: flex; align-items: center; gap: 9px; font-size: 15px; font-weight: 700; color: var(--ink); }
+        .func-panel .fp-title::before {
+            content: ''; width: 8px; height: 8px; border-radius: 50%;
+            background: var(--accent); box-shadow: 0 0 0 4px rgba(26,120,255,.18);
+        }
+        .func-panel .fp-fold-btn {
+            width: 28px; height: 28px; border: 1px solid var(--border); background: #fff;
+            border-radius: 50%; color: var(--ink-subtle); font-size: 15px; line-height: 1;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .2s;
+        }
+        .func-panel .fp-fold-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .func-panel .fp-body { flex: 1; overflow-y: auto; padding: 4px 18px 40px; font-size: 13px; color: #555; line-height: 1.85; }
+        .func-panel .fp-body h4 { font-size: 14px; font-weight: 600; color: var(--ink); margin: 18px 0 6px; }
+        .func-panel .fp-body h4:first-child { margin-top: 12px; }
+        .func-panel .fp-body ul { padding-left: 18px; margin: 0 0 8px; }
+        .func-panel .fp-body li { margin-bottom: 6px; }
+        .func-panel .fp-body strong { color: #333; }
+        .func-panel .fp-open {
+            display: none; position: absolute; top: 0; bottom: 0; left: 0; right: 0;
+            border: none; background: transparent; cursor: pointer;
+            writing-mode: vertical-rl; text-orientation: upright;
+            font-size: 13px; font-weight: 600; letter-spacing: 6px; color: var(--ink-subtle);
+            align-items: center; justify-content: center; font-family: inherit; transition: all .2s;
+        }
+        .func-panel .fp-open:hover { color: var(--accent); background: #fafbfc; }
+        @media (min-width: 1024px) {
+            .main, .breadcrumb { margin-right: 340px; }
+            body.fp-collapsed .main,
+            body.fp-collapsed .breadcrumb { margin-right: 40px; }
+            body.fp-collapsed .func-panel { width: 40px; }
+            body.fp-collapsed .fp-inner { display: none; }
+            body.fp-collapsed .fp-open { display: flex; }
+        }
+        @media (max-width: 1023.98px) {
+            .func-panel { display: none; }
+            .main, .breadcrumb { margin-right: 0; }
+        }
     </style>
 </head>
 <body>
 
-<!-- 顶部 -->
-<div class="topbar">
-    <div class="topbar-left">
-        <button class="menu-btn">≡</button>
-        <div class="breadcrumb">
-            <span>首页</span> /
-            <span>寄售管理</span> /
-            <span class="active">寄售详情管理</span>
+<div class="breadcrumb">
+    <a href="数据看板.html">首页</a> <span> &gt; </span>
+    <a href="#">寄售管理</a> <span> &gt; </span>
+    <span class="current">寄售详情管理</span>
+</div>
+
+<div class="main">
+    <div class="page-header">
+        <h2>寄售详情管理</h2>
+        <span class="market-tag">寄售管理</span>
+    </div>
+
+    <!-- 统计卡 -->
+    <div class="stat-card">
+        <div class="stat-item">
+            <div class="stat-num red">4</div>
+            <div class="stat-label">寄售中</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-num green">3</div>
+            <div class="stat-label">已售出</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-num">2</div>
+            <div class="stat-label">已下架</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-num">¥404.80</div>
+            <div class="stat-label">累计成交</div>
         </div>
     </div>
-    <div class="topbar-right">
-        <button class="btn-func" onclick="toggleFuncModal()">📖 功能说明</button>
-        <span class="avatar">👤</span>
-        <span class="name">平台账号</span>
-        <span class="arrow">▾</span>
-    </div>
-</div>
 
-<!-- 二级面包屑 -->
-<div class="subnav">
-    <span>首页 / 寄售管理 /</span>
-    <span class="tab active">寄售详情管理</span>
-</div>
+    <!-- 搜索区 -->
+    <div class="search-area">
+        <div class="search-row">
+            <div class="search-item">
+                <label>寄售人账号</label>
+                <input type="text" id="searchUser" placeholder="请输入寄售人手机号">
+            </div>
+            <div class="search-item">
+                <label>产品名称</label>
+                <input type="text" id="searchName" placeholder="请输入产品名称">
+            </div>
+            <div class="search-item">
+                <label>产品编号</label>
+                <input type="text" id="searchNo" placeholder="请输入产品编号">
+            </div>
+            <div class="search-item">
+                <label>寄售状态</label>
+                <select id="searchStatus">
+                    <option value="">全部</option>
+                    <option value="selling">寄售中</option>
+                    <option value="sold">已售出</option>
+                    <option value="off">已下架</option>
+                </select>
+            </div>
+            <div class="search-item">
+                <label>挂单时间</label>
+                <div class="date-pair">
+                    <input type="text" id="dateStart" placeholder="开始日期" style="width:130px;">
+                    <span>至</span>
+                    <input type="text" id="dateEnd" placeholder="结束日期" style="width:130px;">
+                </div>
+            </div>
+            <div class="search-actions">
+                <button class="btn btn-search" onclick="doSearch()">🔍 搜索</button>
+                <button class="btn btn-reset" onclick="doReset()">↻ 重置</button>
+                <button class="btn btn-export" onclick="doExport()">⇣ 导出</button>
+            </div>
+        </div>
+    </div>
 
-<!-- 统计卡 -->
-<div class="stat-card">
-    <div class="stat-item">
-        <div class="stat-num red">4</div>
-        <div class="stat-label">寄售中</div>
+    <!-- 表格 -->
+    <div class="table-wrap">
+        <div class="table-scroll">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width:74px;">图片</th>
+                        <th>产品名称</th>
+                        <th>寄售人</th>
+                        <th>挂单价格</th>
+                        <th>挂单时间</th>
+                        <th>状态</th>
+                        <th>剩余天数 / 成交信息</th>
+                        <th>成交时间</th>
+                        <th style="width:90px;">操作</th>
+                    </tr>
+                </thead>
+                <tbody id="tbBody"></tbody>
+            </table>
+        </div>
     </div>
-    <div class="stat-item">
-        <div class="stat-num green">3</div>
-        <div class="stat-label">已售出</div>
-    </div>
-    <div class="stat-item">
-        <div class="stat-num">2</div>
-        <div class="stat-label">已下架</div>
-    </div>
-    <div class="stat-item">
-        <div class="stat-num">¥404.80</div>
-        <div class="stat-label">累计成交</div>
-    </div>
-</div>
-
-<!-- 筛选区 -->
-<div class="filter-bar">
-    <div class="filter-item">
-        <span class="filter-label">寄售人账号</span>
-        <input class="filter-input" id="searchUser" placeholder="请输入寄售人手机号">
-    </div>
-    <div class="filter-item">
-        <span class="filter-label">产品名称</span>
-        <input class="filter-input" id="searchName" placeholder="请输入产品名称">
-    </div>
-    <div class="filter-item">
-        <span class="filter-label">产品编号</span>
-        <input class="filter-input" id="searchNo" placeholder="请输入产品编号" style="width:140px;">
-    </div>
-    <div class="filter-item">
-        <span class="filter-label">寄售状态</span>
-        <select class="filter-select" id="searchStatus">
-            <option value="">全部</option>
-            <option value="selling">寄售中</option>
-            <option value="sold">已售出</option>
-            <option value="off">已下架</option>
-        </select>
-    </div>
-    <div class="filter-item">
-        <span class="filter-label">挂单时间</span>
-        <input class="filter-date-input" id="dateStart" placeholder="开始日期">
-        <span class="filter-sep">至</span>
-        <input class="filter-date-input" id="dateEnd" placeholder="结束日期">
-    </div>
-    <div class="filter-actions">
-        <button class="btn-export" onclick="doExport()">⬇ 导 出</button>
-        <button class="btn-search" onclick="doSearch()">🔍 搜 索</button>
-        <button class="btn-reset" onclick="doReset()">↻ 重 置</button>
-    </div>
-</div>
-
-<!-- 表格 -->
-<div class="table-card">
-    <table class="table">
-        <thead>
-            <tr>
-                <th style="width:74px;">图片</th>
-                <th>产品名称</th>
-                <th>寄售人</th>
-                <th>挂单价格</th>
-                <th>挂单时间</th>
-                <th>状态</th>
-                <th>剩余天数 / 成交信息</th>
-                <th>成交时间</th>
-                <th style="width:90px;">操作</th>
-            </tr>
-        </thead>
-        <tbody id="tbBody"></tbody>
-    </table>
 </div>
 
 <!-- 寄售详情弹窗 -->
@@ -520,7 +427,7 @@
         </div>
         <div class="modal-body">
             <div class="d-product">
-                <img class="product-img" id="dmImg" src="">
+                <div class="product-img" id="dmImg"></div>
                 <div class="d-info">
                     <div class="d-name"><span id="dmName"></span><span class="d-code" id="dmCode"></span></div>
                     <div class="d-status"><span class="status-tag" id="dmStatus"></span></div>
@@ -531,39 +438,42 @@
     </div>
 </div>
 
-<!-- ====== 功能说明浮窗 ====== -->
-<div class="f-modal" id="funcModal">
-  <div class="fm-title">
-    <span>📖 功能说明</span>
-    <button class="fm-close" onclick="toggleFuncModal()">✕</button>
-  </div>
-  <div style="font-size:13px;font-weight:600;color:#e74c5e;margin:-6px 0 12px;">平台 · 寄售管理 / 寄售详情管理</div>
-  <div class="fm-body">
-    <h4><span class="badge">1</span> <span style="vertical-align:middle;">页面说明</span></h4>
-    <ul>
-      <li>展示平台上<b>所有用户、所有产品</b>的寄售记录（对应零售端「我的寄售」）</li>
-      <li>顶部统计：寄售中件数、已售出件数、已下架件数、<b>累计成交金额</b></li>
-      <li>本页面<b>仅可查看</b>，不支持下架 / 撤销，操作列提供「查看详情」</li>
-    </ul>
-    <h4><span class="badge">2</span> <span style="vertical-align:middle;">寄售记录字段</span></h4>
-    <ul>
-      <li>每行展示：产品图、产品名称、<b>寄售人手机号</b>、挂单价格、挂单时间、寄售状态、成交时间</li>
-      <li><b>寄售中</b>：成交信息列展示剩余挂单天数（橙色标签）</li>
-      <li><b>已售出</b>：成交信息列仅展示<b>订单编号</b>（点击跳转订单管理），成交价与交易服务费见详情浮层</li>
-      <li><b>已下架</b>：成交信息列展示下架时间</li>
-    </ul>
-    <h4><span class="badge">3</span> <span style="vertical-align:middle;">筛选</span></h4>
-    <ul>
-      <li>支持按<b>寄售人账号</b>、<b>产品名称</b>、<b>产品编号</b>模糊搜索</li>
-      <li>支持按<b>寄售状态</b>（寄售中 / 已售出 / 已下架）及<b>挂单时间范围</b>筛选，可组合条件</li>
-    </ul>
-    <h4><span class="badge">4</span> <span style="vertical-align:middle;">寄售详情浮层</span></h4>
-    <ul>
-      <li>点击操作列「查看详情」展示完整寄售信息：产品信息、寄售人、挂单价格与时间、到期时间、状态</li>
-      <li>已售出记录额外展示：<b>订单编号</b>（点击跳转订单管理）、成交价、<b>买家账号</b>、交易服务费、成交时间</li>
-    </ul>
-  </div>
-</div>
+<!-- ===== 右侧功能说明面板 ===== -->
+<aside class="func-panel">
+    <div class="fp-inner">
+        <div class="fp-header">
+            <span class="fp-title">功能说明</span>
+            <button class="fp-fold-btn" onclick="toggleFuncPanel()" title="收起功能说明">›</button>
+        </div>
+        <div class="fp-body">
+            <h4>一、页面说明</h4>
+            <ul>
+                <li>展示平台上 <strong>所有用户、所有产品</strong> 的寄售记录（对应零售端「我的寄售」）</li>
+                <li>顶部统计：<strong>寄售中件数、已售出件数、已下架件数、累计成交金额</strong></li>
+                <li>本页面 <strong>仅可查看</strong>，不支持下架 / 撤销，操作列提供「查看详情」</li>
+            </ul>
+            <h4>二、寄售记录字段</h4>
+            <ul>
+                <li>每行展示：产品图、产品名称、<strong>寄售人手机号</strong>、挂单价格、挂单时间、寄售状态、成交时间</li>
+                <li><strong>寄售中</strong>：成交信息列展示剩余挂单天数（橙色标签）</li>
+                <li><strong>已售出</strong>：成交信息列仅展示 <strong>订单编号</strong>（点击跳转订单管理），<strong>交易服务费明细</strong> 见详情浮层</li>
+                <li><strong>已下架</strong>：成交信息列展示下架时间</li>
+            </ul>
+            <h4>三、筛选</h4>
+            <ul>
+                <li>支持按 <strong>寄售人账号</strong>、<strong>产品名称</strong>、<strong>产品编号</strong> 模糊搜索</li>
+                <li>支持按 <strong>寄售状态</strong>（寄售中 / 已售出 / 已下架）及 <strong>挂单时间范围</strong> 筛选，可组合条件</li>
+            </ul>
+            <h4>四、寄售详情浮层</h4>
+            <ul>
+                <li>点击操作列「查看详情」展示完整寄售信息：产品信息、寄售人、挂单价格与时间、到期时间、状态</li>
+                <li>已售出记录额外展示：<strong>订单编号</strong>（点击跳转订单管理）、买家账号、成交时间</li>
+                <li>已售出记录额外展示 <strong>交易服务费明细</strong>（小表格）：<strong>成交价、卖家手续费、第三方支付手续费、平台交易手续费</strong></li>
+            </ul>
+        </div>
+    </div>
+    <button class="fp-open" onclick="toggleFuncPanel()" title="展开功能说明">功能说明‹</button>
+</aside>
 
 <script>
 // ===== 全平台寄售数据（status: selling 寄售中 / sold 已售出 / off 已下架）=====
@@ -571,7 +481,7 @@ var records = [
     { img: 'img1', name: '永淳·夏日帖', code: '#0027', user: '13800172866', status: 'selling', price: 92.00, time: '2026-07-30 14:23', remain: 5, endTime: '2026-09-05 14:23' },
     { img: 'img3', name: '兰亭序', code: '#0031', user: '18227406306', status: 'selling', price: 128.00, time: '2026-08-01 09:15', remain: 9, endTime: '2026-09-10 09:15' },
     { img: 'img1', name: '永淳·夏日帖', code: '#0029', user: '19981465373', status: 'selling', price: 88.00, time: '2026-07-25 11:30', remain: 2, endTime: '2026-09-02 11:30' },
-    { img: 'img4', name: '山水空灵', code: '#0018', user: '15528430479', status: 'selling', price: 45.00, time: '2026-08-03 16:08', remain: 11, endTime: '2026-09-12 16:08' },
+    { img: 'img4', name: '山水空灵', code: '#0018', user: '15528430479', status: 'selling', price: 45.00, time: '2026-08-03 16:08', remain: 8, endTime: '2026-09-12 16:08' },
     { img: 'img1', name: '永淳·夏日帖', code: '#0025', user: '13800172866', status: 'sold', price: 98.00, time: '2026-07-23 10:12', deal: 96.00, fee: 3.46, buyer: '19130634113', dealTime: '2026-07-28 16:42', order: 'XB-txbuy26072804025101' },
     { img: 'img4', name: '山水空灵', code: '#0012', user: '19382153852', status: 'sold', price: 256.00, time: '2026-07-15 09:30', deal: 250.00, fee: 9.00, buyer: '13908193164', dealTime: '2026-07-22 15:30', order: 'XB-txbuy26072203050102' },
     { img: 'img5', name: '十七贴', code: '#0044', user: '19113541040', status: 'sold', price: 60.00, time: '2026-07-24 14:05', deal: 58.80, fee: 2.12, buyer: '18227406306', dealTime: '2026-07-30 11:20', order: 'XB-txbuy26073005010103' },
@@ -585,7 +495,7 @@ function fmt(n) { return n.toLocaleString('zh-CN', { minimumFractionDigits: 2, m
 
 function render(list) {
     var html = '';
-    list.forEach(function(o) {
+    list.forEach(function(o, idx) {
         var extra;
         if (o.status === 'selling') {
             extra = '<span class="remain-tag">剩余 ' + o.remain + ' 天</span>';
@@ -596,7 +506,7 @@ function render(list) {
         }
         html +=
             '<tr data-user="' + o.user + '" data-name="' + o.name + '" data-code="' + o.code + '" data-status="' + o.status + '" data-time="' + o.time + '">' +
-                '<td><img class="product-img ' + o.img + '" src=""></td>' +
+                '<td><div class="product-img ' + o.img + '"></div></td>' +
                 '<td><div class="product-name">' + o.name + '</div><div class="product-no">' + o.code + '</div></td>' +
                 '<td class="phone-cell">' + o.user + '</td>' +
                 '<td class="amount-cell">¥' + fmt(o.price) + '</td>' +
@@ -604,13 +514,13 @@ function render(list) {
                 '<td><span class="status-tag ' + o.status + '">' + statusNames[o.status] + '</span></td>' +
                 '<td>' + extra + '</td>' +
                 '<td class="time-cell">' + (o.status === 'sold' ? o.dealTime : '') + '</td>' +
-                '<td class="actions"><a onclick="openDetail(' + records.indexOf(o) + ')">查看详情</a></td>' +
+                '<td class="actions"><a onclick="openDetail(' + idx + ')">查看详情</a></td>' +
             '</tr>';
     });
     document.getElementById('tbBody').innerHTML = html;
 }
 
-// ===== 搜索 / 重置 =====
+// ===== 搜索 / 重置 / 导出 =====
 function doSearch() {
     var kwUser = document.getElementById('searchUser').value.trim().toLowerCase();
     var kwName = document.getElementById('searchName').value.trim().toLowerCase();
@@ -678,9 +588,7 @@ function openDetail(idx) {
         items.push(['剩余天数', o.remain + ' 天', '']);
     } else if (o.status === 'sold') {
         items.push(['订单编号', '<a class="order-link" href="零售市场订单.html" title="点击查看订单">' + o.order + '</a>', '']);
-        items.push(['成交价', '¥' + fmt(o.deal), 'green']);
         items.push(['买家账号', o.buyer, '']);
-        items.push(['交易服务费', '¥' + fmt(o.fee), '']);
         items.push(['成交时间', o.dealTime, '']);
     } else {
         items.push(['下架时间', o.offTime, '']);
@@ -693,6 +601,53 @@ function openDetail(idx) {
         grid.appendChild(div);
     });
 
+    /* 已售出：追加交易服务费明细小表格
+       ① 卖家手续费 = 成交价 × 1.6%（向上取整到分）
+       ② 第三方支付手续费 = 成交价 × 0.6%（向上取整到分）
+       ④ 平台交易手续费 = 卖家手续费 − 第三方支付手续费 */
+    if (o.status === 'sold') {
+        var existingMt = grid.parentNode.querySelector('.mini-table');
+        if (existingMt) existingMt.remove();
+
+        var dealPrice = o.deal;
+        var sellerFee = Math.ceil(dealPrice * 0.016 * 100) / 100;
+        var payFee = Math.ceil(dealPrice * 0.006 * 100) / 100;
+        var platformFee = Math.round((sellerFee - payFee) * 100) / 100;
+
+        var mt = document.createElement('div');
+        mt.className = 'mini-table';
+
+        var title = document.createElement('div');
+        title.className = 'mt-title';
+        title.textContent = '交易服务费明细';
+        mt.appendChild(title);
+
+        var tbl = document.createElement('table');
+        var thead = document.createElement('thead');
+        var thr = document.createElement('tr');
+        ['成交价', '卖家手续费', '第三方支付手续费', '平台交易手续费'].forEach(function(h) {
+            var th = document.createElement('th');
+            th.textContent = h;
+            thr.appendChild(th);
+        });
+        thead.appendChild(thr);
+        tbl.appendChild(thead);
+
+        var tbody = document.createElement('tbody');
+        var tdr = document.createElement('tr');
+        [dealPrice, sellerFee, payFee, platformFee].forEach(function(v) {
+            var td = document.createElement('td');
+            td.className = 'amt';
+            td.textContent = '¥' + fmt(v);
+            tdr.appendChild(td);
+        });
+        tbody.appendChild(tdr);
+        tbl.appendChild(tbody);
+        mt.appendChild(tbl);
+
+        grid.parentNode.appendChild(mt);
+    }
+
     document.getElementById('detailOverlay').classList.add('show');
 }
 
@@ -700,36 +655,14 @@ function closeDetail() {
     document.getElementById('detailOverlay').classList.remove('show');
 }
 
-// ===== 功能说明浮窗 =====
-function toggleFuncModal() {
-  var el = document.getElementById('funcModal');
-  el.classList.toggle('show');
-  if (el.classList.contains('show') && !el.dataset.dragged) {
-    el.style.left = '50%'; el.style.top = '50%'; el.style.transform = 'translate(-50%,-50%)';
-  }
+// ===== 右侧功能说明面板：收起 / 展开 =====
+function toggleFuncPanel() {
+    document.body.classList.toggle('fp-collapsed');
 }
-(function() {
-  var modal, titleBar, offX, offY, dragging = false;
-  document.addEventListener('DOMContentLoaded', function() {
-    modal = document.getElementById('funcModal');
-    titleBar = modal.querySelector('.fm-title');
-    titleBar.addEventListener('mousedown', startDrag);
-    titleBar.addEventListener('touchstart', startDragTouch, {passive:true});
-    document.addEventListener('mousemove', onDrag);
-    document.addEventListener('mouseup', endDrag);
-    document.addEventListener('touchmove', onDragTouch, {passive:true});
-    document.addEventListener('touchend', endDrag);
-  });
-  function startDrag(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = e.clientX - rect.left; offY = e.clientY - rect.top; dragging = true; titleBar.style.cursor = 'grabbing'; }
-  function startDragTouch(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; var t = e.touches[0]; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = t.clientX - rect.left; offY = t.clientY - rect.top; dragging = true; }
-  function onDrag(e) { if (!dragging) return; modal.style.left = (e.clientX - offX) + 'px'; modal.style.top = (e.clientY - offY) + 'px'; }
-  function onDragTouch(e) { if (!dragging) return; var t = e.touches[0]; modal.style.left = (t.clientX - offX) + 'px'; modal.style.top = (t.clientY - offY) + 'px'; }
-  function endDrag() { dragging = false; if (titleBar) titleBar.style.cursor = 'grab'; }
-})();
 
 // 初始化
 render(records);
 </script>
-
+<script src="asset/admin-sidebar.js"></script>
 </body>
 </html>

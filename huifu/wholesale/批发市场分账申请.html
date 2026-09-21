@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>批发市场分账申请</title>
+<link rel="stylesheet" href="asset/admin-sidebar.css">
 <style>
     :root{
       --primary:#1a78ff;--primary-hover:#0f6ae8;--primary-bg:#e6f4ff;
@@ -20,45 +21,27 @@
         background: var(--page-bg);
         color: var(--ink);
         font-size: 14px;
-        min-height: 100vh;
     }
 
-    /* 顶栏（白底企业风，无侧边栏） */
-    .topbar {
-        height: 56px;
-        background: #fff;
-        border-bottom: 1px solid var(--border-light);
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 0 24px;
+    /* ── 页面结构：左侧目录（asset/admin-sidebar.js 公用注入）+ 中间内容 + 右侧功能说明 ── */
+
+    /* 面包屑（页面最上方） */
+    .breadcrumb {
+        padding: 16px 24px 0; font-size: 13px; color: var(--ink-subtle);
+        display: flex; align-items: center; gap: 6px;
     }
-    .topbar-left { display: flex; align-items: center; gap: 14px; min-width: 0; }
-    .logo-icon {
-        width: 28px; height: 28px; background: var(--brand); border-radius: 4px;
-        color: #fff; display: flex; align-items: center; justify-content: center;
-        font-weight: 700; font-size: 14px; flex-shrink: 0;
-    }
-    .logo-text { font-size: 16px; font-weight: 600; color: var(--ink); white-space: nowrap; }
-    .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink-subtle); white-space: nowrap; overflow: hidden; }
     .breadcrumb .sep { color: #c0c8d4; }
     .breadcrumb .active { color: var(--ink); font-weight: 500; }
-    .topbar-right { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
-    .btn-func {
-        padding: 6px 14px; border-radius: 6px; background: #f5f7fa; color: #333;
-        border: 1px solid #e0e4ea; font-size: 13px; font-weight: 500; cursor: pointer;
-        white-space: nowrap; display: inline-flex; align-items: center; gap: 4px; font-family: inherit;
-    }
-    .btn-func:hover { border-color: var(--primary); color: var(--primary); }
-    .user-chip { display: flex; align-items: center; gap: 8px; cursor: pointer; }
-    .user-chip .avatar {
+    .breadcrumb .user-chip { margin-left: auto; display: flex; align-items: center; gap: 8px; cursor: pointer; }
+    .breadcrumb .user-chip .avatar {
         width: 30px; height: 30px; border-radius: 50%; background: #f5deb3;
         display: flex; align-items: center; justify-content: center; font-size: 15px;
     }
-    .user-chip .name { font-size: 13px; color: var(--ink); }
-    .user-chip .arrow { color: var(--ink-faint); font-size: 12px; }
+    .breadcrumb .user-chip .name { font-size: 13px; color: var(--ink); }
+    .breadcrumb .user-chip .arrow { color: var(--ink-faint); font-size: 12px; }
 
-    .container { max-width: 1200px; margin: 0 auto; padding: 12px 24px 40px; }
+    /* 内容区 */
+    .content { padding: 12px 24px 40px; }
 
     /* 返回产品管理 */
     .back-bar { padding: 8px 0 4px; }
@@ -90,7 +73,7 @@
     /* 信息卡片网格 */
     .info-grid {
         display: grid;
-        grid-template-columns: repeat(5, 1fr);
+        grid-template-columns: repeat(6, 1fr);
         gap: 12px;
     }
     .info-card { background: var(--info-bg); border-radius: var(--radius-md); padding: 14px 16px; min-height: 80px; }
@@ -99,6 +82,12 @@
     .info-card .value.total { color: #e67e22; }
     .info-card .value.fee { color: var(--brand); }
     .info-card .calc { font-size: 12px; color: var(--ink-faint); font-weight: 400; margin-top: 6px; line-height: 1.5; }
+
+    /* 档位类型标签 */
+    .tier-tag {
+        display:inline-block; padding: 2px 10px; border-radius: var(--radius-sm);
+        font-size: 12px; font-weight: 600; background: var(--primary-bg); color: var(--primary);
+    }
 
     /* 分账金额 */
     .split-card { display: flex; gap: 12px; margin-top: 12px; }
@@ -109,12 +98,12 @@
         padding: 20px;
         border-top: 3px solid var(--primary);
     }
-    .split-box.service { border-top-color: #e67e22; }
+    .split-box.rebate { border-top-color: #1aab67; }
     .split-label { font-size: 13px; color: var(--ink-muted); }
     .split-val { font-size: 26px; font-weight: 700; margin: 10px 0 6px; }
     .split-box.wholesale .split-val { color: var(--primary); }
-    .split-box.service .split-val { color: #e67e22; }
-    .split-calc { font-size: 12px; color: var(--ink-faint); }
+    .split-box.rebate .split-val { color: #1aab67; }
+    .split-calc { font-size: 12px; color: var(--ink-faint); line-height: 1.6; }
 
     .split-action {
         width: 220px;
@@ -158,12 +147,14 @@
         font-size: 13px;
         color: var(--ink);
         border-bottom: 1px solid #f5f5f7;
+        white-space: nowrap;
     }
     .table tr:last-child td { border-bottom: none; }
     .money { font-weight: 600; }
     .money.fee { color: var(--brand); }
     .money.ws { color: var(--primary); }
     .money.sv { color: #e67e22; }
+    .money.rebate { color: #1aab67; }
 
     .status-tag {
         display: inline-block;
@@ -195,164 +186,219 @@
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    /* 功能说明浮窗 */
-    .badge { display: inline-block; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 50%; background: var(--primary); color: #fff; font-size: 12px; line-height: 18px; text-align: center; font-weight: 600; box-shadow: 0 1px 3px rgba(26,120,255,0.3); }
-    .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 540px; max-width: 94vw; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 8px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 9999; padding: 24px; display: none; }
-    .f-modal.show { display: block; }
-    .f-modal .fm-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
-    .f-modal .fm-title:active { cursor: grabbing; }
-    .f-modal .fm-close { width: 28px; height: 28px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; color: #666; border: none; flex-shrink: 0; }
-    .f-modal .fm-body { font-size: 13px; color: #555; line-height: 1.8; }
-    .f-modal .fm-body h4 { font-size: 14px; font-weight: 600; color: var(--ink); margin: 16px 0 8px; }
-    .f-modal .fm-body h4:first-child { margin-top: 0; }
-    .f-modal .fm-body ul { padding-left: 18px; margin: 0 0 12px; }
-    .f-modal .fm-body li { margin-bottom: 4px; }
+    /* ===== 右侧功能说明面板 ===== */
+    .func-panel {
+        position: fixed; top: 0; right: 0; bottom: 0;
+        width: 340px; z-index: 890;
+        background: #fff; border-left: 1px solid #e3e6eb;
+        box-shadow: -1px 0 12px rgba(20, 30, 60, 0.04);
+        display: flex; flex-direction: column;
+    }
+    .func-panel .fp-inner { display: flex; flex-direction: column; height: 100%; min-width: 0; }
+    .func-panel .fp-header {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 15px 14px 13px 18px; border-bottom: 1px solid #f0f1f4; flex-shrink: 0;
+    }
+    .func-panel .fp-title { display: flex; align-items: center; gap: 9px; font-size: 15px; font-weight: 700; color: var(--ink); }
+    .func-panel .fp-title::before {
+        content: ''; width: 8px; height: 8px; border-radius: 50%;
+        background: var(--primary); box-shadow: 0 0 0 4px rgba(26, 120, 255, 0.12);
+    }
+    .func-panel .fp-fold-btn {
+        width: 28px; height: 28px; border: 1px solid var(--border); background: #fff;
+        border-radius: 50%; color: var(--ink-subtle); font-size: 15px; line-height: 1;
+        cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .2s;
+    }
+    .func-panel .fp-fold-btn:hover { border-color: var(--primary); color: var(--primary); }
+    .func-panel .fp-body { flex: 1; overflow-y: auto; padding: 4px 18px 40px; font-size: 13px; color: #555; line-height: 1.85; }
+    .func-panel .fp-body h4 { font-size: 14px; font-weight: 600; color: var(--ink); margin: 18px 0 6px; }
+    .func-panel .fp-body h4:first-child { margin-top: 12px; }
+    .func-panel .fp-body ul { padding-left: 18px; margin: 0 0 8px; }
+    .func-panel .fp-body li { margin-bottom: 6px; }
+    .func-panel .fp-body strong { color: #333; }
+    .func-panel .fp-body p { margin: 6px 0; }
+    .func-panel .fp-open {
+        display: none; position: absolute; top: 0; bottom: 0; left: 0; right: 0;
+        border: none; background: transparent; cursor: pointer;
+        writing-mode: vertical-rl; text-orientation: upright;
+        font-size: 13px; font-weight: 600; letter-spacing: 6px; color: var(--ink-subtle);
+        align-items: center; justify-content: center; font-family: inherit; transition: all .2s;
+    }
+    .func-panel .fp-open:hover { color: var(--primary); background: #fafbfc; }
 
-    @media (max-width: 1100px) { .info-grid { grid-template-columns: repeat(3, 1fr); } }
+    .badge { display: inline-block; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 50%; background: var(--primary); color: #fff; font-size: 12px; line-height: 18px; text-align: center; font-weight: 600; box-shadow: 0 1px 3px rgba(26,120,255,0.3); }
+
+    @media (min-width: 1024px) {
+        .main, .breadcrumb { margin-right: 340px; }
+        body.fp-collapsed .main,
+        body.fp-collapsed .breadcrumb { margin-right: 40px; }
+        body.fp-collapsed .func-panel { width: 40px; }
+        body.fp-collapsed .fp-inner { display: none; }
+        body.fp-collapsed .fp-open { display: flex; }
+    }
+    @media (max-width: 1023.98px) {
+        .func-panel { display: none; }
+        .main, .breadcrumb { margin-right: 0; }
+    }
+    @media (max-width: 1400px) { .info-grid { grid-template-columns: repeat(3, 1fr); } }
     @media (max-width: 800px)  { .info-grid { grid-template-columns: repeat(2, 1fr); } .split-card { flex-direction: column; } .split-action { width: 100%; } }
 </style>
 </head>
 <body>
 
-<div class="topbar">
-    <div class="topbar-left">
-        <span class="logo-icon">深</span>
-        <span class="logo-text">深艺交 · 批发商工作台</span>
-        <div class="breadcrumb">
-            <span>首页</span><span class="sep">/</span>
-            <span>产品管理</span><span class="sep">/</span>
-            <span class="active">批发市场分账申请</span>
-        </div>
+<div class="breadcrumb">
+    <span>首页</span><span class="sep">/</span>
+    <span>我的产品</span><span class="sep">/</span>
+    <span class="active">批发市场分账申请</span>
+    <div class="user-chip">
+        <span class="avatar">👤</span>
+        <span class="name">批发商：李文轩</span>
+        <span class="arrow">▾</span>
     </div>
-    <div class="topbar-right">
-        <button class="btn-func" onclick="toggleFuncModal()">📖 功能说明</button>
-        <div class="user-chip">
-            <span class="avatar">👤</span>
-            <span class="name">批发商：李文轩</span>
-            <span class="arrow">▾</span>
+</div>
+
+<div class="app">
+    <div class="main">
+        <div class="content">
+
+            <!-- 返回产品管理 -->
+            <div class="back-bar">
+                <a class="back-link" href="javascript:history.back()">← 返回产品管理</a>
+            </div>
+
+            <!-- 本次分账申请 -->
+            <div class="section">
+                <div class="section-title">本次分账申请</div>
+                <div class="section-body">
+                    <div class="prod-main">
+                        <div class="product-img" id="prodImg">品</div>
+                        <div>
+                            <div class="prod-name" id="prodName">-</div>
+                            <div class="prod-src">来源：产品管理「批发分账申请」</div>
+                        </div>
+                    </div>
+                    <div class="info-grid">
+                        <div class="info-card">
+                            <div class="label">批发单价</div>
+                            <div class="value" id="unitPrice">-</div>
+                        </div>
+                        <div class="info-card">
+                            <div class="label">批发总数量</div>
+                            <div class="value" id="totalQty">-</div>
+                        </div>
+                        <div class="info-card">
+                            <div class="label">批发实际销售数量</div>
+                            <div class="value" id="soldQty">-</div>
+                        </div>
+                        <div class="info-card">
+                            <div class="label">批发总金额</div>
+                            <div class="value total" id="totalAmt">-</div>
+                            <div class="calc">批发单价 × 批发实际销售数量</div>
+                        </div>
+                        <div class="info-card">
+                            <div class="label">第三方支付手续费</div>
+                            <div class="value fee" id="feeAmt">-</div>
+                            <div class="calc">批发总金额 × 0.6%</div>
+                        </div>
+                        <div class="info-card">
+                            <div class="label">平台管理服务费类型</div>
+                            <div class="value"><span class="tier-tag" id="tierTag">-</span></div>
+                            <div class="calc" id="tierDesc">平台管理服务费费率</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 分账金额计算 -->
+            <div class="split-card">
+                <div class="split-box wholesale">
+                    <div class="split-label">批发分账金额</div>
+                    <div class="split-val" id="wsAmt">-</div>
+                    <div class="split-calc">= 批发总金额 × 40% − 第三方支付手续费<br>＋ 平台管理服务费档位返还金额（<span id="wsRateText">-</span>）</div>
+                </div>
+                <div class="split-box rebate">
+                    <div class="split-label">平台管理服务费档位返还金额</div>
+                    <div class="split-val" id="rebateAmt">-</div>
+                    <div class="split-calc">= 批发总金额 × <span id="rebateRateText">-</span><br>（默认 10% − <span id="rebateTierText">-</span>档位费率）</div>
+                </div>
+                <div class="split-action">
+                    <button class="btn-submit" onclick="submitApply()">提交申请</button>
+                    <div class="hint">提交后进入「待审核」<br>由平台审核通过后完成分账</div>
+                </div>
+            </div>
+
+            <!-- 申请记录 -->
+            <div class="section">
+                <div class="section-title">
+                    <span>申请记录</span>
+                    <span class="count" id="recCount">共 5 条</span>
+                </div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>申请单号</th>
+                            <th>产品名称</th>
+                            <th>批发总金额</th>
+                            <th>第三方支付手续费</th>
+                            <th>批发分账金额</th>
+                            <th>平台管理服务费类型</th>
+                            <th>返还金额</th>
+                            <th>申请时间</th>
+                            <th>状态</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recTbody"></tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
 
-<div class="container">
-
-    <!-- 返回产品管理 -->
-    <div class="back-bar">
-        <a class="back-link" href="javascript:history.back()">← 返回产品管理</a>
-    </div>
-
-    <!-- 本次分账申请 -->
-    <div class="section">
-        <div class="section-title">本次分账申请</div>
-        <div class="section-body">
-            <div class="prod-main">
-                <div class="product-img" id="prodImg">品</div>
-                <div>
-                    <div class="prod-name" id="prodName">-</div>
-                    <div class="prod-src">来源：产品管理「批发分账申请」</div>
-                </div>
-            </div>
-            <div class="info-grid">
-                <div class="info-card">
-                    <div class="label">批发单价</div>
-                    <div class="value" id="unitPrice">-</div>
-                </div>
-                <div class="info-card">
-                    <div class="label">批发总数量</div>
-                    <div class="value" id="totalQty">-</div>
-                </div>
-                <div class="info-card">
-                    <div class="label">批发实际销售数量</div>
-                    <div class="value" id="soldQty">-</div>
-                </div>
-                <div class="info-card">
-                    <div class="label">批发总金额</div>
-                    <div class="value total" id="totalAmt">-</div>
-                    <div class="calc">批发单价 × 批发实际销售数量</div>
-                </div>
-                <div class="info-card">
-                    <div class="label">第三方支付手续费</div>
-                    <div class="value fee" id="feeAmt">-</div>
-                    <div class="calc">批发总金额 × 0.6%</div>
-                </div>
-            </div>
+<!-- 右侧功能说明 -->
+<aside class="func-panel">
+    <div class="fp-inner">
+        <div class="fp-header">
+            <div class="fp-title">功能说明</div>
+            <button class="fp-fold-btn" onclick="toggleFuncPanel()">›</button>
+        </div>
+        <div class="fp-body">
+            <div style="font-size:13px;font-weight:600;color:#e67e22;margin-bottom:8px;">批发商</div>
+            <h4><span class="badge">1</span> <span style="vertical-align:middle;">分账申请入口</span></h4>
+            <ul>
+                <li>在「产品管理」点击<strong>批发分账申请</strong>进入本页，自动带入对应产品的<strong>产品名称、批发单价、批发总数量、批发实际销售数量</strong>。</li>
+            </ul>
+            <h4><span class="badge">2</span> <span style="vertical-align:middle;">金额计算规则</span></h4>
+            <ul>
+                <li><strong>批发总金额</strong> = 批发单价 × 批发实际销售数量</li>
+                <li><strong>第三方支付手续费</strong> = 批发总金额 × 0.6%</li>
+                <li><strong>平台管理服务费返还金额</strong> = 批发总金额 ×（默认 10% − 当前档位费率）</li>
+                <li><strong>批发分账金额</strong> = 批发总金额 × 40% − 第三方支付手续费 ＋ 平台管理服务费返还金额</li>
+                <li>已去掉原<strong>运营服务费</strong>相关计算与展示。</li>
+            </ul>
+            <h4><span class="badge">3</span> <span style="vertical-align:middle;">平台管理服务费档位返还</span></h4>
+            <ul>
+                <li>平台管理服务费默认按 <strong>10%</strong> 收取（交给平台），再按批发总金额匹配档位费率，<strong>差额部分返还</strong>给批发商并计入批发分账金额。</li>
+                <li><strong>A类</strong>（500万元以内）10%：无返还</li>
+                <li><strong>B类</strong>（500万-800万元）8%：返还 2%</li>
+                <li><strong>C类</strong>（800万-1000万元）6%：返还 4%</li>
+                <li><strong>D类</strong>（1000万元以上）5%：返还 5%</li>
+                <li>返还金额在「平台管理服务费档位返还金额」中独立展示，并同步展示在下方申请记录列表。</li>
+            </ul>
+            <h4><span class="badge">4</span> <span style="vertical-align:middle;">提交申请</span></h4>
+            <ul>
+                <li>核对金额无误后点击<strong>提交申请</strong>，生成申请单并进入<strong>待审核</strong>状态。</li>
+            </ul>
+            <h4><span class="badge">5</span> <span style="vertical-align:middle;">申请记录</span></h4>
+            <ul>
+                <li>下方展示历史申请记录：<strong>待审核</strong>（蓝）与<strong>已通过</strong>（绿）。</li>
+                <li>平台审核通过后，批发商与服务商按申请金额完成分账。</li>
+            </ul>
         </div>
     </div>
-
-    <!-- 分账金额计算 -->
-    <div class="split-card">
-        <div class="split-box wholesale">
-            <div class="split-label">批发分账金额</div>
-            <div class="split-val" id="wsAmt">-</div>
-            <div class="split-calc">= 批发总金额 × 25% − 第三方支付手续费</div>
-        </div>
-        <div class="split-box service">
-            <div class="split-label">运营服务费金额</div>
-            <div class="split-val" id="svAmt">-</div>
-            <div class="split-calc">= 批发总金额 × 20%</div>
-        </div>
-        <div class="split-action">
-            <button class="btn-submit" onclick="submitApply()">提交申请</button>
-            <div class="hint">提交后进入「待审核」<br>由平台审核通过后完成分账</div>
-        </div>
-    </div>
-
-    <!-- 申请记录 -->
-    <div class="section">
-        <div class="section-title">
-            <span>申请记录</span>
-            <span class="count" id="recCount">共 3 条</span>
-        </div>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>申请单号</th>
-                    <th>产品名称</th>
-                    <th>批发总金额</th>
-                    <th>第三方支付手续费</th>
-                    <th>批发分账金额</th>
-                    <th>运营服务费金额</th>
-                    <th>申请时间</th>
-                    <th>状态</th>
-                </tr>
-            </thead>
-            <tbody id="recTbody"></tbody>
-        </table>
-    </div>
-</div>
+    <button class="fp-open" onclick="toggleFuncPanel()">功能说明</button>
+</aside>
 
 <div class="toast" id="toast"></div>
-
-<!-- ====== 功能说明浮窗 ====== -->
-<div class="f-modal" id="funcModal">
-  <div class="fm-title">
-    <span>📖 功能说明</span>
-    <button class="fm-close" onclick="toggleFuncModal()">✕</button>
-  </div>
-  <div style="font-size:13px;font-weight:600;color:#e67e22;margin:-6px 0 12px;">批发商</div>
-  <div class="fm-body">
-    <h4><span class="badge">1</span> <span style="vertical-align:middle;">分账申请入口</span></h4>
-    <ul>
-      <li>在「产品管理」点击<b>批发分账申请</b>进入本页，自动带入对应产品的<b>产品名称、批发单价、批发总数量、批发实际销售数量</b></li>
-    </ul>
-    <h4><span class="badge">2</span> <span style="vertical-align:middle;">金额计算规则</span></h4>
-    <ul>
-      <li><b>批发总金额</b> = 批发单价 × 批发实际销售数量</li>
-      <li><b>第三方支付手续费</b> = 批发总金额 × 0.6%</li>
-      <li><b>批发分账金额</b> = 批发总金额 × 25% − 第三方支付手续费</li>
-      <li><b>运营服务费金额</b> = 批发总金额 × 20%</li>
-    </ul>
-    <h4><span class="badge">3</span> <span style="vertical-align:middle;">提交申请</span></h4>
-    <ul>
-      <li>核对金额无误后点击<b>提交申请</b>，生成申请单并进入<b>待审核</b>状态</li>
-    </ul>
-    <h4><span class="badge">4</span> <span style="vertical-align:middle;">申请记录</span></h4>
-    <ul>
-      <li>下方展示历史申请记录：<b>待审核</b>（蓝）与<b>已通过</b>（绿）</li>
-      <li>平台审核通过后，批发商与服务商按申请金额完成分账</li>
-    </ul>
-  </div>
-</div>
 
 <script>
 (function() {
@@ -362,19 +408,37 @@
         return m ? decodeURIComponent(m[1]) : '';
     }
     var name = getParam('name') || '青莲-初心';
-    var price = parseFloat(getParam('price')) || 1562.50;
+    var price = parseFloat(getParam('price')) || 1000000;   // 默认数据落在 B 类档位（500万-800万元）
     var qty = parseInt(getParam('qty')) || 8;
     var sold = parseInt(getParam('sold')) || 6;
     var img = getParam('img') || 'img1';
 
     // ===== 金额计算 =====
-    var total = price * sold;               // 批发总金额
-    var fee = total * 0.006;                // 第三方支付手续费 = 总金额 × 0.6%
-    var wsAmt = total * 0.25 - fee;         // 批发分账金额 = 总金额 × 25% − 手续费
-    var svAmt = total * 0.20;               // 运营服务费金额 = 总金额 × 20%
+    var total = price * sold;               // 批发总金额 = 批发单价 × 批发实际销售数量
+    var fee = total * 0.006;                // 第三方支付手续费 = 批发总金额 × 0.6%
+
+    // 平台管理服务费：默认按 10% 收取（交给平台）
+    // 按档位标准，超出档位费率的部分返还给批发商，计入批发分账金额
+    // A类 500万以内 → 10%（无返还）；B类 500万-800万 → 8%（返还2%）；
+    // C类 800万-1000万 → 6%（返还4%）；D类 1000万以上 → 5%（返还5%）
+    var BASE_RATE = 0.10;                   // 默认平台管理服务费费率
+    function getTier(amount) {
+        if (amount < 5000000)  return { type: 'A类', rate: 0.10 };
+        if (amount < 8000000)  return { type: 'B类', rate: 0.08 };
+        if (amount < 10000000) return { type: 'C类', rate: 0.06 };
+        return { type: 'D类', rate: 0.05 };
+    }
+    var tier = getTier(total);
+    var tierRate = tier.rate;                          // 该档位平台管理服务费费率（交给平台）
+    var rebateRate = BASE_RATE - tierRate;             // 返还费率 = 默认 10% − 档位费率
+    var rebateAmt = total * rebateRate;                // 返还金额 = 批发总金额 × 返还费率
+    var wsAmt = total * 0.40 - fee + rebateAmt;        // 批发分账金额
 
     function fmt(n) {
         return '¥' + n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    }
+    function pct(rate) {
+        return (rate * 100).toFixed(rate * 100 % 1 === 0 ? 0 : 1) + '%';
     }
 
     // ===== 渲染产品信息 =====
@@ -387,14 +451,22 @@
     document.getElementById('soldQty').textContent = sold + ' 件';
     document.getElementById('totalAmt').textContent = fmt(total);
     document.getElementById('feeAmt').textContent = fmt(fee);
+    document.getElementById('tierTag').textContent = tier.type;
+    document.getElementById('tierDesc').textContent = '平台管理服务费 ' + pct(tierRate) + '，返还 ' + pct(rebateRate);
     document.getElementById('wsAmt').textContent = fmt(wsAmt);
-    document.getElementById('svAmt').textContent = fmt(svAmt);
+    document.getElementById('wsRateText').textContent = tier.type + ' 返还 ' + pct(rebateRate);
+    document.getElementById('rebateAmt').textContent = fmt(rebateAmt);
+    document.getElementById('rebateRateText').textContent = pct(rebateRate);
+    document.getElementById('rebateTierText').textContent = tier.type;
 
-    // ===== 模拟申请记录（三种不同状态：待审核 × 2、已通过 × 1）=====
+    // ===== 模拟申请记录 =====
+    // rebate（返还金额）= 批发总金额 ×（默认 10% − 档位费率）
     var records = [
-        { no: 'PF202608051001', prod: '西路财童', total: '¥12,500.00', fee: '¥75.00', ws: '¥3,050.00', sv: '¥2,500.00', time: '2026-08-05 16:40:52', status: 'pending' },
-        { no: 'PF202608031001', prod: '青莲-舒展', total: '¥20,000.00', fee: '¥120.00', ws: '¥4,880.00', sv: '¥4,000.00', time: '2026-08-03 10:22:15', status: 'pending' },
-        { no: 'PF202607281001', prod: '青莲-初心', total: '¥9,375.00', fee: '¥56.25', ws: '¥2,287.50', sv: '¥1,875.00', time: '2026-07-28 09:15:33', status: 'approved' }
+        { no: 'PF202608201001', prod: '青莲-初心', total: 6000000,  fee: 36000, ws: 2484000, rebate: 120000, tier: 'B类', rate: 0.08, time: '2026-08-20 16:40:52', status: 'pending' },
+        { no: 'PF202608181001', prod: '蜀锦山河', total: 6500000,  fee: 39000, ws: 2691000, rebate: 130000, tier: 'B类', rate: 0.08, time: '2026-08-18 10:22:15', status: 'approved' },
+        { no: 'PF202608121001', prod: '敦煌飞天', total: 8800000,  fee: 52800, ws: 3819200, rebate: 352000, tier: 'C类', rate: 0.06, time: '2026-08-12 15:08:41', status: 'approved' },
+        { no: 'PF202608051001', prod: '蜀绣屏风', total: 12500000, fee: 75000, ws: 5550000, rebate: 625000, tier: 'D类', rate: 0.05, time: '2026-08-05 11:32:07', status: 'approved' },
+        { no: 'PF202607281001', prod: '青莲-舒展', total: 20000,    fee: 120,   ws: 7880,    rebate: 0,      tier: 'A类', rate: 0.10, time: '2026-07-28 09:15:33', status: 'approved' }
     ];
 
     function statusHtml(status) {
@@ -408,15 +480,16 @@
             html += '<tr>' +
                 '<td>' + r.no + '</td>' +
                 '<td>' + r.prod + '</td>' +
-                '<td class="money">' + r.total + '</td>' +
-                '<td class="money fee">' + r.fee + '</td>' +
-                '<td class="money ws">' + r.ws + '</td>' +
-                '<td class="money sv">' + r.sv + '</td>' +
+                '<td class="money">' + fmt(r.total) + '</td>' +
+                '<td class="money fee">' + fmt(r.fee) + '</td>' +
+                '<td class="money ws">' + fmt(r.ws) + '</td>' +
+                '<td class="money sv">' + r.tier + ' · ' + pct(r.rate) + '</td>' +
+                '<td class="money rebate">' + fmt(r.rebate) + '</td>' +
                 '<td>' + r.time + '</td>' +
                 '<td>' + statusHtml(r.status) + '</td>' +
             '</tr>';
         });
-        document.getElementById('recTbody').innerHTML = html || '<tr><td colspan="8" class="empty">暂无申请记录</td></tr>';
+        document.getElementById('recTbody').innerHTML = html || '<tr><td colspan="9" class="empty">暂无申请记录</td></tr>';
         document.getElementById('recCount').textContent = '共 ' + records.length + ' 条';
     }
     renderRecords();
@@ -431,10 +504,12 @@
         records.unshift({
             no: no,
             prod: name,
-            total: fmt(total),
-            fee: fmt(fee),
-            ws: fmt(wsAmt),
-            sv: fmt(svAmt),
+            total: total,
+            fee: fee,
+            ws: wsAmt,
+            rebate: rebateAmt,
+            tier: tier.type,
+            rate: tierRate,
             time: time,
             status: 'pending'
         });
@@ -451,33 +526,15 @@
         clearTimeout(toastTimer);
         toastTimer = setTimeout(function() { el.classList.remove('show'); }, 2200);
     }
-
-    // ===== 功能说明浮窗 =====
-    window.toggleFuncModal = function() {
-        var el = document.getElementById('funcModal');
-        el.classList.toggle('show');
-        if (el.classList.contains('show') && !el.dataset.dragged) {
-            el.style.left = '50%'; el.style.top = '50%'; el.style.transform = 'translate(-50%,-50%)';
-        }
-    };
-    var modal, titleBar, offX, offY, dragging = false;
-    document.addEventListener('DOMContentLoaded', function() {
-        modal = document.getElementById('funcModal');
-        titleBar = modal.querySelector('.fm-title');
-        titleBar.addEventListener('mousedown', startDrag);
-        titleBar.addEventListener('touchstart', startDragTouch, {passive:true});
-        document.addEventListener('mousemove', onDrag);
-        document.addEventListener('mouseup', endDrag);
-        document.addEventListener('touchmove', onDragTouch, {passive:true});
-        document.addEventListener('touchend', endDrag);
-    });
-    function startDrag(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = e.clientX - rect.left; offY = e.clientY - rect.top; dragging = true; titleBar.style.cursor = 'grabbing'; }
-    function startDragTouch(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; var t = e.touches[0]; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = t.clientX - rect.left; offY = t.clientY - rect.top; dragging = true; }
-    function onDrag(e) { if (!dragging) return; modal.style.left = (e.clientX - offX) + 'px'; modal.style.top = (e.clientY - offY) + 'px'; }
-    function onDragTouch(e) { if (!dragging) return; var t = e.touches[0]; modal.style.left = (t.clientX - offX) + 'px'; modal.style.top = (t.clientY - offY) + 'px'; }
-    function endDrag() { dragging = false; if (titleBar) titleBar.style.cursor = 'grab'; }
 })();
+
+// ===== 右侧功能说明折叠 =====
+function toggleFuncPanel() {
+    document.body.classList.toggle('fp-collapsed');
+}
 </script>
+
+<script src="asset/admin-sidebar.js"></script>
 
 </body>
 </html>

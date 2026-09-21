@@ -3,628 +3,425 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>平台账户</title>
+    <title>平台账户 · 深艺交管理后台</title>
+    <link rel="stylesheet" href="asset/admin-sidebar.css">
     <style>
-        * { margin:0; padding:0; box-sizing:border-box; }
+        :root {
+            --bg: #ffffff;
+            --accent: #1a78ff;
+            --accent-hover: #0f6ae8;
+            --ink: #1d1d1f;
+            --ink-muted: #3f424b;
+            --ink-subtle: #86868b;
+            --border: #e0e0e0;
+            --radius-pill: 9999px;
+            --radius-card: 18px;
+            --shadow-card: 0 0 0 1px rgba(0,0,0,.06);
+            --font: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
-            background: #f0f2f5;
-            color: #1a1a2e;
-            font-size: 14px;
+            font-family: var(--font);
+            background: #f5f5f7;
+            min-height: 100vh;
+            color: var(--ink);
+            -webkit-font-smoothing: antialiased;
         }
+        .breadcrumb { padding: 16px 24px 0; font-size: 13px; color: var(--ink-subtle); }
+        .breadcrumb a { color: var(--ink-subtle); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--accent); }
+        .breadcrumb .current { color: var(--ink); font-weight: 500; }
 
-        /* 顶部 */
-        .topbar {
-            background: #fff;
-            height: 56px;
-            display: flex;
-            align-items: center;
-            padding: 0 20px;
-            border-bottom: 1px solid #f0f0f0;
-            position: sticky;
-            top: 0;
-            z-index: 10;
+        .main { padding: 16px 24px 40px; }
+        .page-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin: 4px 0 16px;
         }
-        .topbar-left {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-        .menu-btn {
-            width: 32px;
-            height: 32px;
-            border: 1px solid #d0d5dd;
-            border-radius: 4px;
-            background: #fff;
-            color: #6b7588;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-        }
-        .menu-btn:hover { background: #f5f5f7; }
-        .breadcrumb {
-            font-size: 13px;
-            color: #6b7588;
-        }
-        .breadcrumb .active { color: #1a1a2e; }
-        .topbar-right {
-            margin-left: auto;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-        }
-        .topbar-right .avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: #f5deb3;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-        }
-        .topbar-right .name { font-size: 13px; }
-        .topbar-right .arrow { color: #9ba6b9; font-size: 12px; }
+        .page-header h2 { font-size: 20px; font-weight: 600; }
+        .total-text { font-size: 13px; color: var(--ink-subtle); }
+        .total-text strong { color: var(--ink); }
 
         /* 资金汇总卡片 */
         .summary-row {
-            display: flex;
-            gap: 12px;
-            padding: 12px 12px 0;
+            display: flex; gap: 16px; margin-bottom: 16px;
         }
         .summary-card {
-            flex: 1;
-            background: #fff;
-            border-radius: 6px;
-            padding: 16px 18px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+            flex: 1; background: #fff; border-radius: var(--radius-card);
+            padding: 20px 24px; box-shadow: var(--shadow-card);
+            display: flex; align-items: center; justify-content: space-between;
         }
-        .summary-card .head {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-        .summary-card .label {
-            font-size: 14px;
-            color: #4e5a6e;
-            font-weight: 500;
-        }
-        .summary-card .amount {
-            font-size: 22px;
-            font-weight: 700;
-        }
-        .summary-card .amount.bff { color: #e67e22; }
-        .summary-card .amount.hf { color: #4f7cff; }
+        .summary-card .left .label { font-size: 13px; color: var(--ink-subtle); margin-bottom: 8px; }
+        .summary-card .left .amount { font-size: 26px; font-weight: 700; line-height: 1.2; }
+        .summary-card .left .amount.bff { color: #e67e22; }
+        .summary-card .left .amount.hf { color: #4f7cff; }
         .summary-card .btn {
-            background: #1a78ff;
-            color: #fff;
-            border: none;
-            padding: 5px 16px;
-            border-radius: 4px;
-            font-size: 13px;
-            cursor: pointer;
+            background: var(--accent); color: #fff; border: none;
+            padding: 8px 22px; border-radius: var(--radius-pill);
+            font-size: 13px; cursor: pointer; font-family: inherit; font-weight: 500;
         }
-        .summary-card .btn:hover { background: #0f6ae8; }
+        .summary-card .btn:hover { background: var(--accent-hover); }
 
-        /* 筛选区 */
-        .filter-bar {
-            background: #fff;
-            padding: 12px 20px;
-            display: flex;
-            align-items: center;
-            gap: 0;
-            border-bottom: 1px solid #f0f0f0;
-            flex-wrap: wrap;
+        /* 搜索卡片 */
+        .search-area {
+            background: #fff; border-radius: var(--radius-card);
+            padding: 20px 24px; margin-bottom: 16px; box-shadow: var(--shadow-card);
         }
-        .filter-item {
-            display: flex;
-            align-items: center;
-            margin-right: 16px;
-            margin-bottom: 4px;
+        .search-row { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: flex-end; }
+        .search-item { display: flex; flex-direction: column; gap: 6px; min-width: 160px; flex: 0 0 auto; }
+        .search-item label { font-size: 12px; color: var(--ink-subtle); font-weight: 500; }
+        .search-item input, .search-item select {
+            height: 36px; padding: 0 12px; border: 1px solid var(--border);
+            border-radius: var(--radius-pill); font-size: 13px; color: var(--ink);
+            background: #fff; outline: none; font-family: inherit;
         }
-        .filter-label {
-            font-size: 13px;
-            color: #4e5a6e;
-            margin-right: 8px;
-            white-space: nowrap;
+        .search-item input:focus, .search-item select:focus { border-color: var(--accent); }
+        .search-actions { display: flex; gap: 10px; align-items: flex-end; margin-left: auto; flex: 0 0 auto; }
+        .search-actions .btn {
+            height: 36px; padding: 0 20px; border-radius: var(--radius-pill);
+            font-size: 13px; cursor: pointer; border: none; font-family: inherit; font-weight: 500;
         }
-        .filter-input {
-            width: 160px;
-            height: 30px;
-            padding: 0 10px;
-            border: 1px solid #d0d5dd;
-            border-radius: 4px;
-            font-size: 13px;
-            color: #1a1a2e;
-            outline: none;
-        }
-        .filter-input:focus { border-color: #1a78ff; }
-        .filter-select {
-            width: 160px;
-            height: 30px;
-            padding: 0 10px;
-            border: 1px solid #d0d5dd;
-            border-radius: 4px;
-            font-size: 13px;
-            color: #1a1a2e;
-            outline: none;
-            background: #fff;
-        }
-        .filter-date-input {
-            width: 130px;
-            height: 30px;
-            padding: 0 10px;
-            border: 1px solid #d0d5dd;
-            border-radius: 4px;
-            font-size: 13px;
-            color: #1a1a2e;
-            outline: none;
-        }
-        .filter-sep {
-            font-size: 13px;
-            color: #9ba6b9;
-            margin: 0 6px;
-        }
-        .filter-actions {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-left: auto;
-        }
-        .btn-search {
-            background: #f59e0b;
-            color: #fff;
-            border: none;
-            padding: 0 18px;
-            height: 30px;
-            border-radius: 4px;
-            font-size: 13px;
-            cursor: pointer;
-        }
-        .btn-search:hover { background: #e08d04; }
-        .btn-search-icon {
-            background: #1a78ff;
-            color: #fff;
-            border: none;
-            padding: 0 14px;
-            height: 30px;
-            border-radius: 4px;
-            font-size: 13px;
-            cursor: pointer;
-        }
-        .btn-search-icon:hover { background: #0f6ae8; }
-        .btn-reset {
-            background: #fff;
-            color: #1a78ff;
-            border: 1px solid #1a78ff;
-            padding: 0 14px;
-            height: 30px;
-            border-radius: 4px;
-            font-size: 13px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-        .btn-reset:hover { background: #f5f8ff; }
+        .search-actions .btn-search { background: var(--accent); color: #fff; }
+        .search-actions .btn-reset { background: #f5f5f7; color: var(--ink-subtle); border: 1px solid var(--border); }
+        .search-actions .btn-export { background: #ff9500; color: #fff; }
+        .search-actions .btn-export:hover { background: #e68600; }
 
-        /* 表格 */
-        .table-card {
-            background: #fff;
-            margin: 12px;
-            border-radius: 6px;
-            overflow: hidden;
+        /* 日期范围 */
+        .range-input { display: flex; align-items: center; gap: 8px; }
+        .range-input input { width: 110px; min-width: 0; }
+        .range-input span { color: var(--ink-subtle); font-size: 13px; }
+
+        /* 表格卡片 */
+        .table-wrap {
+            background: #fff; border-radius: var(--radius-card);
+            box-shadow: var(--shadow-card); overflow: hidden;
         }
-        .table {
-            width: 100%;
-            border-collapse: collapse;
+        .table-scroll { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 1280px; }
+        thead th {
+            font-size: 12px; font-weight: 600; color: var(--ink-subtle);
+            text-align: left; padding: 14px 16px; white-space: nowrap;
+            border-bottom: 1px solid var(--border); background: #fafafc;
         }
-        .table th {
-            background: #fafbfc;
-            padding: 12px 16px;
-            text-align: left;
-            font-size: 13px;
-            color: #4e5a6e;
-            font-weight: 500;
-            border-bottom: 1px solid #f0f0f0;
-        }
-        .table td {
-            padding: 14px 16px;
-            font-size: 13px;
-            color: #1a1a2e;
-            border-bottom: 1px solid #f5f5f7;
-        }
-        .table tr:last-child td { border-bottom: none; }
-        .table .seq {
-            color: #6b7588;
-            text-align: center;
-            width: 50px;
-        }
-        .table .order-no {
-            color: #1a78ff;
-        }
-        .table .order-no:hover { text-decoration: underline; cursor: pointer; }
-        .table .type {
-            color: #4e5a6e;
-        }
-        .table .amount {
-            color: #4caf50;
-            font-weight: 500;
-        }
+        tbody td { font-size: 13px; padding: 14px 16px; border-bottom: 1px solid #f5f5f5; vertical-align: middle; }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: #fafbff; }
+        tbody tr.hl td { color: var(--accent); }
+        tbody tr.hl .amount-tag { background: #e6f4ff; color: var(--accent); }
+        .seq-cell { color: var(--ink-subtle); text-align: center; width: 50px; }
+        .order-no { color: var(--accent); }
+
         .amount-tag {
-            display: inline-block;
-            background: #e8f5e9;
-            color: #2e7d32;
-            padding: 2px 10px;
-            border-radius: 4px;
-            font-size: 12px;
-        }
-        .table .time {
-            color: #6b7588;
-            font-size: 12px;
-        }
-        .table tr.hl td {
-            color: #1a78ff !important;
-        }
-        .table tr.hl .amount-tag {
-            background: #e6f4ff;
-            color: #1a78ff;
-        }
-        .col-sort {
-            display: inline-block;
-            margin-left: 4px;
-            color: #c0c8d4;
-            cursor: pointer;
+            display: inline-block; background: #e8f5e9; color: #2e7d32;
+            padding: 3px 12px; border-radius: var(--radius-pill);
+            font-size: 12px; font-weight: 500; white-space: nowrap;
         }
 
         /* 分页 */
         .pagination {
-            background: #fff;
-            padding: 12px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            gap: 8px;
-            font-size: 13px;
-            color: #4e5a6e;
+            display: flex; align-items: center; justify-content: flex-end;
+            gap: 8px; padding: 14px 16px; border-top: 1px solid #f5f5f5;
+            font-size: 13px; color: var(--ink-muted);
         }
-        .pagination .total {
-            margin-right: 16px;
+        .pagination-info { margin-right: auto; }
+        .pagination button, .pagination a {
+            min-width: 28px; height: 28px; padding: 0 8px;
+            border: 1px solid var(--border); border-radius: 6px;
+            background: #fff; color: var(--ink-muted); cursor: pointer;
+            display: inline-flex; align-items: center; justify-content: center;
+            font-size: 13px; text-decoration: none; font-family: inherit;
         }
-        .page-btn {
-            min-width: 28px;
-            height: 28px;
-            padding: 0 8px;
-            background: #fff;
-            border: 1px solid #d0d5dd;
-            border-radius: 4px;
-            font-size: 13px;
-            color: #4e5a6e;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
+        .pagination button:hover, .pagination a:hover { border-color: var(--accent); color: var(--accent); }
+        .pagination button.active, .pagination a.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+        .pagination button:disabled { background: #f5f5f7; color: #c0c8d4; cursor: not-allowed; border-color: var(--border); }
+        .pagination .page-size { margin-left: 12px; }
+        .pagination .page-size select {
+            height: 28px; border: 1px solid var(--border); border-radius: 6px;
+            padding: 0 6px; font-size: 13px; outline: none; font-family: inherit;
         }
-        .page-btn:hover { color: #1a78ff; border-color: #1a78ff; }
-        .page-btn.active {
-            background: #1a78ff;
-            color: #fff;
-            border-color: #1a78ff;
+
+        /* ===== 右侧功能说明面板 ===== */
+        .func-panel {
+            position: fixed; top: 0; right: 0; bottom: 0;
+            width: 340px; z-index: 890;
+            background: #fff; border-left: 1px solid #e3e6eb;
+            box-shadow: -1px 0 12px rgba(20, 30, 60, 0.04);
+            display: flex; flex-direction: column;
         }
-        .page-btn:disabled {
-            color: #c0c8d4;
-            cursor: not-allowed;
+        .func-panel .fp-inner { display: flex; flex-direction: column; height: 100%; min-width: 0; }
+        .func-panel .fp-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 15px 14px 13px 18px; border-bottom: 1px solid #f0f1f4; flex-shrink: 0;
         }
-        .page-jump {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            margin-left: 12px;
+        .func-panel .fp-title { display: flex; align-items: center; gap: 9px; font-size: 15px; font-weight: 700; color: var(--ink); }
+        .func-panel .fp-title::before {
+            content: ''; width: 8px; height: 8px; border-radius: 50%;
+            background: var(--accent); box-shadow: 0 0 0 4px rgba(26, 120, 255, 0.12);
         }
-        .page-jump input {
-            width: 48px;
-            height: 28px;
-            border: 1px solid #d0d5dd;
-            border-radius: 4px;
-            text-align: center;
-            font-size: 13px;
-            outline: none;
+        .func-panel .fp-fold-btn {
+            width: 28px; height: 28px; border: 1px solid var(--border); background: #fff;
+            border-radius: 50%; color: var(--ink-subtle); font-size: 15px; line-height: 1;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .2s;
         }
-        .page-jump select {
-            height: 28px;
-            border: 1px solid #d0d5dd;
-            border-radius: 4px;
-            padding: 0 6px;
-            font-size: 13px;
-            outline: none;
-            background: #fff;
+        .func-panel .fp-fold-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .func-panel .fp-body { flex: 1; overflow-y: auto; padding: 4px 18px 40px; font-size: 13px; color: #555; line-height: 1.85; }
+        .func-panel .fp-body h4 { font-size: 14px; font-weight: 600; color: var(--ink); margin: 18px 0 6px; }
+        .func-panel .fp-body h4:first-child { margin-top: 12px; }
+        .func-panel .fp-body ul { padding-left: 18px; margin: 0 0 8px; }
+        .func-panel .fp-body li { margin-bottom: 6px; }
+        .func-panel .fp-body strong { color: #333; }
+        .func-panel .fp-body p { margin: 6px 0; }
+        .func-panel .fp-open {
+            display: none; position: absolute; top: 0; bottom: 0; left: 0; right: 0;
+            border: none; background: transparent; cursor: pointer;
+            writing-mode: vertical-rl; text-orientation: upright;
+            font-size: 13px; font-weight: 600; letter-spacing: 6px; color: var(--ink-subtle);
+            align-items: center; justify-content: center; font-family: inherit; transition: all .2s;
         }
+        .func-panel .fp-open:hover { color: var(--accent); background: #fafbfc; }
 
         /* 标注圆点 */
         .badge {
-            display: inline-block;
-            min-width: 18px;
-            height: 18px;
-            padding: 0 5px;
-            border-radius: 50%;
-            background: #ff2d55;
-            color: #fff;
-            font-size: 12px;
-            line-height: 18px;
-            text-align: center;
-            font-weight: 600;
+            display: inline-block; min-width: 18px; height: 18px; padding: 0 5px;
+            border-radius: 50%; background: #ff2d55; color: #fff; font-size: 12px;
+            line-height: 18px; text-align: center; font-weight: 600;
             box-shadow: 0 1px 3px rgba(255,45,85,0.3);
         }
-        .badge.sm {
-            min-width: 16px;
-            height: 16px;
-            font-size: 11px;
-            line-height: 16px;
-        }
 
-        /* ── 功能说明浮窗 ── */
-        .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 560px; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 9999; padding: 24px; display: none; }
-        .f-modal.show { display: block; }
-        .f-modal .fm-title { font-size: 16px; font-weight: 600; color: #1a1a2e; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
-        .f-modal .fm-title:active { cursor: grabbing; }
-        .f-modal .fm-close { width: 28px; height: 28px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; color: #666; border: none; flex-shrink: 0; }
-        .f-modal .fm-close:hover { background: #e8e8e8; }
-        .f-modal .fm-body { font-size: 13px; color: #555; line-height: 1.8; }
-        .f-modal .fm-body h4 { font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 16px 0 8px; }
-        .f-modal .fm-body h4:first-child { margin-top: 0; }
-        .f-modal .fm-body ul { padding-left: 18px; margin: 0 0 12px; }
-        .f-modal .fm-body li { margin-bottom: 4px; }
+        @media (min-width: 1024px) {
+            .main, .breadcrumb { margin-right: 340px; }
+            body.fp-collapsed .main,
+            body.fp-collapsed .breadcrumb { margin-right: 40px; }
+            body.fp-collapsed .func-panel { width: 40px; }
+            body.fp-collapsed .fp-inner { display: none; }
+            body.fp-collapsed .fp-open { display: flex; }
+        }
+        @media (max-width: 1023.98px) {
+            .func-panel { display: none; }
+            .main, .breadcrumb { margin-right: 0; }
+        }
     </style>
 </head>
 <body>
 
-<!-- 顶部 -->
-<div class="topbar">
-    <div class="topbar-left">
-        <button class="menu-btn">≡</button>
-        <div class="breadcrumb">
-            <span>首页</span> /
-            <span>平台账户管理</span> /
-            <span class="active">平台账户</span>
-        </div>
-    </div>
-    <div class="topbar-right">
-        <button onclick="toggleFuncModal()" style="margin-right:12px;padding:6px 14px;border-radius:6px;background:#f5f7fa;color:#333;border:1px solid #e0e4ea;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:4px;">📖 功能说明</button>
-        <span class="avatar">👤</span>
-        <span class="name">系统参数设置</span>
-        <span class="arrow">▾</span>
-    </div>
+<div class="breadcrumb">
+    <a href="../index.html">首页</a> <span> &gt; </span>
+    <a href="#">平台账户管理</a> <span> &gt; </span>
+    <span class="current">平台账户</span>
 </div>
 
-<!-- 资金汇总卡片 -->
-<div class="summary-row">
-    <div class="summary-card">
-        <div class="head">
-            <span class="label">宝付余额</span>
+<div class="main">
+    <div class="page-header">
+        <h2>平台账户</h2>
+        <span class="total-text">共 <strong>77285</strong> 条交易流水</span>
+    </div>
+
+    <!-- 资金汇总卡片 -->
+    <div class="summary-row">
+        <div class="summary-card">
+            <div class="left">
+                <div class="label">宝付余额</div>
+                <div class="amount bff">128.00</div>
+            </div>
             <button class="btn">提现</button>
         </div>
-        <span class="amount bff">128.00</span>
-    </div>
-    <div class="summary-card">
-        <div class="head">
-            <span class="label">汇付余额</span>
+        <div class="summary-card">
+            <div class="left">
+                <div class="label">汇付余额</div>
+                <div class="amount hf">3,286.50</div>
+            </div>
             <button class="btn">提现</button>
         </div>
-        <span class="amount hf">3,286.50</span>
     </div>
-</div>
 
-<!-- 筛选区 -->
-<div class="filter-bar">
-    <div class="filter-item">
-        <span class="filter-label">交易单号</span>
-        <input class="filter-input" placeholder="请输入交易单号">
+    <!-- 筛选区 -->
+    <div class="search-area">
+        <div class="search-row">
+            <div class="search-item">
+                <label>交易单号</label>
+                <input type="text" placeholder="请输入交易单号">
+            </div>
+            <div class="search-item">
+                <label>产品名</label>
+                <input type="text" placeholder="请输入产品名">
+            </div>
+            <div class="search-item">
+                <label>交易阶段</label>
+                <select>
+                    <option>请选择交易阶段</option>
+                    <option>批发市场</option>
+                    <option>零售市场</option>
+                </select>
+            </div>
+            <div class="search-item">
+                <label>类型</label>
+                <select>
+                    <option>请选择类型</option>
+                    <option>收入</option>
+                    <option>支出</option>
+                </select>
+            </div>
+            <div class="search-item">
+                <label>交易来源</label>
+                <select>
+                    <option>请选择交易来源</option>
+                    <option>第三方支付手续费</option>
+                    <option>上线服务费</option>
+                    <option>平台管理服务费</option>
+                    <option>平台交易手续费</option>
+                    <option>提现</option>
+                </select>
+            </div>
+            <div class="search-item">
+                <label>支付渠道</label>
+                <select>
+                    <option>请选择支付渠道</option>
+                    <option>宝付钱包</option>
+                    <option>汇付钱包</option>
+                </select>
+            </div>
+            <div class="search-item" style="min-width: 240px;">
+                <label>时间</label>
+                <div class="range-input">
+                    <input type="text" placeholder="开始日期">
+                    <span>至</span>
+                    <input type="text" placeholder="结束日期">
+                </div>
+            </div>
+            <div class="search-actions">
+                <button class="btn btn-search">🔍 查询</button>
+                <button class="btn btn-reset">↻ 重置</button>
+                <button class="btn btn-export">⇧ 导出</button>
+            </div>
+        </div>
     </div>
-    <div class="filter-item">
-        <span class="filter-label">产品名</span>
-        <input class="filter-input" placeholder="请输入产品名">
-    </div>
-    <div class="filter-item">
-        <span class="filter-label">交易阶段</span>
-        <select class="filter-select">
-            <option>请选择交易阶段</option>
-            <option>批发市场</option>
-            <option>零售市场</option>
-        </select>
-    </div>
-    <div class="filter-item">
-        <span class="filter-label">类型</span>
-        <select class="filter-select">
-            <option>请选择类型</option>
-            <option>收入</option>
-            <option>支出</option>
-        </select>
-    </div>
-    <div class="filter-item">
-        <span class="filter-label">交易来源</span>
-        <select class="filter-select">
-            <option>请选择交易来源</option>
-            <option>第三方支付手续费</option>
-            <option>上线服务费</option>
-            <option>平台管理服务费</option>
-            <option>平台交易手续费</option>
-            <option>提现</option>
-        </select>
-    </div>
-    <div class="filter-item">
-        <span class="filter-label">支付渠道</span>
-        <select class="filter-select">
-            <option>请选择支付渠道</option>
-            <option>宝付钱包</option>
-            <option>汇付钱包</option>
-        </select>
-    </div>
-    <div class="filter-item">
-        <span class="filter-label">时间</span>
-        <input class="filter-date-input" placeholder="开始日期">
-        <span class="filter-sep">至</span>
-        <input class="filter-date-input" placeholder="结束日期">
-    </div>
-    <div class="filter-actions">
-        <button class="btn-search">查 询</button>
-        <button class="btn-search-icon">导 出</button>
-        <button class="btn-reset">↻ 重 置</button>
-    </div>
-</div>
 
-<!-- 表格 -->
-<div class="table-card">
-    <table class="table">
-        <thead>
-            <tr>
-                <th class="seq">序号</th>
-                <th>交易单号 <span class="col-sort">⇅</span></th>
-                <th>支付订单号</th>
-                <th>交易阶段</th>
-                <th>类型</th>
-                <th>交易来源</th>
-                <th>支付渠道</th>
-                <th>金额</th>
-                <th>产品名称</th>
-                <th>时间 <span class="col-sort">⇅</span></th>
-            </tr>
-        </thead>
-        <tbody id="tableBody"></tbody>
-    </table>
-
-    <div class="pagination">
-        <span class="total">共 77285 条</span>
-        <button class="page-btn">‹</button>
-        <button class="page-btn active">1</button>
-        <button class="page-btn">2</button>
-        <button class="page-btn">3</button>
-        <button class="page-btn">4</button>
-        <button class="page-btn">5</button>
-        <button class="page-btn">6</button>
-        <span style="color:#9ba6b9;">...</span>
-        <button class="page-btn">7729</button>
-        <button class="page-btn">›</button>
-        <div class="page-jump">
-            <input type="text" value="1">
-            <span>10条/页</span>
-            <select>
-                <option>10条/页</option>
-                <option>20条/页</option>
-                <option>50条/页</option>
-            </select>
+    <!-- 表格 -->
+    <div class="table-wrap">
+        <div class="table-scroll">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width:50px;">序号</th>
+                        <th>交易单号 <span class="col-sort" style="color:#c0c8d4;cursor:pointer;margin-left:2px;">⇅</span></th>
+                        <th>支付订单号</th>
+                        <th>交易阶段</th>
+                        <th>类型</th>
+                        <th>交易来源</th>
+                        <th>支付渠道</th>
+                        <th>金额</th>
+                        <th>产品名称</th>
+                        <th>时间 <span class="col-sort" style="color:#c0c8d4;cursor:pointer;margin-left:2px;">⇅</span></th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+        <div class="pagination">
+            <div class="pagination-info">共 77285 条</div>
+            <button disabled>&lt;</button>
+            <button class="active">1</button>
+            <a href="#">2</a>
+            <a href="#">3</a>
+            <a href="#">4</a>
+            <a href="#">5</a>
+            <a href="#">6</a>
+            <span>…</span>
+            <a href="#">7729</a>
+            <a href="#">&gt;</a>
+            <div class="page-size">
+                <select>
+                    <option>10条/页</option>
+                    <option>20条/页</option>
+                    <option>50条/页</option>
+                </select>
+            </div>
         </div>
     </div>
 </div>
 
+<!-- 右侧功能说明 -->
+<aside class="func-panel">
+    <div class="fp-inner">
+        <div class="fp-header">
+            <div class="fp-title">功能说明</div>
+            <button class="fp-fold-btn" onclick="toggleFuncPanel()">›</button>
+        </div>
+        <div class="fp-body">
+            <p style="color:#666;">平台账户管理：展示平台各类资金交易流水，支持按条件筛选查询。</p>
+            <h4><span class="badge">1</span> <span style="vertical-align:middle;">交易阶段</span></h4>
+            <ul>
+                <li>原「交易类型」改为<strong>「交易阶段」</strong>（批发市场 / 零售市场）。</li>
+                <li>作为一列放入列表展示，同时支持作为查询条件筛选。</li>
+            </ul>
+            <h4><span class="badge">2</span> <span style="vertical-align:middle;">交易类型</span></h4>
+            <ul>
+                <li>增加<strong>交易类型</strong>（收入 / 支出），用于区分资金流向。</li>
+            </ul>
+            <h4><span class="badge">3</span> <span style="vertical-align:middle;">交易来源查询</span></h4>
+            <ul>
+                <li>交易来源作为查询条件，包括：</li>
+                <li><strong>第三方支付手续费</strong>（支付手续费，按支付渠道区分）。</li>
+                <li><strong>上线服务费</strong>。</li>
+                <li><strong>平台管理服务费</strong>。</li>
+                <li><strong>平台交易手续费</strong>。</li>
+                <li><strong>提现</strong>。</li>
+            </ul>
+            <h4><span class="badge">4</span> <span style="vertical-align:middle;">支付渠道</span></h4>
+            <ul>
+                <li>增加<strong>支付渠道</strong>作为筛选条件（宝付钱包 / 汇付钱包），并在列表中展示。</li>
+            </ul>
+        </div>
+    </div>
+    <button class="fp-open" onclick="toggleFuncPanel()">功能说明</button>
+</aside>
+
+<script src="asset/admin-sidebar.js"></script>
 <script>
-var data = [
-    { id: 1, tradeNo: 'XB-pf2608170001', payNo: '126081700000000001', stage: '批发市场', type: '收入', source: '第三方支付手续费', channel: '汇付钱包', amount: '+0.60', product: '中路财童', time: '2026-08-17 10:00:00', highlight: true },
-    { id: 2, tradeNo: 'XB-pf2608170001', payNo: '126081700000000001', stage: '批发市场', type: '收入', source: '上线服务费', channel: '汇付钱包', amount: '+5.00', product: '中路财童', time: '2026-08-17 10:00:00', highlight: true },
-    { id: 3, tradeNo: 'XB-pf2608170001', payNo: '126081700000000001', stage: '批发市场', type: '收入', source: '平台管理服务费', channel: '汇付钱包', amount: '+20.00', product: '中路财童', time: '2026-08-17 10:00:00', highlight: true },
-    { id: 4, tradeNo: 'XB-ls2608170002', payNo: '126081700000000002', stage: '零售市场', type: '收入', source: '平台交易手续费', channel: '汇付钱包', amount: '+1.80', product: '中路财童', time: '2026-08-17 10:30:00', highlight: true },
-    { id: 5, tradeNo: 'XB-ls2608170002', payNo: '126081700000000002', stage: '零售市场', type: '收入', source: '第三方支付手续费', channel: '汇付钱包', amount: '+0.60', product: '中路财童', time: '2026-08-17 10:30:00', highlight: true },
-    { id: 6, tradeNo: 'XB-txbuy26072004046001', payNo: '12607201114450853227', stage: '零售市场', type: '收入', source: '第三方支付手续费', channel: '宝付钱包', amount: '+0.06', product: '东坡万里', time: '2026-07-20 11:14:37' },
-    { id: 7, tradeNo: 'XB-txbuy26072004046001', payNo: '12607201114450853227', stage: '零售市场', type: '收入', source: '平台交易手续费', channel: '宝付钱包', amount: '+0.18', product: '东坡万里', time: '2026-07-20 11:14:37' },
-    { id: 8, tradeNo: 'XB-txbuy26072004034301', payNo: '1260720111244892128', stage: '批发市场', type: '收入', source: '第三方支付手续费', channel: '宝付钱包', amount: '+0.07', product: '诺亚宝', time: '2026-07-20 11:12:41' },
-    { id: 9, tradeNo: 'XB-txbuy26072004034301', payNo: '1260720111244892128', stage: '批发市场', type: '收入', source: '平台交易手续费', channel: '宝付钱包', amount: '+0.21', product: '诺亚宝', time: '2026-07-20 11:12:41' },
-    { id: 10, tradeNo: 'XB-txbuy26071704007801', payNo: '1260717110765289498', stage: '零售市场', type: '收入', source: '第三方支付手续费', channel: '宝付钱包', amount: '+0.18', product: '招财财', time: '2026-07-17 11:08:14' },
-    { id: 11, tradeNo: 'XB-txbuy26071704007801', payNo: '1260717110765289498', stage: '零售市场', type: '收入', source: '平台交易手续费', channel: '宝付钱包', amount: '+0.54', product: '招财财', time: '2026-07-17 11:08:14' },
-    { id: 12, tradeNo: 'XB-txbuy26071703998401', payNo: '1260717110665197510', stage: '批发市场', type: '收入', source: '第三方支付手续费', channel: '宝付钱包', amount: '+0.05', product: '东坡佛春', time: '2026-07-17 11:06:43' },
-    { id: 13, tradeNo: 'XB-txbuy26071703998401', payNo: '1260717110665197510', stage: '批发市场', type: '收入', source: '平台交易手续费', channel: '宝付钱包', amount: '+0.13', product: '东坡佛春', time: '2026-07-17 11:06:43' },
-    { id: 14, tradeNo: 'XB-txbuy26071703982401', payNo: '1260717110064894877', stage: '零售市场', type: '收入', source: '第三方支付手续费', channel: '宝付钱包', amount: '+0.35', product: '招财财', time: '2026-07-17 11:00:44' },
-    { id: 15, tradeNo: 'XB-txbuy26071703982401', payNo: '1260717110064894877', stage: '零售市场', type: '收入', source: '平台交易手续费', channel: '宝付钱包', amount: '+1.05', product: '招财财', time: '2026-07-17 11:00:44' }
-];
+    function toggleFuncPanel() {
+        document.body.classList.toggle('fp-collapsed');
+    }
 
-function renderTable() {
-    var html = '';
-    data.forEach(function(o) {
-        var rowClass = o.highlight ? ' class="hl"' : '';
-        html += [
-            '<tr' + rowClass + '>',
-            '    <td class="seq">' + o.id + '</td>',
-            '    <td class="order-no">' + o.tradeNo + '</td>',
-            '    <td>' + o.payNo + '</td>',
-            '    <td>' + o.stage + '</td>',
-            '    <td class="type">' + o.type + '</td>',
-            '    <td>' + o.source + '</td>',
-            '    <td>' + o.channel + '</td>',
-            '    <td><span class="amount-tag amount">' + o.amount + '</span></td>',
-            '    <td>' + o.product + '</td>',
-            '    <td class="time">' + o.time + '</td>',
-            '</tr>'
-        ].join('');
-    });
-    document.getElementById('tableBody').innerHTML = html;
-}
+    var data = [
+        { id: 1, tradeNo: 'XB-pf2608170001', payNo: '126081700000000001', stage: '批发市场', type: '收入', source: '第三方支付手续费', channel: '汇付钱包', amount: '+0.60', product: '中路财童', time: '2026-08-17 10:00:00', highlight: true },
+        { id: 2, tradeNo: 'XB-pf2608170001', payNo: '126081700000000001', stage: '批发市场', type: '收入', source: '上线服务费', channel: '汇付钱包', amount: '+5.00', product: '中路财童', time: '2026-08-17 10:00:00', highlight: true },
+        { id: 3, tradeNo: 'XB-pf2608170001', payNo: '126081700000000001', stage: '批发市场', type: '收入', source: '平台管理服务费', channel: '汇付钱包', amount: '+20.00', product: '中路财童', time: '2026-08-17 10:00:00', highlight: true },
+        { id: 4, tradeNo: 'XB-ls2608170002', payNo: '126081700000000002', stage: '零售市场', type: '收入', source: '平台交易手续费', channel: '汇付钱包', amount: '+1.80', product: '中路财童', time: '2026-08-17 10:30:00', highlight: true },
+        { id: 5, tradeNo: 'XB-ls2608170002', payNo: '126081700000000002', stage: '零售市场', type: '收入', source: '第三方支付手续费', channel: '汇付钱包', amount: '+0.60', product: '中路财童', time: '2026-08-17 10:30:00', highlight: true },
+        { id: 6, tradeNo: 'XB-txbuy26072004046001', payNo: '12607201114450853227', stage: '零售市场', type: '收入', source: '第三方支付手续费', channel: '宝付钱包', amount: '+0.06', product: '东坡万里', time: '2026-07-20 11:14:37' },
+        { id: 7, tradeNo: 'XB-txbuy26072004046001', payNo: '12607201114450853227', stage: '零售市场', type: '收入', source: '平台交易手续费', channel: '宝付钱包', amount: '+0.18', product: '东坡万里', time: '2026-07-20 11:14:37' },
+        { id: 8, tradeNo: 'XB-txbuy26072004034301', payNo: '1260720111244892128', stage: '批发市场', type: '收入', source: '第三方支付手续费', channel: '宝付钱包', amount: '+0.07', product: '诺亚宝', time: '2026-07-20 11:12:41' },
+        { id: 9, tradeNo: 'XB-txbuy26072004034301', payNo: '1260720111244892128', stage: '批发市场', type: '收入', source: '平台交易手续费', channel: '宝付钱包', amount: '+0.21', product: '诺亚宝', time: '2026-07-20 11:12:41' },
+        { id: 10, tradeNo: 'XB-txbuy26071704007801', payNo: '1260717110765289498', stage: '零售市场', type: '收入', source: '第三方支付手续费', channel: '宝付钱包', amount: '+0.18', product: '招财财', time: '2026-07-17 11:08:14' },
+        { id: 11, tradeNo: 'XB-txbuy26071704007801', payNo: '1260717110765289498', stage: '零售市场', type: '收入', source: '平台交易手续费', channel: '宝付钱包', amount: '+0.54', product: '招财财', time: '2026-07-17 11:08:14' },
+        { id: 12, tradeNo: 'XB-txbuy26071703998401', payNo: '1260717110665197510', stage: '批发市场', type: '收入', source: '第三方支付手续费', channel: '宝付钱包', amount: '+0.05', product: '东坡佛春', time: '2026-07-17 11:06:43' },
+        { id: 13, tradeNo: 'XB-txbuy26071703998401', payNo: '1260717110665197510', stage: '批发市场', type: '收入', source: '平台交易手续费', channel: '宝付钱包', amount: '+0.13', product: '东坡佛春', time: '2026-07-17 11:06:43' },
+        { id: 14, tradeNo: 'XB-txbuy26071703982401', payNo: '1260717110064894877', stage: '零售市场', type: '收入', source: '第三方支付手续费', channel: '宝付钱包', amount: '+0.35', product: '招财财', time: '2026-07-17 11:00:44' },
+        { id: 15, tradeNo: 'XB-txbuy26071703982401', payNo: '1260717110064894877', stage: '零售市场', type: '收入', source: '平台交易手续费', channel: '宝付钱包', amount: '+1.05', product: '招财财', time: '2026-07-17 11:00:44' }
+    ];
 
-renderTable();
+    function renderTable() {
+        var html = '';
+        data.forEach(function(o) {
+            var rowClass = o.highlight ? ' class="hl"' : '';
+            html += [
+                '<tr' + rowClass + '>',
+                '    <td class="seq-cell">' + o.id + '</td>',
+                '    <td class="order-no">' + o.tradeNo + '</td>',
+                '    <td>' + o.payNo + '</td>',
+                '    <td>' + o.stage + '</td>',
+                '    <td>' + o.type + '</td>',
+                '    <td>' + o.source + '</td>',
+                '    <td>' + o.channel + '</td>',
+                '    <td><span class="amount-tag">' + o.amount + '</span></td>',
+                '    <td>' + o.product + '</td>',
+                '    <td>' + o.time + '</td>',
+                '</tr>'
+            ].join('');
+        });
+        document.getElementById('tableBody').innerHTML = html;
+    }
+
+    renderTable();
 </script>
-
-<!-- ====== 功能说明浮窗 ====== -->
-<div class="f-modal" id="funcModal">
-  <div class="fm-title">
-    <span>📖 功能说明</span>
-    <button class="fm-close" onclick="toggleFuncModal()">✕</button>
-  </div>
-  <div style="font-size:13px;font-weight:600;color:#e74c5e;margin:-6px 0 12px;">平台</div>
-  <div class="fm-body">
-    <p style="margin:0 0 12px;color:#666">平台账户管理：展示平台各类资金交易流水，支持按条件筛选查询。</p>
-    <h4><span class="badge">1</span> <span style="vertical-align:middle;">交易阶段</span></h4>
-    <ul>
-      <li>原「交易类型」改为<b>「交易阶段」</b>（批发市场 / 零售市场）</li>
-      <li>作为一列放入列表展示，同时支持作为查询条件筛选</li>
-    </ul>
-    <h4><span class="badge">2</span> <span style="vertical-align:middle;">交易类型</span></h4>
-    <ul>
-      <li>增加<b>交易类型</b>（收入 / 支出），用于区分资金流向</li>
-    </ul>
-    <h4><span class="badge">3</span> <span style="vertical-align:middle;">交易来源查询</span></h4>
-    <ul>
-      <li>交易来源作为查询条件，包括：</li>
-      <li><b>第三方支付手续费</b>（支付手续费，按支付渠道区分）</li>
-      <li><b>上线服务费</b></li>
-      <li><b>平台管理服务费</b></li>
-      <li><b>平台交易手续费</b></li>
-      <li><b>提现</b></li>
-    </ul>
-    <h4><span class="badge">4</span> <span style="vertical-align:middle;">支付渠道</span></h4>
-    <ul>
-      <li>增加<b>支付渠道</b>作为筛选条件（宝付钱包 / 汇付钱包），并在列表中展示</li>
-    </ul>
-  </div>
-</div>
-
-<script>
-function toggleFuncModal() {
-  var el = document.getElementById('funcModal');
-  el.classList.toggle('show');
-  if (el.classList.contains('show') && !el.dataset.dragged) {
-    el.style.left = '50%'; el.style.top = '50%'; el.style.transform = 'translate(-50%,-50%)';
-  }
-}
-(function() {
-  var modal, titleBar, offX, offY, dragging = false;
-  document.addEventListener('DOMContentLoaded', function() {
-    modal = document.getElementById('funcModal');
-    titleBar = modal.querySelector('.fm-title');
-    titleBar.addEventListener('mousedown', startDrag);
-    titleBar.addEventListener('touchstart', startDragTouch, {passive:true});
-    document.addEventListener('mousemove', onDrag);
-    document.addEventListener('mouseup', endDrag);
-    document.addEventListener('touchmove', onDragTouch, {passive:true});
-    document.addEventListener('touchend', endDrag);
-  });
-  function startDrag(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = e.clientX - rect.left; offY = e.clientY - rect.top; dragging = true; titleBar.style.cursor = 'grabbing'; }
-  function startDragTouch(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; var t = e.touches[0]; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = t.clientX - rect.left; offY = t.clientY - rect.top; dragging = true; }
-  function onDrag(e) { if (!dragging) return; modal.style.left = (e.clientX - offX) + 'px'; modal.style.top = (e.clientY - offY) + 'px'; }
-  function onDragTouch(e) { if (!dragging) return; var t = e.touches[0]; modal.style.left = (t.clientX - offX) + 'px'; modal.style.top = (t.clientY - offY) + 'px'; }
-  function endDrag() { dragging = false; if (titleBar) titleBar.style.cursor = 'grab'; }
-})();
-</script>
-
 </body>
 </html>

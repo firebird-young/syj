@@ -1,0 +1,95 @@
+/* ============================================================
+   原型风格 · 公用左侧目录样式 (admin-sidebar.css)
+   ------------------------------------------------------------
+   - 目录栏顶到页面最上方（top: 0），页面为三部分结构：
+     左目录 + 中内容 + 右功能说明；
+   - 背景深色 #304156，可通过下方 --snav-* 变量整体调整。
+   ============================================================ */
+
+:root {
+    --snav-bg: #304156;        /* 侧栏背景 */
+    --snav-item: #bfcbd9;      /* 菜单文字 */
+    --snav-accent: #409eff;    /* 高亮色 */
+}
+
+.admin-sidenav {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 232px;
+    z-index: 900;            /* 低于弹层，不影响遮罩 */
+    background: var(--snav-bg);
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 16px 12px 48px;
+    box-shadow: 1px 0 10px rgba(0, 0, 0, 0.08);
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+.admin-sidenav::-webkit-scrollbar { width: 5px; }
+.admin-sidenav::-webkit-scrollbar-thumb { background: #45566b; border-radius: 3px; }
+.admin-sidenav::-webkit-scrollbar-track { background: transparent; }
+
+.admin-sidenav .sn-brand {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 15px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.92);
+    padding: 4px 10px 16px;
+    margin-bottom: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+.admin-sidenav .sn-brand .sn-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--snav-accent);
+    box-shadow: 0 0 0 4px rgba(64, 158, 255, 0.18);
+    flex-shrink: 0;
+}
+
+.admin-sidenav .sn-group { margin-top: 8px; }
+.admin-sidenav .sn-group-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: #7a8aa0;
+    letter-spacing: 0.6px;
+    padding: 12px 10px 6px;
+    user-select: none;
+}
+.admin-sidenav .sn-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 12px;
+    margin: 2px 0;
+    border-radius: 8px;
+    color: var(--snav-item);
+    font-size: 13.5px;
+    line-height: 1.4;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.16s ease;
+}
+.admin-sidenav .sn-item:hover {
+    background: #263445;
+    color: #ffffff;
+}
+.admin-sidenav .sn-item.active {
+    background: #263445;
+    color: var(--snav-accent);
+    font-weight: 600;
+    box-shadow: inset 3px 0 0 0 var(--snav-accent);
+}
+
+/* 宽屏下主内容右移，为目录栏留出空间 */
+@media (min-width: 1024px) {
+    body.has-sidenav .breadcrumb,
+    body.has-sidenav .main { margin-left: 232px; }
+}
+
+/* 窄屏收起目录栏，页面恢复正常布局 */
+@media (max-width: 1023.98px) {
+    .admin-sidenav { display: none; }
+}

@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人用户管理 · 深艺交管理后台</title>
+    <link rel="stylesheet" href="asset/admin-sidebar.css">
+    <style>
+        :root {
+            --bg: #ffffff;
+            --accent: #1a78ff;
+            --accent-hover: #0f6ae8;
+            --ink: #1d1d1f;
+            --ink-muted: #3f424b;
+            --ink-subtle: #86868b;
+            --border: #e0e0e0;
+            --radius-pill: 9999px;
+            --radius-card: 18px;
+            --shadow-card: 0 0 0 1px rgba(0,0,0,.06);
+            --font: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: var(--font);
+            background: #f5f5f7;
+            min-height: 100vh;
+            color: var(--ink);
+            -webkit-font-smoothing: antialiased;
+        }
+        .breadcrumb { padding: 16px 24px 0; font-size: 13px; color: var(--ink-subtle); }
+        .breadcrumb a { color: var(--ink-subtle); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--accent); }
+        .breadcrumb .current { color: var(--ink); font-weight: 500; }
+
+        .main { padding: 16px 24px 40px; }
+        .page-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin: 4px 0 16px;
+        }
+        .page-header h2 { font-size: 20px; font-weight: 600; }
+        .total-text { font-size: 13px; color: var(--ink-subtle); }
+        .total-text strong { color: var(--ink); }
+
+        /* 搜索卡片 */
+        .search-area {
+            background: #fff; border-radius: var(--radius-card);
+            padding: 20px 24px; margin-bottom: 16px; box-shadow: var(--shadow-card);
+        }
+        .search-row { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: flex-end; }
+        .search-item { display: flex; flex-direction: column; gap: 6px; min-width: 160px; flex: 0 0 auto; }
+        .search-item label { font-size: 12px; color: var(--ink-subtle); font-weight: 500; }
+        .search-item input, .search-item select {
+            height: 36px; padding: 0 12px; border: 1px solid var(--border);
+            border-radius: var(--radius-pill); font-size: 13px; color: var(--ink);
+            background: #fff; outline: none; font-family: inherit;
+        }
+        .search-item input:focus, .search-item select:focus { border-color: var(--accent); }
+        .search-actions { display: flex; gap: 10px; align-items: flex-end; margin-left: auto; flex: 0 0 auto; }
+        .search-actions .btn {
+            height: 36px; padding: 0 20px; border-radius: var(--radius-pill);
+            font-size: 13px; cursor: pointer; border: none; font-family: inherit; font-weight: 500;
+        }
+        .search-actions .btn-search { background: var(--accent); color: #fff; }
+        .search-actions .btn-reset { background: #f5f5f7; color: var(--ink-subtle); border: 1px solid var(--border); }
+        .search-actions .btn-export { background: #ff9500; color: #fff; }
+        .search-actions .btn-export:hover { background: #e68600; }
+
+        /* 多选 */
+        .checkbox-group {
+            display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+            min-height: 36px;
+        }
+        .checkbox-group label {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 13px; color: var(--ink); cursor: pointer; user-select: none;
+        }
+        .checkbox-group input[type="checkbox"] {
+            width: 14px; height: 14px; accent-color: var(--accent); cursor: pointer;
+        }
+
+        /* 表格卡片 */
+        .table-wrap {
+            background: #fff; border-radius: var(--radius-card);
+            box-shadow: var(--shadow-card); overflow: hidden;
+        }
+        .table-scroll { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 1180px; }
+        thead th {
+            font-size: 12px; font-weight: 600; color: var(--ink-subtle);
+            text-align: left; padding: 14px 16px; white-space: nowrap;
+            border-bottom: 1px solid var(--border); background: #fafafc;
+        }
+        tbody td { font-size: 13px; padding: 14px 16px; border-bottom: 1px solid #f5f5f5; vertical-align: middle; }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: #fafbff; }
+        .seq-cell { color: var(--ink-subtle); }
+
+        /* 状态标签 */
+        .status-tag {
+            display: inline-block; padding: 3px 10px; border-radius: var(--radius-pill);
+            font-size: 12px; font-weight: 500; white-space: nowrap;
+        }
+        .status-tag.normal { background: #e8f8f0; color: #1aab67; }
+        .status-tag.frozen { background: #fdecee; color: #e74c5e; }
+
+        /* 操作列 */
+        .actions-cell { white-space: nowrap; }
+        .actions-cell a {
+            color: var(--accent); text-decoration: none; font-size: 13px;
+            cursor: pointer; margin-right: 12px;
+        }
+        .actions-cell a:last-child { margin-right: 0; }
+        .actions-cell a:hover { text-decoration: underline; }
+        .actions-cell a.danger { color: #e74c5e; }
+        .actions-cell a.strong { font-weight: 600; }
+
+        /* 分页 */
+        .pagination {
+            display: flex; align-items: center; justify-content: flex-end;
+            gap: 8px; padding: 14px 16px; border-top: 1px solid #f5f5f5;
+            font-size: 13px; color: var(--ink-muted);
+        }
+        .pagination-info { margin-right: auto; }
+        .pagination button, .pagination a {
+            min-width: 28px; height: 28px; padding: 0 8px;
+            border: 1px solid var(--border); border-radius: 6px;
+            background: #fff; color: var(--ink-muted); cursor: pointer;
+            display: inline-flex; align-items: center; justify-content: center;
+            font-size: 13px; text-decoration: none; font-family: inherit;
+        }
+        .pagination button:hover, .pagination a:hover { border-color: var(--accent); color: var(--accent); }
+        .pagination button.active, .pagination a.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+        .pagination button:disabled { background: #f5f5f7; color: #c0c8d4; cursor: not-allowed; border-color: var(--border); }
+        .pagination .page-size { margin-left: 12px; }
+        .pagination .page-size select {
+            height: 28px; border: 1px solid var(--border); border-radius: 6px;
+            padding: 0 6px; font-size: 13px; outline: none; font-family: inherit;
+        }
+
+        /* ===== 右侧功能说明面板 ===== */
+        .func-panel {
+            position: fixed; top: 0; right: 0; bottom: 0;
+            width: 340px; z-index: 890;
+            background: #fff; border-left: 1px solid #e3e6eb;
+            box-shadow: -1px 0 12px rgba(20, 30, 60, 0.04);
+            display: flex; flex-direction: column;
+        }
+        .func-panel .fp-inner { display: flex; flex-direction: column; height: 100%; min-width: 0; }
+        .func-panel .fp-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 15px 14px 13px 18px; border-bottom: 1px solid #f0f1f4; flex-shrink: 0;
+        }
+        .func-panel .fp-title { display: flex; align-items: center; gap: 9px; font-size: 15px; font-weight: 700; color: var(--ink); }
+        .func-panel .fp-title::before {
+            content: ''; width: 8px; height: 8px; border-radius: 50%;
+            background: var(--accent); box-shadow: 0 0 0 4px rgba(26, 120, 255, 0.12);
+        }
+        .func-panel .fp-fold-btn {
+            width: 28px; height: 28px; border: 1px solid var(--border); background: #fff;
+            border-radius: 50%; color: var(--ink-subtle); font-size: 15px; line-height: 1;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .2s;
+        }
+        .func-panel .fp-fold-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .func-panel .fp-body { flex: 1; overflow-y: auto; padding: 4px 18px 40px; font-size: 13px; color: #555; line-height: 1.85; }
+        .func-panel .fp-body h4 { font-size: 14px; font-weight: 600; color: var(--ink); margin: 18px 0 6px; }
+        .func-panel .fp-body h4:first-child { margin-top: 12px; }
+        .func-panel .fp-body ul { padding-left: 18px; margin: 0 0 8px; }
+        .func-panel .fp-body li { margin-bottom: 6px; }
+        .func-panel .fp-body strong { color: #333; }
+        .func-panel .fp-open {
+            display: none; position: absolute; top: 0; bottom: 0; left: 0; right: 0;
+            border: none; background: transparent; cursor: pointer;
+            writing-mode: vertical-rl; text-orientation: upright;
+            font-size: 13px; font-weight: 600; letter-spacing: 6px; color: var(--ink-subtle);
+            align-items: center; justify-content: center; font-family: inherit; transition: all .2s;
+        }
+        .func-panel .fp-open:hover { color: var(--accent); background: #fafbfc; }
+
+        @media (min-width: 1024px) {
+            .main, .breadcrumb { margin-right: 340px; }
+            body.fp-collapsed .main,
+            body.fp-collapsed .breadcrumb { margin-right: 40px; }
+            body.fp-collapsed .func-panel { width: 40px; }
+            body.fp-collapsed .fp-inner { display: none; }
+            body.fp-collapsed .fp-open { display: flex; }
+        }
+        @media (max-width: 1023.98px) {
+            .func-panel { display: none; }
+            .main, .breadcrumb { margin-right: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="breadcrumb">
+    <a href="../index.html">首页</a> <span> &gt; </span>
+    <a href="#">会员中心</a> <span> &gt; </span>
+    <span class="current">个人用户管理</span>
+</div>
+
+<div class="main">
+    <div class="page-header">
+        <h2>个人用户管理</h2>
+        <span class="total-text">共 <strong>35702</strong> 条</span>
+    </div>
+
+    <!-- 搜索区 -->
+    <div class="search-area">
+        <div class="search-row">
+            <div class="search-item">
+                <label>用户编号</label>
+                <input type="text" placeholder="请输入用户编号">
+            </div>
+            <div class="search-item">
+                <label>用户账号</label>
+                <input type="text" placeholder="请输入用户账号">
+            </div>
+            <div class="search-item">
+                <label>用户名</label>
+                <input type="text" placeholder="请输入用户名">
+            </div>
+            <div class="search-item" style="min-width: 280px;">
+                <label>开户类型</label>
+                <div class="checkbox-group">
+                    <label><input type="checkbox" value="none"> 未开户</label>
+                    <label><input type="checkbox" value="huifu"> 汇付开户</label>
+                </div>
+            </div>
+            <div class="search-item" style="min-width: 240px;">
+                <label>开户时间</label>
+                <div class="range-input">
+                    <input type="text" placeholder="开始日期">
+                    <span>至</span>
+                    <input type="text" placeholder="结束日期">
+                </div>
+            </div>
+            <div class="search-actions">
+                <button class="btn btn-search">🔍 搜索</button>
+                <button class="btn btn-reset">↻ 重置</button>
+                <button class="btn btn-export">⇧ 导出</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 表格 -->
+    <div class="table-wrap">
+        <div class="table-scroll">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width:60px;">序号</th>
+                        <th>用户编号</th>
+                        <th>用户账号</th>
+                        <th>姓名</th>
+                        <th>昵称</th>
+                        <th>创建时间 <span class="col-sort" style="color:#c0c8d4;cursor:pointer;margin-left:2px;">⇅</span></th>
+                        <th>状态</th>
+                        <th>汇付开户时间 <span class="col-sort" style="color:#c0c8d4;cursor:pointer;margin-left:2px;">⇅</span></th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="seq-cell">1</td>
+                        <td>1861991706771652609</td>
+                        <td>18328715975</td>
+                        <td>徐朝辉</td>
+                        <td>user_5975</td>
+                        <td>2024-11-28 12:33:12</td>
+                        <td><span class="status-tag normal">正常</span></td>
+                        <td>Invalid Date</td>
+                        <td class="actions-cell"><a class="danger">冻结</a><a class="strong" href="个人用户详情.html?id=1861991706771652609">查看</a><a>修改绑定手机号</a></td>
+                    </tr>
+                    <tr>
+                        <td class="seq-cell">2</td>
+                        <td>186204120951959298</td>
+                        <td>13990328245</td>
+                        <td>胡春花</td>
+                        <td>user_8245</td>
+                        <td>2024-11-28 14:41:55</td>
+                        <td><span class="status-tag normal">正常</span></td>
+                        <td>Invalid Date</td>
+                        <td class="actions-cell"><a class="danger">冻结</a><a class="strong" href="个人用户详情.html?id=186204120951959298">查看</a><a>修改绑定手机号</a></td>
+                    </tr>
+                    <tr>
+                        <td class="seq-cell">3</td>
+                        <td>186202412345678901</td>
+                        <td>13800138000</td>
+                        <td>王明</td>
+                        <td>user_1380</td>
+                        <td>2024-11-28 14:42:19</td>
+                        <td><span class="status-tag normal">正常</span></td>
+                        <td>2024-11-29 09:30:00</td>
+                        <td class="actions-cell"><a class="danger">冻结</a><a class="strong" href="个人用户详情.html?id=186202412345678901">查看</a><a>修改绑定手机号</a></td>
+                    </tr>
+                    <tr>
+                        <td class="seq-cell">4</td>
+                        <td>186202498765432109</td>
+                        <td>13900139000</td>
+                        <td>李华</td>
+                        <td>user_1390</td>
+                        <td>2024-11-28 14:44:44</td>
+                        <td><span class="status-tag frozen">冻结</span></td>
+                        <td>2024-11-30 10:15:22</td>
+                        <td class="actions-cell"><a>解冻</a><a class="strong" href="个人用户详情.html?id=186202498765432109">查看</a><a>修改绑定手机号</a></td>
+                    </tr>
+                    <tr>
+                        <td class="seq-cell">5</td>
+                        <td>1862044508146662274</td>
+                        <td>18283305186</td>
+                        <td>谢怡</td>
+                        <td>user_5186</td>
+                        <td>2024-11-28 14:43:19</td>
+                        <td><span class="status-tag normal">正常</span></td>
+                        <td>Invalid Date</td>
+                        <td class="actions-cell"><a class="danger">冻结</a><a class="strong" href="个人用户详情.html?id=1862044508146662274">查看</a><a>修改绑定手机号</a></td>
+                    </tr>
+                    <tr>
+                        <td class="seq-cell">6</td>
+                        <td>1862024486656755073</td>
+                        <td>18282721782</td>
+                        <td>李佳俊</td>
+                        <td>user_1782</td>
+                        <td>2024-11-28 14:44:58</td>
+                        <td><span class="status-tag normal">正常</span></td>
+                        <td>Invalid Date</td>
+                        <td class="actions-cell"><a class="danger">冻结</a><a class="strong" href="个人用户详情.html?id=1862024486656755073">查看</a><a>修改绑定手机号</a></td>
+                    </tr>
+                    <tr>
+                        <td class="seq-cell">7</td>
+                        <td>1862025704241360897</td>
+                        <td>13708095602</td>
+                        <td>刘明昌</td>
+                        <td>user_5602</td>
+                        <td>2024-11-28 14:52:16</td>
+                        <td><span class="status-tag normal">正常</span></td>
+                        <td>Invalid Date</td>
+                        <td class="actions-cell"><a class="danger">冻结</a><a class="strong" href="个人用户详情.html?id=1862025704241360897">查看</a><a>修改绑定手机号</a></td>
+                    </tr>
+                    <tr>
+                        <td class="seq-cell">8</td>
+                        <td>1862099075102998530</td>
+                        <td>15928963279</td>
+                        <td>李婷</td>
+                        <td>user_3279</td>
+                        <td>2024-11-28 19:39:50</td>
+                        <td><span class="status-tag normal">正常</span></td>
+                        <td>Invalid Date</td>
+                        <td class="actions-cell"><a class="danger">冻结</a><a class="strong" href="个人用户详情.html?id=1862099075102998530">查看</a><a>修改绑定手机号</a></td>
+                    </tr>
+                    <tr>
+                        <td class="seq-cell">9</td>
+                        <td>1862128192605034978</td>
+                        <td>18349706778</td>
+                        <td>刘淇</td>
+                        <td>user_5778</td>
+                        <td>2024-11-28 20:08:00</td>
+                        <td><span class="status-tag normal">正常</span></td>
+                        <td>Invalid Date</td>
+                        <td class="actions-cell"><a class="danger">冻结</a><a class="strong" href="个人用户详情.html?id=1862128192605034978">查看</a><a>修改绑定手机号</a></td>
+                    </tr>
+                    <tr>
+                        <td class="seq-cell">10</td>
+                        <td>186202422345345345</td>
+                        <td>18684012997</td>
+                        <td>马凌</td>
+                        <td>user_6251</td>
+                        <td>2024-11-29 10:29:19</td>
+                        <td><span class="status-tag normal">正常</span></td>
+                        <td>2024-11-29 11:00:00</td>
+                        <td class="actions-cell"><a class="danger">冻结</a><a class="strong" href="个人用户详情.html?id=186202422345345345">查看</a><a>修改绑定手机号</a></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="pagination">
+            <div class="pagination-info">共 35702 条</div>
+            <button disabled>&lt;</button>
+            <button class="active">1</button>
+            <a href="#">2</a>
+            <a href="#">3</a>
+            <a href="#">4</a>
+            <a href="#">5</a>
+            <a href="#">6</a>
+            <span>…</span>
+            <a href="#">3571</a>
+            <a href="#">&gt;</a>
+            <div class="page-size">
+                <select>
+                    <option>10条/页</option>
+                    <option>20条/页</option>
+                    <option>50条/页</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 右侧功能说明 -->
+<aside class="func-panel">
+    <div class="fp-inner">
+        <div class="fp-header">
+            <div class="fp-title">功能说明</div>
+            <button class="fp-fold-btn" onclick="toggleFuncPanel()">›</button>
+        </div>
+        <div class="fp-body">
+            <h4>一、搜索筛选</h4>
+            <ul>
+                <li>支持按<strong>用户编号、用户账号、用户名</strong>进行模糊查询。</li>
+                <li><strong>开户类型</strong>为多选：未开户、汇付开户，可多选组合筛选。</li>
+                <li>支持按<strong>开户时间</strong>起止范围筛选。开户时间必须搭配开户类型使用。</li>
+                <li>点击<strong>导出</strong>可将当前筛选结果导出。</li>
+            </ul>
+            <h4>二、用户列表</h4>
+            <ul>
+                <li>展示用户编号、账号、姓名、昵称、创建时间、状态、汇付开户时间等字段。</li>
+                <li>点击表头创建时间/汇付开户时间可进行排序切换。</li>
+            </ul>
+            <h4>三、操作</h4>
+            <ul>
+                <li><strong>查看</strong>：点击跳转至「个人用户详情.html」查看用户详细信息。里面的内容有改动</li>
+            </ul>
+        </div>
+    </div>
+    <button class="fp-open" onclick="toggleFuncPanel()">功能说明</button>
+</aside>
+
+<script src="asset/admin-sidebar.js"></script>
+<script>
+    function toggleFuncPanel() {
+        document.body.classList.toggle('fp-collapsed');
+    }
+</script>
+</body>
+</html>

@@ -3,422 +3,435 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>产品分账管理</title>
+    <title>产品分账管理 · 深艺交管理后台</title>
+    <link rel="stylesheet" href="asset/admin-sidebar.css">
     <style>
-        * { margin:0; padding:0; box-sizing:border-box; }
+        :root {
+            --bg: #ffffff;
+            --accent: #1a78ff;
+            --accent-hover: #0f6ae8;
+            --ink: #1d1d1f;
+            --ink-muted: #3f424b;
+            --ink-subtle: #86868b;
+            --border: #e0e0e0;
+            --radius-pill: 9999px;
+            --radius-card: 18px;
+            --shadow-card: 0 0 0 1px rgba(0,0,0,.06);
+            --font: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
-            background: #f0f2f5;
-            color: #1a1a2e;
-            font-size: 14px;
+            font-family: var(--font);
+            background: #f5f5f7;
+            min-height: 100vh;
+            color: var(--ink);
+            -webkit-font-smoothing: antialiased;
         }
+        .breadcrumb {
+            padding: 16px 24px 0;
+            font-size: 13px; color: var(--ink-subtle);
+        }
+        .breadcrumb a { color: var(--ink-subtle); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--accent); }
+        .breadcrumb .current { color: var(--ink); font-weight: 500; }
 
-        .topbar {
-            background: #fff;
-            height: 56px;
-            display: flex;
-            align-items: center;
-            padding: 0 20px;
-            border-bottom: 1px solid #f0f0f0;
-            position: sticky;
-            top: 0;
-            z-index: 10;
+        .main { padding: 16px 24px 40px; }
+        .page-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin: 4px 0 16px;
         }
-        .topbar-left { display: flex; align-items: center; gap: 16px; }
-        .menu-btn {
-            width: 32px; height: 32px;
-            border: 1px solid #d0d5dd;
-            border-radius: 4px;
-            background: #fff;
-            color: #6b7588;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-        }
-        .menu-btn:hover { background: #f5f5f7; }
-        .breadcrumb { font-size: 13px; color: #6b7588; }
-        .breadcrumb .active { color: #1a1a2e; }
-        .topbar-right {
-            margin-left: auto;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-        }
-        .topbar-right .avatar {
-            width: 32px; height: 32px;
-            border-radius: 50%;
-            background: #f5deb3;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 16px;
-        }
-        .topbar-right .name { font-size: 13px; }
-        .topbar-right .arrow { color: #9ba6b9; font-size: 12px; }
+        .page-header h2 { font-size: 20px; font-weight: 600; }
+        .page-header .hint { font-size: 12px; color: var(--ink-subtle); }
 
-        /* 筛选区 */
-        .filter-bar {
-            background: #fff;
-            margin: 12px 12px 0;
-            padding: 12px 20px;
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            border-radius: 6px;
+        /* 搜索区 */
+        .search-area {
+            background: #fff; border-radius: var(--radius-card);
+            padding: 20px 24px; margin-bottom: 16px; box-shadow: var(--shadow-card);
         }
-        .filter-item {
-            display: flex;
-            align-items: center;
-            margin-right: 16px;
-            margin-bottom: 4px;
+        .search-row { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: flex-end; }
+        .search-item { display: flex; flex-direction: column; gap: 6px; min-width: 160px; flex: 0 0 auto; }
+        .search-item label { font-size: 12px; color: var(--ink-subtle); font-weight: 500; }
+        .search-item input, .search-item select {
+            height: 36px; padding: 0 12px; border: 1px solid var(--border);
+            border-radius: var(--radius-pill); font-size: 13px; color: var(--ink);
+            background: #fff; outline: none; font-family: inherit;
         }
-        .filter-label {
-            font-size: 13px;
-            color: #4e5a6e;
-            margin-right: 8px;
-            white-space: nowrap;
+        .search-item .date-pair { display: flex; align-items: center; gap: 6px; }
+        .search-item .date-pair span { color: var(--ink-subtle); font-size: 12px; }
+        .search-actions {
+            display: flex; gap: 10px; align-items: flex-end; margin-left: auto; flex: 0 0 auto;
         }
-        .filter-input {
-            width: 160px;
-            height: 30px;
-            padding: 0 10px;
-            border: 1px solid #d0d5dd;
-            border-radius: 4px;
-            font-size: 13px;
-            color: #1a1a2e;
-            outline: none;
+        .search-actions .btn {
+            height: 36px; padding: 0 20px; border-radius: var(--radius-pill);
+            font-size: 13px; cursor: pointer; border: none; font-weight: 500; font-family: inherit;
         }
-        .filter-input:focus { border-color: #1a78ff; }
-        .filter-select {
-            width: 140px;
-            height: 30px;
-            padding: 0 10px;
-            border: 1px solid #d0d5dd;
-            border-radius: 4px;
-            font-size: 13px;
-            color: #1a1a2e;
-            outline: none;
-            background: #fff;
-        }
-        .filter-actions {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-left: auto;
-        }
-        .btn-search {
-            background: #1a78ff;
-            color: #fff;
-            border: none;
-            padding: 0 14px;
-            height: 30px;
-            border-radius: 4px;
-            font-size: 13px;
-            cursor: pointer;
-        }
-        .btn-search:hover { background: #0f6ae8; }
-        .btn-reset {
-            background: #f59e0b;
-            color: #fff;
-            border: none;
-            padding: 0 14px;
-            height: 30px;
-            border-radius: 4px;
-            font-size: 13px;
-            cursor: pointer;
-        }
-        .btn-reset:hover { background: #e08d04; }
-        .btn-export {
-            background: #fff;
-            color: #1a78ff;
-            border: 1px solid #1a78ff;
-            padding: 0 14px;
-            height: 30px;
-            border-radius: 4px;
-            font-size: 13px;
-            cursor: pointer;
-        }
-        .btn-export:hover { background: #f5f8ff; }
+        .search-actions .btn-search { background: var(--accent); color: #fff; }
+        .search-actions .btn-search:hover { background: var(--accent-hover); }
+        .search-actions .btn-reset { background: #f5f5f7; color: var(--ink-subtle); border: 1px solid var(--border); }
+        .search-actions .btn-export { background: #fff; color: var(--accent); border: 1px solid var(--accent); }
+        .search-actions .btn-export:hover { background: #f5f8ff; }
 
         /* 表格 */
-        .table-card {
-            background: #fff;
-            margin: 12px;
-            border-radius: 6px;
-            overflow-x: auto;
+        .table-wrap {
+            background: #fff; border-radius: var(--radius-card);
+            box-shadow: var(--shadow-card); overflow: hidden;
         }
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-            table-layout: auto;
+        .table-scroll { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 1280px; }
+        thead th {
+            font-size: 12px; font-weight: 600; color: var(--ink-muted);
+            text-align: left; padding: 14px 12px; white-space: nowrap;
+            border-bottom: 1px solid var(--border); background: #fafafc;
         }
-        .table th {
-            background: #fafbfc;
-            padding: 12px 10px;
-            text-align: left;
-            font-size: 12px;
-            color: #4e5a6e;
-            font-weight: 500;
-            border-bottom: 1px solid #f0f0f0;
-            white-space: nowrap;
-            vertical-align: middle;
-        }
-        .table td {
-            padding: 10px 10px;
-            font-size: 12px;
-            color: #1a1a2e;
-            border-bottom: 1px solid #f5f5f7;
-            vertical-align: top;
-        }
-        .table tr:last-child td { border-bottom: none; }
-        .cell-main { font-weight: 500; }
-        .cell-sub { color: #86909c; font-size: 11px; margin-top: 2px; }
-        .cell-rate { color: #e67e22; font-size: 11px; margin-top: 2px; }
-        .amount-val { font-weight: 500; }
+        tbody td { font-size: 13px; padding: 12px; border-bottom: 1px solid #f5f5f5; vertical-align: top; }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: #fafbff; }
+        .cell-main { font-weight: 600; color: var(--ink); }
+        .cell-sub { color: var(--ink-subtle); font-size: 11px; margin-top: 2px; }
+        .cell-rate { color: #e67e22; font-size: 11px; margin-top: 2px; font-weight: 500; }
+        .amount-val { font-weight: 600; }
 
-        .pagination {
-            padding: 12px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            gap: 8px;
-            font-size: 13px;
-            color: #4e5a6e;
+        /* 分页 */
+        .table-foot {
+            padding: 14px 24px; display: flex; align-items: center; justify-content: flex-end;
+            gap: 8px; font-size: 13px; color: var(--ink-muted);
+            border-top: 1px solid #f0f0f0;
         }
-        .pagination .total { margin-right: 16px; }
+        .table-foot .total { margin-right: 16px; }
         .page-btn {
-            min-width: 28px;
-            height: 28px;
-            padding: 0 8px;
-            border: 1px solid #d0d5dd;
-            border-radius: 4px;
-            background: #fff;
-            color: #4e5a6e;
-            font-size: 12px;
-            cursor: pointer;
+            min-width: 32px; height: 32px; padding: 0 10px;
+            border: 1px solid var(--border); border-radius: var(--radius-pill);
+            background: #fff; color: var(--ink-muted); font-size: 12px;
+            cursor: pointer; font-family: inherit;
         }
-        .page-btn:hover { border-color: #1a78ff; color: #1a78ff; }
-        .page-btn.active {
-            background: #1a78ff;
-            border-color: #1a78ff;
-            color: #fff;
-        }
+        .page-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .page-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
 
-        /* 标注圆点 */
-        .badge {
-            display: inline-block;
-            min-width: 18px;
-            height: 18px;
-            padding: 0 5px;
-            border-radius: 50%;
-            background: #ff2d55;
-            color: #fff;
-            font-size: 12px;
-            line-height: 18px;
-            text-align: center;
-            font-weight: 600;
-            box-shadow: 0 1px 3px rgba(255,45,85,0.3);
+        /* ===== 右侧功能说明面板（继承自 assets/func-panel.html） ===== */
+        .func-panel {
+            position: fixed; top: 0; right: 0; bottom: 0;
+            width: 340px; z-index: 890;
+            background: #fff; border-left: 1px solid #e3e6eb;
+            box-shadow: -1px 0 12px rgba(20,30,60,.04);
+            display: flex; flex-direction: column;
         }
-
-        /* ── 功能说明浮窗 ── */
-        .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 580px; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 9999; padding: 24px; display: none; }
-        .f-modal.show { display: block; }
-        .f-modal .fm-title { font-size: 16px; font-weight: 600; color: #1a1a2e; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
-        .f-modal .fm-title:active { cursor: grabbing; }
-        .f-modal .fm-close { width: 28px; height: 28px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; color: #666; border: none; flex-shrink: 0; }
-        .f-modal .fm-close:hover { background: #e8e8e8; }
-        .f-modal .fm-body { font-size: 13px; color: #555; line-height: 1.8; }
-        .f-modal .fm-body h4 { font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 16px 0 8px; }
-        .f-modal .fm-body h4:first-child { margin-top: 0; }
-        .f-modal .fm-body ul { padding-left: 18px; margin: 0 0 12px; }
-        .f-modal .fm-body li { margin-bottom: 4px; }
+        .func-panel .fp-inner { display: flex; flex-direction: column; height: 100%; min-width: 0; }
+        .func-panel .fp-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 15px 14px 13px 18px; border-bottom: 1px solid #f0f1f4; flex-shrink: 0;
+        }
+        .func-panel .fp-title { display: flex; align-items: center; gap: 9px; font-size: 15px; font-weight: 700; color: var(--ink); }
+        .func-panel .fp-title::before {
+            content: ''; width: 8px; height: 8px; border-radius: 50%;
+            background: var(--accent); box-shadow: 0 0 0 4px rgba(26,120,255,.18);
+        }
+        .func-panel .fp-fold-btn {
+            width: 28px; height: 28px; border: 1px solid var(--border); background: #fff;
+            border-radius: 50%; color: var(--ink-subtle); font-size: 15px; line-height: 1;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .2s;
+        }
+        .func-panel .fp-fold-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .func-panel .fp-body { flex: 1; overflow-y: auto; padding: 4px 18px 40px; font-size: 13px; color: #555; line-height: 1.85; }
+        .func-panel .fp-body h4 { font-size: 14px; font-weight: 600; color: var(--ink); margin: 18px 0 6px; }
+        .func-panel .fp-body h4:first-child { margin-top: 12px; }
+        .func-panel .fp-body ul { padding-left: 18px; margin: 0 0 8px; }
+        .func-panel .fp-body li { margin-bottom: 6px; }
+        .func-panel .fp-body strong { color: #333; }
+        .func-panel .fp-body table {
+            width: 100%; border-collapse: collapse;
+            margin: 6px 0 10px; font-size: 12px;
+        }
+        .func-panel .fp-body table th,
+        .func-panel .fp-body table td {
+            border: 1px solid var(--border); padding: 6px 8px;
+            text-align: center; color: var(--ink-muted);
+        }
+        .func-panel .fp-body table th { background: #fafafc; font-weight: 600; color: var(--ink); }
+        .func-panel .fp-body table td .em { color: #e67e22; font-weight: 600; }
+        .func-panel .fp-open {
+            display: none; position: absolute; top: 0; bottom: 0; left: 0; right: 0;
+            border: none; background: transparent; cursor: pointer;
+            writing-mode: vertical-rl; text-orientation: upright;
+            font-size: 13px; font-weight: 600; letter-spacing: 6px; color: var(--ink-subtle);
+            align-items: center; justify-content: center; font-family: inherit; transition: all .2s;
+        }
+        .func-panel .fp-open:hover { color: var(--accent); background: #fafbfc; }
+        @media (min-width: 1024px) {
+            .main, .breadcrumb { margin-right: 340px; }
+            body.fp-collapsed .main,
+            body.fp-collapsed .breadcrumb { margin-right: 40px; }
+            body.fp-collapsed .func-panel { width: 40px; }
+            body.fp-collapsed .fp-inner { display: none; }
+            body.fp-collapsed .fp-open { display: flex; }
+        }
+        @media (max-width: 1023.98px) {
+            .func-panel { display: none; }
+            .main, .breadcrumb { margin-right: 0; }
+        }
     </style>
 </head>
 <body>
 
-<div class="topbar">
-    <div class="topbar-left">
-        <button class="menu-btn">≡</button>
-        <div class="breadcrumb">
-            <span>首页</span> /
-            <span>分账管理</span> /
-            <span class="active">产品分账管理</span>
+<div class="breadcrumb">
+    <a href="数据看板.html">首页</a> <span> &gt; </span>
+    <a href="#">分账管理</a> <span> &gt; </span>
+    <span class="current">产品分账管理</span>
+</div>
+
+<div class="main">
+    <div class="page-header">
+        <h2>产品分账管理</h2>
+        <span class="hint">批发商分账采用「40% − 0.6% + 档位增量」机制，平台管理服务费按最终批发金额档位（10% / 8% / 6% / 5%）阶梯确定</span>
+    </div>
+
+    <div class="search-area">
+        <div class="search-row">
+            <div class="search-item">
+                <label>订单编号</label>
+                <input type="text" placeholder="请输入订单编号">
+            </div>
+            <div class="search-item">
+                <label>产品名称</label>
+                <input type="text" placeholder="请输入产品名称">
+            </div>
+            <div class="search-item">
+                <label>用户账号</label>
+                <input type="text" placeholder="请输入用户账号">
+            </div>
+            <div class="search-item">
+                <label>创建时间</label>
+                <div class="date-pair">
+                    <input type="text" placeholder="开始日期" style="width:130px;">
+                    <span>至</span>
+                    <input type="text" placeholder="结束日期" style="width:130px;">
+                </div>
+            </div>
+            <div class="search-item">
+                <label>首次分账时间</label>
+                <div class="date-pair">
+                    <input type="text" placeholder="开始日期" style="width:130px;">
+                    <span>至</span>
+                    <input type="text" placeholder="结束日期" style="width:130px;">
+                </div>
+            </div>
+            <div class="search-actions">
+                <button class="btn btn-search">🔍 搜索</button>
+                <button class="btn btn-reset">↻ 重置</button>
+                <button class="btn btn-export">⇣ 导出</button>
+            </div>
         </div>
     </div>
-    <div class="topbar-right">
-        <button onclick="toggleFuncModal()" style="margin-right:12px;padding:6px 14px;border-radius:6px;background:#f5f7fa;color:#333;border:1px solid #e0e4ea;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:4px;">📖 功能说明</button>
-        <span class="avatar">👤</span>
-        <span class="name">系统参数设置</span>
-        <span class="arrow">▾</span>
+
+    <div class="table-wrap">
+        <div class="table-scroll">
+            <table>
+                <thead>
+                    <tr>
+                        <th>订单编号</th>
+                        <th>产品名称</th>
+                        <th>用户账号</th>
+                        <th>数量 / 单价</th>
+                        <th>总价</th>
+                        <th>第三方支付手续费</th>
+                        <th>创建时间</th>
+                        <th>首次分账时间</th>
+                        <th>批发商分账</th>
+                        <th>平台分账（上线服务费）</th>
+                        <th>平台分账（平台管理服务费）</th>
+                        <th>平台分账（补第三方支付手续费）</th>
+                        <th>零售市场分账</th>
+                        <th>剩余金额</th>
+                        <th>零售市场最后分账时间</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+        <div class="table-foot">
+            <span class="total">共 6 条</span>
+            <button class="page-btn">‹</button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn">›</button>
+        </div>
     </div>
 </div>
 
-<!-- 筛选区 -->
-<div class="filter-bar">
-    <div class="filter-item">
-        <span class="filter-label">订单编号</span>
-        <input class="filter-input" placeholder="请输入订单编号">
+<!-- ===== 右侧功能说明面板 ===== -->
+<aside class="func-panel">
+    <div class="fp-inner">
+        <div class="fp-header">
+            <span class="fp-title">功能说明</span>
+            <button class="fp-fold-btn" onclick="toggleFuncPanel()" title="收起功能说明">›</button>
+        </div>
+        <div class="fp-body">
+            <h4>一、页面定位与字段</h4>
+            <ul>
+                <li>展示平台「<strong>产品分账</strong>」订单明细，含订单、产品、用户、金额与分账结果</li>
+                <li>字段：订单编号、产品名称、用户账号、数量 / 单价、总价、第三方支付手续费、创建时间、首次分账时间</li>
+                <li>分账字段：<strong>批发商分账、平台分账（上线服务费 / 平台管理服务费 / 补第三方支付手续费）、零售市场分账、剩余金额、零售市场最后分账时间</strong></li>
+            </ul>
+            <h4>二、首次分账规则</h4>
+            <ul>
+                <li><strong>平台分账（上线服务费）</strong>：固定 <strong>5%</strong>，不变</li>
+                <li><strong>平台分账（补第三方支付手续费）</strong>：固定 <strong>0.6%</strong>，不变</li>
+                <li><strong>平台分账（平台管理服务费）</strong>：按「最终批发金额」所属档位确定为 <strong>10% / 8% / 6% / 5%</strong>，详见下方档位规则</li>
+                <li><strong>批发商分账</strong>：基础 <strong>40% − 0.6%</strong>，加上按档位匹配的增量 <strong>0% / 2% / 4% / 5%</strong>（与平台管理服务费呈镜像：批发商增量 = 10% − 档位费率）</li>
+                <li>分账链路仅含「批发商 + 平台」两方，不涉及其他角色</li>
+            </ul>
+            <h4>三、批发金额档位规则</h4>
+            <ul>
+                <li>系统依据每笔订单的「最终批发金额」匹配以下档位，档位在订单生成时即确定并固化</li>
+                <li>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>档位</th>
+                                <th>最终批发金额</th>
+                                <th>平台管理服务费</th>
+                                <th>批发商增量</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>A 类</strong></td>
+                                <td>500 万以内</td>
+                                <td><span class="em">10%</span></td>
+                                <td>0%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>B 类</strong></td>
+                                <td>500 万 ~ 800 万</td>
+                                <td><span class="em">8%</span></td>
+                                <td>2%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>C 类</strong></td>
+                                <td>800 万 ~ 1000 万</td>
+                                <td><span class="em">6%</span></td>
+                                <td>4%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>D 类</strong></td>
+                                <td>1000 万以上</td>
+                                <td><span class="em">5%</span></td>
+                                <td>5%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </li>
+                <li>批发商实际分账比例 = <strong>40% − 0.6% + 档位增量</strong></li>
+                <li>档位一经确定不再变更，订单详情与列表均按该档位计算与展示</li>
+            </ul>
+            <h4>四、平台分账与批发商分账关系</h4>
+            <ul>
+                <li>平台管理服务费随批发金额档位<strong>阶梯下调</strong>（A→B→C→D：10% → 8% → 6% → 5%）；批发商分账则对应<strong>阶梯上调</strong>（+0% → +2% → +4% → +5%）</li>
+                <li>无论档位如何，「<strong>批发商分账 + 平台管理服务费</strong>」恒为 <strong>40% − 0.6% + 10% = 49.4%</strong></li>
+                <li>批发金额越大，批发商实际分账越多；批发金额越小，平台管理服务费占比越大 —— 二者呈<strong>镜像关系</strong></li>
+            </ul>
+            <h4>五、计算公式</h4>
+            <ul>
+                <li><strong>第三方支付手续费</strong> = 总价 × 0.6%</li>
+                <li><strong>平台管理服务费</strong> = 总价 × 档位费率（10% / 8% / 6% / 5%）</li>
+                <li><strong>批发商分账</strong> = 总价 × (40% − 0.6% + 档位增量) = 总价 × (40% − 0.6% + (10% − 档位费率))</li>
+                <li><strong>平台分账（合计）</strong> = 上线服务费 5% + 平台管理服务费 + 补第三方支付手续费 0.6%</li>
+                <li><strong>零售市场分账总金额</strong> =（总价 − 批发商分账 − 平台分账合计）/ 总数量 × 零售市场分账总数量</li>
+                <li><strong>剩余金额</strong> = 总价 − 批发商分账 − 平台分账合计 − 零售市场分账总金额</li>
+            </ul>
+        </div>
     </div>
-    <div class="filter-item">
-        <span class="filter-label">产品名称</span>
-        <input class="filter-input" placeholder="请输入产品名称">
-    </div>
-    <div class="filter-item">
-        <span class="filter-label">用户账号</span>
-        <input class="filter-input" placeholder="请输入用户账号">
-    </div>
-    <div class="filter-item">
-        <span class="filter-label">创建时间</span>
-        <input class="filter-input" placeholder="开始日期" style="width:130px;">
-        <span style="color:#9ba6b9;margin:0 6px;">至</span>
-        <input class="filter-input" placeholder="结束日期" style="width:130px;">
-    </div>
-    <div class="filter-item">
-        <span class="filter-label">首次分账时间</span>
-        <input class="filter-input" placeholder="开始日期" style="width:130px;">
-        <span style="color:#9ba6b9;margin:0 6px;">至</span>
-        <input class="filter-input" placeholder="结束日期" style="width:130px;">
-    </div>
-    <div class="filter-actions">
-        <button class="btn-search">🔍 搜 索</button>
-        <button class="btn-reset">↻ 重 置</button>
-        <button class="btn-export">⇣ 导出</button>
-    </div>
-</div>
-
-<!-- 表格 -->
-<div class="table-card">
-    <table class="table">
-        <thead>
-            <tr>
-                <th>订单编号</th>
-                <th>产品名称</th>
-                <th>用户账号</th>
-                <th>数量/单价</th>
-                <th>总价</th>
-                <th>第三方支付手续费</th>
-                <th>创建时间</th>
-                <th>首次分账时间</th>
-                <th>批发商服务商分账时间</th>
-                <th>批发商分账</th>
-                <th>服务商分账</th>
-                <th>平台分账（上线服务费）</th>
-                <th>平台分账（平台管理服务费）</th>
-                <th>平台分账（补第三方支付手续费）</th>
-                <th>零售市场分账</th>
-                <th>剩余金额</th>
-                <th>零售市场最后分账时间</th>
-            </tr>
-        </thead>
-        <tbody id="tableBody"></tbody>
-    </table>
-
-    <div class="pagination">
-        <span class="total">共 6 条</span>
-        <button class="page-btn">‹</button>
-        <button class="page-btn active">1</button>
-        <button class="page-btn">›</button>
-    </div>
-</div>
-
-<!-- ====== 功能说明浮窗 ====== -->
-<div class="f-modal" id="funcModal">
-  <div class="fm-title">
-    <span>📖 功能说明</span>
-    <button class="fm-close" onclick="toggleFuncModal()">✕</button>
-  </div>
-  <div style="font-size:13px;font-weight:600;color:#e74c5e;margin:-6px 0 12px;">平台</div>
-  <div class="fm-body">
-    <h4>列表字段</h4>
-    <ul>
-      <li>订单编号、产品名称、用户账号、购买数量、单价、总价、第三方支付手续费、创建时间、首次分账时间</li>
-      <li>订单编号、产品名称、用户账号、数量/单价、总价、第三方支付手续费、创建时间、首次分账时间、批发商服务商分账时间、批发商分账（金额+比例）、服务商分账（金额+比例）、平台分账（上线服务费/平台管理服务费/补第三方支付手续费，金额+比例）、零售市场分账（次数/金额）、剩余金额、零售市场最后分账时间</li>
-    </ul>
-    <h4>首次分账逻辑</h4>
-    <ul>
-      <li>平台分账（上线服务费）：<b>5%</b></li>
-      <li>平台分账（补第三方支付手续费）：<b>0.6%</b></li>
-      <li>平台分账（平台管理服务费）：<b>10%</b></li>
-      <li>服务商分账：<b>20%</b></li>
-      <li>批发商分账：<b>25% - 0.6%</b></li>
-    </ul>
-    <h4>分账计算规则</h4>
-    <ul>
-      <li><b>第三方支付手续费</b> = 总价 × 0.6%</li>
-      <li><b>平台分账（合计）</b> = 上线服务费5% + 补第三方支付手续费0.6% + 平台管理服务费10%</li>
-      <li><b>零售市场分账总金额</b> =（总价 - 批发商分账 - 服务商分账 - 平台分账合计）/ 总数量 × 零售市场分账总数量</li>
-      <li><b>剩余金额</b> = 总价 - 批发商分账 - 服务商分账 - 平台分账合计 - 零售市场分账总金额</li>
-    </ul>
-  </div>
-</div>
+    <button class="fp-open" onclick="toggleFuncPanel()" title="展开功能说明">功能说明‹</button>
+</aside>
 
 <script>
-var data = [
-    { id: 1, orderNo: 'XB-first26071505024701', product: '中路财童', userNo: '1876829699476860930', qty: 5, price: 128.00, total: 640.00, fee: 3.84, createTime: '2026-07-15 13:57:39', firstTime: '2026-07-15 14:00:01', wsSvTime: '2026-07-15 14:05:30', wsShare: 156.16, wsRate: '25%-0.6%', svShare: 128.00, svRate: '20%', pfOnline: 32.00, pfFee: 3.84, pfMgmt: 64.00, rCount: 3, rQty: 3, rAmount: 153.60, remain: 102.40, lastTime: '2026-07-18 09:00:00', rLastTime: '2026-07-18 10:12:33' },
-    { id: 2, orderNo: 'XB-first26071505016701', product: '中路财童', userNo: '1878638327087280130', qty: 8, price: 260.00, total: 2080.00, fee: 12.48, createTime: '2026-07-15 13:56:24', firstTime: '2026-07-15 13:58:02', wsSvTime: '2026-07-15 14:02:18', wsShare: 507.52, wsRate: '25%-0.6%', svShare: 416.00, svRate: '20%', pfOnline: 104.00, pfFee: 12.48, pfMgmt: 208.00, rCount: 5, rQty: 5, rAmount: 520.00, remain: 312.00, lastTime: '2026-07-16 09:00:00', rLastTime: '2026-07-16 09:20:11' },
-    { id: 3, orderNo: 'XB-first26071504105201', product: '中路财童', userNo: '1881547100063838210', qty: 12, price: 320.00, total: 3840.00, fee: 23.04, createTime: '2026-07-15 11:24:14', firstTime: '2026-07-15 11:26:45', wsSvTime: '2026-07-15 11:30:03', wsShare: 936.96, wsRate: '25%-0.6%', svShare: 768.00, svRate: '20%', pfOnline: 192.00, pfFee: 23.04, pfMgmt: 384.00, rCount: 0, rQty: 0, rAmount: 0.00, remain: 1536.00, lastTime: '-', rLastTime: '-' },
-    { id: 4, orderNo: 'XB-first26071504026701', product: '中路财童', userNo: '2061664641202323457', qty: 3, price: 100.00, total: 300.00, fee: 1.80, createTime: '2026-07-15 11:11:16', firstTime: '2026-07-15 11:12:30', wsSvTime: '2026-07-15 11:15:42', wsShare: 73.20, wsRate: '25%-0.6%', svShare: 60.00, svRate: '20%', pfOnline: 15.00, pfFee: 1.80, pfMgmt: 30.00, rCount: 2, rQty: 2, rAmount: 80.00, remain: 40.00, lastTime: '2026-07-15 11:10:00', rLastTime: '2026-07-15 11:12:31' },
-    { id: 5, orderNo: 'XB-first26071504008801', product: '中路财童', userNo: '1881528763372056578', qty: 6, price: 420.00, total: 2520.00, fee: 15.12, createTime: '2026-07-15 11:08:19', firstTime: '2026-07-15 11:10:05', wsSvTime: '2026-07-15 11:13:55', wsShare: 614.88, wsRate: '25%-0.6%', svShare: 504.00, svRate: '20%', pfOnline: 126.00, pfFee: 15.12, pfMgmt: 252.00, rCount: 4, rQty: 4, rAmount: 672.00, remain: 336.00, lastTime: '2026-07-19 15:00:00', rLastTime: '2026-07-19 15:42:58' },
-    { id: 6, orderNo: 'XB-first26071503857801', product: '中路财童', userNo: '1977229438734100253', qty: 9, price: 180.00, total: 1620.00, fee: 9.72, createTime: '2026-07-15 10:42:58', firstTime: '2026-07-15 10:45:12', wsSvTime: '2026-07-15 10:48:26', wsShare: 395.28, wsRate: '25%-0.6%', svShare: 324.00, svRate: '20%', pfOnline: 81.00, pfFee: 9.72, pfMgmt: 162.00, rCount: 6, rQty: 6, rAmount: 432.00, remain: 216.00, lastTime: '2026-07-16 14:00:00', rLastTime: '2026-07-16 14:05:20' }
+/* ===== 数据：订单基础信息 ===== */
+var orders = [
+    { orderNo: 'XB-first26071505024701', product: '中路财童', userNo: '1876829699476860930', qty: 5,  price: 128.00, total: 30000.00,
+      createTime: '2026-07-15 13:57:39', firstTime: '2026-07-15 14:00:01',
+      rCount: 3, rQty: 3, rAmount: 172.80, lastTime: '2026-07-18 09:00:00', rLastTime: '2026-07-18 10:12:33' },
+    { orderNo: 'XB-first26071505016701', product: '中路财童', userNo: '1878638327087280130', qty: 8,  price: 260.00, total: 300000.00,
+      createTime: '2026-07-15 13:56:24', firstTime: '2026-07-15 13:58:02',
+      rCount: 5, rQty: 5, rAmount: 585.00, lastTime: '2026-07-16 09:00:00', rLastTime: '2026-07-16 09:20:11' },
+    { orderNo: 'XB-first26071504105201', product: '中路财童', userNo: '1881547100063838210', qty: 12, price: 320.00, total: 5500000.00,
+      createTime: '2026-07-15 11:24:14', firstTime: '2026-07-15 11:26:45',
+      rCount: 0, rQty: 0, rAmount: 0.00, lastTime: '-', rLastTime: '-' },
+    { orderNo: 'XB-first26071504026701', product: '中路财童', userNo: '2061664641202323457', qty: 3,  price: 100.00, total: 8500000.00,
+      createTime: '2026-07-15 11:11:16', firstTime: '2026-07-15 11:12:30',
+      rCount: 2, rQty: 2, rAmount: 85.50, lastTime: '2026-07-15 11:10:00', rLastTime: '2026-07-15 11:12:31' },
+    { orderNo: 'XB-first26071504008801', product: '中路财童', userNo: '1881528763372056578', qty: 6,  price: 420.00, total: 12000000.00,
+      createTime: '2026-07-15 11:08:19', firstTime: '2026-07-15 11:10:05',
+      rCount: 4, rQty: 4, rAmount: 740.00, lastTime: '2026-07-19 15:00:00', rLastTime: '2026-07-19 15:42:58' },
+    { orderNo: 'XB-first26071503857801', product: '中路财童', userNo: '1977229438734100253', qty: 9,  price: 180.00, total: 1580000.00,
+      createTime: '2026-07-15 10:42:58', firstTime: '2026-07-15 10:45:12',
+      rCount: 6, rQty: 6, rAmount: 459.00, lastTime: '2026-07-16 14:00:00', rLastTime: '2026-07-16 14:05:20' }
 ];
 
+/* ===== 批发金额档位（按最终批发金额匹配） ===== */
+var TIERS = [
+    { name: 'A', max: 5000000,  pfRate: 10 },  // 500 万以内
+    { name: 'B', max: 8000000,  pfRate: 8  },  // 500 ~ 800 万
+    { name: 'C', max: 10000000, pfRate: 6  },  // 800 ~ 1000 万
+    { name: 'D', max: Infinity, pfRate: 5  }   // 1000 万以上
+];
+function pickTier(total) {
+    for (var i = 0; i < TIERS.length; i++) {
+        if (total < TIERS[i].max) return TIERS[i];
+    }
+    return TIERS[TIERS.length - 1];
+}
+
+/* ===== 渲染表格 ===== */
 function renderTable() {
     var html = '';
-    data.forEach(function(o) {
+    orders.forEach(function (o, idx) {
+        var tier = pickTier(o.total);
+        var pfRate = tier.pfRate;
+        var wsBonus = 10 - pfRate;
+        // 比例
+        var wsRateText = '40%−0.6%+' + wsBonus + '% · ' + tier.name + ' 类';
+        var pfMgmtRateText = pfRate + '%';
+        var pfOnlineRateText = '5%';
+        var pfFeeRateText = '0.6%';
+        // 金额
+        var pfFee = round2(o.total * 0.006);
+        var pfOnline = round2(o.total * 0.05);
+        var pfMgmt = round2(o.total * pfRate / 100);
+        var wsShare = round2(o.total * (40 - 0.6 + wsBonus) / 100);
+        var pfTotal = round2(pfOnline + pfFee + pfMgmt);
+        var rAmount = round2((o.total - wsShare - pfTotal) / o.qty * o.rQty);
+        var remain = round2(o.total - wsShare - pfTotal - rAmount);
+
         html += [
             '<tr>',
-            '    <td>' + o.orderNo + '</td>',
-            '    <td>' + o.product + '</td>',
-            '    <td>' + o.userNo + '</td>',
-            '    <td><div class="cell-main">' + o.qty + '</div><div class="cell-sub">¥' + o.price.toFixed(2) + '</div></td>',
-            '    <td><div class="amount-val">¥' + o.total.toFixed(2) + '</div></td>',
-            '    <td><div>¥' + o.fee.toFixed(2) + '</div></td>',
-            '    <td>' + o.createTime + '</td>',
-            '    <td>' + o.firstTime + '</td>',
-            '    <td>' + o.wsSvTime + '</td>',
-            '    <td><div class="cell-main">¥' + o.wsShare.toFixed(2) + '</div><div class="cell-rate">' + o.wsRate + '</div></td>',
-            '    <td><div class="cell-main">¥' + o.svShare.toFixed(2) + '</div><div class="cell-rate">' + o.svRate + '</div></td>',
-            '    <td><div class="cell-main">¥' + o.pfOnline.toFixed(2) + '</div><div class="cell-rate">5%</div></td>',
-            '    <td><div class="cell-main">¥' + o.pfMgmt.toFixed(2) + '</div><div class="cell-rate">10%</div></td>',
-            '    <td><div class="cell-main">¥' + o.pfFee.toFixed(2) + '</div><div class="cell-rate">0.6%</div></td>',
-            '    <td><div class="cell-main">次数 ' + o.rCount + '</div><div class="cell-sub">¥' + o.rAmount.toFixed(2) + '</div></td>',
-            '    <td><div class="amount-val">¥' + o.remain.toFixed(2) + '</div></td>',
-            '    <td>' + o.rLastTime + '</td>',
+            '  <td>' + o.orderNo + '</td>',
+            '  <td>' + o.product + '</td>',
+            '  <td>' + o.userNo + '</td>',
+            '  <td><div class="cell-main">' + o.qty + '</div><div class="cell-sub">¥' + o.price.toFixed(2) + '</div></td>',
+            '  <td><span class="amount-val">¥' + o.total.toFixed(2) + '</span></td>',
+            '  <td>¥' + pfFee.toFixed(2) + '</td>',
+            '  <td>' + o.createTime + '</td>',
+            '  <td>' + o.firstTime + '</td>',
+            '  <td><div class="cell-main">¥' + wsShare.toFixed(2) + '</div><div class="cell-rate">' + wsRateText + '</div></td>',
+            '  <td><div class="cell-main">¥' + pfOnline.toFixed(2) + '</div><div class="cell-rate">' + pfOnlineRateText + '</div></td>',
+            '  <td><div class="cell-main">¥' + pfMgmt.toFixed(2) + '</div><div class="cell-rate">' + pfMgmtRateText + '</div></td>',
+            '  <td><div class="cell-main">¥' + pfFee.toFixed(2) + '</div><div class="cell-rate">' + pfFeeRateText + '</div></td>',
+            '  <td><div class="cell-main">次数 ' + o.rCount + '</div><div class="cell-sub">¥' + rAmount.toFixed(2) + '</div></td>',
+            '  <td><span class="amount-val">¥' + remain.toFixed(2) + '</span></td>',
+            '  <td>' + o.rLastTime + '</td>',
             '</tr>'
         ].join('');
     });
     document.getElementById('tableBody').innerHTML = html;
 }
 
+function round2(n) { return Math.round(n * 100) / 100; }
+
 renderTable();
 
-function toggleFuncModal() {
-  var el = document.getElementById('funcModal');
-  el.classList.toggle('show');
-  if (el.classList.contains('show') && !el.dataset.dragged) {
-    el.style.left = '50%'; el.style.top = '50%'; el.style.transform = 'translate(-50%,-50%)';
-  }
+/* ===== 右侧功能说明面板：收起 / 展开 ===== */
+function toggleFuncPanel() {
+    document.body.classList.toggle('fp-collapsed');
 }
-(function() {
-  var modal, titleBar, offX, offY, dragging = false;
-  document.addEventListener('DOMContentLoaded', function() {
-    modal = document.getElementById('funcModal');
-    titleBar = modal.querySelector('.fm-title');
-    titleBar.addEventListener('mousedown', startDrag);
-    titleBar.addEventListener('touchstart', startDragTouch, {passive:true});
-    document.addEventListener('mousemove', onDrag);
-    document.addEventListener('mouseup', endDrag);
-    document.addEventListener('touchmove', onDragTouch, {passive:true});
-    document.addEventListener('touchend', endDrag);
-  });
-  function startDrag(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = e.clientX - rect.left; offY = e.clientY - rect.top; dragging = true; titleBar.style.cursor = 'grabbing'; }
-  function startDragTouch(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; var t = e.touches[0]; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = t.clientX - rect.left; offY = t.clientY - rect.top; dragging = true; }
-  function onDrag(e) { if (!dragging) return; modal.style.left = (e.clientX - offX) + 'px'; modal.style.top = (e.clientY - offY) + 'px'; }
-  function onDragTouch(e) { if (!dragging) return; var t = e.touches[0]; modal.style.left = (t.clientX - offX) + 'px'; modal.style.top = (t.clientY - offY) + 'px'; }
-  function endDrag() { dragging = false; if (titleBar) titleBar.style.cursor = 'grab'; }
-})();
 </script>
-
+<script src="asset/admin-sidebar.js"></script>
 </body>
 </html>
