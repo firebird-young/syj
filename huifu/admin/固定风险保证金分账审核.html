@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>冻结金分账申请审核 · 深艺交管理后台</title>
+<title>固定风险保证金分账审核 · 深艺交管理后台</title>
 <link rel="stylesheet" href="asset/admin-sidebar.css">
 <style>
     :root {
@@ -105,7 +105,7 @@
     tbody tr:hover { background: #fafbff; }
     .seq-cell { color: var(--ink-subtle); text-align: center; width: 50px; }
 
-    /* 冻结金金额 */
+    /* 固定风险保证金金额 */
     .f-amt { color: var(--orange); font-weight: 600; white-space: nowrap; }
     .f-calc { font-size: 11px; color: var(--ink-faint); margin-top: 3px; white-space: nowrap; }
 
@@ -342,13 +342,13 @@
 <div class="breadcrumb">
     <span>首页</span><span class="sep"> / </span>
     <span>分账提现管理</span><span class="sep"> / </span>
-    <span class="current">冻结金分账申请审核</span>
+    <span class="current">固定风险保证金分账审核</span>
 </div>
 
 <div class="main">
     <div class="page-header">
-        <h2>冻结金分账申请审核</h2>
-        <span class="hint">冻结金金额 = 产品数量 × 批发单价 × 40%，审核通过后分账回批发商账户</span>
+        <h2>固定风险保证金分账审核</h2>
+        <span class="hint">固定风险保证金金额 = 产品数量 × 批发单价 × 40%，审核通过后分账回批发商账户</span>
     </div>
 
     <!-- 统计卡片 -->
@@ -366,7 +366,7 @@
             <div class="value rejected" id="sumRejected">0</div>
         </div>
         <div class="summary-card">
-            <div class="label">冻结金金额合计</div>
+            <div class="label">固定风险保证金金额合计</div>
             <div class="value frozen" id="sumAmt">¥0.00</div>
         </div>
     </div>
@@ -411,7 +411,7 @@
                         <th>用户账号</th>
                         <th>提货单数量</th>
                         <th>产品总数量</th>
-                        <th>冻结金金额</th>
+                        <th>固定风险保证金金额</th>
                         <th style="width:170px;">申请时间</th>
                         <th>审核状态</th>
                         <th style="width:140px;">操作</th>
@@ -440,7 +440,7 @@
 <div class="overlay" id="auditOverlay" onclick="if(event.target===this)closeAudit()">
     <div class="modal audit-modal">
         <div class="modal-header">
-            <span class="modal-title">冻结金分账申请审核</span>
+            <span class="modal-title">固定风险保证金分账审核</span>
             <button class="modal-close" onclick="closeAudit()">✕</button>
         </div>
         <div class="modal-body">
@@ -470,7 +470,7 @@
                 <div class="val" id="auditTime">-</div>
             </div>
             <div class="audit-row">
-                <div class="label">冻结金金额（数量 × 批发单价 × 40%）</div>
+                <div class="label">固定风险保证金金额（数量 × 批发单价 × 40%）</div>
                 <div class="val amount" id="auditAmount">-</div>
             </div>
             <div class="audit-row" style="margin-bottom:0;">
@@ -534,21 +534,21 @@
         </div>
         <div class="fp-body">
             <div class="fp-role">平台</div>
-            <h4><span class="badge">1</span> <span style="vertical-align:middle;">冻结金规则</span></h4>
+            <h4><span class="badge">1</span> <span style="vertical-align:middle;">固定风险保证金规则</span></h4>
             <ul>
                 <li>批发商提货时，平台按<strong>产品数量 × 批发单价 × 40%</strong> 冻结相应资金。</li>
                 <li>发货后满足冻结分账天数，提货单进入可申请分账状态。</li>
             </ul>
             <h4><span class="badge">2</span> <span style="vertical-align:middle;">分账申请（批发商端）</span></h4>
             <ul>
-                <li>批发商在<strong>批发冻结金分账管理</strong>中勾选符合条件的提货单，填写分账金额与申请原因，提交分账申请。</li>
+                <li>批发商在<strong>批发固定风险保证金分账管理</strong>中勾选符合条件的提货单，填写分账金额与申请原因，提交分账申请。</li>
                 <li>同一批勾选的订单共用一个<strong>申请单号</strong>，提交后进入「待审核」。</li>
             </ul>
             <h4><span class="badge">3</span> <span style="vertical-align:middle;">平台审核</span></h4>
             <ul>
                 <li>本页面展示批发商提交的全部分账申请，支持按申请单号 / 产品名称 / 审核状态筛选。</li>
-                <li>点击<strong>审核</strong>查看申请信息与冻结金计算过程，可<strong>通过</strong>或<strong>驳回</strong>（驳回需填写备注）。</li>
-                <li><strong>已通过</strong>：冻结金分账回批发商账户；<strong>已驳回</strong>：批发商可重新发起申请。</li>
+                <li>点击<strong>审核</strong>查看申请信息与固定风险保证金计算过程，可<strong>通过</strong>或<strong>驳回</strong>（驳回需填写备注）。</li>
+                <li><strong>已通过</strong>：固定风险保证金分账回批发商账户；<strong>已驳回</strong>：批发商可重新发起申请。</li>
             </ul>
             <h4><span class="badge">4</span> <span style="vertical-align:middle;">申请单详情</span></h4>
             <ul>
@@ -585,7 +585,7 @@ var data = [
     { no: 'SQ202607291001', pickCount: 1, prod: '青莲·舒展', prods: rangeNos(26, 75), co: '成都市天府新区明昌博物馆', acc: '155328430479', qty: 50, price: 250, time: '2026-07-29 09:15:33', status: 'approved' }
 ];
 
-/* ===== 冻结金金额 = 产品数量 × 批发单价 × 40% ===== */
+/* ===== 固定风险保证金金额 = 产品数量 × 批发单价 × 40% ===== */
 data.forEach(function (o) {
     o.amt = o.qty * o.price * 0.4;
     o.calc = o.qty + ' 件 × ' + money(o.price) + ' × 40%';
@@ -685,7 +685,7 @@ function approveAudit() {
     if (currentRow) currentRow.status = 'approved';
     closeAudit();
     renderTable();
-    showToast('已通过分账申请，冻结金将分账回批发商账户');
+    showToast('已通过分账申请，固定风险保证金将分账回批发商账户');
 }
 
 function rejectAudit() {

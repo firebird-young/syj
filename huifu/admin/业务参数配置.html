@@ -1,314 +1,287 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>业务参数配置</title>
-    <style>
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
-            background: #f0f2f5;
-            color: #1a1a2e;
-            font-size: 14px;
-            min-height: 100vh;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>业务参数配置 · 深艺交管理后台</title>
+<link rel="stylesheet" href="asset/admin-sidebar.css">
+<style>
+    :root {
+        --accent: #1a78ff;
+        --accent-hover: #0f6ae8;
+        --accent-bg: #e6f4ff;
+        --green: #1aab67;
+        --orange: #e67e22;
+        --red: #e74c5e;
+        --ink: #1d1d1f;
+        --ink-muted: #3f424b;
+        --ink-subtle: #86868b;
+        --ink-faint: #9ba6b9;
+        --border: #e0e0e0;
+        --page-bg: #f5f5f7;
+        --radius-pill: 9999px;
+        --radius-card: 18px;
+        --radius-sm: 6px;
+        --shadow-card: 0 0 0 1px rgba(0,0,0,.06);
+        --font: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        font-family: var(--font);
+        background: var(--page-bg);
+        min-height: 100vh;
+        color: var(--ink);
+        font-size: 14px;
+        -webkit-font-smoothing: antialiased;
+    }
 
-        .topbar {
-            background: #fff;
-            height: 56px;
-            display: flex;
-            align-items: center;
-            padding: 0 20px;
-            border-bottom: 1px solid #f0f0f0;
-        }
-        .topbar-left { display: flex; align-items: center; gap: 16px; }
-        .menu-btn {
-            width: 32px; height: 32px;
-            border: 1px solid #d0d5dd;
-            border-radius: 4px;
-            background: #fff;
-            color: #6b7588;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-        }
-        .menu-btn:hover { background: #f5f5f7; }
-        .breadcrumb { font-size: 13px; color: #6b7588; }
-        .breadcrumb .active { color: #1a1a2e; }
-        .topbar-right {
-            margin-left: auto;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-        }
-        .topbar-right .avatar {
-            width: 32px; height: 32px;
-            border-radius: 50%;
-            background: #f5deb3;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 16px;
-        }
-        .topbar-right .name { font-size: 13px; }
-        .topbar-right .arrow { color: #9ba6b9; font-size: 12px; }
+    /* ── 页面结构：左侧公用目录（asset/admin-sidebar.js 注入）+ 中间内容 + 右侧功能说明 ── */
 
-        /* 主体：左侧标签 + 右侧表单卡 */
-        .layout {
-            display: flex;
-            align-items: stretch;
-            margin: 16px;
-            background: #fff;
-            border-radius: 6px;
-            overflow: hidden;
-            min-height: calc(100vh - 56px - 32px);
-        }
-        .side-tab {
-            width: 80px;
-            background: linear-gradient(180deg, #4f7cff 0%, #1a78ff 100%);
-            color: #fff;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            padding-top: 28px;
-            gap: 12px;
-            flex-shrink: 0;
-        }
-        .side-tab .st-icon {
-            font-size: 20px;
-            line-height: 1;
-        }
-        .side-tab .st-text {
-            font-size: 14px;
-            font-weight: 500;
-            writing-mode: horizontal-tb;
-        }
-        .form-card {
-            flex: 1;
-            padding: 28px 36px;
-        }
+    /* 面包屑 */
+    .breadcrumb { padding: 16px 24px 0; font-size: 13px; color: var(--ink-subtle); }
+    .breadcrumb a { color: var(--ink-subtle); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--accent); }
+    .breadcrumb .sep { color: #c0c8d4; }
+    .breadcrumb .current { color: var(--ink); font-weight: 500; }
 
-        /* 表单行 */
-        .form-row {
-            display: flex;
-            align-items: center;
-            margin-bottom: 22px;
-        }
-        .form-row.align-top { align-items: flex-start; }
-        .form-label {
-            width: 180px;
-            flex-shrink: 0;
-            font-size: 13px;
-            color: #1a1a2e;
-            text-align: right;
-            padding-right: 14px;
-        }
-        .form-label .req { color: #e74c5e; margin-left: 2px; }
-        .form-control { flex: 1; }
+    /* 内容区 */
+    .main { padding: 16px 24px 40px; }
+    .page-header {
+        display: flex; align-items: center; justify-content: space-between;
+        gap: 16px; margin: 4px 0 16px; flex-wrap: wrap;
+    }
+    .page-header h2 { font-size: 20px; font-weight: 600; }
+    .page-header .hint { font-size: 13px; color: var(--ink-subtle); margin-top: 6px; }
 
-        /* 输入框 */
-        .text-input {
-            height: 32px;
-            padding: 0 10px;
-            border: 1px solid #d0d5dd;
-            border-radius: 4px;
-            font-size: 13px;
-            color: #1a1a2e;
-            outline: none;
-            background: #fff;
-        }
-        .text-input.w-suffix { width: 160px; }
-        .text-input.w-time { width: 130px; }
-        .text-input.w-mid { width: 200px; }
-        .text-input.w-num { width: 110px; }
-        .text-input:focus { border-color: #1a78ff; }
-        .unit {
-            display: inline-block;
-            margin-left: 8px;
-            font-size: 13px;
-            color: #86909c;
-        }
-        .field-func-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            margin-left: 12px;
-            padding: 3px 10px;
-            border: 1px solid #d0d5dd;
-            border-radius: 4px;
-            background: #f5f7fa;
-            color: #333;
-            font-size: 12px;
-            cursor: pointer;
-            user-select: none;
-            vertical-align: middle;
-        }
-        .field-func-btn:hover { border-color: #1a78ff; color: #1a78ff; }
-        .sep { margin: 0 8px; color: #86909c; }
+    /* 通用卡片 */
+    .card {
+        background: #fff; border-radius: var(--radius-card);
+        padding: 24px 28px; margin-bottom: 16px; box-shadow: var(--shadow-card);
+    }
+    .group-title {
+        font-size: 13px; color: var(--ink-subtle); font-weight: 600;
+        margin: 22px 0 14px; padding-left: 12px;
+        border-left: 3px solid var(--accent);
+    }
+    .group-title:first-child { margin-top: 0; }
 
-        /* 范围 */
-        .range-input {
-            display: inline-flex;
-            align-items: center;
-            gap: 0;
-        }
-        .range-input .text-input {
-            border-radius: 4px 0 0 4px;
-            border-right: none;
-        }
-        .range-input .text-input + .text-input {
-            border-radius: 0 4px 4px 0;
-            border-left: none;
-        }
-        .range-input .text-input { width: 140px; }
+    /* 表单行 */
+    .form-row {
+        display: flex; align-items: center;
+        margin-bottom: 22px;
+    }
+    .form-row:last-child { margin-bottom: 0; }
+    .form-row.align-top { align-items: flex-start; }
+    .form-label {
+        width: 180px;
+        flex-shrink: 0;
+        font-size: 13px;
+        color: var(--ink);
+        text-align: right;
+        padding-right: 14px;
+    }
+    .form-label .req { color: var(--red); margin-left: 2px; }
+    .form-control { flex: 1; }
 
-        /* 开关 */
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 38px;
-            height: 22px;
-            cursor: pointer;
-        }
-        .switch input { display: none; }
-        .switch .slider {
-            position: absolute;
-            inset: 0;
-            background: #d0d5dd;
-            border-radius: 22px;
-            transition: 0.2s;
-        }
-        .switch .slider::before {
-            content: '';
-            position: absolute;
-            width: 18px;
-            height: 18px;
-            left: 2px;
-            top: 2px;
-            background: #fff;
-            border-radius: 50%;
-            transition: 0.2s;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
-        }
-        .switch input:checked + .slider { background: #1a78ff; }
-        .switch input:checked + .slider::before { transform: translateX(16px); }
+    /* 输入框 */
+    .text-input {
+        height: 34px;
+        padding: 0 14px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-pill);
+        font-size: 13px;
+        color: var(--ink);
+        outline: none;
+        background: #fff;
+        font-family: inherit;
+    }
+    .text-input.w-suffix { width: 160px; }
+    .text-input.w-time { width: 130px; }
+    .text-input.w-mid { width: 200px; }
+    .text-input.w-num { width: 110px; }
+    .text-input:focus { border-color: var(--accent); }
+    .text-input[readonly] {
+        background: #f5f5f7; color: var(--ink-subtle);
+        cursor: not-allowed; border-style: dashed;
+    }
+    .unit {
+        display: inline-block;
+        margin-left: 8px;
+        font-size: 13px;
+        color: var(--ink-subtle);
+    }
+    .sep { margin: 0 8px; color: var(--ink-subtle); }
 
-        /* 上传 */
-        .upload-box {
-            width: 88px;
-            height: 88px;
-            border: 1px dashed #d0d5dd;
-            border-radius: 4px;
-            background: #fafbfc;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            color: #c0c8d4;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-        }
-        .upload-box:hover { border-color: #1a78ff; color: #1a78ff; }
-        .upload-preview {
-            width: 88px;
-            height: 88px;
-            border-radius: 4px;
-            background-image: linear-gradient(135deg, #d8b06a 0%, #b8472a 60%, #f0c674 100%);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            font-size: 14px;
-            font-weight: 700;
-            text-align: center;
-            line-height: 1.2;
-            position: relative;
-        }
-        .upload-preview.del {
-            background-image: linear-gradient(135deg, #f7c4b4 0%, #e89a86 100%);
-        }
-        .upload-tip {
-            margin-top: 6px;
-            font-size: 12px;
-            color: #86909c;
-        }
-        .upload-tip em {
-            color: #e74c5e;
-            font-style: normal;
-        }
+    /* 范围输入 */
+    .range-input { display: inline-flex; align-items: center; }
+    .range-input .text-input { width: 140px; border-radius: var(--radius-pill); }
 
-        /* 底部按钮 */
-        .form-actions {
-            display: flex;
-            justify-content: center;
-            margin-top: 28px;
-        }
-        .btn-save {
-            background: #1a78ff;
-            color: #fff;
-            border: none;
-            padding: 10px 40px;
-            border-radius: 4px;
-            font-size: 14px;
-            cursor: pointer;
-        }
-        .btn-save:hover { background: #0f6ae8; }
+    /* 开关 */
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 40px;
+        height: 23px;
+        cursor: pointer;
+    }
+    .switch input { display: none; }
+    .switch .slider {
+        position: absolute;
+        inset: 0;
+        background: #d0d5dd;
+        border-radius: var(--radius-pill);
+        transition: 0.2s;
+    }
+    .switch .slider::before {
+        content: '';
+        position: absolute;
+        width: 19px;
+        height: 19px;
+        left: 2px;
+        top: 2px;
+        background: #fff;
+        border-radius: 50%;
+        transition: 0.2s;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+    }
+    .switch input:checked + .slider { background: var(--accent); }
+    .switch input:checked + .slider::before { transform: translateX(17px); }
 
-        /* 分组标题 */
-        .group-title {
-            font-size: 13px;
-            color: #86909c;
-            margin: 18px 0 12px;
-            padding-left: 12px;
-            border-left: 3px solid #1a78ff;
-        }
-        .group-title:first-child { margin-top: 0; }
+    /* 上传 */
+    .upload-preview {
+        width: 88px;
+        height: 88px;
+        border-radius: var(--radius-sm);
+        background-image: linear-gradient(135deg, #d8b06a 0%, #b8472a 60%, #f0c674 100%);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 14px;
+        font-weight: 700;
+        text-align: center;
+        line-height: 1.2;
+        position: relative;
+    }
+    .upload-preview.del {
+        background-image: linear-gradient(135deg, #f7c4b4 0%, #e89a86 100%);
+    }
+    .upload-tip {
+        margin-top: 6px;
+        font-size: 12px;
+        color: var(--ink-subtle);
+        line-height: 1.7;
+    }
+    .upload-tip em {
+        color: var(--red);
+        font-style: normal;
+    }
 
-        /* ── 功能说明浮窗 ── */
-        .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 560px; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 99999; padding: 24px; display: none; }
-        .f-modal.show { display: block; }
-        .f-modal .fm-title { font-size: 16px; font-weight: 600; color: #1a1a2e; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
-        .f-modal .fm-title:active { cursor: grabbing; }
-        .f-modal .fm-close { width: 28px; height: 28px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; color: #666; border: none; flex-shrink: 0; }
-        .f-modal .fm-close:hover { background: #e8e8e8; }
-        .f-modal .fm-body { font-size: 13px; color: #555; line-height: 1.8; }
-        .f-modal .fm-body h4 { font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 16px 0 8px; }
-        .f-modal .fm-body ul { padding-left: 18px; margin: 0 0 12px; }
-        .f-modal .fm-body li { margin-bottom: 4px; }
-    </style>
+    /* 按钮 */
+    .btn {
+        height: 36px; padding: 0 28px; border-radius: var(--radius-pill);
+        font-size: 13px; cursor: pointer; border: none; font-family: inherit; font-weight: 500;
+        display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+    }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: var(--accent-hover); }
+
+    /* 底部按钮 */
+    .form-actions {
+        display: flex;
+        justify-content: center;
+        margin-top: 28px;
+    }
+
+    /* 标注圆点（表单 + 功能说明序号） */
+    .badge {
+        display: inline-block; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 50%;
+        background: #ff2d55; color: #fff; font-size: 12px; line-height: 18px;
+        text-align: center; font-weight: 600; box-shadow: 0 1px 3px rgba(255,45,85,0.3);
+        margin-left: 6px; vertical-align: middle;
+    }
+
+    /* ===== 右侧功能说明面板 ===== */
+    .func-panel {
+        position: fixed; top: 0; right: 0; bottom: 0;
+        width: 340px; z-index: 890;
+        background: #fff; border-left: 1px solid #e3e6eb;
+        box-shadow: -1px 0 12px rgba(20, 30, 60, 0.04);
+        display: flex; flex-direction: column;
+    }
+    .func-panel .fp-inner { display: flex; flex-direction: column; height: 100%; min-width: 0; }
+    .func-panel .fp-header {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 15px 14px 13px 18px; border-bottom: 1px solid #f0f1f4; flex-shrink: 0;
+    }
+    .func-panel .fp-title { display: flex; align-items: center; gap: 9px; font-size: 15px; font-weight: 700; color: #1d1d1f; }
+    .func-panel .fp-title::before {
+        content: ''; width: 8px; height: 8px; border-radius: 50%;
+        background: var(--accent); box-shadow: 0 0 0 4px rgba(26, 120, 255, 0.12);
+    }
+    .func-panel .fp-fold-btn {
+        width: 28px; height: 28px; border: 1px solid var(--border); background: #fff;
+        border-radius: 50%; color: var(--ink-subtle); font-size: 15px; line-height: 1;
+        cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+    }
+    .func-panel .fp-fold-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .func-panel .fp-body { flex: 1; overflow-y: auto; padding: 4px 18px 40px; font-size: 13px; color: #555; line-height: 1.9; }
+    .func-panel .fp-body::-webkit-scrollbar { width: 5px; }
+    .func-panel .fp-body::-webkit-scrollbar-thumb { background: #d8dce3; border-radius: 3px; }
+    .func-panel .fp-body h4 { font-size: 14px; font-weight: 600; color: #1d1d1f; margin: 18px 0 6px; }
+    .func-panel .fp-body h4:first-child { margin-top: 12px; }
+    .func-panel .fp-body ul { padding-left: 18px; margin: 0 0 8px; }
+    .func-panel .fp-body li { margin-bottom: 6px; }
+    .func-panel .fp-body strong { color: #333; }
+    .func-panel .fp-body .dim {
+        background: #fff8ec; border: 1px solid #f5d9a8; color: #a05a00;
+        border-radius: 8px; padding: 8px 12px; margin-bottom: 8px;
+    }
+    .func-panel .fp-body .dep {
+        background: #fdeef1; border: 1px solid #f5c2cd; color: #b02a4a;
+        border-radius: 8px; padding: 8px 12px; margin-bottom: 8px;
+    }
+    .func-panel .fp-role { font-size: 13px; font-weight: 600; color: var(--red); margin: 10px 0 -4px; }
+    .func-panel .fp-open {
+        display: none; position: absolute; top: 0; bottom: 0; left: 0; right: 0;
+        border: none; background: transparent; cursor: pointer;
+        writing-mode: vertical-rl; text-orientation: upright;
+        font-size: 13px; font-weight: 600; letter-spacing: 6px; color: var(--ink-subtle);
+        align-items: center; justify-content: center; font-family: inherit; transition: all 0.2s;
+    }
+    .func-panel .fp-open:hover { color: var(--accent); background: #fafbfc; }
+
+    @media (min-width: 1024px) {
+        .main, .breadcrumb { margin-right: 340px; }
+        body.fp-collapsed .main,
+        body.fp-collapsed .breadcrumb { margin-right: 40px; }
+        body.fp-collapsed .func-panel { width: 40px; }
+        body.fp-collapsed .fp-inner { display: none; }
+        body.fp-collapsed .fp-open { display: flex; }
+    }
+    @media (max-width: 1023.98px) {
+        .func-panel { display: none; }
+        .main, .breadcrumb { margin-right: 0; }
+    }
+</style>
 </head>
 <body>
 
-<div class="topbar">
-    <div class="topbar-left">
-        <button class="menu-btn">≡</button>
-        <div class="breadcrumb">
-            <span>首页</span> /
-            <span>系统配置</span> /
-            <span class="active">业务参数配置</span>
-        </div>
-    </div>
-    <div class="topbar-right">
-        <button onclick="toggleFuncModal()" style="margin-right:12px;padding:6px 14px;border-radius:6px;background:#f5f7fa;color:#333;border:1px solid #e0e4ea;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:4px;">📖 功能说明</button>
-        <span class="avatar">👤</span>
-        <span class="name">系统参数设置</span>
-        <span class="arrow">▾</span>
-    </div>
+<div class="breadcrumb">
+    <a href="../index.html">首页</a><span class="sep"> / </span>
+    <a href="#">系统配置</a><span class="sep"> / </span>
+    <span class="current">业务参数配置</span>
 </div>
 
-<div class="layout">
-    <!-- 左侧蓝色标签 -->
-    <div class="side-tab">
-        <div class="st-icon">⚙</div>
-        <div class="st-text">参数设置</div>
+<div class="main">
+    <div class="page-header">
+        <div>
+            <h2>业务参数配置</h2>
+            <div class="hint">维护市场开关、交易与资金、活动等平台级业务参数</div>
+        </div>
     </div>
 
-    <!-- 右侧表单卡 -->
-    <div class="form-card">
+    <div class="card">
 
         <div class="group-title">市场开关</div>
 
@@ -335,9 +308,9 @@
         <div class="group-title">交易与资金</div>
 
         <div class="form-row">
-            <div class="form-label">零售市场交易手续费</div>
+            <div class="form-label">零售市场交易手续费<span class="badge">4</span></div>
             <div class="form-control">
-                <input type="number" class="text-input w-suffix" value="3">
+                <input type="number" class="text-input w-suffix" value="1" readonly>
                 <span class="unit">%</span>
             </div>
         </div>
@@ -350,7 +323,7 @@
         </div>
 
         <div class="form-row">
-            <div class="form-label">提现阶梯时隔</div>
+            <div class="form-label">提现阶梯时隔<span class="badge">1</span></div>
             <div class="form-control">
                 <span class="unit" style="margin:0 8px 0 0;">T+</span>
                 <input type="number" class="text-input w-num" value="1">
@@ -359,7 +332,7 @@
         </div>
 
         <div class="form-row">
-            <div class="form-label">提现金额限制</div>
+            <div class="form-label">提现金额限制<span class="badge">1</span></div>
             <div class="form-control">
                 <div class="range-input">
                     <input type="number" class="text-input" value="2.00">
@@ -369,7 +342,7 @@
         </div>
 
         <div class="form-row">
-            <div class="form-label">批发市场退佣比例</div>
+            <div class="form-label">批发市场退佣比例<span class="badge">2</span></div>
             <div class="form-control">
                 <input type="number" class="text-input w-suffix" value="3">
                 <span class="unit">%</span>
@@ -377,7 +350,7 @@
         </div>
 
         <div class="form-row">
-            <div class="form-label">零售市场退佣比例</div>
+            <div class="form-label">零售市场退佣比例<span class="badge">2</span></div>
             <div class="form-control">
                 <input type="number" class="text-input w-suffix" value="100">
                 <span class="unit">%</span>
@@ -385,17 +358,16 @@
         </div>
 
         <div class="form-row">
-            <div class="form-label">提货完成后 <span style="color:#e74c5e;">*</span></div>
+            <div class="form-label">提货完成后 <span class="req">*</span><span class="badge">3</span></div>
             <div class="form-control">
                 <input type="number" class="text-input w-num" value="7" min="0">
                 <span class="unit">天可分账冻结金</span>
-                <span class="field-func-btn" onclick="toggleFrozenModal()">📖 功能说明</span>
                 <div class="upload-tip" style="margin-top:4px;">发货完成后，需经过设定天数批发商才能申请分账对应冻结金；天数必须 ≥ 0</div>
             </div>
         </div>
 
         <div class="form-row">
-            <div class="form-label">提现开放时间段</div>
+            <div class="form-label">提现开放时间段<span class="badge">1</span></div>
             <div class="form-control">
                 <input type="time" class="text-input w-time" value="00:00">
                 <span class="sep">-</span>
@@ -408,7 +380,7 @@
         <div class="form-row align-top">
             <div class="form-label">首页活动banner</div>
             <div class="form-control">
-                <div class="upload-preview">年末钜惠<br>GO>></div>
+                <div class="upload-preview">年末钜惠<br>GO&gt;&gt;</div>
                 <div class="upload-tip">请上传不大于 <em>5MB</em> 格式为 <em>png、jpg、jpeg、gif、bmp</em> 的文件</div>
             </div>
         </div>
@@ -432,87 +404,60 @@
         </div>
 
         <div class="form-actions">
-            <button class="btn-save" onclick="saveConfig()">保存修改</button>
+            <button class="btn btn-primary" onclick="saveConfig()">保存修改</button>
         </div>
 
     </div>
 </div>
 
-<!-- ====== 功能说明浮窗 ====== -->
-<div class="f-modal" id="funcModal">
-  <div class="fm-title">
-    <span>📖 功能说明</span>
-    <button class="fm-close" onclick="toggleFuncModal()">✕</button>
-  </div>
-  <div style="font-size:13px;font-weight:600;color:#e74c5e;margin:-6px 0 12px;">平台</div>
-  <div class="fm-body">
-    <h4>一、提货完成后冻结金释放天数</h4>
-    <ul>
-      <li>批发商提货完成后，需经过<b>设定的天数</b>才能申请释放对应冻结金</li>
-      <li>天数范围 <b>≥ 0</b>，0 表示<b>发货即可申请释放</b></li>
-      <li>未到设定天数时，批发冻结金分账管理列表中<b>不展示</b>该提货单</li>
-      <li>已到期的提货单，列表展示「<b>申请释放</b>」入口供批发商提交</li>
-    </ul>
-  </div>
-</div>
+<!-- ===== 右侧功能说明 ===== -->
+<aside class="func-panel">
+    <div class="fp-inner">
+        <div class="fp-header">
+            <div class="fp-title">功能说明</div>
+            <button class="fp-fold-btn" onclick="toggleFuncPanel()">›</button>
+        </div>
+        <div class="fp-body">
+            <div class="fp-role">平台 · 系统配置</div>
 
-<!-- ====== 提货完成冻结金释放天数 · 字段级功能说明 ====== -->
-<div class="f-modal" id="frozenModal">
-  <div class="fm-title">
-    <span>📖 提货完成后可释放冻结金</span>
-    <button class="fm-close" onclick="toggleFrozenModal()">✕</button>
-  </div>
-  <div style="font-size:13px;font-weight:600;color:#e74c5e;margin:-6px 0 12px;">平台</div>
-  <div class="fm-body">
-    <h4>功能说明</h4>
-    <ul>
-      <li><b>必填</b>：该参数为必填项，未填写时无法保存配置</li>
-      <li><b>数字输入</b>：仅支持填写数字（天），单位固定为「天」</li>
-      <li><b>默认值</b>：默认 <b>7 天</b></li>
-      <li>取值范围：<b>≥ 0</b>；填 0 表示发货完成后<b>立即</b>可申请释放冻结金</li>
-      <li>生效范围：批发商发货完成后，需等待设定天数，<b>批发冻结金分账管理</b>列表中才展示对应提货单的「申请释放」入口</li>
-    </ul>
-  </div>
-</div>
+            <h4><span class="badge">1</span> <span style="vertical-align:middle;">提现相关配置（废弃）</span></h4>
+            <div class="dep">
+                <strong>提现现在由支付平台维护</strong>，本页的提现阶梯时隔、提现金额限制、提现开放时间段均属于<strong>废弃配置</strong>，仅作历史展示，修改后不再生效。
+            </div>
+
+            <h4><span class="badge">2</span> <span style="vertical-align:middle;">退佣比例（废弃）</span></h4>
+            <div class="dep">
+                <strong>新业务里不再给推荐人分佣</strong>，批发市场退佣比例、零售市场退佣比例均属于<strong>废弃配置</strong>，仅作历史展示，修改后不再生效。
+            </div>
+
+            <h4><span class="badge">3</span> <span style="vertical-align:middle;">提货完成后冻结金释放天数</span></h4>
+            <ul>
+                <li>批发商提货完成后，需经过<strong>设定的天数</strong>才能申请释放对应冻结金</li>
+                <li>天数范围 <strong>≥ 0</strong>，0 表示<strong>发货即可申请释放</strong></li>
+                <li>未到设定天数时，固定风险保证金分账申请列表中<strong>不展示</strong>该提货单</li>
+                <li>已到期的提货单，列表展示「<strong>申请释放</strong>」入口供批发商提交</li>
+                <li><strong>必填</strong>：该参数为必填项，未填写时无法保存配置；默认 <strong>7 天</strong></li>
+            </ul>
+
+            <h4><span class="badge">4</span> <span style="vertical-align:middle;">零售市场交易手续费</span></h4>
+            <div class="dim">
+                默认值 <strong>1%</strong>，为系统固定值，<strong>不可编辑</strong>，页面仅作展示。
+            </div>
+        </div>
+    </div>
+    <button class="fp-open" onclick="toggleFuncPanel()">功能说明</button>
+</aside>
 
 <script>
-function toggleFuncModal() {
-  toggleModal('funcModal');
-}
-function toggleFrozenModal() {
-  toggleModal('frozenModal');
-}
-function toggleModal(id) {
-  var el = document.getElementById(id);
-  el.classList.toggle('show');
-  if (el.classList.contains('show') && !el.dataset.dragged) {
-    el.style.left = '50%'; el.style.top = '50%'; el.style.transform = 'translate(-50%,-50%)';
-  }
-}
 function saveConfig() {
   alert('参数已保存');
 }
-(function() {
-  var offX = 0, offY = 0, dragging = false, modal = null, titleBar = null;
-  document.addEventListener('DOMContentLoaded', function() {
-    var modals = document.querySelectorAll('.f-modal');
-    modals.forEach(function(m) {
-      var bar = m.querySelector('.fm-title');
-      bar.addEventListener('mousedown', function(e) { startDrag(e, m, bar); });
-      bar.addEventListener('touchstart', function(e) { startDragTouch(e, m); }, {passive:true});
-    });
-    document.addEventListener('mousemove', onDrag);
-    document.addEventListener('mouseup', endDrag);
-    document.addEventListener('touchmove', onDragTouch, {passive:true});
-    document.addEventListener('touchend', endDrag);
-  });
-  function startDrag(e, m, bar) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; modal = m; titleBar = bar; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = e.clientX - rect.left; offY = e.clientY - rect.top; dragging = true; titleBar.style.cursor = 'grabbing'; }
-  function startDragTouch(e, m) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; var t = e.touches[0]; modal = m; titleBar = m.querySelector('.fm-title'); modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = t.clientX - rect.left; offY = t.clientY - rect.top; dragging = true; }
-  function onDrag(e) { if (!dragging) return; modal.style.left = (e.clientX - offX) + 'px'; modal.style.top = (e.clientY - offY) + 'px'; }
-  function onDragTouch(e) { if (!dragging) return; var t = e.touches[0]; modal.style.left = (t.clientX - offX) + 'px'; modal.style.top = (t.clientY - offY) + 'px'; }
-  function endDrag() { dragging = false; if (titleBar) titleBar.style.cursor = 'grab'; }
-})();
-</script>
 
+/* ── 右侧功能说明面板：收起 / 展开 ── */
+function toggleFuncPanel() {
+    document.body.classList.toggle('fp-collapsed');
+}
+</script>
+<script src="asset/admin-sidebar.js"></script>
 </body>
 </html>

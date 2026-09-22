@@ -1,482 +1,401 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>产品详情管理</title>
-    <style>
-        * { margin:0; padding:0; box-sizing:border-box; }
-        :root{
-            --primary:#1a78ff;--primary-hover:#0f6ae8;--primary-bg:#e6f4ff;
-            --brand:#e74c3e;--danger:#e74c5e;
-            --page-bg:#f0f2f5;--card-bg:#fff;--info-bg:#f5f7fa;
-            --ink:#1a1a2e;--ink-muted:#4e5a6e;--ink-subtle:#6b7588;--ink-faint:#9ba6b9;
-            --border:#d0d5dd;--border-light:#f0f0f0;
-            --radius-sm:4px;--radius-md:6px;
-            --font:"-apple-system","BlinkMacSystemFont","PingFang SC","Microsoft YaHei","Helvetica Neue",sans-serif;
-        }
-        body {
-            font-family: var(--font);
-            background: var(--page-bg);
-            color: var(--ink);
-            font-size: 14px;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>产品详情管理 · 深艺交批发商工作台</title>
+<link rel="stylesheet" href="asset/admin-sidebar.css">
+<style>
+    :root {
+        --accent: #1a78ff;
+        --accent-hover: #0f6ae8;
+        --accent-bg: #e6f4ff;
+        --green: #1aab67;
+        --orange: #e67e22;
+        --red: #e74c5e;
+        --ink: #1d1d1f;
+        --ink-muted: #3f424b;
+        --ink-subtle: #86868b;
+        --ink-faint: #9ba6b9;
+        --border: #e0e0e0;
+        --page-bg: #f5f5f7;
+        --radius-pill: 9999px;
+        --radius-card: 18px;
+        --radius-sm: 6px;
+        --shadow-card: 0 0 0 1px rgba(0,0,0,.06);
+        --font: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        font-family: var(--font);
+        background: var(--page-bg);
+        min-height: 100vh;
+        color: var(--ink);
+        font-size: 14px;
+        -webkit-font-smoothing: antialiased;
+    }
 
-        /* ── 整体布局 ── */
-        .app { display: flex; min-height: 100vh; }
+    /* ── 页面结构：左侧公用目录（asset/admin-sidebar.js 注入）+ 中间内容 + 右侧功能说明 ── */
 
-        /* 侧边栏 */
-        .sidebar { width:200px; background:#1f2c3d; color:#a8b2c0; flex-shrink:0; }
-        .logo {
-            height:56px; display:flex; align-items:center; padding:0 16px;
-            background:#fff; border-bottom:1px solid var(--border-light);
-        }
-        .logo-icon {
-            width:28px; height:28px; background:var(--brand); border-radius:4px;
-            color:#fff; display:flex; align-items:center; justify-content:center;
-            font-weight:700; font-size:14px;
-        }
-        .menu { padding:8px 0; }
-        .menu-item, .menu-group-title {
-            display:flex; align-items:center; height:44px; padding:0 20px;
-            color:#c0c8d4; cursor:pointer; text-decoration:none; font-size:14px;
-            transition:all .15s;
-        }
-        .menu-item:hover, .menu-group-title:hover { background:#2a3849; color:#fff; }
-        .menu-item.active, .menu-group-title.active { color:var(--primary); background:#2a3849; }
-        .menu-item .icon, .menu-group-title .icon { width:20px; margin-right:10px; font-size:16px; text-align:center; }
-        .menu-group-title .arrow { margin-left:auto; font-size:12px; }
-        .menu-group .submenu { display:none; }
-        .menu-group.open .submenu { display:block; }
-        .menu-group .submenu a {
-            display:flex; align-items:center; height:36px; padding:0 20px 0 50px;
-            color:#a8b2c0; cursor:pointer; text-decoration:none; font-size:13px;
-        }
-        .menu-group .submenu a:hover { color:#fff; }
-        .menu-group .submenu a.active { color:var(--primary); }
-        .menu-group .submenu .sub-note {
-            display:flex; align-items:center; height:36px; padding:0 20px 0 50px;
-            color:#6b7588; cursor:not-allowed; font-size:13px;
-        }
-        .menu-group .submenu .sub-note .note-tag {
-            font-size:11px; color:#8a94a6; margin-left:6px;
-            background:#2a3849; padding:1px 6px; border-radius:3px; white-space:nowrap;
-        }
+    /* 面包屑 */
+    .breadcrumb { padding: 16px 24px 0; font-size: 13px; color: var(--ink-subtle); }
+    .breadcrumb .sep { color: #c0c8d4; }
+    .breadcrumb .current { color: var(--ink); font-weight: 500; }
 
-        /* 主体 */
-        .main { flex:1; display:flex; flex-direction:column; min-width:0; }
+    /* 内容区 */
+    .main { padding: 16px 24px 40px; }
+    .page-header {
+        display: flex; align-items: center; justify-content: space-between;
+        gap: 16px; margin: 4px 0 16px; flex-wrap: wrap;
+    }
+    .page-header h2 { font-size: 20px; font-weight: 600; }
+    .page-header .hint { font-size: 13px; color: var(--ink-subtle); }
 
-        /* 顶栏 */
-        .topbar {
-            background:#fff; height:56px; display:flex; align-items:center;
-            padding:0 24px; border-bottom:1px solid var(--border-light);
-        }
-        .breadcrumb { font-size:13px; color:var(--ink-subtle); display:flex; align-items:center; gap:6px; }
-        .breadcrumb .sep { color:#c0c8d4; }
-        .breadcrumb .active { color:var(--ink); }
-        .topbar-right { margin-left:auto; display:flex; align-items:center; gap:12px; }
-        .btn-func {
-            padding:6px 14px; border-radius:6px; background:#f5f7fa; color:#333;
-            border:1px solid #e0e4ea; font-size:13px; font-weight:500; cursor:pointer;
-            white-space:nowrap; display:inline-flex; align-items:center; gap:4px;
-        }
-        .btn-func:hover { border-color:var(--primary); color:var(--primary); }
-        .user-chip { display:flex; align-items:center; gap:8px; cursor:pointer; }
-        .user-chip .avatar {
-            width:32px; height:32px; border-radius:50%; background:#f5deb3;
-            display:flex; align-items:center; justify-content:center; font-size:16px;
-        }
-        .user-chip .name { font-size:13px; color:var(--ink); }
-        .user-chip .arrow { color:var(--ink-faint); font-size:12px; }
+    /* 搜索卡片 */
+    .search-area {
+        background: #fff; border-radius: var(--radius-card);
+        padding: 20px 24px; margin-bottom: 16px; box-shadow: var(--shadow-card);
+    }
+    .search-row { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: flex-end; }
+    .search-item { display: flex; flex-direction: column; gap: 6px; min-width: 170px; flex: 0 0 auto; }
+    .search-item label { font-size: 12px; color: var(--ink-subtle); font-weight: 500; }
+    .search-item input {
+        height: 36px; padding: 0 12px; border: 1px solid var(--border);
+        border-radius: var(--radius-pill); font-size: 13px; color: var(--ink);
+        background: #fff; outline: none; font-family: inherit; width: 170px;
+    }
+    .search-item input:focus { border-color: var(--accent); }
+    .range-inputs { display: flex; align-items: center; gap: 8px; }
+    .range-inputs .sep { color: var(--ink-faint); }
+    .search-actions { display: flex; gap: 10px; align-items: flex-end; margin-left: auto; flex: 0 0 auto; }
+    .search-actions .btn {
+        height: 36px; padding: 0 20px; border-radius: var(--radius-pill);
+        font-size: 13px; cursor: pointer; border: none; font-family: inherit; font-weight: 500;
+    }
+    .search-actions .btn-search { background: var(--accent); color: #fff; }
+    .search-actions .btn-search:hover { background: var(--accent-hover); }
+    .search-actions .btn-reset { background: #f5f5f7; color: var(--ink-subtle); border: 1px solid var(--border); }
+    .search-actions .btn-reset:hover { color: var(--accent); border-color: var(--accent); }
 
-        /* 内容区 */
-        .content { flex:1; padding:12px; overflow-y:auto; }
+    /* 表格卡片 */
+    .table-wrap {
+        background: #fff; border-radius: var(--radius-card);
+        box-shadow: var(--shadow-card); overflow: hidden;
+    }
+    .table-scroll { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 1600px; }
+    thead th {
+        font-size: 12px; font-weight: 600; color: var(--ink-subtle);
+        text-align: left; padding: 14px 16px; white-space: nowrap;
+        border-bottom: 1px solid var(--border); background: #fafafc;
+    }
+    tbody td { font-size: 13px; padding: 14px 16px; border-bottom: 1px solid #f5f5f5; vertical-align: middle; }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: #fafbff; }
+    tbody tr.locked-row, tbody tr.locked-row:hover { background: #fafafa; }
+    tbody tr.locked-row td { color: var(--ink-faint); }
+    tbody tr.locked-row .product-name { color: var(--ink-muted); }
+    .seq-cell { color: var(--ink-subtle); text-align: center; width: 50px; }
 
-        /* ── 筛选栏 ── */
-        .filter-bar {
-            background:var(--card-bg); padding:12px 20px;
-            display:flex; align-items:center; flex-wrap:wrap; border-radius:var(--radius-md);
-        }
-        .filter-item { display:flex; align-items:center; margin-right:16px; margin-bottom:4px; }
-        .filter-label { font-size:13px; color:var(--ink-muted); margin-right:8px; white-space:nowrap; }
-        .filter-input {
-            width:220px; height:30px; padding:0 10px;
-            border:1px solid var(--border); border-radius:var(--radius-sm);
-            font-size:13px; color:var(--ink); outline:none;
-        }
-        .filter-input:focus { border-color:var(--primary); }
-        .filter-actions { display:flex; align-items:center; gap:8px; margin-left:auto; }
+    /* 产品图与名称 */
+    .product-img {
+        width: 56px; height: 56px; border-radius: 8px;
+        background-image: linear-gradient(135deg, #f0e8d8 0%, #c9b88e 100%); display: block;
+    }
+    .product-img.img1 { background-image: linear-gradient(135deg, #d8e0e8 0%, #98a8c4 100%); }
+    .product-img.img2 { background-image: linear-gradient(135deg, #f5e8b8 0%, #c9a04a 100%); }
+    .product-img.img3 { background-image: linear-gradient(135deg, #e8d8a0 0%, #c08830 100%); }
+    .product-img.img4 { background-image: linear-gradient(135deg, #d8b8a0 0%, #a87850 100%); }
+    .product-img.img5 { background-image: linear-gradient(135deg, #d4d8d4 0%, #98a098 100%); }
+    .product-img.img6 { background-image: linear-gradient(135deg, #f7e8d4 0%, #c8a888 100%); }
+    .product-img.img7 { background-image: linear-gradient(135deg, #dce8f0 0%, #88a8c0 100%); }
+    .product-img.img8 { background-image: linear-gradient(135deg, #e8e0d4 0%, #a89878 100%); }
+    .product-name { font-weight: 600; white-space: nowrap; }
+    .product-no { font-size: 12px; color: var(--ink-faint); margin-top: 3px; white-space: nowrap; }
 
-        /* 按钮 */
-        .btn-search { background:var(--primary); color:#fff; border:none; padding:0 14px; height:30px; border-radius:var(--radius-sm); font-size:13px; cursor:pointer; }
-        .btn-search:hover { background:var(--primary-hover); }
-        .btn-reset { background:#fff; color:var(--ink-muted); border:1px solid var(--border); padding:0 14px; height:30px; border-radius:var(--radius-sm); font-size:13px; cursor:pointer; }
-        .btn-reset:hover { border-color:var(--primary); color:var(--primary); }
+    .phone-cell { font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .num-cell { white-space: nowrap; }
+    .trade-count { font-weight: 600; }
+    .wholesale-cell { color: var(--accent); font-weight: 600; white-space: nowrap; }
 
-        /* ── 表格 ── */
-        .table-card {
-            background:var(--card-bg); margin-top:12px; border-radius:var(--radius-md);
-            overflow-x:auto;
-        }
-        .table { width:100%; border-collapse:collapse; }
-        .table th {
-            background:#fafbfc; padding:14px 12px; text-align:left;
-            font-size:13px; color:var(--ink-muted); font-weight:500;
-            border-bottom:1px solid var(--border-light); white-space:nowrap;
-        }
-        .table td {
-            padding:12px; font-size:13px; color:var(--ink);
-            border-bottom:1px solid #f5f5f7;
-        }
-        .table tr:last-child td { border-bottom:none; }
+    .lock-tag {
+        display: inline-block; padding: 2px 10px; border-radius: var(--radius-pill);
+        font-size: 12px; background: #eef1f5; color: var(--ink-subtle); white-space: nowrap;
+    }
+    .remain-tag { display: inline-block; padding: 2px 10px; border-radius: var(--radius-pill); font-size: 12px; background: #e6f7eb; color: var(--green); white-space: nowrap; }
+    .remain-tag.warn { background: #fdf0e4; color: var(--orange); }
+    .remain-tag.danger { background: #fff1f0; color: var(--red); }
+    .day-tag { display: inline-block; padding: 2px 10px; border-radius: var(--radius-pill); font-size: 12px; background: #e6f4ff; color: var(--accent); white-space: nowrap; }
+    .day-tag.warn { background: #fdf0e4; color: var(--orange); }
+    .day-tag.danger { background: #fff1f0; color: var(--red); }
 
-        .product-img {
-            width:56px; height:56px; border-radius:var(--radius-sm);
-            background-image:linear-gradient(135deg,#f0e8d8 0%,#c9b88e 100%); display:block;
-        }
-        .product-img.img1 { background-image:linear-gradient(135deg,#d8e0e8 0%,#98a8c4 100%); }
-        .product-img.img2 { background-image:linear-gradient(135deg,#f5e8b8 0%,#c9a04a 100%); }
-        .product-img.img3 { background-image:linear-gradient(135deg,#e8d8a0 0%,#c08830 100%); }
-        .product-img.img4 { background-image:linear-gradient(135deg,#d8b8a0 0%,#a87850 100%); }
-        .product-img.img5 { background-image:linear-gradient(135deg,#d4d8d4 0%,#98a098 100%); }
-        .product-img.img6 { background-image:linear-gradient(135deg,#f7e8d4 0%,#c8a888 100%); }
+    .status-tag { display: inline-block; padding: 3px 12px; border-radius: var(--radius-pill); font-size: 12px; background: #e6f7eb; color: var(--green); white-space: nowrap; }
+    .status-tag.locked { background: #fdecee; color: var(--red); cursor: help; }
 
-        .product-name { font-weight:600; white-space:nowrap; }
-        .product-no { font-size:12px; color:var(--ink-faint); margin-top:3px; white-space:nowrap; }
+    .time-cell { color: var(--ink-subtle); white-space: nowrap; }
+    .amount-cell { color: var(--red); font-weight: 600; white-space: nowrap; }
 
-        .phone-cell { font-variant-numeric:tabular-nums; white-space:nowrap; }
-        .num-cell { white-space:nowrap; }
-        .trade-count { font-weight:600; }
-        .remain-cell { white-space:nowrap; }
-        .remain-tag { display:inline-block; padding:2px 8px; border-radius:var(--radius-sm); font-size:12px; background:#e6f7eb; color:#1aab67; }
-        .remain-tag.warn { background:#fdf0e4; color:#e67e22; }
-        .remain-tag.danger { background:#fff1f0; color:#e74c5e; }
-        .time-cell { color:var(--ink-subtle); white-space:nowrap; }
-        .amount-cell { color:#e74c3e; font-weight:600; white-space:nowrap; }
+    /* 操作列 */
+    .actions { white-space: nowrap; }
+    .actions a { color: var(--accent); margin-right: 12px; cursor: pointer; text-decoration: none; font-size: 13px; }
+    .actions a:last-child { margin-right: 0; }
+    .actions a:hover { text-decoration: underline; }
 
-        /* 操作列 */
-        .actions { white-space:nowrap; }
-        .actions a {
-            color:var(--primary); margin-right:8px; cursor:pointer;
-            text-decoration:none; font-size:13px;
-        }
-        .actions a:last-child { margin-right:0; }
-        .actions a:hover { text-decoration:underline; }
-        .actions a.disabled { color:#c0c8d4; cursor:default; }
-        .actions a.disabled:hover { text-decoration:none; }
+    /* 弹层公共 */
+    .overlay {
+        position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+        display: none; align-items: center; justify-content: center; z-index: 2000;
+    }
+    .overlay.show { display: flex; }
+    .modal { background: #fff; border-radius: var(--radius-card); max-width: 94vw; }
+    .modal-header {
+        padding: 18px 24px; border-bottom: 1px solid #f0f1f4;
+        display: flex; align-items: center; gap: 10px;
+    }
+    .modal-title { font-size: 16px; font-weight: 600; }
+    .modal-sub { font-size: 12px; color: var(--ink-subtle); font-weight: 400; }
+    .modal-close {
+        margin-left: auto; width: 28px; height: 28px; border: none; background: #f5f5f7; border-radius: 50%;
+        color: var(--ink-subtle); cursor: pointer; font-size: 14px; line-height: 1;
+        display: flex; align-items: center; justify-content: center;
+    }
+    .modal-close:hover { color: var(--red); }
+    .modal-body { padding: 20px 24px; max-height: 68vh; overflow-y: auto; }
 
-        /* ── 交易详情弹窗 ── */
-        .detail-mask { position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:9998; display:none; }
-        .detail-mask.show { display:block; }
-        .detail-modal {
-            position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
-            width:820px; max-width:94vw; max-height:82vh;
-            background:#fff; border-radius:12px; box-shadow:0 8px 40px rgba(0,0,0,.25);
-            z-index:9999; display:none; flex-direction:column; overflow:hidden;
-        }
-        .detail-modal.show { display:flex; }
-        .dm-title {
-            display:flex; align-items:center; padding:16px 20px;
-            border-bottom:1px solid var(--border-light); font-size:15px; font-weight:600;
-        }
-        .dm-sub { margin-left:10px; font-size:12px; color:var(--ink-subtle); font-weight:400; }
-        .dm-close {
-            margin-left:auto; width:28px; height:28px; border-radius:50%;
-            background:#f5f5f5; display:flex; align-items:center; justify-content:center;
-            cursor:pointer; font-size:14px; color:#666; border:none; flex-shrink:0;
-        }
-        .dm-close:hover { background:#e8e8e8; }
-        .dm-body { padding:16px 20px; overflow-y:auto; }
-        .dm-note { font-size:12px; color:var(--ink-faint); margin-bottom:10px; }
-        .dm-table { width:100%; border-collapse:collapse; }
-        .dm-table th {
-            background:#fafbfc; padding:10px 12px; text-align:left;
-            font-size:12px; color:var(--ink-muted); font-weight:500;
-            border-bottom:1px solid var(--border-light); white-space:nowrap;
-        }
-        .dm-table td { padding:10px 12px; font-size:13px; border-bottom:1px solid #f5f5f7; white-space:nowrap; }
-        .dm-table tr:last-child td { border-bottom:none; }
-        .dm-table .dm-amount { color:#e74c3e; font-weight:600; }
-        .dm-empty { text-align:center; color:var(--ink-faint); padding:30px 0; font-size:13px; }
+    /* 交易详情弹窗 */
+    .detail-modal { width: 860px; }
+    .dm-note { font-size: 12px; color: var(--ink-faint); margin-bottom: 12px; line-height: 1.8; }
+    .detail-modal .d-table { width: 100%; border-collapse: collapse; }
+    .detail-modal .d-table th {
+        background: #fafafc; padding: 12px; text-align: left;
+        font-size: 12px; color: var(--ink-subtle); font-weight: 600;
+        border-bottom: 1px solid var(--border); white-space: nowrap;
+    }
+    .detail-modal .d-table td { padding: 12px; font-size: 13px; border-bottom: 1px solid #f5f5f5; white-space: nowrap; }
+    .detail-modal .d-table tr:last-child td { border-bottom: none; }
+    .detail-modal .d-table tr:hover { background: #fafbff; }
+    .detail-modal .d-table .dm-amount { color: var(--red); font-weight: 600; }
+    .detail-modal .d-table .dm-time { color: var(--ink-subtle); }
+    .detail-modal .d-table .ws-cell { color: var(--accent); font-weight: 500; }
 
-        /* ── 功能说明浮窗 ── */
-        .f-modal { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); width:560px; max-height:80vh; overflow-y:auto; background:#fff; border-radius:16px; box-shadow:0 8px 40px rgba(0,0,0,.2); z-index:9999; padding:24px; display:none; }
-        .f-modal.show { display:block; }
-        .f-modal .fm-title { font-size:16px; font-weight:600; color:var(--ink); margin-bottom:16px; display:flex; justify-content:space-between; align-items:center; cursor:grab; }
-        .f-modal .fm-title:active { cursor:grabbing; }
-        .f-modal .fm-close { width:28px; height:28px; border-radius:50%; background:#f5f5f5; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:14px; color:#666; border:none; flex-shrink:0; }
-        .f-modal .fm-close:hover { background:#e8e8e8; }
-        .f-modal .fm-body { font-size:13px; color:#555; line-height:1.8; }
-        .f-modal .fm-body h4 { font-size:14px; font-weight:600; color:var(--ink); margin:16px 0 8px; }
-        .f-modal .fm-body ul { padding-left:18px; margin:0 0 12px; }
-        .f-modal .fm-body li { margin-bottom:4px; }
-        .badge { display:inline-block; min-width:18px; height:18px; padding:0 5px; border-radius:50%; background:#ff2d55; color:#fff; font-size:12px; line-height:18px; text-align:center; font-weight:600; }
-    </style>
+    /* ===== 右侧功能说明面板 ===== */
+    .func-panel {
+        position: fixed; top: 0; right: 0; bottom: 0;
+        width: 340px; z-index: 890;
+        background: #fff; border-left: 1px solid #e3e6eb;
+        box-shadow: -1px 0 12px rgba(20, 30, 60, 0.04);
+        display: flex; flex-direction: column;
+    }
+    .func-panel .fp-inner { display: flex; flex-direction: column; height: 100%; min-width: 0; }
+    .func-panel .fp-header {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 15px 14px 13px 18px; border-bottom: 1px solid #f0f1f4; flex-shrink: 0;
+    }
+    .func-panel .fp-title { display: flex; align-items: center; gap: 9px; font-size: 15px; font-weight: 700; color: var(--ink); }
+    .func-panel .fp-title::before {
+        content: ''; width: 8px; height: 8px; border-radius: 50%;
+        background: var(--accent); box-shadow: 0 0 0 4px rgba(26, 120, 255, 0.12);
+    }
+    .func-panel .fp-fold-btn {
+        width: 28px; height: 28px; border: 1px solid var(--border); background: #fff;
+        border-radius: 50%; color: var(--ink-subtle); font-size: 15px; line-height: 1;
+        cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .2s;
+    }
+    .func-panel .fp-fold-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .func-panel .fp-body { flex: 1; overflow-y: auto; padding: 4px 18px 40px; font-size: 13px; color: #555; line-height: 1.85; }
+    .func-panel .fp-body h4 { font-size: 14px; font-weight: 600; color: var(--ink); margin: 18px 0 6px; }
+    .func-panel .fp-body h4:first-child { margin-top: 12px; }
+    .func-panel .fp-body ul { padding-left: 18px; margin: 0 0 8px; }
+    .func-panel .fp-body li { margin-bottom: 6px; }
+    .func-panel .fp-body strong { color: #333; }
+    .func-panel .fp-body p { margin: 6px 0; }
+    .func-panel .fp-body .fp-role { font-size: 13px; font-weight: 600; color: var(--accent); margin-bottom: 8px; }
+    .func-panel .fp-open {
+        display: none; position: absolute; top: 0; bottom: 0; left: 0; right: 0;
+        border: none; background: transparent; cursor: pointer;
+        writing-mode: vertical-rl; text-orientation: upright;
+        font-size: 13px; font-weight: 600; letter-spacing: 6px; color: var(--ink-subtle);
+        align-items: center; justify-content: center; font-family: inherit; transition: all .2s;
+    }
+    .func-panel .fp-open:hover { color: var(--accent); background: #fafbfc; }
+
+    /* 标注圆点 */
+    .badge {
+        display: inline-block; min-width: 18px; height: 18px; padding: 0 5px;
+        border-radius: 50%; background: #ff2d55; color: #fff; font-size: 12px;
+        line-height: 18px; text-align: center; font-weight: 600;
+        box-shadow: 0 1px 3px rgba(255,45,85,0.3);
+    }
+
+    @media (min-width: 1024px) {
+        .main, .breadcrumb { margin-right: 340px; }
+        body.fp-collapsed .main,
+        body.fp-collapsed .breadcrumb { margin-right: 40px; }
+        body.fp-collapsed .func-panel { width: 40px; }
+        body.fp-collapsed .fp-inner { display: none; }
+        body.fp-collapsed .fp-open { display: flex; }
+    }
+    @media (max-width: 1023.98px) {
+        .func-panel { display: none; }
+        .main, .breadcrumb { margin-right: 0; }
+    }
+    @media (max-width: 800px) {
+        .search-actions { margin-left: 0; }
+    }
+</style>
 </head>
 <body>
 
-<div class="app">
-    <!-- 侧边栏 -->
-    <div class="sidebar">
-        <div class="logo">
-            <div class="logo-icon">深</div>
-        </div>
-        <div class="menu">
-            <a class="menu-item" href="信息查看.html">
-                <span class="icon">📋</span><span>信息查看</span>
-            </a>
-            <div class="menu-group open">
-                <div class="menu-group-title" onclick="this.parentNode.classList.toggle('open')">
-                    <span class="icon">📦</span><span>产品管理</span><span class="arrow">▾</span>
-                </div>
-                <div class="submenu">
-                    <a href="产品管理.html">产品列表</a>
-                    <a href="产品详情管理.html" class="active">产品详情管理</a>
+<div class="breadcrumb">
+    <span>首页</span><span class="sep"> / </span>
+    <span>产品管理</span><span class="sep"> / </span>
+    <span class="current">产品详情管理</span>
+</div>
+
+<div class="main">
+    <div class="page-header">
+        <h2>产品详情管理</h2>
+        <span class="hint">展示本企业全部产品的持有人、交易次数、剩余次数及最近交易信息</span>
+    </div>
+
+    <!-- 搜索区 -->
+    <div class="search-area">
+        <div class="search-row">
+            <div class="search-item">
+                <label>产品名称</label>
+                <input type="text" id="searchName" placeholder="请输入产品名称">
+            </div>
+            <div class="search-item">
+                <label>产品编号</label>
+                <input type="text" id="searchNo" placeholder="请输入产品编号">
+            </div>
+            <div class="search-item">
+                <label>当前持有人</label>
+                <input type="text" id="searchHolder" placeholder="请输入持有人手机号">
+            </div>
+            <div class="search-item">
+                <label>剩余次数（大于 / 小于）</label>
+                <div class="range-inputs">
+                    <input type="number" id="searchRemainMin" placeholder="大于">
+                    <span class="sep">—</span>
+                    <input type="number" id="searchRemainMax" placeholder="小于">
                 </div>
             </div>
-            <div class="menu-group">
-                <div class="menu-group-title" onclick="this.parentNode.classList.toggle('open')">
-                    <span class="icon">💰</span><span>资金管理</span><span class="arrow">▾</span>
-                </div>
-                <div class="submenu">
-                    <a href="账户管理.html">账户管理</a>
-                    <span class="sub-note">我的资产（老）<span class="note-tag">新批发商无此菜单</span></span>
-                </div>
-            </div>
-            <a class="menu-item" href="分佣管理.html">
-                <span class="icon">📊</span><span>分佣管理</span>
-            </a>
-            <a class="menu-item" href="#">
-                <span class="icon">📢</span><span>系统公告</span>
-            </a>
-            <div class="menu-group">
-                <div class="menu-group-title" onclick="this.parentNode.classList.toggle('open')">
-                    <span class="icon">🏷️</span><span>价值管理</span><span class="arrow">▾</span>
-                </div>
-                <div class="submenu">
-                    <a href="价值注入.html">价值注入</a>
-                    <a href="#">价值字典</a>
+            <div class="search-item">
+                <label>剩余天数（大于 / 小于）</label>
+                <div class="range-inputs">
+                    <input type="number" id="searchDaysMin" placeholder="大于">
+                    <span class="sep">—</span>
+                    <input type="number" id="searchDaysMax" placeholder="小于">
                 </div>
             </div>
-            <div class="menu-group">
-                <div class="menu-group-title" onclick="this.parentNode.classList.toggle('open')">
-                    <span class="icon">🏭</span><span>仓管管理</span><span class="arrow">▾</span>
-                </div>
-                <div class="submenu">
-                    <a href="发货管理.html">发货管理</a>
-                </div>
-            </div>
-            <a class="menu-item" href="#">
-                <span class="icon">📝</span><span>任务管理</span>
-            </a>
-            <a class="menu-item" href="#">
-                <span class="icon">📈</span><span>运营数据统计</span>
-            </a>
-            <div class="menu-group">
-                <div class="menu-group-title" onclick="this.parentNode.classList.toggle('open')">
-                    <span class="icon">⚙️</span><span>系统管理</span><span class="arrow">▾</span>
-                </div>
-                <div class="submenu">
-                    <a href="用户管理.html">用户管理</a>
-                    <a href="角色管理.html">角色管理</a>
-                    <a href="业务参数管理.html">业务参数管理</a>
-                    <a href="区块链服务.html">区块链服务管理</a>
-                </div>
+            <div class="search-actions">
+                <button class="btn btn-search" onclick="doSearch()">🔍 搜索</button>
+                <button class="btn btn-reset" onclick="doReset()">↻ 重置</button>
             </div>
         </div>
     </div>
 
-    <!-- 主体 -->
-    <div class="main">
-        <div class="topbar">
-            <div class="breadcrumb">
-                <span>首页</span><span class="sep">/</span><span>产品管理</span><span class="sep">/</span><span class="active">产品详情管理</span>
-            </div>
-            <div class="topbar-right">
-                <button class="btn-func" onclick="toggleFuncModal()">📖 功能说明</button>
-                <div class="user-chip">
-                    <span class="avatar">👤</span>
-                    <span class="name">批发商：Kevin Li</span>
-                    <span class="arrow">▾</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="content">
-            <!-- 筛选栏 -->
-            <div class="filter-bar">
-                <div class="filter-item">
-                    <span class="filter-label">产品名称</span>
-                    <input type="text" class="filter-input" id="searchName" placeholder="请输入产品名称">
-                </div>
-                <div class="filter-item">
-                    <span class="filter-label">产品编号</span>
-                    <input type="text" class="filter-input" id="searchNo" placeholder="请输入产品编号" style="width:160px;">
-                </div>
-                <div class="filter-actions">
-                    <button class="btn-search" onclick="doSearch()">🔍 搜 索</button>
-                    <button class="btn-reset" onclick="doReset()">↻ 重 置</button>
-                </div>
-            </div>
-
-            <!-- 表格 -->
-            <div class="table-card">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th style="width:80px;">图片</th>
-                            <th>产品名称</th>
-                            <th>当前持有人</th>
-                            <th>交易次数</th>
-                            <th>剩余次数</th>
-                            <th>最后交易时间</th>
-                            <th>最后交易金额</th>
-                            <th style="width:100px;">操作</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tbBody">
-                        <tr data-name="青莲-初心" data-no="xb000001">
-                            <td><img class="product-img img1" src=""></td>
-                            <td>
-                                <div class="product-name">青莲-初心</div>
-                                <div class="product-no">XB000001</div>
-                            </td>
-                            <td class="phone-cell">13800172866</td>
-                            <td class="num-cell trade-count">6</td>
-                            <td class="remain-cell"><span class="remain-tag">14</span></td>
-                            <td class="time-cell">2026-07-30 15:38:13</td>
-                            <td class="amount-cell">¥1,562.50</td>
-                            <td class="actions"><a onclick="openDetail(0)">详情</a></td>
-                        </tr>
-                        <tr data-name="西路财童" data-no="xb000002">
-                            <td><img class="product-img img2" src=""></td>
-                            <td>
-                                <div class="product-name">西路财童</div>
-                                <div class="product-no">XB000002</div>
-                            </td>
-                            <td class="phone-cell">19981465373</td>
-                            <td class="num-cell trade-count">5</td>
-                            <td class="remain-cell"><span class="remain-tag">15</span></td>
-                            <td class="time-cell">2026-07-22 15:30:19</td>
-                            <td class="amount-cell">¥2,500.00</td>
-                            <td class="actions"><a onclick="openDetail(1)">详情</a></td>
-                        </tr>
-                        <tr data-name="中路财童" data-no="xb000003">
-                            <td><img class="product-img img3" src=""></td>
-                            <td>
-                                <div class="product-name">中路财童</div>
-                                <div class="product-no">XB000003</div>
-                            </td>
-                            <td class="phone-cell">18227406306</td>
-                            <td class="num-cell trade-count">40</td>
-                            <td class="remain-cell"><span class="remain-tag warn">10</span></td>
-                            <td class="time-cell">2026-07-31 08:00:01</td>
-                            <td class="amount-cell">¥250.00</td>
-                            <td class="actions"><a onclick="openDetail(2)">详情</a></td>
-                        </tr>
-                        <tr data-name="榜样-统一" data-no="xb000004">
-                            <td><img class="product-img img4" src=""></td>
-                            <td>
-                                <div class="product-name">榜样-统一</div>
-                                <div class="product-no">XB000004</div>
-                            </td>
-                            <td class="phone-cell">15528430479</td>
-                            <td class="num-cell trade-count">12</td>
-                            <td class="remain-cell"><span class="remain-tag warn">8</span></td>
-                            <td class="time-cell">2026-07-13 15:29:54</td>
-                            <td class="amount-cell">¥1,200.00</td>
-                            <td class="actions"><a onclick="openDetail(3)">详情</a></td>
-                        </tr>
-                        <tr data-name="青莲-舒展" data-no="xb000005">
-                            <td><img class="product-img img5" src=""></td>
-                            <td>
-                                <div class="product-name">青莲-舒展</div>
-                                <div class="product-no">XB000005</div>
-                            </td>
-                            <td class="phone-cell">19382153852</td>
-                            <td class="num-cell trade-count">25</td>
-                            <td class="remain-cell"><span class="remain-tag danger">5</span></td>
-                            <td class="time-cell">2026-07-22 09:39:56</td>
-                            <td class="amount-cell">¥800.00</td>
-                            <td class="actions"><a onclick="openDetail(4)">详情</a></td>
-                        </tr>
-                        <tr data-name="东坡-惜春" data-no="xb000006">
-                            <td><img class="product-img img6" src=""></td>
-                            <td>
-                                <div class="product-name">东坡-惜春</div>
-                                <div class="product-no">XB000006</div>
-                            </td>
-                            <td class="phone-cell">19113541040</td>
-                            <td class="num-cell trade-count">8</td>
-                            <td class="remain-cell"><span class="remain-tag danger">2</span></td>
-                            <td class="time-cell">2026-07-31 08:00:01</td>
-                            <td class="amount-cell">¥3,000.00</td>
-                            <td class="actions"><a onclick="openDetail(5)">详情</a></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+    <!-- 表格 -->
+    <div class="table-wrap">
+        <div class="table-scroll">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width:50px;">序号</th>
+                        <th style="width:76px;">图片</th>
+                        <th>产品名称</th>
+                        <th>当前持有人</th>
+                        <th>批发价格</th>
+                        <th>交易次数</th>
+                        <th>交易上限</th>
+                        <th>剩余次数</th>
+                        <th>生命周期</th>
+                        <th>剩余天数</th>
+                        <th>交易状态</th>
+                        <th>上次价值注入时间</th>
+                        <th>最后交易时间</th>
+                        <th>最后交易金额</th>
+                        <th style="width:70px;">操作</th>
+                    </tr>
+                </thead>
+                <tbody id="tbBody"></tbody>
+            </table>
         </div>
     </div>
 </div>
 
 <!-- 交易详情弹窗 -->
-<div class="detail-mask" id="detailMask" onclick="closeDetail()"></div>
-<div class="detail-modal" id="detailModal">
-    <div class="dm-title">
-        交易记录详情
-        <span class="dm-sub" id="dmProduct"></span>
-        <button class="dm-close" onclick="closeDetail()">✕</button>
-    </div>
-    <div class="dm-body">
-        <div class="dm-note" id="dmNote"></div>
-        <table class="dm-table">
-            <thead>
-                <tr>
-                    <th>订单编号</th>
-                    <th>卖家</th>
-                    <th>买家</th>
-                    <th>成交金额</th>
-                    <th>成交时间</th>
-                </tr>
-            </thead>
-            <tbody id="dmBody"></tbody>
-        </table>
+<div class="overlay" id="detailOverlay" onclick="if(event.target===this)closeDetail()">
+    <div class="modal detail-modal">
+        <div class="modal-header">
+            <span class="modal-title">交易记录详情</span>
+            <span class="modal-sub" id="dmProduct"></span>
+            <button class="modal-close" onclick="closeDetail()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="dm-note" id="dmNote"></div>
+            <table class="d-table">
+                <thead>
+                    <tr>
+                        <th>订单编号</th>
+                        <th>卖家</th>
+                        <th>买家</th>
+                        <th>成交金额</th>
+                        <th>成交时间</th>
+                    </tr>
+                </thead>
+                <tbody id="dmBody"></tbody>
+            </table>
+        </div>
     </div>
 </div>
 
-<!-- ====== 功能说明浮窗 ====== -->
-<div class="f-modal" id="funcModal">
-  <div class="fm-title">
-    <span>📖 功能说明</span>
-    <button class="fm-close" onclick="toggleFuncModal()">✕</button>
-  </div>
-  <div style="font-size:13px;font-weight:600;color:#e74c5e;margin:-6px 0 12px;">批发商后台 · 产品管理 / 产品详情管理</div>
-  <div class="fm-body">
-    <h4><span class="badge">1</span> <span style="vertical-align:middle;">页面说明</span></h4>
-    <ul>
-      <li>产品管理下的二级菜单，展示每个产品的<b>当前持有人、交易次数、剩余次数</b>及最近交易信息</li>
-      <li><b>剩余次数</b> = 产品交易次数上限 − 已交易次数，剩余 ≤ 10 橙色、≤ 5 红色提示</li>
-    </ul>
-    <h4><span class="badge">2</span> <span style="vertical-align:middle;">搜索</span></h4>
-    <ul>
-      <li>支持按<b>产品名称</b>、<b>产品编号</b>模糊搜索，可组合条件</li>
-    </ul>
-    <h4><span class="badge">3</span> <span style="vertical-align:middle;">交易详情浮层</span></h4>
-    <ul>
-      <li>点击操作列「<b>详情</b>」，浮层列表展示该产品的<b>全部</b>交易记录（数量 = 交易次数）</li>
-      <li>包含字段：<b>订单编号、卖家、买家、成交金额、成交时间</b></li>
-      <li>交易次数较多时，浮层内列表可滚动查看</li>
-    </ul>
-    <h4><span class="badge">4</span> <span style="vertical-align:middle;">手机号展示</span></h4>
-    <ul>
-      <li>当前持有人、卖家、买家统一以<b>11 位手机号</b>展示</li>
-    </ul>
-  </div>
-</div>
+<!-- 右侧功能说明 -->
+<aside class="func-panel">
+    <div class="fp-inner">
+        <div class="fp-header">
+            <div class="fp-title">功能说明</div>
+            <button class="fp-fold-btn" onclick="toggleFuncPanel()">›</button>
+        </div>
+        <div class="fp-body">
+            <div class="fp-role">批发商</div>
+            <h4><span class="badge">1</span> <span style="vertical-align:middle;">页面说明</span></h4>
+            <ul>
+                <li><strong>交易次数</strong>不含首次批发交易；<strong>剩余次数</strong> = 交易上限 − 交易次数，剩余 ≤ 10 橙色、≤ 5 红色提示。</li>
+                <li><strong>剩余天数</strong> = 产品生命周期 − 已过天数，剩余 ≤ 10 天橙色、到期红色「已到期」提示。</li>
+                <li>仅有批发交易、暂无转手交易的产品（交易次数为 0），<strong>当前持有人为批发交易的首位买入用户</strong>。</li>
+            </ul>
+            <h4><span class="badge">2</span> <span style="vertical-align:middle;">搜索</span></h4>
+            <ul>
+                <li>支持按<strong>产品名称</strong>、<strong>产品编号</strong>、<strong>当前持有人</strong>（手机号）模糊搜索，可组合条件。</li>
+                <li>支持按<strong>剩余次数</strong>、<strong>剩余天数</strong>设定区间筛选（大于 / 小于，可只填一侧），留空则不限制该条件。</li>
+            </ul>
+            <h4><span class="badge">3</span> <span style="vertical-align:middle;">交易详情浮层</span></h4>
+            <ul>
+                <li>点击操作列「<strong>详情</strong>」，浮层列表展示该产品的<strong>全部</strong>交易记录（数量 = 交易次数 + 1 笔批发交易）。</li>
+                <li><strong>第一条记录固定为首次批发交易：卖家一定是本批发商（企业名称），买家为首位买入用户</strong>，成交价即批发价格。</li>
+                <li>包含字段：<strong>订单编号、卖家、买家、成交金额、成交时间</strong>，按时间从早到晚排列。</li>
+                <li>交易次数较多时，浮层内列表可滚动查看。</li>
+            </ul>
+            <h4><span class="badge">4</span> <span style="vertical-align:middle;">手机号展示</span></h4>
+            <ul>
+                <li><strong>当前持有人一定是用户</strong>，与卖家、买家统一以<strong>11 位手机号</strong>展示；批发交易中的卖家（本批发商）以<strong>企业名称</strong>展示。</li>
+            </ul>
+            <h4><span class="badge">5</span> <span style="vertical-align:middle;">交易规则与锁定</span></h4>
+            <ul>
+                <li><strong>上次价值注入时间</strong> = 最近一次价值注入的时间</li>
+                <li><strong>锁定规则</strong>：达到<strong>交易次数上限</strong>（剩余次数为 0）或<strong>生命周期到期</strong>（剩余天数为 0），产品即自动锁定、停止交易。</li>
+                <li>锁定产品交易状态列显示红色「<strong>🔒 已锁定</strong>」（悬停可见锁定原因），整行置灰，仅可查看详情。</li>
+            </ul>
+        </div>
+    </div>
+    <button class="fp-open" onclick="toggleFuncPanel()">功能说明</button>
+</aside>
 
 <script>
-// ===== 产品交易数据（详情浮层展示全部交易记录）=====
+// ===== 本批发商产品交易数据 =====
+var WS_CO = '四川华乐博文化艺术发展有限公司';
 var phonePool = ['13800172866','19981465373','18227406306','15528430479','19382153852','19113541040','19130634113','13908193164'];
 
 function pad2(n) { return (n < 10 ? '0' : '') + n; }
@@ -514,40 +433,115 @@ function buildRecords(holder, trades, lastTime, lastAmount, orderPrefix) {
 }
 
 var products = [
-    { no: 'XB000001', name: '青莲-初心', holder: '13800172866', trades: 6, limit: 20, lastTime: '2026-07-30 15:38:13', lastAmount: 1562.50 },
-    { no: 'XB000002', name: '西路财童', holder: '19981465373', trades: 5, limit: 20, lastTime: '2026-07-22 15:30:19', lastAmount: 2500.00 },
-    { no: 'XB000003', name: '中路财童', holder: '18227406306', trades: 40, limit: 50, lastTime: '2026-07-31 08:00:01', lastAmount: 250.00 },
-    { no: 'XB000004', name: '榜样-统一', holder: '15528430479', trades: 12, limit: 20, lastTime: '2026-07-13 15:29:54', lastAmount: 1200.00 },
-    { no: 'XB000005', name: '青莲-舒展', holder: '19382153852', trades: 25, limit: 30, lastTime: '2026-07-22 09:39:56', lastAmount: 800.00 },
-    { no: 'XB000006', name: '东坡-惜春', holder: '19113541040', trades: 8, limit: 10, lastTime: '2026-07-31 08:00:01', lastAmount: 3000.00 }
+    { no: 'XB000001', name: '青莲-初心', holder: '13800172866', trades: 6, maxTrades: 20, lifecycle: 90, wp: 1000.00, wt: '2026-06-28 10:00:00', fh: '19382153852', lastTime: '2026-07-30 15:38:13', lastAmount: 1562.50 },
+    { no: 'XB000002', name: '西路财童', holder: '19981465373', trades: 5, maxTrades: 20, lifecycle: 180, wp: 1800.00, wt: '2026-06-20 14:30:00', fh: '19113541040', lastTime: '2026-07-22 15:30:19', lastAmount: 2500.00 },
+    { no: 'XB000003', name: '中路财童', holder: '18227406306', trades: 40, maxTrades: 50, lifecycle: 365, wp: 100.00, wt: '2026-02-25 09:00:00', fh: '13800172866', lastTime: '2026-07-31 08:00:01', lastAmount: 250.00 },
+    { no: 'XB000004', name: '榜样-统一', holder: '15528430479', trades: 12, maxTrades: 20, lifecycle: 30, wp: 600.00, wt: '2026-05-12 11:00:00', fh: '19981465373', lastTime: '2026-07-13 15:29:54', lastAmount: 1200.00 },
+    { no: 'XB000005', name: '青莲-舒展', holder: '19382153852', trades: 25, maxTrades: 30, lifecycle: 90, wp: 300.00, wt: '2026-04-05 16:00:00', fh: '18227406306', lastTime: '2026-07-22 09:39:56', lastAmount: 800.00 },
+    { no: 'XB000006', name: '东坡-惜春', holder: '19113541040', trades: 10, maxTrades: 10, lifecycle: 60, wp: 1500.00, wt: '2026-06-12 10:30:00', fh: '15528430479', lastTime: '2026-07-31 08:00:01', lastAmount: 3000.00 },
+    { no: 'XB000007', name: '东坡-观澜', holder: '19130634113', trades: 0, maxTrades: 15, lifecycle: 120, wp: 2000.00, wt: '2026-09-19 10:00:00', fh: '19130634113', lastTime: '2026-09-19 10:00:00', lastAmount: 2000.00 },
+    { no: 'XB000008', name: '青莲-听雨', holder: '13908193164', trades: 0, maxTrades: 10, lifecycle: 90, wp: 850.00, wt: '2026-09-20 15:30:00', fh: '13908193164', lastTime: '2026-09-20 15:30:00', lastAmount: 850.00 }
 ];
 
-// 每个产品的交易记录数量 = 交易次数（全部交易）
+// 剩余次数 / 剩余天数 / 锁定状态
+products.forEach(function (p) {
+    p.remain = p.maxTrades - p.trades;
+    p.days = p.lifecycle - Math.round((new Date() - new Date(p.wt.replace(/-/g, '/'))) / 86400000);
+    p.lockReason = '';
+    if (p.remain <= 0) p.lockReason = '已达交易次数上限，产品已锁定停止交易';
+    if (p.days <= 0) p.lockReason = '已达生命周期上限，产品已锁定停止交易';
+    p.locked = !!p.lockReason;
+});
+
+// 每个产品的交易记录 = 首条批发交易（卖家=本批发商）+ 后续 N 笔普通交易（N = 交易次数，不含批发）
 products.forEach(function (p) {
     p.records = buildRecords(p.holder, p.trades, p.lastTime, p.lastAmount, p.no);
+    var wt = new Date(p.wt.replace(/-/g, '/'));
+    var wsOrder = p.no + wt.getFullYear() + pad2(wt.getMonth() + 1) + pad2(wt.getDate())
+        + pad2(wt.getHours()) + pad2(wt.getMinutes()) + pad2(wt.getSeconds()) + '001';
+    p.records.unshift({
+        order: wsOrder,
+        seller: WS_CO,
+        buyer: p.fh,
+        amount: fmtMoney(p.wp),
+        time: p.wt
+    });
 });
+
+// ===== 渲染表格 =====
+function remainTag(remain) {
+    var cls = remain <= 5 ? ' danger' : (remain <= 10 ? ' warn' : '');
+    return '<span class="remain-tag' + cls + '">' + remain + '</span>';
+}
+function dayTag(days) {
+    if (days <= 0) return '<span class="day-tag danger">已到期</span>';
+    var cls = days <= 10 ? ' warn' : '';
+    return '<span class="day-tag' + cls + '">' + days + ' 天</span>';
+}
+
+function renderTable() {
+    var html = '';
+    products.forEach(function (p, i) {
+        var statusCell = p.locked
+            ? '<span class="status-tag locked" title="' + p.lockReason + '">🔒 已锁定</span>'
+            : '<span class="status-tag">交易中</span>';
+        html += '<tr data-idx="' + i + '" data-name="' + p.name + '" data-no="' + p.no.toLowerCase() + '"'
+            + ' data-holder="' + p.holder + '" data-remain="' + p.remain + '" data-days="' + p.days + '"'
+            + (p.locked ? ' class="locked-row"' : '') + '>' +
+            '<td class="seq-cell">' + (i + 1) + '</td>' +
+            '<td><div class="product-img img' + ((i % 8) + 1) + '"></div></td>' +
+            '<td><div class="product-name">' + p.name + '</div><div class="product-no">' + p.no + '</div></td>' +
+            '<td class="phone-cell">' + p.holder + '</td>' +
+            '<td class="wholesale-cell">' + fmtMoney(p.wp) + '</td>' +
+            '<td class="num-cell trade-count">' + p.trades + '</td>' +
+            '<td class="num-cell"><span class="lock-tag">🔒 ' + p.maxTrades + ' 次</span></td>' +
+            '<td class="num-cell">' + remainTag(p.remain) + '</td>' +
+            '<td class="num-cell"><span class="lock-tag">🔒 ' + p.lifecycle + ' 天</span></td>' +
+            '<td class="num-cell">' + dayTag(p.days) + '</td>' +
+            '<td>' + statusCell + '</td>' +
+            '<td class="time-cell">' + p.wt + '</td>' +
+            '<td class="time-cell">' + p.lastTime + '</td>' +
+            '<td class="amount-cell">' + fmtMoney(p.lastAmount) + '</td>' +
+            '<td class="actions"><a onclick="openDetail(' + i + ')">详情</a></td>' +
+        '</tr>';
+    });
+    document.getElementById('tbBody').innerHTML = html;
+}
 
 // ===== 搜索 / 重置 =====
 function doSearch() {
     var kw1 = document.getElementById('searchName').value.trim().toLowerCase();
     var kw2 = document.getElementById('searchNo').value.trim().toLowerCase();
-    var rows = document.querySelectorAll('#tbBody tr');
-    rows.forEach(function(tr) {
+    var kw4 = document.getElementById('searchHolder').value.trim().toLowerCase();
+    var rMin = document.getElementById('searchRemainMin').value.trim();
+    var rMax = document.getElementById('searchRemainMax').value.trim();
+    var dMin = document.getElementById('searchDaysMin').value.trim();
+    var dMax = document.getElementById('searchDaysMax').value.trim();
+    document.querySelectorAll('#tbBody tr').forEach(function (tr) {
         var name = (tr.getAttribute('data-name') || '').toLowerCase();
         var no = (tr.getAttribute('data-no') || '').toLowerCase();
-        var ok = (!kw1 || name.indexOf(kw1) >= 0) && (!kw2 || no.indexOf(kw2) >= 0);
+        var holder = (tr.getAttribute('data-holder') || '').toLowerCase();
+        var remain = parseInt(tr.getAttribute('data-remain'), 10);
+        var days = parseInt(tr.getAttribute('data-days'), 10);
+        var ok = (!kw1 || name.indexOf(kw1) >= 0)
+            && (!kw2 || no.indexOf(kw2) >= 0)
+            && (!kw4 || holder.indexOf(kw4) >= 0)
+            && (rMin === '' || remain > parseInt(rMin, 10))
+            && (rMax === '' || remain < parseInt(rMax, 10))
+            && (dMin === '' || days > parseInt(dMin, 10))
+            && (dMax === '' || days < parseInt(dMax, 10));
         tr.style.display = ok ? '' : 'none';
     });
 }
 
 function doReset() {
-    document.getElementById('searchName').value = '';
-    document.getElementById('searchNo').value = '';
-    document.querySelectorAll('#tbBody tr').forEach(function(tr) { tr.style.display = ''; });
+    ['searchName', 'searchNo', 'searchHolder', 'searchRemainMin', 'searchRemainMax', 'searchDaysMin', 'searchDaysMax']
+        .forEach(function (id) { document.getElementById(id).value = ''; });
+    document.querySelectorAll('#tbBody tr').forEach(function (tr) { tr.style.display = ''; });
 }
 
 // 回车搜索
-document.addEventListener('keydown', function(e) {
+document.addEventListener('keydown', function (e) {
     if (e.key === 'Enter') doSearch();
 });
 
@@ -555,50 +549,31 @@ document.addEventListener('keydown', function(e) {
 function openDetail(idx) {
     var p = products[idx];
     document.getElementById('dmProduct').textContent = p.name + '（' + p.no + '）';
-    document.getElementById('dmNote').textContent = '该产品共交易 ' + p.trades + ' 次，当前持有人：' + p.holder + '，以下为该产品全部 ' + p.records.length + ' 笔交易记录：';
+    document.getElementById('dmNote').textContent = '该产品于 ' + p.wt + ' 完成首次批发交易（卖家为批发商：' + WS_CO + '，买家 ' + p.fh + '），批发价 ' + fmtMoney(p.wp) + '，后续共交易 ' + p.trades + ' 次（不含首次批发），交易上限 ' + p.maxTrades + ' 次，生命周期 ' + p.lifecycle + ' 天，当前持有人：' + p.holder + '，以下为该产品全部 ' + p.records.length + ' 笔交易记录（首条为批发交易）：';
     var body = document.getElementById('dmBody');
     body.innerHTML = '';
-    p.records.forEach(function(r) {
+    p.records.forEach(function (r, i) {
+        var sellerCell = (i === 0) ? '<td class="ws-cell">' + r.seller + '</td>' : '<td>' + r.seller + '</td>';
         var tr = document.createElement('tr');
-        tr.innerHTML = '<td>' + r.order + '</td><td>' + r.seller + '</td><td>' + r.buyer + '</td><td class="dm-amount">' + r.amount + '</td><td>' + r.time + '</td>';
+        tr.innerHTML = '<td>' + r.order + '</td>' + sellerCell + '<td>' + r.buyer + '</td><td class="dm-amount">' + r.amount + '</td><td class="dm-time">' + r.time + '</td>';
         body.appendChild(tr);
     });
-    document.getElementById('detailMask').classList.add('show');
-    document.getElementById('detailModal').classList.add('show');
+    document.getElementById('detailOverlay').classList.add('show');
 }
 
 function closeDetail() {
-    document.getElementById('detailMask').classList.remove('show');
-    document.getElementById('detailModal').classList.remove('show');
+    document.getElementById('detailOverlay').classList.remove('show');
 }
 
-// ===== 功能说明浮窗 =====
-function toggleFuncModal() {
-  var el = document.getElementById('funcModal');
-  el.classList.toggle('show');
-  if (el.classList.contains('show') && !el.dataset.dragged) {
-    el.style.left = '50%'; el.style.top = '50%'; el.style.transform = 'translate(-50%,-50%)';
-  }
+// ===== 右侧功能说明折叠 =====
+function toggleFuncPanel() {
+    document.body.classList.toggle('fp-collapsed');
 }
-(function() {
-  var modal, titleBar, offX, offY, dragging = false;
-  document.addEventListener('DOMContentLoaded', function() {
-    modal = document.getElementById('funcModal');
-    titleBar = modal.querySelector('.fm-title');
-    titleBar.addEventListener('mousedown', startDrag);
-    titleBar.addEventListener('touchstart', startDragTouch, {passive:true});
-    document.addEventListener('mousemove', onDrag);
-    document.addEventListener('mouseup', endDrag);
-    document.addEventListener('touchmove', onDragTouch, {passive:true});
-    document.addEventListener('touchend', endDrag);
-  });
-  function startDrag(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = e.clientX - rect.left; offY = e.clientY - rect.top; dragging = true; titleBar.style.cursor = 'grabbing'; }
-  function startDragTouch(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; var t = e.touches[0]; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = t.clientX - rect.left; offY = t.clientY - rect.top; dragging = true; }
-  function onDrag(e) { if (!dragging) return; modal.style.left = (e.clientX - offX) + 'px'; modal.style.top = (e.clientY - offY) + 'px'; }
-  function onDragTouch(e) { if (!dragging) return; var t = e.touches[0]; modal.style.left = (t.clientX - offX) + 'px'; modal.style.top = (t.clientY - offY) + 'px'; }
-  function endDrag() { dragging = false; if (titleBar) titleBar.style.cursor = 'grab'; }
-})();
+
+renderTable();
 </script>
+
+<script src="asset/admin-sidebar.js"></script>
 
 </body>
 </html>

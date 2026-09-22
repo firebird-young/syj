@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>发货管理 · 深艺交批发商工作台</title>
+    <title>发货管理 · 深艺交管理后台</title>
     <link rel="stylesheet" href="asset/admin-sidebar.css">
     <style>
         :root {
@@ -114,7 +114,6 @@
         .status-tag.shipped { background: var(--accent-bg); color: var(--accent); }
 
         .actions a { color: var(--accent); margin-right: 10px; cursor: pointer; text-decoration: none; }
-        .actions a.danger { color: #e74c5e; }
         .actions a:last-child { margin-right: 0; }
         .actions a:hover { text-decoration: underline; }
         .pick-time.none { color: var(--ink-subtle); }
@@ -231,7 +230,7 @@
 <body>
 
 <div class="breadcrumb">
-    <a href="信息查看.html">首页</a> / <span>仓管管理</span> / <span class="current">发货管理</span>
+    <a href="原功能页面.html">首页</a> / <span>仓库管理</span> / <span class="current">发货管理</span>
 </div>
 
 <div class="main">
@@ -311,7 +310,7 @@
                         <td>2026-07-21 14:49:19</td>
                         <td class="pick-time none">—</td>
                         <td class="pick-time none">—</td>
-                        <td class="actions"><a>处理</a><a>查看详情</a><a class="danger">撤销</a></td>
+                        <td class="actions"><a>查看详情</a></td>
                     </tr>
                     <tr data-status="shipped">
                         <td class="seq">2</td>
@@ -460,30 +459,37 @@
             <button class="fp-fold-btn" onclick="toggleFuncPanel()" title="收起功能说明">›</button>
         </div>
         <div class="fp-body">
-            <p class="role">批发商 · 发货管理</p>
+            <p class="role">平台 · 发货管理</p>
 
-            <h4><span class="badge">1</span> <span style="vertical-align:middle;">发货列表</span></h4>
+            <h4><span class="badge">1</span> <span style="vertical-align:middle;">发货数据查看</span></h4>
             <ul>
-                <li>展示当前批发商的<strong>发货记录</strong>，支持<strong>全部 / 待发货 / 已发货</strong>标签页切换</li>
-                <li><strong>状态</strong>：待发货（橙）、已发货（蓝）</li>
+                <li>平台侧查看<strong>所有批发商</strong>的发货数据（全平台汇总，非单一批发商），一屏掌握平台整体提货、发货情况</li>
+                <li>支持<strong>全部 / 待发货 / 已发货</strong>标签页切换；<strong>状态</strong>：待发货（橙）、已发货（蓝）</li>
+                <li>列表字段：产品名、提货单号、产品编号、提货数量、所属企业、所属仓库、用户账号 / 姓名、收货地址、状态、创建时间、提货时间、发货时间</li>
             </ul>
 
-            <h4><span class="badge">2</span> <span style="vertical-align:middle;">产品编号悬浮操作</span></h4>
+            <h4><span class="badge">2</span> <span style="vertical-align:middle;">只读，无操作权限</span></h4>
             <ul>
-                <li>表格新增展示该提货单关联的<strong>多个产品编号</strong>，单元格内省略显示，<strong>鼠标悬停</strong>展开全部</li>
+                <li>本功能为平台侧<strong>纯查看</strong>入口，<strong>无任何操作权限</strong>：不提供处理发货、撤销提货、修改或删除数据等操作</li>
+                <li>操作列<strong>仅有「查看详情」</strong>，用于查看该笔发货的完整信息</li>
+            </ul>
+
+            <h4><span class="badge">3</span> <span style="vertical-align:middle;">产品编号悬浮操作</span></h4>
+            <ul>
+                <li>展示该提货单关联的<strong>多个产品编号</strong>，单元格内省略显示，<strong>鼠标悬停</strong>展开全部</li>
                 <li>浮窗顶部展示<strong>共 N 个产品编号</strong>，并提供<strong>「复制全部」</strong>按钮，一键复制全部编号</li>
                 <li>复制成功按钮变为绿色<strong>「已复制」</strong>提示，1.2 秒后恢复</li>
             </ul>
 
-            <h4><span class="badge">3</span> <span style="vertical-align:middle;">筛选查询</span></h4>
+            <h4><span class="badge">4</span> <span style="vertical-align:middle;">筛选查询</span></h4>
             <ul>
                 <li>筛选条件：<strong>提货单编号</strong>、<strong>产品名称</strong>、<strong>产品编号</strong></li>
                 <li>按产品编号查询时<strong>必须同时填写产品名称</strong>，否则无法查询</li>
             </ul>
 
-            <h4><span class="badge">4</span> <span style="vertical-align:middle;">导出数据</span></h4>
+            <h4><span class="badge">5</span> <span style="vertical-align:middle;">导出数据</span></h4>
             <ul>
-                <li>点击<strong>「导出」</strong>按钮，将当前列表数据导出为 CSV 文件</li>
+                <li>点击<strong>「导出」</strong>按钮，将当前查询结果导出为 CSV 文件</li>
                 <li>产品编号按<strong>完整值</strong>导出（非省略显示）；仅导出当前标签页筛选后的可见数据</li>
             </ul>
         </div>

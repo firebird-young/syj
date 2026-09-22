@@ -1,502 +1,540 @@
 ﻿﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-  <title>钱包管理</title>
-  <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>钱包管理 · 深艺交管理后台</title>
+<link rel="stylesheet" href="asset/admin-sidebar.css">
+<style>
+    :root {
+        --accent: #1a78ff;
+        --accent-hover: #0f6ae8;
+        --accent-bg: #e6f4ff;
+        --green: #1aab67;
+        --green-bg: #e8f7ef;
+        --ink: #1d1d1f;
+        --ink-muted: #3f424b;
+        --ink-subtle: #86868b;
+        --ink-faint: #9ba6b9;
+        --border: #e0e0e0;
+        --page-bg: #f5f5f7;
+        --radius-pill: 9999px;
+        --radius-card: 18px;
+        --radius-sm: 6px;
+        --shadow-card: 0 0 0 1px rgba(0,0,0,.06);
+        --font: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
-      background: #f0f2f5;
-      color: #1a1a2e;
-      font-size: 14px;
+        font-family: var(--font);
+        background: var(--page-bg);
+        min-height: 100vh;
+        color: var(--ink);
+        font-size: 14px;
+        -webkit-font-smoothing: antialiased;
     }
 
-    /* 顶部 */
-    .topbar {
-      background: #fff;
-      height: 56px;
-      display: flex;
-      align-items: center;
-      padding: 0 20px;
-      border-bottom: 1px solid #f0f0f0;
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
-    .topbar-left { display: flex; align-items: center; gap: 16px; }
-    .menu-btn {
-      width: 32px; height: 32px;
-      border: 1px solid #d0d5dd;
-      border-radius: 4px;
-      background: #fff;
-      color: #6b7588;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-    }
-    .menu-btn:hover { background: #f5f5f7; }
-    .breadcrumb { font-size: 13px; color: #6b7588; }
-    .breadcrumb .active { color: #1a1a2e; }
-    .topbar-right {
-      margin-left: auto;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-    }
-    .topbar-right .avatar {
-      width: 32px; height: 32px;
-      border-radius: 50%;
-      background: #f5deb3;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 16px;
-    }
-    .topbar-right .name { font-size: 13px; }
-    .topbar-right .arrow { color: #9ba6b9; font-size: 12px; }
+    /* 面包屑 */
+    .breadcrumb { padding: 16px 24px 0; font-size: 13px; color: var(--ink-subtle); }
+    .breadcrumb a { color: var(--ink-subtle); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--accent); }
+    .breadcrumb .sep { color: #c0c8d4; }
+    .breadcrumb .current { color: var(--ink); font-weight: 500; }
 
     /* 内容区 */
-    .container { padding: 16px; }
-
-    /* 内容头部 */
-    .content-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
+    .main { padding: 16px 24px 40px; }
+    .page-header {
+        display: flex; align-items: center; justify-content: space-between;
+        gap: 16px; margin: 4px 0 16px; flex-wrap: wrap;
     }
-    .content-title { font-size: 18px; font-weight: 600; color: #1a1a2e; }
+    .page-header h2 { font-size: 20px; font-weight: 600; }
+    .page-header .hint { font-size: 13px; color: var(--ink-subtle); margin-top: 6px; }
+
+    /* 按钮 */
     .btn {
-      height: 32px;
-      padding: 0 18px;
-      border-radius: 4px;
-      font-size: 13px;
-      cursor: pointer;
-      border: none;
+        height: 34px; padding: 0 18px; border-radius: var(--radius-pill);
+        font-size: 13px; cursor: pointer; border: none; font-family: inherit; font-weight: 500;
+        display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
     }
-    .btn-primary { background: #1a78ff; color: #fff; }
-    .btn-primary:hover { background: #0f6ae8; }
+    .btn.sm { height: 30px; padding: 0 14px; font-size: 12px; }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-outline { background: #fff; color: var(--accent); border: 1px solid var(--accent); }
+    .btn-outline:hover { background: var(--accent-bg); }
+    .btn-ghost { background: #fff; color: var(--ink-muted); border: 1px solid var(--border); }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
 
-    /* 表格 */
-    .table-card {
-      background: #fff;
-      border-radius: 6px;
-      overflow: hidden;
+    /* 表格卡片 */
+    .table-wrap {
+        background: #fff; border-radius: var(--radius-card);
+        box-shadow: var(--shadow-card); overflow: hidden;
     }
-    .table {
-      width: 100%;
-      border-collapse: collapse;
+    .table-head {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 16px 24px; border-bottom: 1px solid #f0f1f4; flex-wrap: wrap; gap: 8px;
     }
+    .table-head .th-title { font-size: 14px; font-weight: 600; }
+    .table-head .th-extra { font-size: 12px; color: var(--ink-subtle); }
+    .table-scroll { overflow-x: auto; }
+    .table { width: 100%; border-collapse: collapse; min-width: 860px; }
     .table th {
-      background: #fafbfc;
-      padding: 12px 16px;
-      text-align: left;
-      font-size: 13px;
-      color: #4e5a6e;
-      font-weight: 500;
-      border-bottom: 1px solid #f0f0f0;
+        background: #fafafc; padding: 14px 16px; text-align: left;
+        font-size: 12px; color: var(--ink-subtle); font-weight: 600;
+        border-bottom: 1px solid var(--border); white-space: nowrap;
     }
-    .table td {
-      padding: 14px 16px;
-      font-size: 13px;
-      color: #1a1a2e;
-      border-bottom: 1px solid #f5f5f7;
-    }
+    .table td { padding: 13px 16px; font-size: 13px; color: var(--ink); border-bottom: 1px solid #f5f5f5; vertical-align: middle; }
     .table tr:last-child td { border-bottom: none; }
-    .table .logo-cell { width: 50px; }
-    .table .action-cell { text-align: right; }
+    .table tr:hover td { background: #fafbff; }
+    .table .seq { color: var(--ink-faint); width: 44px; text-align: center; }
 
     .logo-img {
-      width: 36px; height: 36px;
-      border-radius: 6px;
-      object-fit: cover;
-      display: block;
+        width: 36px; height: 36px; border-radius: var(--radius-sm);
+        object-fit: cover; display: block;
     }
+    .name-cell b { font-weight: 600; }
+    .name-cell .sub { font-size: 12px; color: var(--ink-faint); margin-top: 2px; }
 
-    .btn-edit {
-      padding: 4px 12px;
-      background: #e8f5e9;
-      color: #4caf50;
-      border: none;
-      border-radius: 4px;
-      font-size: 12px;
-      cursor: pointer;
-    }
-    .btn-edit:hover { background: #c8e6c9; }
-    .btn-view {
-      padding: 4px 12px;
-      background: #fff;
-      color: #666;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      font-size: 12px;
-      cursor: pointer;
-    }
-    .btn-view:hover { background: #f5f5f5; }
+    .status-tag { display: inline-block; padding: 2px 10px; border-radius: var(--radius-pill); font-size: 12px; }
+    .status-tag.on { background: var(--green-bg); color: var(--green); }
+    .status-tag.off { background: #fdecee; color: #e74c5e; }
 
-    /* 开关 */
-    .toggle-switch {
-      display: inline-block;
-      width: 40px; height: 22px;
-      background: #e0e0e0;
-      border-radius: 11px;
-      position: relative;
-      cursor: pointer;
-      transition: background 0.3s;
-      vertical-align: middle;
-    }
-    .toggle-switch.on { background: #52c41a; }
-    .toggle-switch::after {
-      content: '';
-      position: absolute;
-      width: 18px; height: 18px;
-      background: #fff;
-      border-radius: 50%;
-      top: 2px; left: 2px;
-      transition: left 0.3s;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-    }
-    .toggle-switch.on::after { left: 20px; }
+    .actions { display: flex; align-items: center; gap: 12px; white-space: nowrap; }
+    .actions a { color: var(--accent); cursor: pointer; text-decoration: none; font-size: 13px; }
+    .actions a:hover { text-decoration: underline; }
 
-    /* 弹窗 */
-    .modal-overlay {
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,0.5);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
+    /* 启用/停用开关 */
+    .stop-item {
+        display: inline-flex; align-items: center; gap: 6px;
+        font-size: 12px; color: var(--ink-subtle); cursor: pointer; white-space: nowrap; user-select: none;
     }
-    .modal-overlay.show { display: flex; }
-    .modal-box {
-      background: #fff;
-      border-radius: 6px;
-      width: 90%;
-      max-width: 600px;
-      max-height: 90vh;
-      overflow-y: auto;
+    .switch { position: relative; display: inline-block; width: 36px; height: 20px; flex-shrink: 0; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .switch .slider {
+        position: absolute; cursor: pointer; inset: 0;
+        background: #d4d7de; border-radius: var(--radius-pill); transition: 0.2s;
     }
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 16px 20px;
-      border-bottom: 1px solid #e8e8e8;
+    .switch .slider::before {
+        content: ''; position: absolute; height: 14px; width: 14px; left: 3px; top: 3px;
+        background: #fff; border-radius: 50%; transition: 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,.2);
     }
-    .modal-title { font-size: 16px; font-weight: 600; }
-    .modal-close {
-      font-size: 20px; color: #999;
-      cursor: pointer; padding: 0 8px;
-    }
-    .modal-close:hover { color: #666; }
-    .modal-body { padding: 20px; }
-    .modal-footer {
-      display: flex;
-      justify-content: flex-end;
-      gap: 12px;
-      padding: 16px 20px;
-      border-top: 1px solid #e8e8e8;
-    }
+    .switch input:checked + .slider { background: var(--green); }
+    .switch input:checked + .slider::before { transform: translateX(16px); }
 
-    .form-group { margin-bottom: 20px; }
-    .form-label { display: block; font-size: 14px; color: #666; margin-bottom: 8px; }
+    .table-foot {
+        padding: 14px 24px; display: flex; align-items: center; justify-content: flex-end;
+        gap: 8px; font-size: 13px; color: var(--ink-muted); border-top: 1px solid #f0f1f4;
+    }
+    .page-btn {
+        min-width: 28px; height: 28px; padding: 0 10px;
+        border: 1px solid var(--border); border-radius: var(--radius-pill);
+        background: #fff; color: var(--ink-muted); font-size: 12px; cursor: pointer; font-family: inherit;
+    }
+    .page-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+    /* 浮层通用 */
+    .mask { position: fixed; inset: 0; background: rgba(0,0,0,.4); display: none; z-index: 1000; }
+    .mask.show { display: block; }
+
+    /* 新增/修改/查看钱包浮层 */
+    .w-modal {
+        position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
+        background: #fff; border-radius: var(--radius-card); box-shadow: 0 8px 40px rgba(0,0,0,.2);
+        width: 640px; max-width: 94vw; max-height: 90vh; overflow-y: auto; z-index: 1001; display: none;
+    }
+    .w-modal.show { display: block; }
+    .w-header { padding: 18px 24px; border-bottom: 1px solid #f0f1f4; display: flex; align-items: center; justify-content: space-between; }
+    .w-title { font-size: 16px; font-weight: 600; }
+    .md-close {
+        width: 28px; height: 28px; border-radius: 50%; background: #f5f5f7;
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer; font-size: 14px; color: #666; border: none; flex-shrink: 0;
+    }
+    .md-close:hover { background: #e8e8e8; }
+    .w-body { padding: 20px 24px; }
+    .form-group { margin-bottom: 18px; }
+    .form-group:last-child { margin-bottom: 0; }
+    .form-label { display: block; font-size: 13px; color: var(--ink-muted); margin-bottom: 8px; }
+    .form-label .req { color: #e74c5e; margin-right: 2px; }
     .form-input {
-      width: 100%; padding: 10px 12px;
-      border: 1px solid #ddd; border-radius: 4px;
-      font-size: 14px; outline: none;
+        width: 100%; height: 38px; padding: 0 16px; border: 1px solid var(--border);
+        border-radius: var(--radius-sm); font-size: 14px; color: var(--ink); outline: none; font-family: inherit;
     }
-    .form-input:focus { border-color: #1a78ff; }
+    .form-input:focus { border-color: var(--accent); }
+    .form-input:disabled { background: #f5f5f7; color: var(--ink-subtle); cursor: not-allowed; }
 
     .logo-upload {
-      width: 100px; height: 100px;
-      border: 2px dashed #ddd;
-      border-radius: 8px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
+        width: 96px; height: 96px;
+        border: 2px dashed var(--border);
+        border-radius: var(--radius-card);
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        cursor: pointer; gap: 4px; overflow: hidden;
     }
-    .logo-upload:hover { border-color: #1a78ff; }
-    .logo-upload svg { width: 24px; height: 24px; color: #999; margin-bottom: 4px; }
-    .logo-upload span { font-size: 12px; color: #999; }
-    .logo-preview { width: 100px; height: 100px; border-radius: 8px; object-fit: cover; }
+    .logo-upload:hover { border-color: var(--accent); }
+    .logo-upload svg { width: 22px; height: 22px; color: var(--ink-faint); }
+    .logo-upload span { font-size: 12px; color: var(--ink-faint); }
+    .logo-upload.locked { pointer-events: none; }
+    .logo-preview { width: 96px; height: 96px; border-radius: var(--radius-card); object-fit: cover; display: block; }
+    .logo-tip { font-size: 12px; color: var(--ink-faint); margin-left: 14px; }
 
     .editor-toolbar {
-      display: flex; gap: 4px; padding: 8px;
-      background: #f8f9fa;
-      border: 1px solid #ddd; border-radius: 4px 4px 0 0;
-      flex-wrap: wrap;
+        display: flex; gap: 4px; padding: 6px 8px;
+        background: #fafafc; border: 1px solid var(--border);
+        border-radius: var(--radius-sm) var(--radius-sm) 0 0; flex-wrap: wrap;
     }
     .editor-toolbar button {
-      padding: 4px 8px; border: none; background: #fff;
-      border-radius: 4px; cursor: pointer; font-size: 12px; color: #666;
+        padding: 3px 10px; border: none; background: #fff;
+        border: 1px solid #f0f1f4; border-radius: var(--radius-sm);
+        cursor: pointer; font-size: 12px; color: var(--ink-muted); font-family: inherit;
     }
-    .editor-toolbar button:hover { background: #e8e8e8; }
+    .editor-toolbar button:hover { background: var(--accent-bg); color: var(--accent); border-color: var(--accent-bg); }
     .editor-content {
-      width: 100%; min-height: 150px;
-      padding: 12px;
-      border: 1px solid #ddd; border-top: none;
-      border-radius: 0 0 4px 4px;
-      font-size: 14px; outline: none;
+        width: 100%; min-height: 140px; padding: 12px 14px;
+        border: 1px solid var(--border); border-top: none;
+        border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+        font-size: 13px; outline: none; line-height: 1.7;
     }
+    .editor-content:focus { border-color: var(--accent); }
+    .w-footer { padding: 14px 24px; border-top: 1px solid #f0f1f4; display: flex; justify-content: flex-end; gap: 8px; }
 
-    .btn-default {
-      padding: 8px 16px;
-      background: #fff;
-      color: #666;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      font-size: 14px;
-      cursor: pointer;
-    }
-    .btn-default:hover { background: #f5f5f5; }
-    .btn-primary { background: #1a78ff; color: #fff; border: none; padding: 8px 16px; border-radius: 4px; font-size: 14px; cursor: pointer; }
-    .btn-primary:hover { background: #0f6ae8; }
-
-    /* 标注圆点 */
+    /* 标注圆点（功能说明序号） */
     .badge {
-      display: inline-block;
-      min-width: 18px;
-      height: 18px;
-      padding: 0 5px;
-      border-radius: 50%;
-      background: #ff2d55;
-      color: #fff;
-      font-size: 12px;
-      line-height: 18px;
-      text-align: center;
-      font-weight: 600;
-      box-shadow: 0 1px 3px rgba(255,45,85,0.3);
-    }
-    .badge.sm {
-      min-width: 16px;
-      height: 16px;
-      font-size: 11px;
-      line-height: 16px;
+        display: inline-block; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 50%;
+        background: #ff2d55; color: #fff; font-size: 12px; line-height: 18px;
+        text-align: center; font-weight: 600; box-shadow: 0 1px 3px rgba(255,45,85,0.3);
+        margin-left: 6px; vertical-align: middle;
     }
 
-    /* ── 功能说明浮窗 ── */
-    .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 520px; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 9999; padding: 24px; display: none; }
-    .f-modal.show { display: block; }
-    .f-modal .fm-title { font-size: 16px; font-weight: 600; color: #1a1a2e; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
-    .f-modal .fm-title:active { cursor: grabbing; }
-    .f-modal .fm-close { width: 28px; height: 28px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; color: #666; border: none; flex-shrink: 0; }
-    .f-modal .fm-close:hover { background: #e8e8e8; }
-    .f-modal .fm-body { font-size: 13px; color: #555; line-height: 1.8; }
-    .f-modal .fm-body h4 { font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 16px 0 8px; }
-    .f-modal .fm-body h4:first-child { margin-top: 0; }
-    .f-modal .fm-body ul { padding-left: 18px; margin: 0 0 12px; }
-    .f-modal .fm-body li { margin-bottom: 4px; }
-  </style>
+    /* ===== 右侧功能说明面板 ===== */
+    .func-panel {
+        position: fixed; top: 0; right: 0; bottom: 0;
+        width: 340px; z-index: 890;
+        background: #fff; border-left: 1px solid #e3e6eb;
+        box-shadow: -1px 0 12px rgba(20, 30, 60, 0.04);
+        display: flex; flex-direction: column;
+    }
+    .func-panel .fp-inner { display: flex; flex-direction: column; height: 100%; min-width: 0; }
+    .func-panel .fp-header {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 15px 14px 13px 18px; border-bottom: 1px solid #f0f1f4; flex-shrink: 0;
+    }
+    .func-panel .fp-title { display: flex; align-items: center; gap: 9px; font-size: 15px; font-weight: 700; color: #1d1d1f; }
+    .func-panel .fp-title::before {
+        content: ''; width: 8px; height: 8px; border-radius: 50%;
+        background: var(--accent); box-shadow: 0 0 0 4px rgba(26, 120, 255, 0.12);
+    }
+    .func-panel .fp-fold-btn {
+        width: 28px; height: 28px; border: 1px solid var(--border); background: #fff;
+        border-radius: 50%; color: var(--ink-subtle); font-size: 15px; line-height: 1;
+        cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+    }
+    .func-panel .fp-fold-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .func-panel .fp-body { flex: 1; overflow-y: auto; padding: 4px 18px 40px; font-size: 13px; color: #555; line-height: 1.9; }
+    .func-panel .fp-body::-webkit-scrollbar { width: 5px; }
+    .func-panel .fp-body::-webkit-scrollbar-thumb { background: #d8dce3; border-radius: 3px; }
+    .func-panel .fp-body h4 { font-size: 14px; font-weight: 600; color: #1d1d1f; margin: 18px 0 6px; }
+    .func-panel .fp-body h4:first-child { margin-top: 12px; }
+    .func-panel .fp-body ul { padding-left: 18px; margin: 0 0 8px; }
+    .func-panel .fp-body li { margin-bottom: 6px; }
+    .func-panel .fp-body strong { color: #333; }
+    .func-panel .fp-body .dim {
+        background: #fff8ec; border: 1px solid #f5d9a8; color: #a05a00;
+        border-radius: 8px; padding: 8px 12px; margin-bottom: 8px;
+    }
+    .func-panel .fp-role { font-size: 13px; font-weight: 600; color: #e74c5e; margin: 10px 0 -4px; }
+    .func-panel .fp-open {
+        display: none; position: absolute; top: 0; bottom: 0; left: 0; right: 0;
+        border: none; background: transparent; cursor: pointer;
+        writing-mode: vertical-rl; text-orientation: upright;
+        font-size: 13px; font-weight: 600; letter-spacing: 6px; color: var(--ink-subtle);
+        align-items: center; justify-content: center; font-family: inherit; transition: all 0.2s;
+    }
+    .func-panel .fp-open:hover { color: var(--accent); background: #fafbfc; }
+
+    @media (min-width: 1024px) {
+        .main, .breadcrumb { margin-right: 340px; }
+        body.fp-collapsed .main,
+        body.fp-collapsed .breadcrumb { margin-right: 40px; }
+        body.fp-collapsed .func-panel { width: 40px; }
+        body.fp-collapsed .fp-inner { display: none; }
+        body.fp-collapsed .fp-open { display: flex; }
+    }
+    @media (max-width: 1023.98px) {
+        .func-panel { display: none; }
+        .main, .breadcrumb { margin-right: 0; }
+    }
+</style>
 </head>
 <body>
 
-<div class="topbar">
-  <div class="topbar-left">
-    <button class="menu-btn">≡</button>
-    <div class="breadcrumb">
-      <span>首页</span> /
-      <span>系统管理</span> /
-      <span class="active">钱包管理</span>
-    </div>
-  </div>
-  <div class="topbar-right">
-    <button onclick="toggleFuncModal()" style="margin-right:12px;padding:6px 14px;border-radius:6px;background:#f5f7fa;color:#333;border:1px solid #e0e4ea;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:4px;">📖 功能说明</button>
-    <span class="avatar">👤</span>
-    <span class="name">系统参数设置</span>
-    <span class="arrow">▾</span>
-  </div>
+<div class="breadcrumb">
+    <a href="../index.html">首页</a><span class="sep"> / </span>
+    <a href="#">系统配置</a><span class="sep"> / </span>
+    <span class="current">钱包管理</span>
 </div>
 
-<div class="container">
-  <div class="content-header">
-    <div class="content-title">钱包管理</div>
-    <button class="btn btn-primary" onclick="openAddModal()">新增钱包</button>
-  </div>
-
-  <div class="table-card">
-    <table class="table">
-      <thead>
-        <tr>
-          <th>序号</th>
-          <th class="logo-cell">logo</th>
-          <th>钱包名称</th>
-          <th>创建时间</th>
-          <th class="action-cell">操作</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr data-id="1">
-          <td>1</td>
-          <td><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='30' cy='50' r='20' fill='%23ff6b6b'/%3E%3Ccircle cx='50' cy='35' r='15' fill='%234ecdc4'/%3E%3Ccircle cx='70' cy='50' r='18' fill='%23ffe66d'/%3E%3Ccircle cx='45' cy='65' r='12' fill='%2395e1d3'/%3E%3Ccircle cx='65' cy='68' r='10' fill='%23f38181'/%3E%3C/svg%3E" class="logo-img"></td>
-          <td>汇付钱包</td>
-          <td>2025-05-14 15:18:37</td>
-          <td class="action-cell">
-            <button class="btn-edit" onclick="editWallet(1)">修改</button>
-            <button class="btn-view" onclick="viewWallet(1)">查看</button>
-            <div class="toggle-switch on" onclick="toggleWallet(1)"></div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</div>
-
-<!-- 弹窗 -->
-<div class="modal-overlay" id="walletModal">
-  <div class="modal-box">
-    <div class="modal-header">
-      <div class="modal-title" id="modalTitle">新增钱包</div>
-      <div class="modal-close" onclick="closeModal()">×</div>
-    </div>
-    <div class="modal-body">
-      <input type="hidden" id="walletId">
-      <div class="form-group">
-        <label class="form-label">钱包名称</label>
-        <input class="form-input" id="walletName" placeholder="请输入">
-      </div>
-      <div class="form-group">
-        <label class="form-label">钱包平台logo</label>
-        <div id="logoUploadArea" class="logo-upload" onclick="document.getElementById('logoFile').click()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-          <span>上传</span>
+<div class="main">
+    <div class="page-header">
+        <div>
+            <h2>钱包管理</h2>
+            <div class="hint">维护平台接入的第三方支付钱包信息（logo、开通说明）与启停状态</div>
         </div>
-        <input type="file" id="logoFile" accept="image/*" style="display:none" onchange="handleLogoUpload(this)">
-      </div>
-      <div class="form-group">
-        <label class="form-label">开通说明</label>
-        <div class="editor-toolbar">
-          <button onclick="formatText('bold')"><strong>B</strong></button>
-          <button onclick="formatText('italic')"><em>I</em></button>
-          <button onclick="formatText('underline')"><u>U</u></button>
-          <button onclick="formatText('strikeThrough')"><s>S</s></button>
-          <button onclick="formatText('insertUnorderedList')">☰</button>
-          <button onclick="formatText('insertOrderedList')">☷</button>
-          <button onclick="formatText('justifyLeft')">↵</button>
-          <button onclick="formatText('justifyCenter')">↔</button>
-          <button onclick="formatText('justifyRight')">↪</button>
+        <button class="btn btn-primary" onclick="openWalletModal('add')">＋ 新增钱包</button>
+    </div>
+
+    <!-- 钱包列表 -->
+    <section class="table-wrap">
+        <div class="table-head">
+            <span class="th-title">钱包列表<span class="badge">1</span></span>
+            <span class="th-extra">停用的钱包将不在 C 端开通入口中展示</span>
         </div>
-        <div class="editor-content" id="openDesc" contenteditable="true"></div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn-default" onclick="closeModal()">取消</button>
-      <button class="btn-primary" onclick="saveWallet()">发放</button>
-    </div>
-  </div>
+        <div class="table-scroll">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th class="seq">序号</th>
+                        <th>logo</th>
+                        <th>钱包名称</th>
+                        <th>创建时间</th>
+                        <th>状态</th>
+                        <th style="width:300px;">操作</th>
+                    </tr>
+                </thead>
+                <tbody id="walletBody"></tbody>
+            </table>
+        </div>
+        <div class="table-foot">
+            <span id="totalCount">共 1 条</span>
+            <button class="page-btn">‹</button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn">›</button>
+        </div>
+    </section>
 </div>
+
+<!-- ====== 新增/修改/查看钱包浮层 ====== -->
+<div class="mask" id="wMask" onclick="closeWalletModal()"></div>
+<div class="w-modal" id="wModal">
+    <div class="w-header">
+        <span class="w-title" id="wTitle">新增钱包</span>
+        <button class="md-close" onclick="closeWalletModal()">✕</button>
+    </div>
+    <div class="w-body">
+        <input type="hidden" id="wId">
+        <div class="form-group">
+            <label class="form-label"><span class="req">*</span>钱包名称</label>
+            <input class="form-input" id="wName" placeholder="请输入钱包名称，如：汇付钱包">
+        </div>
+        <div class="form-group">
+            <label class="form-label">钱包平台 logo</label>
+            <div style="display:flex;align-items:center;">
+                <div id="logoUploadArea" class="logo-upload" onclick="document.getElementById('logoFile').click()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    <span>上传</span>
+                </div>
+                <span class="logo-tip">建议上传正方形图片，将在用户开通钱包时展示</span>
+            </div>
+            <input type="file" id="logoFile" accept="image/*" style="display:none" onchange="handleLogoUpload(this)">
+        </div>
+        <div class="form-group">
+            <label class="form-label">开通说明</label>
+            <div class="editor-toolbar">
+                <button type="button" onclick="formatText('bold')"><strong>B</strong></button>
+                <button type="button" onclick="formatText('italic')"><em>I</em></button>
+                <button type="button" onclick="formatText('underline')"><u>U</u></button>
+                <button type="button" onclick="formatText('strikeThrough')"><s>S</s></button>
+                <button type="button" onclick="formatText('insertUnorderedList')">☰</button>
+                <button type="button" onclick="formatText('insertOrderedList')">☷</button>
+                <button type="button" onclick="formatText('justifyLeft')">↵</button>
+                <button type="button" onclick="formatText('justifyCenter')">↔</button>
+                <button type="button" onclick="formatText('justifyRight')">↪</button>
+            </div>
+            <div class="editor-content" id="wDesc" contenteditable="true"></div>
+        </div>
+    </div>
+    <div class="w-footer">
+        <button class="btn btn-ghost" id="wBtnCancel" onclick="closeWalletModal()">取 消</button>
+        <button class="btn btn-primary" id="wBtnSave" onclick="saveWallet()">保 存</button>
+    </div>
+</div>
+
+<!-- ====== 右侧功能说明 ====== -->
+<aside class="func-panel">
+    <div class="fp-inner">
+        <div class="fp-header">
+            <div class="fp-title">功能说明</div>
+            <button class="fp-fold-btn" onclick="toggleFuncPanel()">›</button>
+        </div>
+        <div class="fp-body">
+            <div class="fp-role">平台 · 系统配置</div>
+            <h4><span class="badge">1</span> <span style="vertical-align:middle;">钱包列表</span></h4>
+            <ul>
+                <li>展示平台已接入的第三方支付钱包：<strong>logo、钱包名称、创建时间、启停状态</strong></li>
+                <li>钱包状态以标签展示：<strong>启用</strong>（绿）/ <strong>停用</strong>（红）</li>
+            </ul>
+            <h4><span class="badge">2</span> <span style="vertical-align:middle;">新增 / 修改钱包</span></h4>
+            <ul>
+                <li>点击右上角<strong>新增钱包</strong>或操作列<strong>修改</strong>，打开钱包编辑弹窗</li>
+                <li>填写<strong>钱包名称</strong>（必填）、上传<strong>平台 logo</strong>、编辑<strong>开通说明</strong>（支持富文本：加粗 / 斜体 / 列表 / 对齐等）</li>
+                <li>开通说明将在用户侧<strong>开通该钱包</strong>时展示</li>
+            </ul>
+            <h4><span class="badge">3</span> <span style="vertical-align:middle;">查看钱包</span></h4>
+            <ul>
+                <li>点击操作列<strong>查看</strong>，以<strong>只读模式</strong>打开弹窗：名称、logo、开通说明均不可编辑</li>
+            </ul>
+            <h4><span class="badge">4</span> <span style="vertical-align:middle;">启用 / 停用</span></h4>
+            <ul>
+                <li>操作列开关切换钱包<strong>启用 / 停用</strong>，切换后列表状态标签实时更新</li>
+                <li><strong>停用</strong>的钱包不再出现在 C 端开通入口，已开通用户不受影响</li>
+            </ul>
+        </div>
+    </div>
+    <button class="fp-open" onclick="toggleFuncPanel()">功能说明</button>
+</aside>
 
 <script>
-  function navigateTo(url) { window.location.href = url; }
-  function openAddModal() {
-    document.getElementById('modalTitle').textContent = '新增钱包';
-    document.getElementById('walletId').value = '';
-    document.getElementById('walletName').value = '';
-    document.getElementById('logoUploadArea').innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><span>上传</span>';
-    document.getElementById('logoUploadArea').className = 'logo-upload';
-    document.getElementById('openDesc').innerHTML = '';
-    document.getElementById('walletModal').classList.add('show');
-  }
-  function editWallet(id) {
-    openAddModal();
-    document.getElementById('modalTitle').textContent = '修改钱包';
-    document.getElementById('walletId').value = id;
-    if (id === 1) {
-      document.getElementById('walletName').value = '汇付钱包';
-      document.getElementById('openDesc').innerHTML = '<p>汇付钱包是第三方支付平台，支持多种支付方式。</p>';
+/* ================= 钱包数据 ================= */
+var DEFAULT_LOGO_SVG = 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Ccircle cx=\'30\' cy=\'50\' r=\'20\' fill=\'%23ff6b6b\'/%3E%3Ccircle cx=\'50\' cy=\'35\' r=\'15\' fill=\'%234ecdc4\'/%3E%3Ccircle cx=\'70\' cy=\'50\' r=\'18\' fill=\'%23ffe66d\'/%3E%3Ccircle cx=\'45\' cy=\'65\' r=\'12\' fill=\'%2395e1d3\'/%3E%3Ccircle cx=\'65\' cy=\'68\' r=\'10\' fill=\'%23f38181\'/%3E%3C/svg%3E';
+var UPLOAD_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><span>上传</span>';
+
+var wallets = [
+    {
+        id: 1,
+        name: '汇付钱包',
+        logo: DEFAULT_LOGO_SVG,
+        time: '2025-05-14 15:18:37',
+        desc: '<p>汇付钱包是第三方支付平台，支持多种支付方式。</p>',
+        enabled: true
     }
-  }
-  function viewWallet(id) {
-    editWallet(id);
-    document.getElementById('modalTitle').textContent = '查看钱包';
-    document.getElementById('walletName').disabled = true;
-    document.getElementById('logoUploadArea').style.pointerEvents = 'none';
-    document.getElementById('openDesc').contentEditable = false;
-  }
-  function closeModal() {
-    document.getElementById('walletModal').classList.remove('show');
-    document.getElementById('walletName').disabled = false;
-    document.getElementById('logoUploadArea').style.pointerEvents = '';
-    document.getElementById('openDesc').contentEditable = true;
-  }
-  function handleLogoUpload(input) {
+];
+
+/* ================= 渲染 ================= */
+function renderTable() {
+    var html = '';
+    wallets.forEach(function (w, i) {
+        html += '<tr>' +
+            '<td class="seq">' + (i + 1) + '</td>' +
+            '<td><img src="' + w.logo + '" class="logo-img" alt="logo"></td>' +
+            '<td class="name-cell"><b>' + w.name + '</b><div class="sub">第三方支付钱包</div></td>' +
+            '<td>' + w.time + '</td>' +
+            '<td><span class="status-tag ' + (w.enabled ? 'on' : 'off') + '">' + (w.enabled ? '启用' : '停用') + '</span></td>' +
+            '<td class="actions">' +
+            '  <a onclick="openWalletModal(\'edit\', ' + w.id + ')">修改' + (i === 0 ? '<span class="badge">2</span>' : '') + '</a>' +
+            '  <a onclick="openWalletModal(\'view\', ' + w.id + ')">查看' + (i === 0 ? '<span class="badge">3</span>' : '') + '</a>' +
+            '  <label class="stop-item"><span class="switch"><input type="checkbox"' + (w.enabled ? ' checked' : '') + ' onchange="toggleWallet(' + w.id + ')"><span class="slider"></span></span>启用' + (i === 0 ? '<span class="badge">4</span>' : '') + '</label>' +
+            '</td>' +
+            '</tr>';
+    });
+    document.getElementById('walletBody').innerHTML = html;
+    document.getElementById('totalCount').textContent = '共 ' + wallets.length + ' 条';
+}
+
+function findWallet(id) {
+    for (var i = 0; i < wallets.length; i++) {
+        if (wallets[i].id === id) return wallets[i];
+    }
+    return null;
+}
+
+/* ================= 新增 / 修改 / 查看 ================= */
+var wMode = 'add';
+
+function openWalletModal(mode, id) {
+    wMode = mode;
+    var w = id ? findWallet(id) : null;
+    var isView = (mode === 'view');
+    document.getElementById('wTitle').textContent = mode === 'add' ? '新增钱包' : (mode === 'edit' ? '修改钱包' : '查看钱包');
+    document.getElementById('wId').value = w ? w.id : '';
+    document.getElementById('wName').value = w ? w.name : '';
+    document.getElementById('wName').disabled = isView;
+    document.getElementById('wDesc').innerHTML = w ? (w.desc || '') : '';
+    document.getElementById('wDesc').contentEditable = !isView;
+
+    var area = document.getElementById('logoUploadArea');
+    if (w && w.logo) {
+        area.innerHTML = '<img src="' + w.logo + '" class="logo-preview" alt="logo预览">';
+        area.className = 'logo-upload';
+    } else {
+        area.innerHTML = UPLOAD_ICON;
+        area.className = 'logo-upload';
+    }
+    if (isView) { area.classList.add('locked'); }
+
+    document.getElementById('wBtnSave').style.display = isView ? 'none' : 'inline-flex';
+    document.getElementById('wBtnCancel').textContent = isView ? '关 闭' : '取 消';
+
+    document.getElementById('wMask').classList.add('show');
+    document.getElementById('wModal').classList.add('show');
+    if (!isView) { document.getElementById('wName').focus(); }
+}
+
+function closeWalletModal() {
+    document.getElementById('wMask').classList.remove('show');
+    document.getElementById('wModal').classList.remove('show');
+}
+
+function handleLogoUpload(input) {
     var file = input.files[0];
     if (!file) return;
     var reader = new FileReader();
-    reader.onload = function(e) {
-      var area = document.getElementById('logoUploadArea');
-      area.innerHTML = '<img src="' + e.target.result + '" class="logo-preview">';
-      area.className = '';
+    reader.onload = function (e) {
+        var area = document.getElementById('logoUploadArea');
+        area.innerHTML = '<img src="' + e.target.result + '" class="logo-preview" alt="logo预览">';
     };
     reader.readAsDataURL(file);
-  }
-  function formatText(command) { document.execCommand(command, false, null); }
-  function saveWallet() {
-    var name = document.getElementById('walletName').value.trim();
-    if (!name) { alert('请输入钱包名称'); return; }
-    alert('钱包信息已保存');
-    closeModal();
-  }
-  function toggleWallet(id) {
-    var row = document.querySelector('tr[data-id="' + id + '"]');
-    var toggle = row.querySelector('.toggle-switch');
-    toggle.classList.toggle('on');
-  }
-</script>
-
-<!-- ====== 功能说明浮窗 ====== -->
-<div class="f-modal" id="funcModal">
-  <div class="fm-title">
-    <span>📖 功能说明</span>
-    <button class="fm-close" onclick="toggleFuncModal()">✕</button>
-  </div>
-  <div style="font-size:13px;font-weight:600;color:#e74c5e;margin:-6px 0 12px;">平台</div>
-  <div class="fm-body">
-    <p style="margin:0 0 12px;color:#666">钱包管理：用于平台维护第三方支付钱包信息（汇付钱包）。</p>
-    <h4>一、钱包列表</h4>
-    <ul>
-      <li>展示钱包的<b>logo、钱包名称、创建时间</b></li>
-      <li>每条记录支持<b>修改、查看</b>，并可<b>启用/停用</b>（开关切换）</li>
-    </ul>
-    <h4>二、新增/修改钱包</h4>
-    <ul>
-      <li>点击「新增钱包」或「修改」打开弹窗</li>
-      <li>填写<b>钱包名称</b>、上传<b>logo</b>、编辑<b>开通说明</b>（富文本）</li>
-    </ul>
-  </div>
-</div>
-
-<script>
-function toggleFuncModal() {
-  var el = document.getElementById('funcModal');
-  el.classList.toggle('show');
-  if (el.classList.contains('show') && !el.dataset.dragged) {
-    el.style.left = '50%'; el.style.top = '50%'; el.style.transform = 'translate(-50%,-50%)';
-  }
 }
-(function() {
-  var modal, titleBar, offX, offY, dragging = false;
-  document.addEventListener('DOMContentLoaded', function() {
-    modal = document.getElementById('funcModal');
-    titleBar = modal.querySelector('.fm-title');
-    titleBar.addEventListener('mousedown', startDrag);
-    titleBar.addEventListener('touchstart', startDragTouch, {passive:true});
-    document.addEventListener('mousemove', onDrag);
-    document.addEventListener('mouseup', endDrag);
-    document.addEventListener('touchmove', onDragTouch, {passive:true});
-    document.addEventListener('touchend', endDrag);
-  });
-  function startDrag(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = e.clientX - rect.left; offY = e.clientY - rect.top; dragging = true; titleBar.style.cursor = 'grabbing'; }
-  function startDragTouch(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; var t = e.touches[0]; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = t.clientX - rect.left; offY = t.clientY - rect.top; dragging = true; }
-  function onDrag(e) { if (!dragging) return; modal.style.left = (e.clientX - offX) + 'px'; modal.style.top = (e.clientY - offY) + 'px'; }
-  function onDragTouch(e) { if (!dragging) return; var t = e.touches[0]; modal.style.left = (t.clientX - offX) + 'px'; modal.style.top = (t.clientY - offY) + 'px'; }
-  function endDrag() { dragging = false; if (titleBar) titleBar.style.cursor = 'grab'; }
-})();
-</script>
 
+function formatText(command) { document.execCommand(command, false, null); }
+
+function saveWallet() {
+    var name = document.getElementById('wName').value.trim();
+    if (!name) { alert('请输入钱包名称'); return; }
+    var id = document.getElementById('wId').value;
+    var logoImg = document.querySelector('#logoUploadArea .logo-preview');
+    var desc = document.getElementById('wDesc').innerHTML;
+    if (wMode === 'edit' && id) {
+        var w = findWallet(parseInt(id, 10));
+        if (w) {
+            w.name = name;
+            if (logoImg) { w.logo = logoImg.getAttribute('src'); }
+            w.desc = desc;
+        }
+    } else if (wMode === 'add') {
+        var maxId = 0;
+        wallets.forEach(function (o) { if (o.id > maxId) maxId = o.id; });
+        var now = new Date();
+        function pad(n) { return n < 10 ? '0' + n : '' + n; }
+        wallets.push({
+            id: maxId + 1,
+            name: name,
+            logo: logoImg ? logoImg.getAttribute('src') : DEFAULT_LOGO_SVG,
+            time: now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate()) + ' ' + pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds()),
+            desc: desc,
+            enabled: true
+        });
+    }
+    renderTable();
+    closeWalletModal();
+    alert((wMode === 'add' ? '新增' : '修改') + '钱包「' + name + '」成功');
+}
+
+/* ── 启用 / 停用 ── */
+function toggleWallet(id) {
+    var w = findWallet(id);
+    if (!w) return;
+    w.enabled = !w.enabled;
+    renderTable();
+    if (!w.enabled) {
+        alert('已停用「' + w.name + '」\n停用后该钱包不再出现在 C 端开通入口，已开通用户不受影响');
+    }
+}
+
+/* ── 右侧功能说明面板：收起 / 展开 ── */
+function toggleFuncPanel() {
+    document.body.classList.toggle('fp-collapsed');
+}
+
+renderTable();
+</script>
+<script src="asset/admin-sidebar.js"></script>
 </body>
 </html>

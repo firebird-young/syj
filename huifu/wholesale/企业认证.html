@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>企业认证 · 深艺交批发商工作台</title>
+<link rel="stylesheet" href="asset/admin-sidebar.css">
+<style>
+    :root {
+        --accent: #1a78ff;
+        --accent-hover: #0f6ae8;
+        --accent-bg: #e6f4ff;
+        --green: #1aab67;
+        --orange: #e67e22;
+        --red: #e74c5e;
+        --ink: #1d1d1f;
+        --ink-muted: #3f424b;
+        --ink-subtle: #86868b;
+        --ink-faint: #9ba6b9;
+        --border: #e0e0e0;
+        --page-bg: #f5f5f7;
+        --radius-pill: 9999px;
+        --radius-card: 18px;
+        --radius-sm: 8px;
+        --shadow-card: 0 0 0 1px rgba(0,0,0,.06);
+        --font: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        font-family: var(--font);
+        background: var(--page-bg);
+        min-height: 100vh;
+        color: var(--ink);
+        font-size: 14px;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── 页面结构：左侧公用目录（asset/admin-sidebar.js 注入）+ 中间内容 + 右侧功能说明 ── */
+
+    /* 面包屑 */
+    .breadcrumb { padding: 16px 24px 0; font-size: 13px; color: var(--ink-subtle); }
+    .breadcrumb .sep { color: #c0c8d4; }
+    .breadcrumb .current { color: var(--ink); font-weight: 500; }
+
+    /* 内容区 */
+    .main { padding: 16px 24px 40px; }
+    .page-header {
+        display: flex; align-items: center; justify-content: space-between;
+        gap: 16px; margin: 4px 0 16px; flex-wrap: wrap;
+    }
+    .page-header h2 { font-size: 20px; font-weight: 600; }
+    .page-header .hint { font-size: 13px; color: var(--ink-subtle); }
+
+    /* ── 步骤条 ── */
+    .steps-card {
+        background: #fff; border-radius: var(--radius-card);
+        box-shadow: var(--shadow-card); padding: 18px 24px;
+        display: flex; align-items: center; justify-content: center;
+        flex-wrap: wrap; margin-bottom: 16px;
+    }
+    .step { display: flex; align-items: center; gap: 8px; }
+    .step-dot {
+        width: 26px; height: 26px; border-radius: 50%;
+        background: #f0f1f4; color: var(--ink-subtle);
+        font-size: 13px; font-weight: 600;
+        display: inline-flex; align-items: center; justify-content: center;
+    }
+    .step-label { font-size: 13px; color: var(--ink-subtle); white-space: nowrap; }
+    .step.active .step-dot { background: var(--accent); color: #fff; }
+    .step.active .step-label { color: var(--accent); font-weight: 600; }
+    .step.done .step-dot { background: var(--green); color: #fff; }
+    .step.done .step-label { color: var(--green); }
+    .step-line { width: 90px; height: 2px; background: #eceef2; margin: 0 14px; }
+
+    /* ── 表单卡片 ── */
+    .form-card {
+        background: #fff; border-radius: var(--radius-card);
+        box-shadow: var(--shadow-card); margin-bottom: 16px; overflow: hidden;
+    }
+    .form-card .fc-head {
+        display: flex; align-items: center; gap: 10px;
+        padding: 16px 24px; border-bottom: 1px solid #f0f1f4;
+    }
+    .form-card .fc-head::before {
+        content: ''; width: 4px; height: 16px; border-radius: 2px;
+        background: var(--accent); flex-shrink: 0;
+    }
+    .form-card .fc-head .title { font-size: 15px; font-weight: 600; }
+    .form-card .fc-head .desc { font-size: 12px; color: var(--ink-subtle); margin-left: 4px; }
+    .form-card .fc-body { padding: 22px 24px 4px; }
+
+    .form-row { display: flex; align-items: center; margin-bottom: 18px; }
+    .form-row.upload-row { align-items: flex-start; }
+    .form-label {
+        width: 180px; flex-shrink: 0; text-align: right; padding-right: 14px;
+        font-size: 13px; color: var(--ink-muted);
+    }
+    .form-label .required { color: var(--red); margin-right: 2px; }
+    .help-tip {
+        display: inline-flex; width: 14px; height: 14px; border-radius: 50%;
+        background: #c9d2e0; color: #fff; font-size: 10px; font-weight: 700;
+        align-items: center; justify-content: center; margin-left: 6px;
+        cursor: help; vertical-align: middle;
+    }
+    .form-control { flex: 1; max-width: 560px; min-width: 0; }
+    .form-input, .form-select {
+        width: 100%; height: 36px; padding: 0 14px;
+        border: 1px solid var(--border); border-radius: var(--radius-pill);
+        font-size: 13px; color: var(--ink); background: #fff;
+        outline: none; font-family: inherit;
+    }
+    .form-select { padding: 0 12px; }
+    .form-input:focus, .form-select:focus { border-color: var(--accent); }
+    .form-input[readonly] { background: #f5f7fa; color: var(--accent); }
+    .form-input[readonly]:focus { border-color: var(--border); }
+    .field-note { font-size: 12px; color: var(--ink-faint); margin-top: 6px; }
+
+    /* 上传区 */
+    .upload-box {
+        width: 100%; max-width: 560px; height: 140px;
+        border: 1px dashed var(--border); border-radius: 12px;
+        background: #fafbfc; cursor: pointer; position: relative;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        text-align: center; transition: border-color .2s;
+    }
+    .upload-box:hover { border-color: var(--accent); }
+    .upload-icon { font-size: 30px; color: #c0c8d4; margin-bottom: 8px; line-height: 1; }
+    .upload-text { font-size: 13px; color: var(--ink-muted); }
+    .upload-text .link { color: var(--accent); }
+    .upload-tip { font-size: 12px; color: var(--ink-faint); margin-top: 6px; }
+    .upload-input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+
+    /* 日期输入（年/月/日） */
+    .date-wrap { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .date-input {
+        height: 36px; padding: 0 12px; text-align: center;
+        border: 1px solid var(--border); border-radius: var(--radius-pill);
+        font-size: 13px; color: var(--ink); background: #fff;
+        outline: none; font-family: inherit;
+    }
+    .date-input:focus { border-color: var(--accent); }
+    .date-input.year { width: 84px; }
+    .date-input.md { width: 64px; }
+    .date-input[readonly] { background: #f5f7fa; color: var(--accent); }
+    .date-sep { color: var(--ink-faint); font-size: 14px; }
+    .permanent-label {
+        display: flex; align-items: center; gap: 5px; margin-left: 8px;
+        font-size: 13px; color: var(--ink-muted); cursor: pointer;
+    }
+    .permanent-label input[type="checkbox"] { accent-color: var(--accent); cursor: pointer; }
+
+    /* 提交栏 */
+    .submit-bar {
+        background: #fff; border-radius: var(--radius-card);
+        box-shadow: var(--shadow-card); padding: 22px 24px;
+        display: flex; flex-direction: column; align-items: center; gap: 10px;
+    }
+    .btn-submit {
+        height: 40px; padding: 0 52px; border: none; border-radius: var(--radius-pill);
+        background: var(--accent); color: #fff; font-size: 14px; font-weight: 500;
+        cursor: pointer; font-family: inherit;
+    }
+    .btn-submit:hover { background: var(--accent-hover); }
+    .submit-bar .tip { font-size: 12px; color: var(--ink-faint); }
+
+    /* 标注圆点 */
+    .badge {
+        display: inline-block; min-width: 18px; height: 18px; padding: 0 5px;
+        border-radius: 50%; background: #ff2d55; color: #fff; font-size: 12px;
+        line-height: 18px; text-align: center; font-weight: 600;
+        box-shadow: 0 1px 3px rgba(255,45,85,0.3); vertical-align: middle;
+    }
+
+    /* 轻提示 */
+    .toast {
+        position: fixed; top: 80px; left: 50%;
+        transform: translateX(-50%) translateY(-16px);
+        background: #1d1d1f; color: #fff; padding: 10px 22px;
+        border-radius: var(--radius-pill); font-size: 13px; max-width: 70vw;
+        opacity: 0; pointer-events: none; transition: all .25s; z-index: 9998;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ===== 右侧功能说明面板 ===== */
+    .func-panel {
+        position: fixed; top: 0; right: 0; bottom: 0;
+        width: 340px; z-index: 890;
+        background: #fff; border-left: 1px solid #e3e6eb;
+        box-shadow: -1px 0 12px rgba(20, 30, 60, 0.04);
+        display: flex; flex-direction: column;
+    }
+    .func-panel .fp-inner { display: flex; flex-direction: column; height: 100%; min-width: 0; }
+    .func-panel .fp-header {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 15px 14px 13px 18px; border-bottom: 1px solid #f0f1f4; flex-shrink: 0;
+    }
+    .func-panel .fp-title { display: flex; align-items: center; gap: 9px; font-size: 15px; font-weight: 700; color: var(--ink); }
+    .func-panel .fp-title::before {
+        content: ''; width: 8px; height: 8px; border-radius: 50%;
+        background: var(--accent); box-shadow: 0 0 0 4px rgba(26, 120, 255, 0.12);
+    }
+    .func-panel .fp-fold-btn {
+        width: 28px; height: 28px; border: 1px solid var(--border); background: #fff;
+        border-radius: 50%; color: var(--ink-subtle); font-size: 15px; line-height: 1;
+        cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .2s;
+    }
+    .func-panel .fp-fold-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .func-panel .fp-body { flex: 1; overflow-y: auto; padding: 4px 18px 40px; font-size: 13px; color: #555; line-height: 1.85; }
+    .func-panel .fp-body h4 { font-size: 14px; font-weight: 600; color: var(--ink); margin: 18px 0 6px; }
+    .func-panel .fp-body h4:first-child { margin-top: 12px; }
+    .func-panel .fp-body ul { padding-left: 18px; margin: 0 0 8px; }
+    .func-panel .fp-body li { margin-bottom: 6px; }
+    .func-panel .fp-body strong { color: #333; }
+    .func-panel .fp-body p { margin: 6px 0; }
+    .func-panel .fp-body .fp-role { font-size: 13px; font-weight: 600; color: var(--accent); margin-bottom: 8px; }
+    .func-panel .fp-open {
+        display: none; position: absolute; top: 0; bottom: 0; left: 0; right: 0;
+        border: none; background: transparent; cursor: pointer;
+        writing-mode: vertical-rl; text-orientation: upright;
+        font-size: 13px; font-weight: 600; letter-spacing: 6px; color: var(--ink-subtle);
+        align-items: center; justify-content: center; font-family: inherit; transition: all .2s;
+    }
+    .func-panel .fp-open:hover { color: var(--accent); background: #fafbfc; }
+
+    @media (min-width: 1024px) {
+        .main, .breadcrumb { margin-right: 340px; }
+        body.fp-collapsed .main,
+        body.fp-collapsed .breadcrumb { margin-right: 40px; }
+        body.fp-collapsed .func-panel { width: 40px; }
+        body.fp-collapsed .fp-inner { display: none; }
+        body.fp-collapsed .fp-open { display: flex; }
+    }
+    @media (max-width: 1023.98px) {
+        .func-panel { display: none; }
+        .main, .breadcrumb { margin-right: 0; }
+    }
+    @media (max-width: 768px) {
+        .form-row { flex-direction: column; align-items: stretch; }
+        .form-label { width: auto; text-align: left; padding: 0 0 8px; }
+        .step-line { width: 40px; margin: 0 8px; }
+    }
+</style>
+</head>
+<body>
+
+<div class="breadcrumb">
+    <span>首页</span><span class="sep"> / </span>
+    <span>资料认证</span><span class="sep"> / </span>
+    <span class="current">企业注册</span>
+</div>
+
+<div class="main">
+    <div class="page-header">
+        <h2>企业认证</h2>
+        <span class="hint">批发商企业资料认证，提交后由平台审核</span>
+    </div>
+
+    <!-- 步骤条 -->
+    <div class="steps-card">
+        <div class="step active">
+            <div class="step-dot">1</div>
+            <div class="step-label">填写企业基本资料</div>
+        </div>
+        <div class="step-line"></div>
+        <div class="step">
+            <div class="step-dot">2</div>
+            <div class="step-label">提交审核</div>
+        </div>
+        <div class="step-line"></div>
+        <div class="step">
+            <div class="step-dot">3</div>
+            <div class="step-label">审核完成</div>
+        </div>
+    </div>
+
+    <!-- 企业基本信息 -->
+    <div class="form-card">
+        <div class="fc-head">
+            <span class="title">企业基本信息</span>
+            <span class="desc">账号 / 企业 / 联系方式</span>
+        </div>
+        <div class="fc-body">
+
+            <div class="form-row">
+                <div class="form-label"><span class="required">*</span>账号</div>
+                <div class="form-control">
+                    <input type="text" class="form-input" value="13800172866" readonly>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-label"><span class="required">*</span>企业编号</div>
+                <div class="form-control">
+                    <input type="text" class="form-input" value="20864851498499055" readonly>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-label"><span class="required">*</span>企业全称</div>
+                <div class="form-control">
+                    <input type="text" class="form-input" value="四川华乐博文化艺术发展有限公司" readonly>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-label"><span class="required">*</span>企业简称</div>
+                <div class="form-control">
+                    <input type="text" class="form-input" value="华乐博" readonly>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-label"><span class="required">*</span>企业类型<span class="help-tip" title="主体为艺术品所有者的企业为一类，比如博物馆；主体为代理运营的企业为二类">?</span></div>
+                <div class="form-control">
+                    <select class="form-select" id="entType">
+                        <option value="一类">一类</option>
+                        <option value="二类">二类</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-label"><span class="required">*</span>所属行业</div>
+                <div class="form-control">
+                    <select class="form-select" id="industry">
+                        <option>数字娱乐</option>
+                        <option>大宗商品现货交易</option>
+                        <option>收藏品交易</option>
+                        <option>电商B2B</option>
+                        <option>零售B2C</option>
+                        <option>代理商</option>
+                        <option>其他</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-label"><span class="required">*</span>电子邮箱</div>
+                <div class="form-control">
+                    <input type="text" class="form-input" id="email" placeholder="请输入企业电子邮箱">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-label"><span class="required">*</span>联系人</div>
+                <div class="form-control">
+                    <input type="text" class="form-input" id="contact" placeholder="请输入联系人姓名">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-label"><span class="required">*</span>联系人手机号</div>
+                <div class="form-control">
+                    <input type="text" class="form-input" id="contactMobile" placeholder="请输入联系人手机号" maxlength="11">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 企业证照信息 -->
+    <div class="form-card">
+        <div class="fc-head">
+            <span class="title">企业证照信息</span>
+            <span class="desc">企业证件 / 统一社会信用代码</span>
+        </div>
+        <div class="fc-body">
+
+            <div class="form-row">
+                <div class="form-label"><span class="required">*</span>企业证件类型<span class="badge">3</span></div>
+                <div class="form-control">
+                    <select class="form-select" id="certType">
+                        <option>三证合一</option>
+                        <option>普通证照</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row upload-row">
+                <div class="form-label"><span class="required">*</span>上传企业证件<span class="badge">1</span></div>
+                <div class="form-control">
+                    <div class="upload-box">
+                        <div class="upload-icon">⬆</div>
+                        <div class="upload-text">将文件拖到此处，或<span class="link">点击上传</span></div>
+                        <div class="upload-tip">只能上传 png / jpg 文件，且不超过 500kb</div>
+                        <input type="file" class="upload-input" id="certFile" accept="image/png,image/jpeg">
+                    </div>
+                    <div class="field-note">上传后系统自动 OCR 识别，并将统一社会信用代码填入下方</div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-label"><span class="required">*</span>统一社会信用代码</div>
+                <div class="form-control">
+                    <input type="text" class="form-input" id="creditCode" placeholder="上传企业证件后自动识别填入，可手动修改">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 法人身份信息 -->
+    <div class="form-card">
+        <div class="fc-head">
+            <span class="title">法人身份信息</span>
+            <span class="desc">身份证影像 / 法人身份 / 证件有效期</span>
+        </div>
+        <div class="fc-body">
+
+            <div class="form-row upload-row">
+                <div class="form-label"><span class="required">*</span>法人身份证人像面拍照<span class="badge">2</span></div>
+                <div class="form-control">
+                    <div class="upload-box">
+                        <div class="upload-icon">⬆</div>
+                        <div class="upload-text">将文件拖到此处，或<span class="link">点击上传</span></div>
+                        <div class="upload-tip">只能上传 png / jpg 文件，且不超过 500kb</div>
+                        <input type="file" class="upload-input" id="idFrontFile" accept="image/png,image/jpeg">
+                    </div>
+                    <div class="field-note">上传后系统自动 OCR 识别，并填入下方法人姓名、身份证号与证件日期</div>
+                </div>
+            </div>
+
+            <div class="form-row upload-row">
+                <div class="form-label"><span class="required">*</span>法人身份证国徽面拍照</div>
+                <div class="form-control">
+                    <div class="upload-box">
+                        <div class="upload-icon">⬆</div>
+                        <div class="upload-text">将文件拖到此处，或<span class="link">点击上传</span></div>
+                        <div class="upload-tip">只能上传 png / jpg 文件，且不超过 500kb</div>
+                        <input type="file" class="upload-input" id="idBackFile" accept="image/png,image/jpeg">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-label"><span class="required">*</span>企业法人姓名</div>
+                <div class="form-control">
+                    <input type="text" class="form-input" id="legalName" placeholder="OCR 识别自动填入" readonly>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-label"><span class="required">*</span>企业法人身份证号</div>
+                <div class="form-control">
+                    <input type="text" class="form-input" id="legalIdNo" placeholder="OCR 识别自动填入" readonly>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-label"><span class="required">*</span>法人证件起始日期</div>
+                <div class="form-control">
+                    <div class="date-wrap">
+                        <input type="text" class="date-input year" id="startY" placeholder="年" maxlength="4">
+                        <span class="date-sep">/</span>
+                        <input type="text" class="date-input md" id="startM" placeholder="月" maxlength="2">
+                        <span class="date-sep">/</span>
+                        <input type="text" class="date-input md" id="startD" placeholder="日" maxlength="2">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-label"><span class="required">*</span>法人证件截止日期</div>
+                <div class="form-control">
+                    <div class="date-wrap" id="expireDateWrap">
+                        <input type="text" class="date-input year" id="endY" placeholder="年" maxlength="4">
+                        <span class="date-sep">/</span>
+                        <input type="text" class="date-input md" id="endM" placeholder="月" maxlength="2">
+                        <span class="date-sep">/</span>
+                        <input type="text" class="date-input md" id="endD" placeholder="日" maxlength="2">
+                        <label class="permanent-label">
+                            <input type="checkbox" id="permanentChk" onchange="togglePermanent(this)">
+                            永久
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 提交栏 -->
+    <div class="submit-bar">
+        <button class="btn-submit" onclick="doSubmit()">提交认证</button>
+        <span class="tip">提交后进入平台审核，审核通过后在「账户管理」完成第三方支付开户</span>
+    </div>
+</div>
+
+<!-- 右侧功能说明 -->
+<aside class="func-panel">
+    <div class="fp-inner">
+        <div class="fp-header">
+            <span class="fp-title">功能说明</span>
+            <button class="fp-fold-btn" onclick="toggleFuncPanel()" title="收起功能说明">›</button>
+        </div>
+        <div class="fp-body">
+            <div class="fp-role">批发商后台</div>
+            <p>企业认证即<strong>企业资料认证</strong>：填写企业基本信息、上传企业证件与法人身份证，提交后由平台审核。</p>
+
+            <h4><span class="badge">1</span> <span style="vertical-align:middle;">上传企业证件</span></h4>
+            <ul>
+                <li>上传企业证件后，系统 <strong>OCR 识别统一社会信用代码</strong> 并自动填入表单。</li>
+                <li>识别结果支持<strong>手动修改</strong>。</li>
+            </ul>
+
+            <h4><span class="badge">2</span> <span style="vertical-align:middle;">法人身份证</span></h4>
+            <ul>
+                <li>上传法人身份证后，系统 <strong>OCR 识别身份证</strong>，自动填入<strong>法人姓名、身份证号、证件起始日期、截止日期</strong>。</li>
+                <li>识别结果法人姓名、身份证号<strong>不可修改</strong>，证件日期支持<strong>手动修改</strong>。</li>
+            </ul>
+
+            <h4><span class="badge">3</span> <span style="vertical-align:middle;">企业证件类型变更</span></h4>
+            <ul>
+                <li>企业证件类型支持选择 <strong>三证合一 / 普通证照</strong>。</li>
+                <li>选择类型后提交认证，系统按对应类型进行审核。</li>
+            </ul>
+
+            <h4><span class="badge">4</span> <span style="vertical-align:middle;">提交审核校验</span></h4>
+            <ul>
+                <li>提交审核时，前端根据后端返回的 <strong>OCR 结果</strong>，校验<strong>营业执照法人姓名</strong>与<strong>身份证法人姓名</strong>是否一致。</li>
+            </ul>
+
+            <h4><span class="badge">5</span> <span style="vertical-align:middle;">开户方式</span></h4>
+            <ul>
+                <li>平台审核认证后，<strong>不主动给用户开户</strong>。</li>
+                <li>需要用户在<strong>账户管理</strong>去开户。</li>
+                <li>去掉下一步填写银行相关信息的步骤，提交企业资料后直接等待审核。</li>
+                <li>认证通过后统一在<strong>账户管理</strong>去开户。</li>
+                <li>服务商按照相同的逻辑修改。</li>
+            </ul>
+        </div>
+    </div>
+    <button class="fp-open" onclick="toggleFuncPanel()" title="展开功能说明">功能说明‹</button>
+</aside>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ===== 轻提示 ===== */
+var toastTimer;
+function showToast(msg) {
+    var el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { el.classList.remove('show'); }, 2600);
+}
+
+/* ===== 证件截止日期「永久」 ===== */
+function togglePermanent(chk) {
+    var wrap = document.getElementById('expireDateWrap');
+    var inputs = wrap.querySelectorAll('input[type="text"]');
+    inputs.forEach(function (inp) {
+        if (chk.checked) {
+            inp.readOnly = true;
+            inp.placeholder = '永久';
+        } else {
+            inp.readOnly = false;
+            inp.placeholder = (inp.classList.contains('year') ? '年' : inp.id === 'endM' ? '月' : '日');
+        }
+    });
+}
+
+/* ===== 上传文件后将文件名回显在框内 ===== */
+function markUploaded(input) {
+    var box = input.closest('.upload-box');
+    var name = input.files && input.files.length ? input.files[0].name : '';
+    box.querySelector('.upload-text').innerHTML = '已选择文件：<span class="link">' + name + '</span>';
+    box.style.borderColor = '#1a78ff';
+}
+
+/* ===== 企业证件：OCR 识别统一社会信用代码（演示） ===== */
+document.getElementById('certFile').addEventListener('change', function () {
+    if (!this.files.length) return;
+    markUploaded(this);
+    document.getElementById('creditCode').value = '91510107MA62L1L5N1';
+    showToast('企业证件已上传，OCR 识别成功：统一社会信用代码已自动填入');
+});
+
+/* ===== 法人身份证人像面：OCR 识别法人信息（演示） ===== */
+document.getElementById('idFrontFile').addEventListener('change', function () {
+    if (!this.files.length) return;
+    markUploaded(this);
+    document.getElementById('legalName').value = '曾安华';
+    document.getElementById('legalIdNo').value = '510122196801000173';
+    document.getElementById('startY').value = '2015';
+    document.getElementById('startM').value = '06';
+    document.getElementById('startD').value = '18';
+    document.getElementById('endY').value = '2035';
+    document.getElementById('endM').value = '06';
+    document.getElementById('endD').value = '18';
+    showToast('身份证已上传，OCR 识别成功：法人姓名、身份证号、证件日期已自动填入');
+});
+
+/* ===== 法人身份证国徽面 ===== */
+document.getElementById('idBackFile').addEventListener('change', function () {
+    if (!this.files.length) return;
+    markUploaded(this);
+    showToast('身份证国徽面已上传');
+});
+
+/* ===== 提交认证 ===== */
+function doSubmit() {
+    var email = document.getElementById('email').value.trim();
+    var contact = document.getElementById('contact').value.trim();
+    var mobile = document.getElementById('contactMobile').value.trim();
+    var creditCode = document.getElementById('creditCode').value.trim();
+    var legalName = document.getElementById('legalName').value.trim();
+    var legalIdNo = document.getElementById('legalIdNo').value.trim();
+    var certFile = document.getElementById('certFile');
+    var idFront = document.getElementById('idFrontFile');
+    var idBack = document.getElementById('idBackFile');
+
+    if (!email) { showToast('请输入电子邮箱'); return; }
+    if (!contact) { showToast('请输入联系人'); return; }
+    if (!/^1\d{10}$/.test(mobile)) { showToast('请输入正确的 11 位联系人手机号'); return; }
+    if (!certFile.files.length) { showToast('请上传企业证件'); return; }
+    if (!creditCode) { showToast('请填写统一社会信用代码'); return; }
+    if (!idFront.files.length) { showToast('请上传法人身份证人像面'); return; }
+    if (!idBack.files.length) { showToast('请上传法人身份证国徽面'); return; }
+    if (!legalName || !legalIdNo) { showToast('法人姓名与身份证号需 OCR 识别获取'); return; }
+
+    /* 演示：校验营业执照法人姓名与身份证法人姓名一致后进入审核 */
+    var steps = document.querySelectorAll('.step');
+    steps[0].classList.remove('active');
+    steps[0].classList.add('done');
+    steps[1].classList.add('active');
+    showToast('提交成功，已进入平台审核（演示）');
+}
+</script>
+
+<script src="asset/admin-sidebar.js"></script>
+
+</body>
+</html>

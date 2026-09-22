@@ -1,331 +1,340 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>信息查看</title>
-    <style>
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
-            background: #f0f2f5;
-            color: #1a1a2e;
-            font-size: 14px;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>信息查看 · 深艺交批发商工作台</title>
+<link rel="stylesheet" href="asset/admin-sidebar.css">
+<style>
+    :root {
+        --accent: #1a78ff;
+        --accent-hover: #0f6ae8;
+        --accent-bg: #e6f4ff;
+        --green: #1aab67;
+        --orange: #e67e22;
+        --red: #e74c5e;
+        --ink: #1d1d1f;
+        --ink-muted: #3f424b;
+        --ink-subtle: #86868b;
+        --ink-faint: #9ba6b9;
+        --border: #e0e0e0;
+        --page-bg: #f5f5f7;
+        --radius-pill: 9999px;
+        --radius-card: 18px;
+        --radius-sm: 6px;
+        --shadow-card: 0 0 0 1px rgba(0,0,0,.06);
+        --font: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        font-family: var(--font);
+        background: var(--page-bg);
+        min-height: 100vh;
+        color: var(--ink);
+        font-size: 14px;
+        -webkit-font-smoothing: antialiased;
+    }
 
-        /* 整体布局 */
-        .app { display: flex; min-height: 100vh; }
+    /* ── 页面结构：左侧公用目录（asset/admin-sidebar.js 注入）+ 中间内容 + 右侧功能说明 ── */
 
-        /* 侧边栏 */
-        .sidebar {
-            width: 200px;
-            background: #1f2c3d;
-            color: #a8b2c0;
-            flex-shrink: 0;
-        }
-        .logo {
-            height: 56px;
-            display: flex;
-            align-items: center;
-            padding: 0 16px;
-            background: #fff;
-            border-bottom: 1px solid #f0f0f0;
-        }
-        .logo-icon {
-            width: 28px; height: 28px;
-            background: #e74c3e;
-            border-radius: 4px;
-            color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 14px;
-        }
-        .menu { padding: 8px 0; }
-        .menu-item, .menu-group-title {
-            display: flex;
-            align-items: center;
-            height: 44px;
-            padding: 0 20px;
-            color: #c0c8d4;
-            cursor: pointer;
-            text-decoration: none;
-            font-size: 14px;
-            transition: all .15s;
-        }
-        .menu-item:hover, .menu-group-title:hover { background: #2a3849; color: #fff; }
-        .menu-item.active, .menu-group-title.active { color: #1a78ff; background: #2a3849; }
-        .menu-item .icon, .menu-group-title .icon {
-            width: 20px;
-            margin-right: 10px;
-            font-size: 16px;
-            text-align: center;
-        }
-        .menu-group-title .arrow { margin-left: auto; font-size: 12px; }
-        .menu-group .submenu { display: none; }
-        .menu-group.open .submenu { display: block; }
-        .menu-group .submenu a {
-            display: flex;
-            align-items: center;
-            height: 36px;
-            padding: 0 20px 0 50px;
-            color: #a8b2c0;
-            cursor: pointer;
-            text-decoration: none;
-            font-size: 13px;
-        }
-        .menu-group .submenu a:hover { color: #fff; }
-        .menu-group .submenu a.active { color: #1a78ff; }
-        .menu-group .submenu .sub-note {
-            display: flex; align-items: center; height: 36px; padding: 0 20px 0 50px;
-            color: #6b7588; cursor: not-allowed; font-size: 13px;
-        }
-        .menu-group .submenu .sub-note .note-tag {
-            font-size: 11px; color: #8a94a6; margin-left: 6px;
-            background: #2a3849; padding: 1px 6px; border-radius: 3px; white-space: nowrap;
-        }
+    /* 面包屑 */
+    .breadcrumb { padding: 16px 24px 0; font-size: 13px; color: var(--ink-subtle); }
+    .breadcrumb .sep { color: #c0c8d4; }
+    .breadcrumb .current { color: var(--ink); font-weight: 500; }
 
-        /* 主体 */
-        .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+    /* 内容区 */
+    .main { padding: 16px 24px 40px; }
+    .page-header {
+        display: flex; align-items: center; justify-content: space-between;
+        gap: 16px; margin: 4px 0 16px; flex-wrap: wrap;
+    }
+    .page-header h2 { font-size: 20px; font-weight: 600; }
+    .page-header .hint { font-size: 13px; color: var(--ink-subtle); }
 
-        /* 顶栏 */
-        .topbar {
-            background: #fff;
-            height: 56px;
-            display: flex;
-            align-items: center;
-            padding: 0 24px;
-            border-bottom: 1px solid #f0f0f0;
-        }
-        .breadcrumb { font-size: 13px; color: #6b7588; }
-        .breadcrumb .sep { margin: 0 6px; color: #c0c8d4; }
-        .breadcrumb .active { color: #1a1a2e; }
-        .topbar-right {
-            margin-left: auto;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-        }
-        .topbar-right .avatar {
-            width: 32px; height: 32px;
-            border-radius: 50%;
-            background: #f5deb3;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 16px;
-        }
-        .topbar-right .name { font-size: 13px; color: #1a1a2e; }
-        .topbar-right .arrow { color: #9ba6b9; font-size: 12px; }
+    /* 信息区块卡片 */
+    .info-section {
+        background: #fff; border-radius: var(--radius-card);
+        box-shadow: var(--shadow-card); margin-bottom: 16px; overflow: hidden;
+    }
+    .info-section .section-head {
+        display: flex; align-items: center; gap: 10px;
+        padding: 16px 24px; border-bottom: 1px solid #f0f1f4;
+    }
+    .info-section .section-head::before {
+        content: ''; width: 4px; height: 16px; border-radius: 2px;
+        background: var(--accent); flex-shrink: 0;
+    }
+    .info-section .section-head .title { font-size: 15px; font-weight: 600; }
+    .info-section .section-head .desc { font-size: 12px; color: var(--ink-subtle); margin-left: 4px; }
+    .section-body {
+        padding: 20px 24px;
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 12px;
+    }
+    .info-card {
+        background: #f5f7fa; border-radius: 12px;
+        padding: 14px 16px; min-height: 80px;
+    }
+    .info-card .label { font-size: 12px; color: var(--ink-subtle); margin-bottom: 8px; }
+    .info-card .value { font-size: 14px; color: var(--ink); font-weight: 500; word-break: break-all; }
+    .info-card .value.accent { color: var(--accent); }
 
-        /* 内容区 */
-        .content { flex: 1; padding: 12px; overflow-y: auto; }
+    /* 证照图片占位 */
+    .image-cell {
+        height: 74px;
+        background: #fff;
+        border-radius: 8px;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: 4px;
+        color: var(--accent);
+        font-size: 12px;
+        border: 1px dashed #c4d3e8;
+        cursor: pointer;
+        transition: border-color .15s;
+    }
+    .image-cell:hover { border-color: var(--accent); }
+    .image-cell .img-icon { font-size: 18px; line-height: 1; }
 
-        /* 信息区块 */
-        .section {
-            background: #fff;
-            border-radius: 6px;
-            margin-bottom: 12px;
-            overflow: hidden;
-        }
-        .section-title {
-            background: #1a78ff;
-            color: #fff;
-            padding: 12px 20px;
-            font-size: 14px;
-            font-weight: 600;
-        }
-        .section-body {
-            padding: 20px;
-            display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            gap: 12px;
-        }
-        .info-card {
-            background: #f5f7fa;
-            border-radius: 6px;
-            padding: 14px 16px;
-            min-height: 80px;
-        }
-        .info-card .label { font-size: 12px; color: #6b7588; margin-bottom: 8px; }
-        .info-card .value { font-size: 14px; color: #1a1a2e; font-weight: 500; word-break: break-all; }
-        .image-cell {
-            height: 50px;
-            background: #fff;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #e74c3e;
-            font-size: 12px;
-            border: 1px dashed #d0d5dd;
-        }
-        .image-cell.placeholder { color: #9ba6b9; }
+    @media (max-width: 1280px) {
+        .section-body { grid-template-columns: repeat(4, 1fr); }
+    }
+    @media (max-width: 900px) {
+        .section-body { grid-template-columns: repeat(2, 1fr); }
+    }
 
-        @media (max-width: 1280px) {
-            .section-body { grid-template-columns: repeat(4, 1fr); }
-        }
-        @media (max-width: 900px) {
-            .section-body { grid-template-columns: repeat(2, 1fr); }
-        }
-    </style>
+    /* 轻提示 */
+    .toast {
+        position: fixed; top: 80px; left: 50%;
+        transform: translateX(-50%) translateY(-16px);
+        background: #1d1d1f; color: #fff; padding: 10px 22px;
+        border-radius: var(--radius-pill); font-size: 13px;
+        opacity: 0; pointer-events: none; transition: all .25s; z-index: 9998;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ===== 右侧功能说明面板 ===== */
+    .func-panel {
+        position: fixed; top: 0; right: 0; bottom: 0;
+        width: 340px; z-index: 890;
+        background: #fff; border-left: 1px solid #e3e6eb;
+        box-shadow: -1px 0 12px rgba(20, 30, 60, 0.04);
+        display: flex; flex-direction: column;
+    }
+    .func-panel .fp-inner { display: flex; flex-direction: column; height: 100%; min-width: 0; }
+    .func-panel .fp-header {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 15px 14px 13px 18px; border-bottom: 1px solid #f0f1f4; flex-shrink: 0;
+    }
+    .func-panel .fp-title { display: flex; align-items: center; gap: 9px; font-size: 15px; font-weight: 700; color: var(--ink); }
+    .func-panel .fp-title::before {
+        content: ''; width: 8px; height: 8px; border-radius: 50%;
+        background: var(--accent); box-shadow: 0 0 0 4px rgba(26, 120, 255, 0.12);
+    }
+    .func-panel .fp-fold-btn {
+        width: 28px; height: 28px; border: 1px solid var(--border); background: #fff;
+        border-radius: 50%; color: var(--ink-subtle); font-size: 15px; line-height: 1;
+        cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .2s;
+    }
+    .func-panel .fp-fold-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .func-panel .fp-body { flex: 1; overflow-y: auto; padding: 4px 18px 40px; font-size: 13px; color: #555; line-height: 1.85; }
+    .func-panel .fp-body h4 { font-size: 14px; font-weight: 600; color: var(--ink); margin: 18px 0 6px; }
+    .func-panel .fp-body h4:first-child { margin-top: 12px; }
+    .func-panel .fp-body ul { padding-left: 18px; margin: 0 0 8px; }
+    .func-panel .fp-body li { margin-bottom: 6px; }
+    .func-panel .fp-body strong { color: #333; }
+    .func-panel .fp-body p { margin: 6px 0; }
+    .func-panel .fp-body .fp-role { font-size: 13px; font-weight: 600; color: var(--accent); margin-bottom: 8px; }
+    .func-panel .fp-open {
+        display: none; position: absolute; top: 0; bottom: 0; left: 0; right: 0;
+        border: none; background: transparent; cursor: pointer;
+        writing-mode: vertical-rl; text-orientation: upright;
+        font-size: 13px; font-weight: 600; letter-spacing: 6px; color: var(--ink-subtle);
+        align-items: center; justify-content: center; font-family: inherit; transition: all .2s;
+    }
+    .func-panel .fp-open:hover { color: var(--accent); background: #fafbfc; }
+
+    /* 标注圆点 */
+    .badge {
+        display: inline-block; min-width: 18px; height: 18px; padding: 0 5px;
+        border-radius: 50%; background: #ff2d55; color: #fff; font-size: 12px;
+        line-height: 18px; text-align: center; font-weight: 600;
+        box-shadow: 0 1px 3px rgba(255,45,85,0.3);
+    }
+
+    @media (min-width: 1024px) {
+        .main, .breadcrumb { margin-right: 340px; }
+        body.fp-collapsed .main,
+        body.fp-collapsed .breadcrumb { margin-right: 40px; }
+        body.fp-collapsed .func-panel { width: 40px; }
+        body.fp-collapsed .fp-inner { display: none; }
+        body.fp-collapsed .fp-open { display: flex; }
+    }
+    @media (max-width: 1023.98px) {
+        .func-panel { display: none; }
+        .main, .breadcrumb { margin-right: 0; }
+    }
+</style>
 </head>
 <body>
 
-<div class="app">
-    <!-- 侧边栏 -->
-    <div class="sidebar">
-        <div class="logo">
-            <div class="logo-icon">深</div>
+<div class="breadcrumb">
+    <span>首页</span><span class="sep"> / </span>
+    <span>工作台</span><span class="sep"> / </span>
+    <span class="current">信息查看</span>
+</div>
+
+<div class="main">
+    <div class="page-header">
+        <h2>信息查看</h2>
+        <span class="hint">批发商账号信息与企业认证信息，页面只读</span>
+    </div>
+
+    <!-- 企业基本信息 -->
+    <div class="info-section">
+        <div class="section-head">
+            <span class="title">企业基本信息</span>
+            <span class="desc">账号 / 企业 / 联系方式</span>
         </div>
-        <div class="menu">
-            <a class="menu-item active" href="信息查看.html">
-                <span class="icon">📋</span><span>信息查看</span>
-            </a>
-            <a class="menu-item" href="产品管理.html">
-                <span class="icon">📦</span><span>我的产品</span>
-            </a>
-            <div class="menu-group">
-                <div class="menu-group-title" onclick="this.parentNode.classList.toggle('open')">
-                    <span class="icon">💰</span><span>资金管理</span><span class="arrow">▾</span>
-                </div>
-                <div class="submenu">
-                    <a href="账户管理.html">账户管理</a>
-                    <span class="sub-note">我的资产（老）<span class="note-tag">新批发商无此菜单</span></span>
-                </div>
+        <div class="section-body">
+            <div class="info-card">
+                <div class="label">账号</div>
+                <div class="value accent">13800172866</div>
             </div>
-            <a class="menu-item" href="分佣管理.html">
-                <span class="icon">📊</span><span>分佣管理</span>
-            </a>
-            <a class="menu-item" href="#">
-                <span class="icon">📢</span><span>系统公告</span>
-            </a>
-            <div class="menu-group">
-                <div class="menu-group-title" onclick="this.parentNode.classList.toggle('open')">
-                    <span class="icon">🏷️</span><span>价值管理</span><span class="arrow">▾</span>
-                </div>
-                <div class="submenu">
-                    <a href="价值注入.html">价值注入</a>
-                    <a href="#">价值字典</a>
-                </div>
+            <div class="info-card">
+                <div class="label">账户编号</div>
+                <div class="value">20864851498499055</div>
             </div>
-            <div class="menu-group">
-                <div class="menu-group-title" onclick="this.parentNode.classList.toggle('open')">
-                    <span class="icon">🏭</span><span>仓管管理</span><span class="arrow">▾</span>
-                </div>
-                <div class="submenu">
-                    <a href="发货管理.html">发货管理</a>
-                </div>
+            <div class="info-card">
+                <div class="label">企业全称</div>
+                <div class="value">四川华乐博文化艺术发展有限公司</div>
             </div>
-            <a class="menu-item" href="#">
-                <span class="icon">📝</span><span>任务管理</span>
-            </a>
-            <a class="menu-item" href="#">
-                <span class="icon">📈</span><span>运营数据统计</span>
-            </a>
-            <div class="menu-group">
-                <div class="menu-group-title" onclick="this.parentNode.classList.toggle('open')">
-                    <span class="icon">⚙️</span><span>系统管理</span><span class="arrow">▾</span>
-                </div>
-                <div class="submenu">
-                    <a href="用户管理.html">用户管理</a>
-                    <a href="角色管理.html">角色管理</a>
-                    <a href="业务参数管理.html">业务参数管理</a>
-                    <a href="区块链服务.html">区块链服务管理</a>
-                </div>
+            <div class="info-card">
+                <div class="label">企业简称</div>
+                <div class="value">华乐博文化</div>
+            </div>
+            <div class="info-card">
+                <div class="label">企业类型</div>
+                <div class="value">一类</div>
+            </div>
+            <div class="info-card">
+                <div class="label">所属行业</div>
+                <div class="value">文化娱乐</div>
+            </div>
+            <div class="info-card">
+                <div class="label">电子邮箱</div>
+                <div class="value">359426573@qq.com</div>
+            </div>
+            <div class="info-card">
+                <div class="label">联系人</div>
+                <div class="value">曾安华</div>
+            </div>
+            <div class="info-card">
+                <div class="label">联系人手机号</div>
+                <div class="value">15528430479</div>
             </div>
         </div>
     </div>
 
-    <!-- 主体 -->
-    <div class="main">
-        <div class="topbar">
-            <div class="breadcrumb">
-                <span>首页</span><span class="sep">/</span><span class="active">信息查看</span>
-            </div>
-            <div class="topbar-right">
-                <span class="avatar">👤</span>
-                <span class="name">批发商</span>
-                <span class="arrow">▾</span>
-            </div>
+    <!-- 证照与法人信息 -->
+    <div class="info-section">
+        <div class="section-head">
+            <span class="title">证照与法人信息</span>
+            <span class="desc">企业证件 / 统一社会信用代码 / 法人身份信息</span>
         </div>
-
-        <div class="content">
-            <!-- 信息查看 -->
-            <div class="section">
-                <div class="section-title">信息查看</div>
-                <div class="section-body">
-                    <div class="info-card">
-                        <div class="label">账号</div>
-                        <div class="value">13800172866</div>
-                    </div>
-                    <div class="info-card">
-                        <div class="label">账户编号</div>
-                        <div class="value">20864851498499055</div>
-                    </div>
-                    <div class="info-card">
-                        <div class="label">企业全称</div>
-                        <div class="value">四川华乐博文化艺术发展有限公司</div>
-                    </div>
-                    <div class="info-card">
-                        <div class="label">企业简称</div>
-                        <div class="value">华乐博文化</div>
-                    </div>
-                    <div class="info-card">
-                        <div class="label">企业类型</div>
-                        <div class="value">一类</div>
-                    </div>
-                    <div class="info-card">
-                        <div class="label">所属行业</div>
-                        <div class="value">文化娱乐</div>
-                    </div>
-                    <div class="info-card">
-                        <div class="label">电子邮箱</div>
-                        <div class="value">359426573@qq.com</div>
-                    </div>
-
-                    <div class="info-card">
-                        <div class="label">联系人</div>
-                        <div class="value">曾安华</div>
-                    </div>
-                    <div class="info-card">
-                        <div class="label">联系人手机号</div>
-                        <div class="value">15528430479</div>
-                    </div>
-                    <div class="info-card">
-                        <div class="label">企业证件类型</div>
-                        <div class="value">三证合一</div>
-                    </div>
-                    <div class="info-card">
-                        <div class="label">上传企业证件</div>
-                        <div class="image-cell">营业执照.png</div>
-                    </div>
-                    <div class="info-card">
-                        <div class="label">统一社会信用代码</div>
-                        <div class="value">91510107MA62L1L5N1</div>
-                    </div>
-                    <div class="info-card">
-                        <div class="label">法人身份证人像面拍照</div>
-                        <div class="image-cell">法人身份证人像面.png</div>
-                    </div>
-
-                    <div class="info-card">
-                        <div class="label">法人身份证国徽面拍照</div>
-                        <div class="image-cell">法人身份证国徽面.png</div>
-                    </div>
-                    <div class="info-card">
-                        <div class="label">企业法人姓名</div>
-                        <div class="value">曾安华</div>
-                    </div>
-                    <div class="info-card">
-                        <div class="label">企业法人身份证号</div>
-                        <div class="value">510122196801000173</div>
-                    </div>
+        <div class="section-body">
+            <div class="info-card">
+                <div class="label">企业证件类型</div>
+                <div class="value">三证合一</div>
+            </div>
+            <div class="info-card">
+                <div class="label">统一社会信用代码</div>
+                <div class="value">91510107MA62L1L5N1</div>
+            </div>
+            <div class="info-card">
+                <div class="label">上传企业证件</div>
+                <div class="image-cell" onclick="showToast('查看大图：营业执照.png')">
+                    <span class="img-icon">🖼️</span>
+                    <span>营业执照.png</span>
                 </div>
+            </div>
+            <div class="info-card">
+                <div class="label">法人身份证人像面拍照</div>
+                <div class="image-cell" onclick="showToast('查看大图：法人身份证人像面.png')">
+                    <span class="img-icon">🖼️</span>
+                    <span>法人身份证人像面.png</span>
+                </div>
+            </div>
+            <div class="info-card">
+                <div class="label">法人身份证国徽面拍照</div>
+                <div class="image-cell" onclick="showToast('查看大图：法人身份证国徽面.png')">
+                    <span class="img-icon">🖼️</span>
+                    <span>法人身份证国徽面.png</span>
+                </div>
+            </div>
+            <div class="info-card">
+                <div class="label">企业法人姓名</div>
+                <div class="value">曾安华</div>
+            </div>
+            <div class="info-card">
+                <div class="label">企业法人身份证号</div>
+                <div class="value">510122196801000173</div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- 右侧功能说明 -->
+<aside class="func-panel">
+    <div class="fp-inner">
+        <div class="fp-header">
+            <div class="fp-title">功能说明</div>
+            <button class="fp-fold-btn" onclick="toggleFuncPanel()">›</button>
+        </div>
+        <div class="fp-body">
+            <div class="fp-role">批发商</div>
+            <h4><span class="badge">1</span> <span style="vertical-align:middle;">企业基本信息</span></h4>
+            <ul>
+                <li>展示当前登录批发商的<strong>账号</strong>与<strong>账户编号</strong>。</li>
+                <li>展示企业<strong>全称 / 简称 / 类型 / 所属行业</strong>等认证信息。</li>
+                <li>展示<strong>电子邮箱</strong>与<strong>联系人及手机号</strong>。</li>
+            </ul>
+            <h4><span class="badge">2</span> <span style="vertical-align:middle;">证照与法人信息</span></h4>
+            <ul>
+                <li>展示<strong>企业证件类型</strong>（三证合一）与<strong>统一社会信用代码</strong>。</li>
+                <li>证照影像区：<strong>营业执照</strong>、<strong>法人身份证人像面 / 国徽面</strong>，点击可查看大图（原型演示为轻提示）。</li>
+                <li>展示<strong>企业法人姓名</strong>与<strong>法人身份证号</strong>。</li>
+            </ul>
+            <h4><span class="badge">3</span> <span style="vertical-align:middle;">页面性质</span></h4>
+            <ul>
+                <li>本页信息来源于企业注册与认证资料，为<strong>只读展示</strong>，不支持编辑。</li>
+                <li>如信息有误，需联系平台管理员核实处理。</li>
+            </ul>
+        </div>
+    </div>
+    <button class="fp-open" onclick="toggleFuncPanel()">功能说明</button>
+</aside>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ===== 轻提示 ===== */
+var toastTimer;
+function showToast(msg) {
+    var el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { el.classList.remove('show'); }, 2400);
+}
+
+/* ===== 右侧功能说明折叠 ===== */
+function toggleFuncPanel() {
+    document.body.classList.toggle('fp-collapsed');
+}
+</script>
+
+<script src="asset/admin-sidebar.js"></script>
 
 </body>
 </html>

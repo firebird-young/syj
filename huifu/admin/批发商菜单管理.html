@@ -1,304 +1,333 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>批发商菜单管理</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
-            background: #f0f2f5;
-            color: #1a1a2e;
-            font-size: 14px;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>批发商菜单管理 · 深艺交管理后台</title>
+<link rel="stylesheet" href="asset/admin-sidebar.css">
+<style>
+    :root {
+        --accent: #1a78ff;
+        --accent-hover: #0f6ae8;
+        --accent-bg: #e6f4ff;
+        --green: #1aab67;
+        --orange: #e67e22;
+        --red: #e74c5e;
+        --ink: #1d1d1f;
+        --ink-muted: #3f424b;
+        --ink-subtle: #86868b;
+        --ink-faint: #9ba6b9;
+        --border: #e0e0e0;
+        --page-bg: #f5f5f7;
+        --radius-pill: 9999px;
+        --radius-card: 18px;
+        --radius-sm: 6px;
+        --shadow-card: 0 0 0 1px rgba(0,0,0,.06);
+        --font: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        font-family: var(--font);
+        background: var(--page-bg);
+        min-height: 100vh;
+        color: var(--ink);
+        font-size: 14px;
+        -webkit-font-smoothing: antialiased;
+    }
 
-        /* 顶部 */
-        .topbar {
-            background: #fff;
-            height: 56px;
-            display: flex;
-            align-items: center;
-            padding: 0 20px;
-            border-bottom: 1px solid #f0f0f0;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-        .topbar-left { display: flex; align-items: center; gap: 16px; }
-        .menu-btn {
-            width: 32px; height: 32px;
-            border: 1px solid #d0d5dd; border-radius: 4px;
-            background: #fff; color: #6b7588;
-            cursor: pointer; display: flex; align-items: center; justify-content: center;
-            font-size: 16px;
-        }
-        .menu-btn:hover { background: #f5f5f7; }
-        .breadcrumb { font-size: 13px; color: #6b7588; }
-        .breadcrumb .active { color: #1a1a2e; font-weight: 600; }
-        .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 8px; cursor: pointer; }
-        .btn-func {
-            margin-right: 12px; padding: 6px 14px; border-radius: 6px;
-            background: #f5f7fa; color: #333; border: 1px solid #e0e4ea;
-            font-size: 13px; font-weight: 500; cursor: pointer;
-            white-space: nowrap; display: inline-flex; align-items: center; gap: 4px;
-        }
-        .btn-func:hover { border-color: #1a78ff; color: #1a78ff; }
-        .topbar-right .avatar {
-            width: 32px; height: 32px; border-radius: 50%;
-            background: #f5deb3; display: flex; align-items: center; justify-content: center;
-            font-size: 16px;
-        }
-        .topbar-right .name { font-size: 13px; }
-        .topbar-right .arrow { color: #9ba6b9; font-size: 12px; }
+    /* ── 页面结构：左侧公用目录（asset/admin-sidebar.js 注入）+ 中间内容 + 右侧功能说明 ── */
 
-        /* 内容 */
-        .content { padding: 12px; }
+    /* 面包屑 */
+    .breadcrumb { padding: 16px 24px 0; font-size: 13px; color: var(--ink-subtle); }
+    .breadcrumb a { color: var(--ink-subtle); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--accent); }
+    .breadcrumb .sep { color: #c0c8d4; }
+    .breadcrumb .current { color: var(--ink); font-weight: 500; }
 
-        /* 提示条 */
-        .info-banner {
-            background: #eaf4ff; border: 1px solid #cfe6ff; border-radius: 6px;
-            padding: 12px 16px; margin-bottom: 12px;
-            font-size: 13px; color: #1a3d6d; line-height: 1.7;
-            display: flex; gap: 10px; align-items: flex-start;
-        }
-        .info-banner .ico { font-size: 16px; }
-        .info-banner b { color: #0f5db8; }
-        .info-banner .tag-dim {
-            display: inline-block; background: #fff; border: 1px solid #9cc8f5; color: #0f5db8;
-            border-radius: 4px; font-size: 11px; padding: 0 6px; margin: 0 2px; vertical-align: middle;
-        }
+    /* 内容区 */
+    .main { padding: 16px 24px 40px; }
+    .page-header {
+        display: flex; align-items: center; justify-content: space-between;
+        gap: 16px; margin: 4px 0 16px; flex-wrap: wrap;
+    }
+    .page-header h2 { font-size: 20px; font-weight: 600; }
+    .page-header .hint { font-size: 13px; color: var(--ink-subtle); margin-top: 6px; }
 
-        /* 筛选 */
-        .filter-bar {
-            background: #fff; padding: 12px 20px;
-            display: flex; align-items: center; flex-wrap: wrap; gap: 16px;
-            border-radius: 6px;
-        }
-        .filter-item { display: flex; align-items: center; }
-        .filter-label { font-size: 13px; color: #4e5a6e; margin-right: 8px; white-space: nowrap; }
-        .filter-input, .filter-select {
-            width: 180px; height: 30px; padding: 0 10px;
-            border: 1px solid #d0d5dd; border-radius: 4px;
-            font-size: 13px; color: #1a1a2e; outline: none; background: #fff;
-        }
-        .filter-input:focus, .filter-select:focus { border-color: #1a78ff; }
-        .filter-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; }
-        .btn-search {
-            background: #1a78ff; color: #fff; border: none;
-            padding: 0 16px; height: 30px; border-radius: 4px;
-            font-size: 13px; cursor: pointer;
-        }
-        .btn-search:hover { background: #0f6ae8; }
-        .btn-reset {
-            background: #fff; color: #4e5a6e; border: 1px solid #d0d5dd;
-            padding: 0 14px; height: 30px; border-radius: 4px;
-            font-size: 13px; cursor: pointer;
-        }
-        .btn-reset:hover { border-color: #1a78ff; color: #1a78ff; }
-        .btn-add {
-            background: #fff; color: #1a78ff; border: 1px solid #1a78ff;
-            padding: 0 14px; height: 30px; border-radius: 4px;
-            font-size: 13px; cursor: pointer; white-space: nowrap;
-            display: inline-flex; align-items: center; gap: 4px;
-        }
-        .btn-add:hover { background: #e6f4ff; }
-        .btn-primary {
-            background: #1a78ff; color: #fff; border: none;
-            padding: 0 18px; height: 32px; border-radius: 4px;
-            font-size: 13px; cursor: pointer;
-        }
-        .btn-primary:hover { background: #0f6ae8; }
+    /* 提示条 */
+    .info-banner {
+        background: var(--accent-bg); border: 1px solid #cfe6ff; border-radius: var(--radius-card);
+        padding: 12px 16px; margin-bottom: 16px;
+        font-size: 13px; color: #1a3d6d; line-height: 1.8;
+        display: flex; gap: 10px; align-items: flex-start;
+    }
+    .info-banner .ico { font-size: 16px; }
+    .info-banner b { color: #0f5db8; }
 
-        /* 表格 */
-        .table-card { background: #fff; margin-top: 12px; border-radius: 6px; overflow: hidden; }
-        .table { width: 100%; border-collapse: collapse; }
-        .table th {
-            background: #fafbfc; padding: 12px 14px; text-align: left;
-            font-size: 13px; color: #4e5a6e; font-weight: 500;
-            border-bottom: 1px solid #f0f0f0; white-space: nowrap;
-        }
-        .table td { padding: 10px 14px; font-size: 13px; color: #1a1a2e; border-bottom: 1px solid #f5f5f7; vertical-align: middle; }
-        .table tr:last-child td { border-bottom: none; }
-        .table tr.row-dir td { background: #fafbfc; }
-        .table .seq { color: #9ba6b9; width: 44px; }
+    /* 通用卡片 */
+    .card {
+        background: #fff; border-radius: var(--radius-card);
+        padding: 20px 24px; margin-bottom: 16px; box-shadow: var(--shadow-card);
+    }
 
-        .menu-cell { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
-        .menu-cell .indent { flex-shrink: 0; }
-        .menu-cell .icon { font-size: 15px; flex-shrink: 0; width: 18px; text-align: center; }
-        .menu-cell .name { font-weight: 500; }
-        .row-dir .menu-cell .name { font-weight: 700; color: #1a1a2e; }
-        .type-tag {
-            display: inline-block; padding: 1px 8px; border-radius: 3px;
-            font-size: 11px; flex-shrink: 0;
-        }
-        .type-tag.dir { background: #eef1f6; color: #4e5a6e; }
-        .type-tag.menu { background: #e6f4ff; color: #1a78ff; }
-        .type-tag.btn { background: #fdf2e6; color: #e67e22; }
+    /* 筛选区 */
+    .filter-row { display: flex; align-items: center; flex-wrap: wrap; gap: 12px 20px; }
+    .filter-item { display: flex; align-items: center; gap: 8px; }
+    .filter-label { font-size: 13px; color: var(--ink-muted); white-space: nowrap; }
+    .filter-input, .filter-select {
+        width: 180px; height: 34px; padding: 0 14px;
+        border: 1px solid var(--border); border-radius: var(--radius-pill);
+        font-size: 13px; color: var(--ink); outline: none; background: #fff;
+        font-family: inherit;
+    }
+    .filter-input:focus, .filter-select:focus { border-color: var(--accent); }
+    .filter-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; }
 
-        .btn-chip {
-            display: inline-block; padding: 2px 8px; margin: 2px 4px 2px 0;
-            border-radius: 4px; background: #e6f4ff; color: #1a78ff; font-size: 12px;
-        }
-        .btn-chip.more { background: #f0f2f5; color: #6b7588; }
-        .btn-chip.custom { background: #fff8ec; color: #b7791f; }
-        .btn-chip-none { color: #c0c8d4; }
+    /* 按钮 */
+    .btn {
+        height: 34px; padding: 0 18px; border-radius: var(--radius-pill);
+        font-size: 13px; cursor: pointer; border: none; font-family: inherit; font-weight: 500;
+        display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+    }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-outline { background: #fff; color: var(--accent); border: 1px solid var(--accent); }
+    .btn-outline:hover { background: var(--accent-bg); }
+    .btn-ghost { background: #fff; color: var(--ink-muted); border: 1px solid var(--border); }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+    .btn.sm { height: 30px; padding: 0 14px; font-size: 12px; }
 
-        .status-tag { display: inline-block; padding: 3px 10px; border-radius: 4px; font-size: 12px; }
-        .status-tag.on { background: #e6f7eb; color: #1aab67; }
-        .status-tag.off { background: #f0f2f5; color: #9ba6b9; }
+    /* 表格卡片 */
+    .table-wrap {
+        background: #fff; border-radius: var(--radius-card);
+        box-shadow: var(--shadow-card); overflow: hidden;
+    }
+    .table-head {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 16px 24px; border-bottom: 1px solid #f0f1f4; flex-wrap: wrap; gap: 8px;
+    }
+    .table-head .th-title { font-size: 14px; font-weight: 600; }
+    .table-head .th-title .type-tag { margin-left: 8px; vertical-align: middle; }
+    .table-head .th-extra { font-size: 12px; color: var(--ink-subtle); }
+    .table-scroll { overflow-x: auto; }
+    .table { width: 100%; border-collapse: collapse; min-width: 1120px; }
+    .table th {
+        background: #fafafc; padding: 14px 16px; text-align: left;
+        font-size: 12px; color: var(--ink-subtle); font-weight: 600;
+        border-bottom: 1px solid var(--border); white-space: nowrap;
+    }
+    .table td { padding: 13px 16px; font-size: 13px; color: var(--ink); border-bottom: 1px solid #f5f5f5; vertical-align: middle; }
+    .table tr:last-child td { border-bottom: none; }
+    .table tr:hover td { background: #fafbff; }
+    .table tr.row-dir td { background: #fafafc; }
+    .table tr.row-dir:hover td { background: #f4f7fc; }
+    .table .seq { color: var(--ink-faint); width: 44px; text-align: center; }
 
-        .act-link { color: #1a78ff; cursor: pointer; margin-right: 10px; white-space: nowrap; }
-        .act-link:hover { text-decoration: underline; }
-        .act-link.danger { color: #e74c5e; }
-        .act-link.muted { color: #8a8f99; }
-        .act-link.muted:hover { text-decoration: none; color: #1a78ff; }
+    .menu-cell { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+    .menu-cell .indent { flex-shrink: 0; }
+    .menu-cell .icon { font-size: 15px; flex-shrink: 0; width: 18px; text-align: center; }
+    .menu-cell .name { font-weight: 500; }
+    .row-dir .menu-cell .name { font-weight: 700; color: var(--ink); }
+    .type-tag {
+        display: inline-block; padding: 1px 8px; border-radius: var(--radius-pill);
+        font-size: 11px; flex-shrink: 0;
+    }
+    .type-tag.dir { background: #eef1f6; color: var(--ink-muted); }
+    .type-tag.menu { background: var(--accent-bg); color: var(--accent); }
+    .type-tag.warn { background: #fdf2e6; color: var(--orange); }
 
-        .table-foot {
-            padding: 12px 20px; display: flex; align-items: center; justify-content: space-between;
-            font-size: 13px; color: #4e5a6e;
-        }
+    .btn-chip {
+        display: inline-block; padding: 2px 8px; margin: 2px 4px 2px 0;
+        border-radius: var(--radius-pill); background: var(--accent-bg); color: var(--accent); font-size: 12px;
+    }
+    .btn-chip.more { background: #f0f2f5; color: var(--ink-subtle); }
+    .btn-chip-none { color: #c0c8d4; font-size: 12px; }
 
-        /* 标注圆点 */
-        .badge {
-            display: inline-block; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 50%;
-            background: #ff2d55; color: #fff; font-size: 12px; line-height: 18px;
-            text-align: center; font-weight: 600; box-shadow: 0 1px 3px rgba(255,45,85,0.3);
-        }
-        .cnt-dot {
-            display: inline-block; min-width: 16px; height: 16px; padding: 0 4px;
-            border-radius: 8px; background: #1a78ff; color: #fff; font-size: 11px;
-            line-height: 16px; text-align: center; font-weight: 600; margin-left: 6px;
-        }
+    .status-tag { display: inline-block; padding: 3px 12px; border-radius: var(--radius-pill); font-size: 12px; white-space: nowrap; }
+    .status-tag.on { background: #e6f7eb; color: var(--green); }
+    .status-tag.off { background: #f0f2f5; color: var(--ink-faint); }
 
-        /* 浮层 */
-        .mask { position: fixed; inset: 0; background: rgba(0,0,0,.4); display: none; z-index: 1000; }
-        .mask.show { display: block; }
-        .modal {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
-            background: #fff; border-radius: 8px; box-shadow: 0 8px 40px rgba(0,0,0,.2);
-            z-index: 1001; display: none; padding: 22px 24px; width: 640px; max-height: 84vh;
-        }
-        .modal.show { display: block; }
-        .modal.sm { width: 480px; }
-        .modal .md-title {
-            font-size: 16px; font-weight: 600; color: #1a1a2e; margin-bottom: 14px;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .modal .md-close {
-            width: 28px; height: 28px; border-radius: 50%; background: #f5f5f5;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; font-size: 14px; color: #666; border: none;
-        }
-        .modal .md-close:hover { background: #e8e8e8; }
+    .cnt-dot {
+        display: inline-block; min-width: 16px; height: 16px; padding: 0 4px;
+        border-radius: 8px; background: var(--accent); color: #fff; font-size: 11px;
+        line-height: 16px; text-align: center; font-weight: 600; margin-left: 2px;
+    }
 
-        /* 表单 */
-        .form-grid { display: grid; grid-template-columns: 96px 1fr; gap: 14px 10px; align-items: center; }
-        .form-label { font-size: 13px; color: #4e5a6e; text-align: right; }
-        .form-label .req { color: #e74c5e; margin-right: 2px; }
-        .form-control { display: flex; flex-direction: column; gap: 4px; }
-        .form-control .row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-        .f-input, .f-select {
-            height: 32px; padding: 0 10px; border: 1px solid #d0d5dd; border-radius: 4px;
-            font-size: 13px; color: #1a1a2e; outline: none; background: #fff;
-        }
-        .f-input:focus, .f-select:focus { border-color: #1a78ff; }
-        .f-input { width: 100%; }
-        .f-select { min-width: 130px; }
-        .f-help { font-size: 12px; color: #9ba6b9; }
-        .f-help.err { color: #e74c5e; }
-        .radio-line { display: flex; gap: 18px; align-items: center; }
-        .radio-line label { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; cursor: pointer; color: #1a1a2e; }
-        .radio-line input { accent-color: #1a78ff; cursor: pointer; }
-        .fm-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
-        .btn-cancel {
-            background: #fff; color: #4e5a6e; border: 1px solid #d0d5dd;
-            padding: 0 18px; height: 32px; border-radius: 4px; font-size: 13px; cursor: pointer;
-        }
-        .btn-cancel:hover { border-color: #1a78ff; color: #1a78ff; }
+    .act-link { color: var(--accent); cursor: pointer; margin-right: 12px; white-space: nowrap; text-decoration: none; font-size: 13px; }
+    .act-link:hover { text-decoration: underline; }
+    .act-link.danger { color: var(--red); }
 
-        /* 按钮配置浮层 */
-        .btn-config-body { max-height: 46vh; overflow-y: auto; }
-        .perm-head {
-            display: flex; align-items: center; justify-content: space-between;
-            background: #f5f7fa; border-radius: 6px;
-            padding: 8px 14px; margin-bottom: 10px; font-size: 13px; color: #4e5a6e;
-        }
-        .perm-head .head-ops { display: flex; align-items: center; gap: 12px; }
-        .link-btn { color: #1a78ff; cursor: pointer; user-select: none; white-space: nowrap; }
-        .link-btn:hover { text-decoration: underline; }
-        .link-btn.muted { color: #8a8f99; }
-        .add-btn-panel {
-            display: none; border: 1px dashed #9cc8f5; background: #f5f9ff; border-radius: 6px;
-            padding: 10px 12px; margin-bottom: 10px; gap: 8px; align-items: center; flex-wrap: wrap;
-        }
-        .add-btn-panel.show { display: flex; }
-        .add-btn-panel .t { font-size: 12px; color: #4e5a6e; margin-right: 4px; }
-        .add-btn-panel input {
-            width: 120px; height: 30px; padding: 0 8px; border: 1px solid #d0d5dd; border-radius: 4px;
-            font-size: 13px; outline: none;
-        }
-        .add-btn-panel input:focus { border-color: #1a78ff; }
-        .btn-grid {
-            display: grid; grid-template-columns: repeat(2, 1fr); gap: 2px 16px;
-            border: 1px solid #f0f0f0; border-radius: 6px; padding: 8px 12px;
-        }
-        .btn-opt {
-            display: flex; align-items: center; padding: 6px 4px;
-            font-size: 13px; color: #1a1a2e; border-radius: 4px;
-        }
-        .btn-opt:hover { background: #f5f9ff; }
-        .btn-opt > label { display: flex; align-items: center; flex: 1; cursor: pointer; min-width: 0; }
-        .btn-opt input { margin-right: 8px; accent-color: #1a78ff; cursor: pointer; flex-shrink: 0; }
-        .btn-opt .b-name { font-weight: 500; white-space: nowrap; }
-        .btn-opt .b-code { margin-left: auto; color: #9ba6b9; font-size: 11px; background: #f5f7fa; padding: 1px 6px; border-radius: 3px; white-space: nowrap; }
-        .b-del {
-            color: #e74c5e; cursor: pointer; font-size: 12px; padding: 2px 5px; margin-left: 2px;
-            border-radius: 4px; white-space: nowrap; flex-shrink: 0;
-        }
-        .b-del:hover { background: #fdeaea; }
-        .perm-note { font-size: 12px; color: #9ba6b9; margin-top: 10px; line-height: 1.7; }
-        .perm-note b { color: #4e5a6e; }
+    .table-foot {
+        padding: 14px 24px; display: flex; align-items: center; justify-content: space-between;
+        font-size: 13px; color: var(--ink-muted); border-top: 1px solid #f0f1f4;
+        flex-wrap: wrap; gap: 8px;
+    }
+    .table-foot .foot-note { color: var(--ink-faint); font-size: 12px; }
 
-        /* 功能说明浮窗 */
-        .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 560px; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 9999; padding: 24px; display: none; }
-        .f-modal.show { display: block; }
-        .f-modal .fm-title { font-size: 16px; font-weight: 600; color: #1a1a2e; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
-        .f-modal .fm-title:active { cursor: grabbing; }
-        .f-modal .fm-close { width: 28px; height: 28px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; color: #666; border: none; flex-shrink: 0; }
-        .f-modal .fm-close:hover { background: #e8e8e8; }
-        .f-modal .fm-body { font-size: 13px; color: #555; line-height: 1.8; }
-        .f-modal .fm-body h4 { font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 16px 0 8px; }
-        .f-modal .fm-body h4:first-child { margin-top: 0; }
-        .f-modal .fm-body ul { padding-left: 18px; margin: 0 0 12px; }
-        .f-modal .fm-body li { margin-bottom: 4px; }
-        .f-modal .fm-body .dim {
-            background: #fff8ec; border: 1px solid #f5d9a8; color: #a05a00;
-            border-radius: 6px; padding: 8px 12px; margin-bottom: 4px;
-        }
-    </style>
+    /* 浮层 */
+    .mask { position: fixed; inset: 0; background: rgba(0,0,0,.4); display: none; z-index: 1000; }
+    .mask.show { display: block; }
+    .modal {
+        position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
+        background: #fff; border-radius: var(--radius-card); box-shadow: 0 8px 40px rgba(0,0,0,.2);
+        z-index: 1001; display: none; padding: 22px 24px; width: 640px; max-height: 84vh; overflow-y: auto;
+    }
+    .modal.show { display: block; }
+    .modal.sm { width: 480px; }
+    .modal .md-title {
+        font-size: 16px; font-weight: 600; color: var(--ink); margin-bottom: 14px;
+        display: flex; justify-content: space-between; align-items: center;
+    }
+    .modal .md-close {
+        width: 28px; height: 28px; border-radius: 50%; background: #f5f5f7;
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer; font-size: 14px; color: #666; border: none;
+    }
+    .modal .md-close:hover { background: #e8e8e8; }
+
+    /* 表单 */
+    .form-grid { display: grid; grid-template-columns: 96px 1fr; gap: 14px 10px; align-items: center; }
+    .form-label { font-size: 13px; color: var(--ink-muted); text-align: right; }
+    .form-label .req { color: var(--red); margin-right: 2px; }
+    .form-control { display: flex; flex-direction: column; gap: 4px; }
+    .form-control .row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .f-input, .f-select {
+        height: 34px; padding: 0 12px; border: 1px solid var(--border); border-radius: var(--radius-pill);
+        font-size: 13px; color: var(--ink); outline: none; background: #fff; font-family: inherit;
+    }
+    .f-input:focus, .f-select:focus { border-color: var(--accent); }
+    .f-input { width: 100%; }
+    .f-select { min-width: 130px; }
+    .f-help { font-size: 12px; color: var(--ink-faint); }
+    .f-help.err { color: var(--red); }
+    .radio-line { display: flex; gap: 18px; align-items: center; }
+    .radio-line label { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; cursor: pointer; color: var(--ink); }
+    .radio-line input { accent-color: var(--accent); cursor: pointer; }
+    .fm-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
+
+    /* 按钮配置浮层 */
+    .btn-config-body { max-height: 46vh; overflow-y: auto; }
+    .perm-head {
+        display: flex; align-items: center; justify-content: space-between;
+        background: #f5f7fa; border-radius: 10px;
+        padding: 8px 14px; margin-bottom: 10px; font-size: 13px; color: var(--ink-muted); flex-wrap: wrap; gap: 6px;
+    }
+    .perm-head .head-ops { display: flex; align-items: center; gap: 12px; }
+    .link-btn { color: var(--accent); cursor: pointer; user-select: none; white-space: nowrap; font-size: 13px; }
+    .link-btn:hover { text-decoration: underline; }
+    .add-btn-panel {
+        display: none; border: 1px dashed #9cc8f5; background: #f5f9ff; border-radius: 10px;
+        padding: 10px 12px; margin-bottom: 10px; gap: 8px; align-items: center; flex-wrap: wrap;
+    }
+    .add-btn-panel.show { display: flex; }
+    .add-btn-panel .t { font-size: 12px; color: var(--ink-muted); margin-right: 4px; }
+    .add-btn-panel input {
+        width: 120px; height: 30px; padding: 0 10px; border: 1px solid var(--border); border-radius: var(--radius-pill);
+        font-size: 13px; outline: none; font-family: inherit;
+    }
+    .add-btn-panel input:focus { border-color: var(--accent); }
+    .btn-grid {
+        display: grid; grid-template-columns: repeat(2, 1fr); gap: 2px 16px;
+        border: 1px solid #f0f1f4; border-radius: 10px; padding: 8px 12px;
+    }
+    .btn-opt {
+        display: flex; align-items: center; padding: 6px 4px;
+        font-size: 13px; color: var(--ink); border-radius: var(--radius-sm);
+    }
+    .btn-opt:hover { background: #f5f9ff; }
+    .btn-opt > label { display: flex; align-items: center; flex: 1; cursor: pointer; min-width: 0; }
+    .btn-opt input { margin-right: 8px; accent-color: var(--accent); cursor: pointer; flex-shrink: 0; }
+    .btn-opt .b-name { font-weight: 500; white-space: nowrap; }
+    .btn-opt .b-code { margin-left: auto; color: var(--ink-faint); font-size: 11px; background: #f5f7fa; padding: 1px 6px; border-radius: 3px; white-space: nowrap; }
+    .b-del {
+        color: var(--red); cursor: pointer; font-size: 12px; padding: 2px 5px; margin-left: 2px;
+        border-radius: var(--radius-sm); white-space: nowrap; flex-shrink: 0;
+    }
+    .b-del:hover { background: #fdeaea; }
+    .perm-note { font-size: 12px; color: var(--ink-faint); margin-top: 10px; line-height: 1.8; }
+    .perm-note b { color: var(--ink-muted); }
+
+    /* 标注圆点（功能说明序号） */
+    .badge {
+        display: inline-block; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 50%;
+        background: #ff2d55; color: #fff; font-size: 12px; line-height: 18px;
+        text-align: center; font-weight: 600; box-shadow: 0 1px 3px rgba(255,45,85,0.3);
+    }
+
+    /* ===== 右侧功能说明面板 ===== */
+    .func-panel {
+        position: fixed; top: 0; right: 0; bottom: 0;
+        width: 340px; z-index: 890;
+        background: #fff; border-left: 1px solid #e3e6eb;
+        box-shadow: -1px 0 12px rgba(20, 30, 60, 0.04);
+        display: flex; flex-direction: column;
+    }
+    .func-panel .fp-inner { display: flex; flex-direction: column; height: 100%; min-width: 0; }
+    .func-panel .fp-header {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 15px 14px 13px 18px; border-bottom: 1px solid #f0f1f4; flex-shrink: 0;
+    }
+    .func-panel .fp-title { display: flex; align-items: center; gap: 9px; font-size: 15px; font-weight: 700; color: #1d1d1f; }
+    .func-panel .fp-title::before {
+        content: ''; width: 8px; height: 8px; border-radius: 50%;
+        background: var(--accent); box-shadow: 0 0 0 4px rgba(26, 120, 255, 0.12);
+    }
+    .func-panel .fp-fold-btn {
+        width: 28px; height: 28px; border: 1px solid var(--border); background: #fff;
+        border-radius: 50%; color: var(--ink-subtle); font-size: 15px; line-height: 1;
+        cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+    }
+    .func-panel .fp-fold-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .func-panel .fp-body { flex: 1; overflow-y: auto; padding: 4px 18px 40px; font-size: 13px; color: #555; line-height: 1.9; }
+    .func-panel .fp-body::-webkit-scrollbar { width: 5px; }
+    .func-panel .fp-body::-webkit-scrollbar-thumb { background: #d8dce3; border-radius: 3px; }
+    .func-panel .fp-body h4 { font-size: 14px; font-weight: 600; color: #1d1d1f; margin: 18px 0 6px; }
+    .func-panel .fp-body h4:first-child { margin-top: 12px; }
+    .func-panel .fp-body ul { padding-left: 18px; margin: 0 0 8px; }
+    .func-panel .fp-body li { margin-bottom: 6px; }
+    .func-panel .fp-body strong { color: #333; }
+    .func-panel .fp-body .dim {
+        background: #fff8ec; border: 1px solid #f5d9a8; color: #a05a00;
+        border-radius: 8px; padding: 8px 12px; margin-bottom: 8px;
+    }
+    .func-panel .fp-role { font-size: 13px; font-weight: 600; color: var(--red); margin: 10px 0 -4px; }
+    .func-panel .fp-open {
+        display: none; position: absolute; top: 0; bottom: 0; left: 0; right: 0;
+        border: none; background: transparent; cursor: pointer;
+        writing-mode: vertical-rl; text-orientation: upright;
+        font-size: 13px; font-weight: 600; letter-spacing: 6px; color: var(--ink-subtle);
+        align-items: center; justify-content: center; font-family: inherit; transition: all 0.2s;
+    }
+    .func-panel .fp-open:hover { color: var(--accent); background: #fafbfc; }
+
+    @media (min-width: 1024px) {
+        .main, .breadcrumb { margin-right: 340px; }
+        body.fp-collapsed .main,
+        body.fp-collapsed .breadcrumb { margin-right: 40px; }
+        body.fp-collapsed .func-panel { width: 40px; }
+        body.fp-collapsed .fp-inner { display: none; }
+        body.fp-collapsed .fp-open { display: flex; }
+    }
+    @media (max-width: 1023.98px) {
+        .func-panel { display: none; }
+        .main, .breadcrumb { margin-right: 0; }
+    }
+</style>
 </head>
 <body>
 
-<!-- 顶部 -->
-<div class="topbar">
-    <div class="topbar-left">
-        <button class="menu-btn">≡</button>
-        <div class="breadcrumb">
-            <span>首页</span> /
-            <span>系统管理</span> /
-            <span class="active">批发商菜单管理</span>
-        </div>
-    </div>
-    <div class="topbar-right">
-        <button class="btn-func" onclick="toggleFuncModal()">📖 功能说明</button>
-        <span class="avatar">👤</span>
-        <span class="name">平台管理员</span>
-        <span class="arrow">▾</span>
-    </div>
+<div class="breadcrumb">
+    <a href="../index.html">首页</a><span class="sep"> / </span>
+    <a href="#">系统配置</a><span class="sep"> / </span>
+    <span class="current">批发商菜单管理</span>
 </div>
 
-<div class="content">
+<div class="main">
+    <div class="page-header">
+        <div>
+            <h2>批发商菜单管理</h2>
+            <div class="hint">维护批发商端菜单资源（目录 / 菜单两级）及各菜单下的按钮权限</div>
+        </div>
+    </div>
 
     <!-- 提示说明 -->
     <div class="info-banner">
@@ -310,57 +339,65 @@
     </div>
 
     <!-- 筛选区 -->
-    <div class="filter-bar">
-        <div class="filter-item">
-            <span class="filter-label">菜单名称</span>
-            <input class="filter-input" id="kwInput" placeholder="请输入菜单名称/编码">
+    <section class="card">
+        <div class="filter-row">
+            <div class="filter-item">
+                <span class="filter-label">菜单名称</span>
+                <input class="filter-input" id="kwInput" placeholder="请输入菜单名称/编码">
+            </div>
+            <div class="filter-item">
+                <span class="filter-label">类型</span>
+                <select class="filter-select" id="typeSel">
+                    <option value="">全部</option>
+                    <option value="dir">目录</option>
+                    <option value="menu">菜单</option>
+                </select>
+            </div>
+            <div class="filter-item">
+                <span class="filter-label">状态</span>
+                <select class="filter-select" id="statusSel">
+                    <option value="">全部</option>
+                    <option value="1">启用</option>
+                    <option value="0">停用</option>
+                </select>
+            </div>
+            <div class="filter-actions">
+                <button class="btn btn-outline" onclick="openMenuModal()">＋ 新建菜单</button>
+                <button class="btn btn-primary" onclick="renderTable()">🔍 搜 索</button>
+                <button class="btn btn-ghost" onclick="resetFilter()">↻ 重 置</button>
+            </div>
         </div>
-        <div class="filter-item">
-            <span class="filter-label">类型</span>
-            <select class="filter-select" id="typeSel">
-                <option value="">全部</option>
-                <option value="dir">目录</option>
-                <option value="menu">菜单</option>
-            </select>
-        </div>
-        <div class="filter-item">
-            <span class="filter-label">状态</span>
-            <select class="filter-select" id="statusSel">
-                <option value="">全部</option>
-                <option value="1">启用</option>
-                <option value="0">停用</option>
-            </select>
-        </div>
-        <div class="filter-actions">
-            <button class="btn-add" onclick="openMenuModal()">＋ 新建菜单</button>
-            <button class="btn-search" onclick="renderTable()">🔍 搜 索</button>
-            <button class="btn-reset" onclick="resetFilter()">↻ 重 置</button>
-        </div>
-    </div>
+    </section>
 
     <!-- 菜单资源表 -->
-    <div class="table-card">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th class="seq">序号</th>
-                    <th style="min-width:220px;">菜单名称</th>
-                    <th>编码</th>
-                    <th>上级</th>
-                    <th>路由</th>
-                    <th>排序</th>
-                    <th style="min-width:220px;">按钮权限 <span class="type-tag btn" style="vertical-align:middle;margin-left:4px;">已启用</span></th>
-                    <th>状态</th>
-                    <th style="width:210px;">操作</th>
-                </tr>
-            </thead>
-            <tbody id="menuBody"></tbody>
-        </table>
+    <section class="table-wrap">
+        <div class="table-head">
+            <span class="th-title">菜单资源列表<span class="type-tag warn">按钮权限已启用</span></span>
+            <span class="th-extra">支持新建目录 / 菜单 / 自定义按钮，编辑后按钮配置即时生效</span>
+        </div>
+        <div class="table-scroll">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th class="seq">序号</th>
+                        <th style="min-width:220px;">菜单名称</th>
+                        <th>编码</th>
+                        <th>上级</th>
+                        <th>路由</th>
+                        <th>排序</th>
+                        <th style="min-width:220px;">按钮权限</th>
+                        <th>状态</th>
+                        <th style="width:210px;">操作</th>
+                    </tr>
+                </thead>
+                <tbody id="menuBody"></tbody>
+            </table>
+        </div>
         <div class="table-foot">
             <span id="footInfo"></span>
-            <span style="color:#9ba6b9;">支持新建目录 / 菜单 / 自定义按钮，编辑后按钮配置即时生效</span>
+            <span class="foot-note">目录行浅灰底展示，子菜单缩进挂在所属目录下</span>
         </div>
-    </div>
+    </section>
 </div>
 
 <!-- ====== 新建 / 编辑菜单浮层 ====== -->
@@ -438,8 +475,8 @@
         </div>
     </div>
     <div class="fm-actions">
-        <button class="btn-cancel" onclick="closeMenuModal()">取 消</button>
-        <button class="btn-primary" onclick="saveMenuModal()">保 存</button>
+        <button class="btn btn-ghost" onclick="closeMenuModal()">取 消</button>
+        <button class="btn btn-primary" onclick="saveMenuModal()">保 存</button>
     </div>
 </div>
 
@@ -451,7 +488,7 @@
         <button class="md-close" onclick="closeBtnModal()">✕</button>
     </div>
     <div class="perm-head">
-        <span>勾选该菜单下<b>开放给角色分配</b>的按钮（按钮权限<b>已启用</b>：保存后可在「角色管理」页按角色勾选菜单及其按钮）</span>
+        <span>勾选该菜单下<b>开放给角色分配</b>的按钮（保存后可在「角色管理」页按角色勾选菜单及其按钮）</span>
         <span class="head-ops">
             <span class="link-btn" onclick="toggleAddBtnPanel()">＋ 新建按钮</span>
             <span class="link-btn" onclick="toggleSelectAllBtn()">☑ 全选 / 反选</span>
@@ -462,60 +499,63 @@
         <input id="nbName" placeholder="如：打印" maxlength="10">
         <span class="t">编码</span>
         <input id="nbCode" placeholder="小写英文，如 print" maxlength="40">
-        <button class="btn-primary" style="height:30px;font-size:12px;" onclick="addCustomBtn()">＋ 确认添加</button>
-        <button class="btn-cancel" style="height:30px;font-size:12px;" onclick="hideAddBtnPanel()">取 消</button>
+        <button class="btn btn-primary sm" onclick="addCustomBtn()">＋ 确认添加</button>
+        <button class="btn btn-ghost sm" onclick="hideAddBtnPanel()">取 消</button>
     </div>
     <div class="btn-config-body" id="btnConfigBody"></div>
     <div class="perm-note" id="btnLibNote">
         按钮库<b>初始为空</b>，由「＋ 新建按钮」按需创建；创建后进入<b>全局按钮库</b>，任意菜单可直接勾选复用，可删除（删除后将从所有菜单中同步移除）。按钮新增后需<b>点击「保存」</b>才会写入当前菜单。
     </div>
     <div class="fm-actions">
-        <button class="btn-cancel" onclick="closeBtnModal()">取 消</button>
-        <button class="btn-primary" onclick="saveBtnConfig()">保 存</button>
+        <button class="btn btn-ghost" onclick="closeBtnModal()">取 消</button>
+        <button class="btn btn-primary" onclick="saveBtnConfig()">保 存</button>
     </div>
 </div>
 
-<!-- ====== 功能说明浮窗 ====== -->
-<div class="f-modal" id="funcModal">
-  <div class="fm-title">
-    <span>📖 功能说明</span>
-    <button class="fm-close" onclick="toggleFuncModal()">✕</button>
-  </div>
-  <div style="font-size:13px;font-weight:600;color:#e74c5e;margin:-6px 0 12px;">平台 · 系统管理</div>
-  <div class="fm-body">
-    <h4><span class="badge">1</span> <span style="vertical-align:middle;">页面定位</span></h4>
-    <ul>
-      <li>维护<b>批发商端菜单资源</b>：资源分「<b>目录</b>」（组织分组）与「<b>菜单</b>」（可访问页面）两级</li>
-      <li>本页<b>新建 / 编辑 / 删除均真实生效</b>，可完全从零搭建菜单与按钮</li>
-    </ul>
-    <h4><span class="badge">2</span> <span style="vertical-align:middle;">新建与编辑（支持任意层级组合）</span></h4>
-    <ul>
-      <li>顶部「＋ 新建菜单」统一新建：类型支持<b>目录 / 菜单</b>，上级下拉选择「顶级 / 某目录」，往目录下加菜单即在此选该目录即可</li>
-      <li><b>目录</b>：顶级分组，仅用于组织下级菜单；<b>菜单</b>：挂在顶级或某目录下</li>
-      <li><b>编码唯一</b>（小写字母/数字/中划线），路由、状态（启用/停用）、图标均可配置</li>
-      <li><b>排序</b>：决定<b>同级资源</b>的展示顺序 —— 顶级资源为一组、每个目录下的子菜单各自成组，同组内按数值<b>从小到大</b>排列、数值越小越靠前；不要求连续，可随时调整</li>
-      <li>目录下已有下级菜单时，不可直接改为「菜单」类型；可先移动或删除下级</li>
-    </ul>
-    <h4><span class="badge">3</span> <span style="vertical-align:middle;">按钮权限（已启用）</span></h4>
-    <div class="dim">
-      本页建立「菜单 → 按钮」二级资源，<b>按钮权限已启用</b>：<b>角色管理</b>页分配权限时可按「菜单 + 按钮」勾选 —— 角色进入某菜单后仅能使用已开放的按钮。
+<!-- ===== 右侧功能说明 ===== -->
+<aside class="func-panel">
+    <div class="fp-inner">
+        <div class="fp-header">
+            <div class="fp-title">功能说明</div>
+            <button class="fp-fold-btn" onclick="toggleFuncPanel()">›</button>
+        </div>
+        <div class="fp-body">
+            <div class="fp-role">平台 · 系统配置</div>
+            <h4><span class="badge">1</span> <span style="vertical-align:middle;">页面定位</span></h4>
+            <ul>
+                <li>维护<strong>批发商端菜单资源</strong>：资源分「<strong>目录</strong>」（组织分组）与「<strong>菜单</strong>」（可访问页面）两级</li>
+                <li>本页<strong>新建 / 编辑 / 删除均真实生效</strong>，可完全从零搭建菜单与按钮</li>
+            </ul>
+            <h4><span class="badge">2</span> <span style="vertical-align:middle;">新建与编辑（支持任意层级组合）</span></h4>
+            <ul>
+                <li>顶部「＋ 新建菜单」统一新建：类型支持<strong>目录 / 菜单</strong>，上级下拉选择「顶级 / 某目录」，往目录下加菜单即在此选该目录即可</li>
+                <li><strong>目录</strong>：顶级分组，仅用于组织下级菜单；<strong>菜单</strong>：挂在顶级或某目录下</li>
+                <li><strong>编码唯一</strong>（小写字母/数字/中划线），路由、状态（启用/停用）、图标均可配置</li>
+                <li><strong>排序</strong>：决定<strong>同级资源</strong>的展示顺序 —— 顶级资源为一组、每个目录下的子菜单各自成组，同组内按数值<strong>从小到大</strong>排列、数值越小越靠前；不要求连续，可随时调整</li>
+                <li>目录下已有下级菜单时，不可直接改为「菜单」类型；可先移动或删除下级</li>
+            </ul>
+            <h4><span class="badge">3</span> <span style="vertical-align:middle;">按钮权限（已启用）</span></h4>
+            <div class="dim">
+                本页建立「菜单 → 按钮」二级资源，<strong>按钮权限已启用</strong>：<strong>角色管理</strong>页分配权限时可按「菜单 + 按钮」勾选 —— 角色进入某菜单后仅能使用已开放的按钮。
+            </div>
+            <ul>
+                <li>菜单<strong>默认不内置任何按钮</strong>，需在「🔘 按钮配置」内勾选并保存</li>
+                <li>勾选后的按钮以浅蓝标签展示在按钮列，超过 5 个自动折叠；配好后即供角色管理页按角色勾选</li>
+            </ul>
+            <h4><span class="badge">4</span> <span style="vertical-align:middle;">按钮库（＋ 新建按钮）</span></h4>
+            <ul>
+                <li>按钮配置弹窗内「<strong>＋ 新建按钮</strong>」按需创建按钮（名称 + 编码），创建后进入<strong>全局按钮库</strong>，可在任意菜单复用</li>
+                <li>弹窗内「<strong>✕</strong>」可删除按钮，删除后从所有菜单同步移除</li>
+            </ul>
+            <h4><span class="badge">5</span> <span style="vertical-align:middle;">删除保护</span></h4>
+            <ul>
+                <li>目录下仍有下级菜单时<strong>不允许删除</strong>，需先处理下级</li>
+                <li>菜单删除不会影响按钮库，仅解除该菜单与按钮的引用</li>
+            </ul>
+        </div>
     </div>
-    <ul>
-      <li>菜单<b>默认不内置任何按钮</b>，需在「🔘 按钮配置」内勾选并保存</li>
-      <li>勾选后的按钮以浅蓝标签展示在按钮列，超过 5 个自动折叠；配好后即供角色管理页按角色勾选</li>
-    </ul>
-    <h4><span class="badge">4</span> <span style="vertical-align:middle;">按钮库（＋ 新建按钮）</span></h4>
-    <ul>
-      <li>按钮配置弹窗内「<b>＋ 新建按钮</b>」按需创建按钮（名称 + 编码），创建后进入<b>全局按钮库</b>，可在任意菜单复用</li>
-      <li>弹窗内「<b>✕</b>」可删除按钮，删除后从所有菜单同步移除</li>
-    </ul>
-    <h4><span class="badge">5</span> <span style="vertical-align:middle;">删除保护</span></h4>
-    <ul>
-      <li>目录下仍有下级菜单时<b>不允许删除</b>，需先处理下级</li>
-      <li>菜单删除不会影响按钮库，仅解除该菜单与按钮的引用</li>
-    </ul>
-  </div>
-</div>
+    <button class="fp-open" onclick="toggleFuncPanel()">功能说明</button>
+</aside>
 
 <script>
 /* ====== 全局按钮库（初始为空，全部由用户「＋ 新建按钮」按需创建） ====== */
@@ -721,9 +761,6 @@ function refreshParentSelect(type, parentVal, selfId) {
     var sel = document.getElementById('mParent');
     sel.innerHTML = parentOptions(type, selfId);
     if (parentVal !== null && parentVal !== undefined) sel.value = String(parentVal);
-    if (sel.value === '' && type === 'menu') {
-        // 默认挂在顶级
-    }
     document.getElementById('mParentHelp').textContent = type === 'dir'
         ? '目录固定为顶级分组，用于组织下级菜单'
         : '菜单可挂在顶级，或挂在某个目录下';
@@ -849,7 +886,7 @@ function renderBtnList() {
         });
         html += '</div>';
     } else {
-        html = '<div style="color:#9ba6b9;padding:26px 12px;text-align:center;">按钮库为空 — 点上方「＋ 新建按钮」创建后即可勾选</div>';
+        html = '<div class="btn-chip-none" style="padding:26px 12px;text-align:center;">按钮库为空 — 点上方「＋ 新建按钮」创建后即可勾选</div>';
     }
     document.getElementById('btnConfigBody').innerHTML = html;
     updateBtnChecked();
@@ -953,36 +990,14 @@ function hideMask(modalId, maskId) {
     document.getElementById(maskId).classList.remove('show');
 }
 
+/* ── 右侧功能说明面板：收起 / 展开 ── */
+function toggleFuncPanel() {
+    document.body.classList.toggle('fp-collapsed');
+}
+
 /* ====== 初始化 ====== */
 renderTable();
-
-/* ====== 功能说明浮窗 ====== */
-function toggleFuncModal() {
-  var el = document.getElementById('funcModal');
-  el.classList.toggle('show');
-  if (el.classList.contains('show') && !el.dataset.dragged) {
-    el.style.left = '50%'; el.style.top = '50%'; el.style.transform = 'translate(-50%,-50%)';
-  }
-}
-(function() {
-  var modal, titleBar, offX, offY, dragging = false;
-  document.addEventListener('DOMContentLoaded', function() {
-    modal = document.getElementById('funcModal');
-    titleBar = modal.querySelector('.fm-title');
-    titleBar.addEventListener('mousedown', startDrag);
-    titleBar.addEventListener('touchstart', startDragTouch, {passive:true});
-    document.addEventListener('mousemove', onDrag);
-    document.addEventListener('mouseup', endDrag);
-    document.addEventListener('touchmove', onDragTouch, {passive:true});
-    document.addEventListener('touchend', endDrag);
-  });
-  function startDrag(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = e.clientX - rect.left; offY = e.clientY - rect.top; dragging = true; titleBar.style.cursor = 'grabbing'; }
-  function startDragTouch(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; var t = e.touches[0]; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = t.clientX - rect.left; offY = t.clientY - rect.top; dragging = true; }
-  function onDrag(e) { if (!dragging) return; modal.style.left = (e.clientX - offX) + 'px'; modal.style.top = (e.clientY - offY) + 'px'; }
-  function onDragTouch(e) { if (!dragging) return; var t = e.touches[0]; modal.style.left = (t.clientX - offX) + 'px'; modal.style.top = (t.clientY - offY) + 'px'; }
-  function endDrag() { dragging = false; if (titleBar) titleBar.style.cursor = 'grab'; }
-})();
 </script>
-
+<script src="asset/admin-sidebar.js"></script>
 </body>
 </html>

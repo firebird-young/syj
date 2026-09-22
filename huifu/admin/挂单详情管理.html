@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>寄售详情管理 · 深艺交管理后台</title>
+    <title>挂单详情管理 · 深艺交管理后台</title>
     <link rel="stylesheet" href="asset/admin-sidebar.css">
     <style>
         :root {
@@ -324,21 +324,21 @@
 
 <div class="breadcrumb">
     <a href="数据看板.html">首页</a> <span> &gt; </span>
-    <a href="#">寄售管理</a> <span> &gt; </span>
-    <span class="current">寄售详情管理</span>
+    <a href="#">挂单管理</a> <span> &gt; </span>
+    <span class="current">挂单详情管理</span>
 </div>
 
 <div class="main">
     <div class="page-header">
-        <h2>寄售详情管理</h2>
-        <span class="market-tag">寄售管理</span>
+        <h2>挂单详情管理</h2>
+        <span class="market-tag">挂单管理</span>
     </div>
 
     <!-- 统计卡 -->
     <div class="stat-card">
         <div class="stat-item">
             <div class="stat-num red">4</div>
-            <div class="stat-label">寄售中</div>
+            <div class="stat-label">挂单中</div>
         </div>
         <div class="stat-item">
             <div class="stat-num green">3</div>
@@ -358,8 +358,8 @@
     <div class="search-area">
         <div class="search-row">
             <div class="search-item">
-                <label>寄售人账号</label>
-                <input type="text" id="searchUser" placeholder="请输入寄售人手机号">
+                <label>挂单人账号</label>
+                <input type="text" id="searchUser" placeholder="请输入挂单人手机号">
             </div>
             <div class="search-item">
                 <label>产品名称</label>
@@ -370,10 +370,10 @@
                 <input type="text" id="searchNo" placeholder="请输入产品编号">
             </div>
             <div class="search-item">
-                <label>寄售状态</label>
+                <label>挂单状态</label>
                 <select id="searchStatus">
                     <option value="">全部</option>
-                    <option value="selling">寄售中</option>
+                    <option value="selling">挂单中</option>
                     <option value="sold">已售出</option>
                     <option value="off">已下架</option>
                 </select>
@@ -402,7 +402,7 @@
                     <tr>
                         <th style="width:74px;">图片</th>
                         <th>产品名称</th>
-                        <th>寄售人</th>
+                        <th>挂单人</th>
                         <th>挂单价格</th>
                         <th>挂单时间</th>
                         <th>状态</th>
@@ -417,11 +417,11 @@
     </div>
 </div>
 
-<!-- 寄售详情弹窗 -->
+<!-- 挂单详情弹窗 -->
 <div class="modal-overlay" id="detailOverlay" onclick="if(event.target===this)closeDetail()">
     <div class="modal-box">
         <div class="modal-header">
-            <span class="modal-title">寄售详情</span>
+            <span class="modal-title">挂单详情</span>
             <span class="modal-sub" id="dmSub"></span>
             <span class="modal-close" onclick="closeDetail()">×</span>
         </div>
@@ -448,25 +448,25 @@
         <div class="fp-body">
             <h4>一、页面说明</h4>
             <ul>
-                <li>展示平台上 <strong>所有用户、所有产品</strong> 的寄售记录（对应零售端「我的寄售」）</li>
-                <li>顶部统计：<strong>寄售中件数、已售出件数、已下架件数、累计成交金额</strong></li>
+                <li>展示平台上 <strong>所有用户、所有产品</strong> 的挂单记录（对应零售端「我的挂单」）</li>
+                <li>顶部统计：<strong>挂单中件数、已售出件数、已下架件数、累计成交金额</strong></li>
                 <li>本页面 <strong>仅可查看</strong>，不支持下架 / 撤销，操作列提供「查看详情」</li>
             </ul>
-            <h4>二、寄售记录字段</h4>
+            <h4>二、挂单记录字段</h4>
             <ul>
-                <li>每行展示：产品图、产品名称、<strong>寄售人手机号</strong>、挂单价格、挂单时间、寄售状态、成交时间</li>
-                <li><strong>寄售中</strong>：成交信息列展示剩余挂单天数（橙色标签）</li>
+                <li>每行展示：产品图、产品名称、<strong>挂单人手机号</strong>、挂单价格、挂单时间、挂单状态、成交时间</li>
+                <li><strong>挂单中</strong>：成交信息列展示剩余挂单天数（橙色标签）</li>
                 <li><strong>已售出</strong>：成交信息列仅展示 <strong>订单编号</strong>（点击跳转订单管理），<strong>交易服务费明细</strong> 见详情浮层</li>
                 <li><strong>已下架</strong>：成交信息列展示下架时间</li>
             </ul>
             <h4>三、筛选</h4>
             <ul>
-                <li>支持按 <strong>寄售人账号</strong>、<strong>产品名称</strong>、<strong>产品编号</strong> 模糊搜索</li>
-                <li>支持按 <strong>寄售状态</strong>（寄售中 / 已售出 / 已下架）及 <strong>挂单时间范围</strong> 筛选，可组合条件</li>
+                <li>支持按 <strong>挂单人账号</strong>、<strong>产品名称</strong>、<strong>产品编号</strong> 模糊搜索</li>
+                <li>支持按 <strong>挂单状态</strong>（挂单中 / 已售出 / 已下架）及 <strong>挂单时间范围</strong> 筛选，可组合条件</li>
             </ul>
-            <h4>四、寄售详情浮层</h4>
+            <h4>四、挂单详情浮层</h4>
             <ul>
-                <li>点击操作列「查看详情」展示完整寄售信息：产品信息、寄售人、挂单价格与时间、到期时间、状态</li>
+                <li>点击操作列「查看详情」展示完整挂单信息：产品信息、挂单人、挂单价格与时间、到期时间、状态</li>
                 <li>已售出记录额外展示：<strong>订单编号</strong>（点击跳转订单管理）、买家账号、成交时间</li>
                 <li>已售出记录额外展示 <strong>交易服务费明细</strong>（小表格）：<strong>成交价、卖家手续费、第三方支付手续费、平台交易手续费</strong></li>
             </ul>
@@ -476,7 +476,7 @@
 </aside>
 
 <script>
-// ===== 全平台寄售数据（status: selling 寄售中 / sold 已售出 / off 已下架）=====
+// ===== 全平台挂单数据（status: selling 挂单中 / sold 已售出 / off 已下架）=====
 var records = [
     { img: 'img1', name: '永淳·夏日帖', code: '#0027', user: '13800172866', status: 'selling', price: 92.00, time: '2026-07-30 14:23', remain: 5, endTime: '2026-09-05 14:23' },
     { img: 'img3', name: '兰亭序', code: '#0031', user: '18227406306', status: 'selling', price: 128.00, time: '2026-08-01 09:15', remain: 9, endTime: '2026-09-10 09:15' },
@@ -489,7 +489,7 @@ var records = [
     { img: 'img3', name: '兰亭序', code: '#0033', user: '19981465373', status: 'off', price: 66.00, time: '2026-07-18 15:22', offTime: '2026-07-20 15:22' }
 ];
 
-var statusNames = { selling: '寄售中', sold: '已售出', off: '已下架' };
+var statusNames = { selling: '挂单中', sold: '已售出', off: '已下架' };
 
 function fmt(n) { return n.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 
@@ -557,7 +557,7 @@ function doReset() {
 }
 
 function doExport() {
-    alert('已导出当前筛选条件下的寄售记录（演示）');
+    alert('已导出当前筛选条件下的挂单记录（演示）');
 }
 
 // 回车搜索
@@ -565,10 +565,10 @@ document.addEventListener('keydown', function(e) {
     if (e.key === 'Enter') doSearch();
 });
 
-// ===== 寄售详情弹窗 =====
+// ===== 挂单详情弹窗 =====
 function openDetail(idx) {
     var o = records[idx];
-    document.getElementById('dmSub').textContent = '寄售人 ' + o.user;
+    document.getElementById('dmSub').textContent = '挂单人 ' + o.user;
     document.getElementById('dmImg').className = 'product-img ' + o.img;
     document.getElementById('dmName').textContent = o.name;
     document.getElementById('dmCode').textContent = o.code;
@@ -578,7 +578,7 @@ function openDetail(idx) {
 
     var grid = document.getElementById('dmGrid');
     var items = [
-        ['寄售人账号', o.user, ''],
+        ['挂单人账号', o.user, ''],
         ['挂单价格', '¥' + fmt(o.price), 'red'],
         ['挂单时间', o.time, ''],
         ['结算渠道', '汇付钱包', '']

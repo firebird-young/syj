@@ -15,24 +15,40 @@
     /* ↓↓↓ 在此维护模块菜单（分组 + 条目，href 相对本文件所在目录）↓↓↓ */
     var MENU = [
          {
+            group: '首页',
+            items: [
+                { name: '首页',       href: '原功能页面.html' },
+            ]
+        },
+        {
+            group: '认证管理',
+            items: [
+                { name: '个人用户审核',       href: '原功能页面.html' },
+                { name: '企业用户审核',       href: '原功能页面.html' },
+            ]
+        },
+         {
             group: '会员中心',
             items: [
                 { name: '个人用户管理',       href: '个人用户管理.html' },
-                { name: '企业用户管理',     href: '企业用户管理.html' }
+                { name: '企业用户管理',     href: '企业用户管理.html' },
+                { name: '委托服务商（废弃功能，入口和数据展示保留）',     href: '#' }
             ]
         },
         {
             group: '数字艺术品管理',
             items: [
                 { name: '数字艺术品管理',     href: '数字艺术品管理.html' },
+                { name: '价值注入审核',     href: '价值注入审核.html' },
+                { name: '价值管理',     href: '价值管理.html' }
             ]
         },
         {
-            group: '订单与商品管理',
+            group: '订单产品管理',
             items: [
                 { name: '零售市场订单',       href: '零售市场订单.html' },
                 { name: '批发市场订单',       href: '批发市场订单.html' },
-                { name: '寄售详情管理',       href: '寄售详情管理.html' },
+                { name: '挂单详情管理',       href: '挂单详情管理.html' },
                 { name: '产品详情管理',       href: '产品详情管理.html' },
                 { name: '产品分账管理',       href: '产品分账管理.html' }
             ]
@@ -40,21 +56,47 @@
         {
             group: '平台账户管理',
             items: [
-                { name: '平台账户',       href: '平台账户.html' }
+                { name: '平台账户',       href: '平台账户.html' },
+                { name: '批发商账户（废弃功能，入口和数据展示保留）',       href: '#' }
+            ]
+        },
+            {
+            group: '仓库管理',
+            items: [
+                { name: '仓库列表',       href: '原功能页面.html' },
+                { name: '发货管理（原实物提取管理）',       href: '发货管理.html' },
+                { name: '货款提取审核（废弃功能，入口和数据展示保留）',       href: '#' },
+                { name: '数字艺术品存储',       href: '原功能页面.html' },
+              
             ]
         },
         {
             group: '分账提现管理',
             items: [
                 { name: '批发市场分账审核',   href: '批发市场分账审核.html' },
-                { name: '冻结金分账申请审核', href: '冻结金分账申请审核.html' },
+                { name: '固定风险保证金分账审核', href: '固定风险保证金分账审核.html' },
                 { name: '批发商提现审核',     href: '批发商提现审核.html' },
             ]
         },
         {
             group: '平台统计',
             items: [
-                { name: '平台产品销售报表',   href: '平台产品销售报表.html' }
+                { name: '平台产品销售报表',   href: '平台产品销售报表.html' },
+                { name: '财务日统计',   href: '原功能页面.html' },
+                { name: '平台数据总汇',   href: '原功能页面.html' },
+                { name: '上线服务费统计',   href: '原功能页面.html' }
+            ]
+        },
+        {
+            group: '报表推送',
+            items: [
+                { name: '推送记录',   href: '原功能页面.html' },
+            ]
+        },
+        {
+            group: '财务管理',
+            items: [
+                { name: '提现记录（废弃功能，入口和数据展示保留）',   href: '#' },
             ]
         },
         {
@@ -63,7 +105,13 @@
                 { name: '批发商菜单管理',     href: '批发商菜单管理.html' },
                 { name: '业务参数配置',       href: '业务参数配置.html' },
                 { name: '区块链服务管理',     href: '区块链服务管理.html' },
-                { name: '钱包管理',           href: 'wallet-admin.html' }
+                { name: '钱包管理',           href: 'wallet-admin.html' },
+                { name: 'Banner管理',     href: '原功能页面.html' },
+                { name: 'app上架管理',       href: '原功能页面.html' },
+                { name: '类型管理',     href: '原功能页面.html' },
+                { name: '风险测评',           href: '原功能页面.html' },
+                { name: '风控规则配置',     href: '原功能页面.html' },
+                { name: '协议管理',           href: '原功能页面.html' }
             ]
         }
     ];
