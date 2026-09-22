@@ -2,615 +2,486 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>零售市场支付</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>零售市场支付 - APP 原型</title>
+    <!-- ① 左侧目录：公用文件引用（菜单在 asset/admin-sidebar.js 的 MENU 中维护） -->
+    <link rel="stylesheet" href="asset/admin-sidebar.css">
     <style>
         * { margin:0; padding:0; box-sizing:border-box; }
-        html { background: #b0b8c6; min-height:100vh; }
-        .page-wrap {
-            display: flex;
-            align-items: flex-start;
-            justify-content: center;
-            min-height: 100vh;
-        }
-        .phone-frame {
-            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
-            background: #f5f6fa;
-            max-width: 420px;
-            width: 420px;
-            min-height: 100vh;
-            padding-bottom: 84px;
-            box-shadow: 0 0 0 1px rgba(0,0,0,0.04);
-            flex-shrink: 0;
-            position: relative;
-        }
-        .side-btns {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-left: 10px;
-            margin-top: 60px;
-        }
-        .side-btns label {
-            font-size: 13px;
-            color: #fff;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            background: rgba(255,255,255,0.15);
-            padding: 5px 12px;
-            border-radius: 6px;
+
+        /* ===== 主色（沿用本模块移动端红粉调性，全页与右侧说明面板共用变量） ===== */
+        :root {
+            --accent:#e74c5e; --accent-dark:#c45454; --accent-soft:#fbe4e0;
+            --ink:#1a1a2e; --ink-sub:#4e5a6e; --ink-weak:#86909c;
+            --line:#f0f0f0; --card-radius:14px; --border:#e0e0e0;
+            --warn:#c41e1e; --warn-line:#f5c6c6; --warn-bg:#fff3f3;
         }
 
-        /* 头部 */
-        .header {
-            background: #fff;
-            padding: 44px 20px 14px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-bottom: 1px solid #f0f0f0;
-        }
-        .back-btn {
-            font-size: 22px;
-            color: #1a1a2e;
-            cursor: pointer;
-            line-height: 1;
-        }
-        .header-title {
-            font-size: 17px;
-            font-weight: 600;
-            color: #1a1a2e;
-        }
-        .header-placeholder { width: 22px; }
-
-        /* 商品卡片 */
-        .product-card {
-            background: #fff;
-            border-radius: 12px;
-            margin: 12px 16px 0;
-            padding: 14px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-        }
-        .product-top {
-            display: flex;
-            gap: 12px;
-        }
-        .product-img {
-            width: 76px;
-            height: 76px;
-            border-radius: 8px;
-            background: linear-gradient(135deg, #d4a574, #8b6f47);
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            font-size: 24px;
-        }
-        .product-info { flex: 1; min-width: 0; }
-        .product-name {
-            font-size: 15px;
-            font-weight: 600;
-            color: #1a1a2e;
-        }
-        .product-code {
-            font-size: 12px;
-            color: #9ba6b9;
-            margin-top: 4px;
+        body {
+            font-family:-apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+            background:#f5f5f7; color:var(--ink); font-size:14px; min-height:100vh;
+            -webkit-font-smoothing:antialiased; -webkit-tap-highlight-color:transparent;
         }
 
-        .price-row {
-            display: flex;
-            margin-top: 14px;
-            border-top: 1px solid #f5f5f7;
-            padding-top: 12px;
-        }
-        .price-item {
-            flex: 1;
-            text-align: center;
-            border-right: 1px solid #f0f0f0;
-        }
-        .price-item:last-child { border-right: none; }
-        .price-label {
-            font-size: 12px;
-            color: #6b7588;
-        }
-        .price-value {
-            font-size: 14px;
-            font-weight: 600;
-            color: #1a1a2e;
-            margin-top: 4px;
-        }
-        .price-value.price-red { color: #D62828; }
+        /* ===== ② 中间原型内容：面包屑 + 手机原型容器 ===== */
+        .breadcrumb { padding:16px 24px 0; font-size:13px; color:var(--ink-weak); display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+        .breadcrumb a { color:var(--ink-weak); text-decoration:none; }
+        .breadcrumb a:hover { color:var(--accent); }
+        .breadcrumb .sep { margin:0 4px; }
+        .breadcrumb .current { color:var(--ink); font-weight:500; }
 
-        /* 购买设置卡片 */
-        .setting-card {
-            background: #fff;
-            border-radius: 12px;
-            margin: 12px 16px 0;
-            padding: 16px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-        }
-        .setting-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 6px 0;
-        }
-        .setting-label {
-            font-size: 14px;
-            color: #4e5a6e;
-        }
-        .qty-control {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .qty-btn {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: #f5f5f7;
-            border: none;
-            color: #999;
-            font-size: 18px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .qty-btn.primary {
-            background: #D62828;
-            color: #fff;
-        }
-        .qty-num {
-            font-size: 16px;
-            font-weight: 600;
-            color: #1a1a2e;
-            min-width: 24px;
-            text-align: center;
-        }
+        /* 面包屑右侧：演示用状态切换 */
+        .bc-switch { display:flex; align-items:center; gap:14px; flex-wrap:wrap; justify-content:flex-end; }
+        .bc-group { display:flex; align-items:center; gap:6px; }
+        .bc-switch-label { font-size:12px; color:var(--ink-weak); }
+        .bc-switch-btn { height:26px; padding:0 12px; border-radius:9999px; cursor:pointer; border:1px solid var(--border); background:#fff; font-size:12px; color:var(--ink-sub); font-family:inherit; transition:all .2s; }
+        .bc-switch-btn:hover { border-color:var(--accent); color:var(--accent); }
+        .bc-switch-btn.active { background:var(--accent); border-color:var(--accent); color:#fff; font-weight:600; }
 
-        /* 提货方式 */
-        .delivery-tabs {
-            display: flex;
-            background: #f5f5f7;
-            border-radius: 999px;
-            padding: 4px;
-            margin-top: 8px;
-        }
-        .delivery-tab {
-            flex: 1;
-            height: 36px;
-            border-radius: 999px;
-            background: transparent;
-            border: none;
-            font-size: 13px;
-            color: #6b7588;
-            cursor: pointer;
-            font-weight: 500;
-        }
-        .delivery-tab.active {
-            background: #D62828;
-            color: #fff;
-        }
+        .main { padding:16px 24px 40px; display:flex; justify-content:center; align-items:flex-start; }
 
-        /* 服务商卡片 */
-        .service-card {
-            background: #fff;
-            border-radius: 12px;
-            margin: 12px 16px 0;
-            padding: 14px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-        }
-        .service-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 4px 0;
-        }
-        .service-label {
-            font-size: 13px;
-            color: #4e5a6e;
-        }
-        .service-value {
-            font-size: 13px;
-            color: #1a1a2e;
-            font-weight: 500;
-        }
-        .agree-row {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            margin-top: 8px;
-            font-size: 12px;
-            color: #6b7588;
-        }
-        .agree-check {
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background: #D62828;
-            color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-            flex-shrink: 0;
-        }
-        .agree-link {
-            color: #D62828;
-            cursor: pointer;
-        }
+        /* 手机页面容器：固定屏高 + 内部滚动（430px） */
+        .app-container { width:100%; max-width:430px; flex-shrink:0; height:calc(100vh - 120px); min-height:600px; background:#f5f5f5; border-radius:18px; overflow:hidden; box-shadow:0 10px 34px rgba(30,60,120,.14); display:flex; flex-direction:column; position:relative; }
+        .app-scroll { flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+        .app-scroll::-webkit-scrollbar { width:4px; }
+        .app-scroll::-webkit-scrollbar-thumb { background:#d8dce3; border-radius:2px; }
 
-        /* 底部提交按钮 */
-        .submit-bar {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: #fff;
-            border-top: 1px solid #edf0f5;
-            padding: 12px 16px 24px;
-            box-shadow: 0 -4px 12px rgba(0,0,0,0.06);
-            z-index: 10;
-        }
-        .btn-submit {
-            width: 100%;
-            height: 48px;
-            background: #D62828;
-            color: #fff;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-        .btn-submit:active {
-            background: #c41e1e;
-        }
+        /* 顶部两段：状态栏 + 标题栏 */
+        .page-top { flex-shrink:0; }
+        .status-bar { height:44px; background:#fff; color:var(--ink); display:flex; align-items:center; justify-content:space-between; padding:0 20px; }
+        .status-bar .sb-left { display:flex; align-items:baseline; gap:8px; }
+        .status-bar .sb-time { font-size:15px; font-weight:600; letter-spacing:.3px; }
+        .status-bar .sb-date { font-size:12px; color:#666; }
+        .status-bar .sb-right { display:flex; align-items:center; gap:7px; }
+        .status-bar .sb-signal { display:inline-flex; align-items:flex-end; gap:1.5px; height:11px; }
+        .status-bar .sb-signal i { width:3px; border-radius:1px; background:currentColor; }
+        .status-bar .sb-signal i:nth-child(1) { height:4px; }
+        .status-bar .sb-signal i:nth-child(2) { height:6px; }
+        .status-bar .sb-signal i:nth-child(3) { height:8px; }
+        .status-bar .sb-signal i:nth-child(4) { height:11px; }
+        .status-bar .sb-wifi { width:15px; height:11px; position:relative; display:inline-block; }
+        .status-bar .sb-wifi::before { content:''; position:absolute; left:50%; bottom:0; transform:translateX(-50%); width:5px; height:5px; border-radius:50%; background:currentColor; }
+        .status-bar .sb-wifi::after { content:''; position:absolute; left:50%; bottom:2px; transform:translateX(-50%); width:14px; height:14px; box-sizing:border-box; border-top:2px solid currentColor; border-radius:50%; }
+        .status-bar .sb-batt { width:25px; height:12px; border:1.4px solid currentColor; border-radius:3px; padding:1.5px; position:relative; }
+        .status-bar .sb-batt::after { content:''; position:absolute; right:-3.5px; top:50%; transform:translateY(-50%); width:2px; height:5px; background:currentColor; border-radius:0 1px 1px 0; }
+        .status-bar .sb-batt i { display:block; height:100%; width:78%; background:currentColor; border-radius:1px; }
 
-        /* ===== 弹窗 ===== */
-        .modal-mask {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.5);
-            display: none;
-            z-index: 99;
-        }
-        .modal-mask.show { display: block; }
+        .top-nav { height:50px; background:linear-gradient(135deg, var(--accent), var(--accent-dark)); display:flex; align-items:center; padding:0 16px; }
+        .top-nav .back-btn { width:32px; font-size:24px; color:#fff; line-height:1; cursor:pointer; text-align:left; background:none; border:none; font-family:inherit; }
+        .top-nav .top-nav-title { flex:1; text-align:center; font-size:17px; font-weight:600; color:#fff; }
+        .top-nav .right-placeholder { width:32px; }
 
-        .modal-panel {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            transform: translateY(100%);
-            background: #fff;
-            border-radius: 16px 16px 0 0;
-            z-index: 100;
-            transition: transform 0.3s ease;
-            padding-bottom: 24px;
-        }
-        .modal-panel.show { transform: translateY(0); }
+        /* ===== 商品信息卡片 ===== */
+        .product-card { background:#fff; border-radius:var(--card-radius); margin:12px 16px 0; padding:14px 16px; box-shadow:0 4px 16px rgba(0,0,0,.06); }
+        .product-top { display:flex; gap:12px; }
+        .product-img { width:76px; height:76px; border-radius:8px; background:#fafbfc; flex-shrink:0; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+        .product-img img { width:100%; height:100%; object-fit:cover; display:block; }
+        .product-info { flex:1; min-width:0; }
+        .product-name { font-size:15px; font-weight:600; color:var(--ink); }
+        .code-tag { display:inline-block; font-size:12px; color:#1a78ff; font-weight:600; background:#e6f4ff; border:1px solid #b7dcff; padding:2px 8px; border-radius:4px; margin-left:8px; vertical-align:1px; }
+        .product-code { font-size:12px; color:var(--ink-weak); margin-top:6px; }
+        .product-code b { color:var(--ink); font-weight:600; }
 
-        .modal-title {
-            text-align: center;
-            padding: 16px;
-            font-size: 16px;
-            font-weight: 600;
-            color: #1a1a2e;
-            border-bottom: 1px solid #f0f0f0;
-            position: relative;
-        }
-        .modal-close {
-            position: absolute;
-            right: 14px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 26px;
-            height: 26px;
-            border-radius: 50%;
-            background: #f5f5f7;
-            border: none;
-            color: #999;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-        }
+        .price-row { display:flex; margin-top:14px; border-top:1px solid #f5f5f7; padding-top:12px; }
+        .price-item { flex:1; text-align:center; border-right:1px solid var(--line); }
+        .price-item:last-child { border-right:none; }
+        .price-label { font-size:12px; color:#6b7588; }
+        .price-value { font-size:14px; font-weight:600; color:var(--ink); margin-top:4px; }
+        .price-value.price-red { color:var(--accent); font-size:16px; }
 
-        .modal-body {
-            padding: 14px 20px;
-        }
-        .modal-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
-            font-size: 14px;
-        }
-        .modal-row .label { color: #6b7588; }
-        .modal-row .value { color: #1a1a2e; font-weight: 500; }
-        .modal-divider {
-            height: 1px;
-            background: #f0f0f0;
-            margin: 8px 0;
-        }
-        .modal-section-title {
-            font-size: 15px;
-            font-weight: 600;
-            color: #1a1a2e;
-            margin-bottom: 8px;
-        }
-        .pay-option {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 14px 0;
-            border-bottom: 1px solid #f5f5f7;
-        }
-        .pay-option:last-child { border-bottom: none; }
-        .pay-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-        }
-        .pay-icon.hui { background: linear-gradient(135deg, #f5a623, #e0941e); color: #fff; }
-        .pay-info { flex: 1; }
-        .pay-name {
-            font-size: 14px;
-            font-weight: 500;
-            color: #1a1a2e;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .pay-link {
-            color: #D62828;
-            font-size: 12px;
-            cursor: pointer;
-            text-decoration: underline;
-            display: none;
-        }
-        .pay-link.show { display: inline; }
-        .pay-radio {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            border: 2px solid #d0d5dd;
-            flex-shrink: 0;
-        }
-        .pay-radio.checked {
-            border-color: #D62828;
-            background: #D62828;
-            position: relative;
-        }
-        .pay-radio.checked::after {
-            content: '';
-            position: absolute;
-            top: 4px;
-            left: 4px;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #fff;
-        }
+        /* ===== 购买设置卡片 ===== */
+        .setting-card { background:#fff; border-radius:var(--card-radius); margin:12px 16px 0; padding:16px; box-shadow:0 4px 16px rgba(0,0,0,.06); }
+        .setting-label { font-size:14px; color:var(--ink-sub); }
+        .delivery-tabs { display:flex; background:#f5f5f7; border-radius:999px; padding:4px; margin-top:8px; }
+        .delivery-tab { flex:1; height:36px; border-radius:999px; background:transparent; border:none; font-size:13px; color:#6b7588; cursor:pointer; font-weight:500; font-family:inherit; transition:all .2s; }
+        .delivery-tab.active { background:var(--accent); color:#fff; }
 
-        .pay-provider {
-            text-align: center;
-            font-size: 11px;
-            color: #9ba6b9;
-            margin: 12px 0 16px;
-        }
+        /* ===== 协议卡片 ===== */
+        .service-card { background:#fff; border-radius:var(--card-radius); margin:12px 16px 0; padding:14px 16px; box-shadow:0 4px 16px rgba(0,0,0,.06); }
+        .agree-row { display:flex; align-items:center; gap:6px; font-size:12px; color:#6b7588; flex-wrap:wrap; }
+        .agree-check { width:16px; height:16px; border-radius:50%; background:var(--accent); color:#fff; display:flex; align-items:center; justify-content:center; font-size:10px; flex-shrink:0; }
+        .agree-link { color:var(--accent); cursor:pointer; }
 
-        .modal-confirm-btn {
-            width: calc(100% - 40px);
-            margin: 0 20px;
-            height: 48px;
-            background: #f0a8a8;
-            color: #fff;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: not-allowed;
-        }
-        .modal-confirm-btn.active {
-            background: #D62828;
-            cursor: pointer;
-        }
+        /* ===== 提示条（交易次数 / 存续周期 两条提示可同时展示） ===== */
+        .warn-bar { display:none; margin:12px 16px 16px; padding:12px 14px; background:var(--warn-bg); border:1px solid var(--warn-line); border-radius:10px; font-size:13px; color:var(--warn); line-height:1.6; }
+        .warn-bar.show { display:block; }
+        .warn-bar .wb-item { display:flex; align-items:flex-start; gap:8px; }
+        .warn-bar .wb-item + .wb-item { margin-top:10px; padding-top:10px; border-top:1px dashed var(--warn-line); }
+        .warn-bar .wb-ico { flex-shrink:0; width:18px; height:18px; border-radius:50%; background:#D62828; color:#fff; font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center; margin-top:2px; }
+        .warn-bar b { font-weight:700; }
+
+        /* ===== 底部固定提交栏 ===== */
+        .submit-bar { flex-shrink:0; background:#fff; border-top:1px solid var(--line); padding:12px 16px 18px; box-shadow:0 -4px 12px rgba(0,0,0,.06); }
+        .btn-submit { width:100%; height:48px; background:var(--accent); color:#fff; border:none; border-radius:12px; font-size:16px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .2s; }
+        .btn-submit:active { background:var(--accent-dark); }
+
+        /* ===== 弹窗（限定在手机框内） ===== */
+        .modal-mask { position:absolute; inset:0; background:rgba(0,0,0,.5); display:none; z-index:200; }
+        .modal-mask.show { display:block; }
+        .modal-panel { position:absolute; bottom:0; left:0; right:0; background:#fff; border-radius:16px 16px 0 0; z-index:201; max-height:86%; overflow-y:auto; transform:translateY(100%); transition:transform .3s ease; padding-bottom:18px; }
+        .modal-panel.show { transform:translateY(0); }
+        .modal-title { text-align:center; padding:18px 16px 14px; font-size:16px; font-weight:600; color:var(--ink); position:relative; }
+        .modal-close { position:absolute; right:14px; top:14px; width:28px; height:28px; border-radius:50%; background:#f5f5f7; border:none; color:#666; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:14px; z-index:2; font-family:inherit; }
+        .modal-body { padding:0 20px; }
+        .modal-row { display:flex; justify-content:space-between; align-items:center; padding:10px 0; font-size:14px; }
+        .modal-row .label { color:#6b7588; }
+        .modal-row .value { color:var(--ink); font-weight:500; }
+        .modal-row .value.price-red { color:var(--accent); }
+        .modal-divider { height:1px; background:var(--line); margin:14px 0; }
+        .modal-section-title { font-size:15px; font-weight:600; color:var(--ink); margin:16px 0 10px; }
+
+        .pay-option { display:flex; align-items:center; gap:12px; padding:14px 0; cursor:pointer; }
+        .pay-icon { font-size:18px; color:#f5a623; }
+        .pay-info { flex:1; }
+        .pay-name { font-size:14px; color:var(--ink); display:flex; align-items:center; gap:8px; }
+        .pay-link { color:var(--accent); font-size:12px; cursor:pointer; text-decoration:underline; display:none; }
+        .pay-link.show { display:inline; }
+        .pay-radio { width:20px; height:20px; border-radius:50%; border:2px solid #d0d5dd; flex-shrink:0; }
+        .pay-radio.checked { border-color:var(--accent); background:var(--accent); position:relative; }
+        .pay-radio.checked::after { content:''; position:absolute; top:4px; left:4px; width:8px; height:8px; border-radius:50%; background:#fff; }
+        .pay-provider { text-align:center; font-size:11px; color:var(--ink-weak); margin:14px 0 12px; }
+        .pay-submit-btn { width:100%; height:48px; margin-top:4px; background:#f0a8a8; color:#fff; border:none; border-radius:12px; font-size:16px; font-weight:600; cursor:not-allowed; font-family:inherit; }
+        .pay-submit-btn.active { background:var(--accent); cursor:pointer; }
 
         /* 标注圆点 */
-        .badge {
-            display: inline-block;
-            min-width: 18px;
-            height: 18px;
-            padding: 0 5px;
-            border-radius: 50%;
-            background: #ff2d55;
-            color: #fff;
-            font-size: 12px;
-            line-height: 18px;
-            text-align: center;
-            font-weight: 600;
-            box-shadow: 0 1px 3px rgba(255,45,85,0.3);
-        }
-        .badge.sm {
-            min-width: 16px;
-            height: 16px;
-            font-size: 11px;
-            line-height: 16px;
-        }
+        .badge { display:inline-block; min-width:18px; height:18px; padding:0 5px; border-radius:50%; background:#ff2d55; color:#fff; font-size:12px; line-height:18px; text-align:center; font-weight:600; box-shadow:0 1px 3px rgba(255,45,85,.3); }
+        .badge.sm { min-width:16px; height:16px; font-size:11px; line-height:16px; }
 
-        /* ── 功能说明浮窗 ── */
-        .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 430px; max-width: 94vw; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 99999; padding: 22px; display: none; }
-        .f-modal.show { display: block; }
-        .f-modal .fm-title { font-size: 15px; font-weight: 600; color: #1a1a2e; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
-        .f-modal .fm-title:active { cursor: grabbing; }
-        .f-modal .fm-close { width: 26px; height: 26px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 13px; color: #666; border: none; flex-shrink: 0; }
-        .f-modal .fm-close:hover { background: #e8e8e8; }
-        .f-modal .fm-body { font-size: 13px; color: #555; line-height: 1.8; }
-        .f-modal .fm-body h4 { font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 14px 0 6px; }
-        .f-modal .fm-body ul { padding-left: 18px; margin: 0 0 8px; }
-        .f-modal .fm-body li { margin-bottom: 4px; }
+        /* 轻提示（z-index 高于目录栏 900 / 说明面板 890） */
+        .toast { position:fixed; top:70px; left:50%; transform:translateX(-50%) translateY(-14px); background:rgba(26,26,46,.92); color:#fff; padding:9px 20px; border-radius:9999px; font-size:13px; max-width:70vw; opacity:0; pointer-events:none; transition:all .25s; z-index:9999; }
+        .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+        /* ===== ③ 右侧功能说明面板（配色复用页面变量） ===== */
+        .func-panel { position:fixed; top:0; right:0; bottom:0; width:340px; z-index:890; background:#fff; border-left:1px solid #e3e6eb; box-shadow:-1px 0 12px rgba(20,30,60,.04); display:flex; flex-direction:column; }
+        .func-panel .fp-inner { display:flex; flex-direction:column; height:100%; min-width:0; }
+        .func-panel .fp-header { display:flex; align-items:center; justify-content:space-between; padding:15px 14px 13px 18px; border-bottom:1px solid #f0f1f4; flex-shrink:0; }
+        .func-panel .fp-title { display:flex; align-items:center; gap:9px; font-size:15px; font-weight:700; color:var(--ink); }
+        .func-panel .fp-title::before { content:''; width:8px; height:8px; border-radius:50%; background:var(--accent); box-shadow:0 0 0 4px rgba(231,76,94,.14); }
+        .func-panel .fp-fold-btn { width:28px; height:28px; border:1px solid var(--border); background:#fff; border-radius:50%; color:var(--ink-weak); font-size:15px; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all .2s; font-family:inherit; }
+        .func-panel .fp-fold-btn:hover { border-color:var(--accent); color:var(--accent); }
+        .func-panel .fp-body { flex:1; overflow-y:auto; padding:4px 18px 40px; font-size:13px; color:#555; line-height:1.9; }
+        .func-panel .fp-body::-webkit-scrollbar { width:5px; }
+        .func-panel .fp-body::-webkit-scrollbar-thumb { background:#d8dce3; border-radius:3px; }
+        .func-panel .fp-body h4 { font-size:14px; font-weight:600; color:var(--ink); margin:18px 0 6px; }
+        .func-panel .fp-body h4:first-child { margin-top:12px; }
+        .func-panel .fp-body ul { padding-left:18px; margin:0 0 8px; }
+        .func-panel .fp-body li { margin-bottom:6px; }
+        .func-panel .fp-body strong { color:#333; }
+        .func-panel .fp-body .badge { vertical-align:1px; }
+        .func-panel .fp-body img { width:100%; border-radius:8px; border:1px solid #f0f0f0; cursor:zoom-in; display:block; }
+        .func-panel .fp-body .img-tip { text-align:center; font-size:12px; color:var(--ink-weak); margin-top:6px; }
+        .func-panel .fp-open { display:none; position:absolute; top:0; bottom:0; left:0; right:0; border:none; background:transparent; cursor:pointer; writing-mode:vertical-rl; text-orientation:upright; font-size:13px; font-weight:600; letter-spacing:6px; color:var(--ink-weak); align-items:center; justify-content:center; font-family:inherit; transition:all .2s; }
+        .func-panel .fp-open:hover { color:var(--accent); background:#fafbfc; }
+
+        @media (min-width:1024px) {
+            .main, .breadcrumb { margin-right:340px; }
+            body.fp-collapsed .main, body.fp-collapsed .breadcrumb { margin-right:40px; }
+            body.fp-collapsed .func-panel { width:40px; }
+            body.fp-collapsed .fp-inner { display:none; }
+            body.fp-collapsed .fp-open { display:flex; }
+        }
+        @media (max-width:1023.98px) {
+            .func-panel { display:none; }
+            .main, .breadcrumb { margin-right:0; }
+        }
+        /* 真机宽度：手机页铺满 */
+        @media (max-width:540px) {
+            .main { padding:12px 0 32px; }
+            .breadcrumb { padding:12px 16px 0; }
+            .app-container { border-radius:0; box-shadow:none; height:100vh; min-height:100vh; }
+        }
     </style>
 </head>
 <body>
-
-<div class="page-wrap">
-
-<div class="phone-frame">
-
-    <div class="header">
-        <span class="back-btn" onclick="history.back()">‹</span>
-        <span class="header-title">吃水不忘挖井人</span>
-        <span class="header-placeholder"></span>
-    </div>
-
-    <!-- 商品信息 -->
-    <div class="product-card">
-        <div class="product-top">
-            <div class="product-img">🏺</div>
-            <div class="product-info">
-                <div class="product-name">吃水不忘挖井人</div>
-                <div class="product-code">产品编码 XB000005</div>
-            </div>
-        </div>
-        <div class="price-row">
-            <div class="price-item">
-                <div class="price-label">零售商</div>
-                <div class="price-value">*******6925</div>
-            </div>
-            <div class="price-item">
-                <div class="price-label">售价</div>
-                <div class="price-value price-red">¥950.00</div>
-            </div>
-            <div class="price-item">
-                <div class="price-label">数量</div>
-                <div class="price-value" id="priceQty">1</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 购买设置 -->
-    <div class="setting-card">
-        <div class="setting-row">
-            <span class="setting-label">购买数量</span>
-            <div class="qty-control">
-                <button class="qty-btn" onclick="changeQty(-1)">−</button>
-                <span class="qty-num" id="qtyNum">1</span>
-                <button class="qty-btn primary" onclick="changeQty(1)">+</button>
-            </div>
-        </div>
-        <div class="setting-row">
-            <span class="setting-label">提货方式</span>
-        </div>
-        <div class="delivery-tabs">
-            <button class="delivery-tab active" onclick="selectDelivery(this, 0)">仓库暂存</button>
-            <button class="delivery-tab" onclick="selectDelivery(this, 1)">立即提货</button>
-        </div>
-    </div>
-
-    <!-- 服务商 -->
-    <div class="service-card">
-        <div class="service-row">
-            <span class="service-label">委托服务商</span>
-            <span class="service-value">四川华泰博文文化艺术发展有限公司</span>
-        </div>
-        <div class="agree-row">
-            <span class="agree-check">✓</span>
-            <span>我已阅读并同意</span>
-            <span class="agree-link">《风险揭示书》</span>
-            <span class="agree-link">《购买须知、购买协议、委托保管协议及提货须知》</span>
-        </div>
-    </div>
-
-    <!-- 底部提交 -->
-    <div class="submit-bar">
-        <button class="btn-submit" onclick="openConfirm()">提交订单</button>
-    </div>
-
-    <!-- 确认订单弹窗 -->
-    <div class="modal-panel" id="modalPanel">
-        <div class="modal-title">
-            确认订单
-            <button class="modal-close" onclick="closeConfirm()">✕</button>
-        </div>
-        <div class="modal-body">
-            <div class="modal-row">
-                <span class="label">数量</span>
-                <span class="value" id="modalQty">1</span>
-            </div>
-            <div class="modal-row">
-                <span class="label">单价</span>
-                <span class="value">¥950.00</span>
-            </div>
-            <div class="modal-row">
-                <span class="label">提货方式</span>
-                <span class="value" id="modalDelivery">仓库暂存</span>
-            </div>
-
-            <div class="modal-divider"></div>
-
-            <div class="modal-section-title">选择支付方式</div>
-
-            <div class="pay-option" onclick="selectPay(this)">
-                <div class="pay-icon hui">💰</div>
-                <div class="pay-info">
-                    <div class="pay-name">汇付钱包 <span class="pay-link" id="payLink" onclick="event.stopPropagation();goRecharge()">去充值</span></div>
-                </div>
-                <div class="pay-radio"></div>
-            </div>
-
-            <button class="modal-confirm-btn" id="modalConfirmBtn">请选择支付方式</button>
-        </div>
-    </div>
-
-</div><!-- /phone-frame -->
-
-<div class="side-btns">
-    <label>
-        <input type="radio" name="walletStatus" value="opened" checked onchange="setWalletStatus('opened')">
-        已开通
-    </label>
-    <label>
-        <input type="radio" name="walletStatus" value="unopened" onchange="setWalletStatus('unopened')">
-        未开通
-    </label>
+<!-- ② 中间原型内容：面包屑 + 手机页面 -->
+<div class="breadcrumb">
+    <span>
+        <a href="index.html">首页</a>
+        <span class="sep">&gt;</span>
+        <span>APP 端</span>
+        <span class="sep">&gt;</span>
+        <span class="current">零售市场支付</span>
+    </span>
+    <!-- 演示用状态切换：钱包 / 交易次数 / 存续周期 -->
+    <span class="bc-switch">
+        <span class="bc-group">
+            <span class="bc-switch-label">钱包</span>
+            <button class="bc-switch-btn active" onclick="setWalletStatus('opened', this)">已开通</button>
+            <button class="bc-switch-btn" onclick="setWalletStatus('unopened', this)">未开通</button>
+        </span>
+        <span class="bc-group">
+            <span class="bc-switch-label">交易次数</span>
+            <button class="bc-switch-btn active" onclick="setTradeStatus('normal', this)">次数充足</button>
+            <button class="bc-switch-btn" onclick="setTradeStatus('max', this)">次数即将达到最大</button>
+        </span>
+        <span class="bc-group">
+            <span class="bc-switch-label">存续周期</span>
+            <button class="bc-switch-btn active" onclick="setLifeStatus('enough', this)">存续周期充足</button>
+            <button class="bc-switch-btn" onclick="setLifeStatus('short', this)">存续周期小于10天</button>
+        </span>
+    </span>
 </div>
 
-</div><!-- /page-wrap -->
+<div class="main">
+    <div class="app-container">
 
-<!-- 弹窗遮罩 -->
-<div class="modal-mask" id="modalMask" onclick="closeConfirm()"></div>
+        <!-- 顶部两段：状态栏 + 标题栏 -->
+        <div class="page-top">
+            <div class="status-bar">
+                <span class="sb-left">
+                    <span class="sb-time">9:41</span>
+                    <span class="sb-date">9月22日 星期二</span>
+                </span>
+                <span class="sb-right">
+                    <span class="sb-signal"><i></i><i></i><i></i><i></i></span>
+                    <span class="sb-wifi"></span>
+                    <span class="sb-batt"><i></i></span>
+                </span>
+            </div>
+            <div class="top-nav">
+                <button class="back-btn" onclick="goBack()" aria-label="返回">‹</button>
+                <span class="top-nav-title">零售市场支付</span>
+                <span class="right-placeholder"></span>
+            </div>
+        </div>
+
+        <div class="app-scroll">
+
+            <!-- 商品信息 -->
+            <div class="product-card">
+                <div class="product-top">
+                    <div class="product-img"><img src="../asset/永淳·夏日帖.png" alt="永淳·夏日帖"></div>
+                    <div class="product-info">
+                        <div class="product-name">永淳·夏日帖<span class="code-tag">#0002</span></div>
+                        <div class="product-code">产品编码 XB000004 · 已交易次数 <b>3</b>/共 <b>20</b> 次</div>
+                    </div>
+                </div>
+                <div class="price-row">
+                    <div class="price-item">
+                        <div class="price-label">零售商</div>
+                        <div class="price-value">*******6925</div>
+                    </div>
+                    <div class="price-item">
+                        <div class="price-label">售价</div>
+                        <div class="price-value price-red">¥10.00</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 购买设置 -->
+            <div class="setting-card">
+                <div class="setting-label">提货方式</div>
+                <div class="delivery-tabs">
+                    <button class="delivery-tab active" onclick="selectDelivery(this, 0)">仓库暂存</button>
+                    <button class="delivery-tab" onclick="selectDelivery(this, 1)">立即提货</button>
+                </div>
+            </div>
+
+            <!-- 协议 -->
+            <div class="service-card">
+                <div class="agree-row">
+                    <span class="agree-check">✓</span>
+                    <span>我已阅读并同意</span>
+                    <span class="agree-link" onclick="showToast('查看《风险揭示书》（原型演示）')">《风险揭示书》</span>
+                    <span class="agree-link" onclick="showToast('查看《购买须知、购买协议、委托保管协议及提货须知》（原型演示）')">《购买须知、购买协议、委托保管协议及提货须知》</span>
+                </div>
+            </div>
+
+            <!-- 提示条：交易次数达上限 / 存续周期不足（可同时展示） -->
+            <div class="warn-bar" id="warnBar"></div>
+
+        </div><!-- /app-scroll -->
+
+        <!-- 底部固定提交栏 -->
+        <div class="submit-bar">
+            <button class="btn-submit" onclick="openConfirm()">提交订单</button>
+        </div>
+
+        <!-- 弹窗遮罩 -->
+        <div class="modal-mask" id="modalMask" onclick="closeConfirm()"></div>
+
+        <!-- 确认订单弹窗 -->
+        <div class="modal-panel" id="modalPanel">
+            <div class="modal-title">
+                确认订单
+                <button class="modal-close" onclick="closeConfirm()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-row">
+                    <span class="label">产品编号</span>
+                    <span class="value">#0002</span>
+                </div>
+                <div class="modal-row">
+                    <span class="label">单价</span>
+                    <span class="value price-red">¥10.00</span>
+                </div>
+                <div class="modal-row">
+                    <span class="label">提货方式</span>
+                    <span class="value" id="modalDelivery">仓库暂存</span>
+                </div>
+
+                <div class="modal-divider"></div>
+                <div class="modal-section-title">选择支付方式</div>
+                <div class="pay-option" onclick="selectPay(this)">
+                    <span class="pay-icon">💰</span>
+                    <div class="pay-info">
+                        <div class="pay-name">汇付钱包 <span class="pay-link" id="payLink" onclick="event.stopPropagation();goRecharge()">去充值</span></div>
+                    </div>
+                    <div class="pay-radio"></div>
+                </div>
+                <div class="pay-provider">支付服务由汇付天下提供</div>
+                <button class="pay-submit-btn" id="paySubmitBtn">请选择支付方式</button>
+            </div>
+        </div>
+
+    </div><!-- /app-container -->
+</div><!-- /main -->
+
+<!-- ③ 右侧功能说明面板 -->
+<aside class="func-panel">
+    <div class="fp-inner">
+        <div class="fp-header">
+            <span class="fp-title">功能说明</span>
+            <button class="fp-fold-btn" onclick="toggleFuncPanel()" title="收起功能说明">›</button>
+        </div>
+        <div class="fp-body">
+
+            <h4>1、产品信息 <span class="badge">1</span></h4>
+            <ul>
+                <li>展示产品名称、产品编号（<strong>#0002</strong>）、产品编码及<strong>已交易次数 3/共 20 次</strong></li>
+                <li>售价 <strong>¥10.00</strong> 为该产品零售商挂单价格，产品按<strong>一份一份</strong>出售</li>
+            </ul>
+
+            <h4>2、交易次数显示 <span class="badge">2</span></h4>
+            <ul>
+                <li><strong>次数充足</strong>：默认「仓库暂存」，无提示</li>
+                <li><strong>次数即将达到最大</strong>：默认「立即提货」，且只能选择立即提货，并在提交栏上方显示红色提示条</li>
+            </ul>
+
+            <h4>3、市场存续周期 <span class="badge">3</span></h4>
+            <ul>
+                <li><strong>存续周期充足</strong>：无提示</li>
+                <li><strong>存续周期小于 10 天</strong>：在提示条中增加一段提示 ——「该产品市场<strong>存续周期不足10天</strong>，期满后不可再次交易，需尽快完成提货」</li>
+                <li>「交易次数达上限」与「存续周期不足 10 天」可能同时成立，提示条按<strong>两条并列展示</strong></li>
+            </ul>
+
+            <h4>4、去掉宝付支付 <span class="badge">4</span></h4>
+            <ul>
+                <li>去掉<strong>宝付支付</strong>，支付方式仅保留<strong>汇付钱包</strong></li>
+                <li>根据卖家寄售时选择的支付渠道进行展示</li>
+                <li>保证买卖双方必须都开通同一个支付渠道</li>
+            </ul>
+
+            <h4>5、零售市场分账逻辑</h4>
+            <a href="../asset/零售市场分账逻辑.png" target="_blank" title="点击查看原图">
+                <img src="../asset/零售市场分账逻辑.png" alt="零售市场分账逻辑">
+            </a>
+            <div class="img-tip">点击图片查看原图</div>
+
+            <h4>6、原型说明</h4>
+            <ul>
+                <li>顶部状态栏、标题栏为移动端公用骨架，返回按钮回上一页</li>
+                <li>面包屑右侧可切换<strong>钱包</strong>（已开通/未开通）、<strong>交易次数</strong>（次数充足/次数即将达到最大）、<strong>存续周期</strong>（充足/小于 10 天），用于演示不同提示分支</li>
+            </ul>
+
+        </div>
+    </div>
+    <button class="fp-open" onclick="toggleFuncPanel()" title="展开功能说明">功能说明‹</button>
+</aside>
+
+<div class="toast" id="toast"></div>
+
+<!-- ① 左侧目录：公用文件引用 -->
+<script src="asset/admin-sidebar.js"></script>
 
 <script>
-var qty = 1;
-var deliveryType = 0;
-var walletOpened = true;
+/* ── 右侧功能说明面板：收起 / 展开 ── */
+function toggleFuncPanel() {
+    document.body.classList.toggle('fp-collapsed');
+}
 
-function changeQty(delta) {
-    qty = Math.max(1, qty + delta);
-    document.getElementById('qtyNum').textContent = qty;
-    document.getElementById('priceQty').textContent = qty;
+/* ── 轻提示 ── */
+var toastTimer;
+function showToast(msg) {
+    var el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { el.classList.remove('show'); }, 2000);
+}
+
+function goBack() {
+    if (history.length > 1) { history.back(); } else { location.href = '零售市场详情.html'; }
+}
+
+/* ── 页面状态 ── */
+var deliveryType = 0;      /* 0 仓库暂存 / 1 立即提货 */
+var walletOpened = true;
+var tradeMaxed = false;    /* 交易次数即将达到最大 */
+var lifeShort = false;     /* 市场存续周期小于 10 天 */
+var unitPrice = 10;        /* 单价 ¥10.00 */
+
+/* ── 状态切换按钮：同组内互斥高亮 ── */
+function setGroupActive(btn) {
+    var group = btn.parentNode;
+    group.querySelectorAll('.bc-switch-btn').forEach(function (el) { el.classList.remove('active'); });
+    btn.classList.add('active');
 }
 
 function selectDelivery(btn, idx) {
-    document.querySelectorAll('.delivery-tab').forEach(function(el) { el.classList.remove('active'); });
+    document.querySelectorAll('.delivery-tab').forEach(function (el) { el.classList.remove('active'); });
     btn.classList.add('active');
     deliveryType = idx;
+    document.getElementById('modalDelivery').textContent = idx === 0 ? '仓库暂存' : '立即提货';
 }
 
+/* ── 钱包状态 ── */
+function setWalletStatus(status, btn) {
+    walletOpened = (status === 'opened');
+    setGroupActive(btn);
+    if (document.getElementById('modalMask').classList.contains('show')) { updatePayState(); }
+}
+
+/* ── 交易次数状态：达上限默认「立即提货」 ── */
+function setTradeStatus(status, btn) {
+    tradeMaxed = (status === 'max');
+    setGroupActive(btn);
+    var tabs = document.querySelectorAll('.delivery-tab');
+    if (tradeMaxed) { selectDelivery(tabs[1], 1); } else { selectDelivery(tabs[0], 0); }
+    renderWarn();
+}
+
+/* ── 存续周期状态 ── */
+function setLifeStatus(status, btn) {
+    lifeShort = (status === 'short');
+    setGroupActive(btn);
+    renderWarn();
+}
+
+/* ── 提示条：交易次数 / 存续周期 两条提示可同时展示 ── */
+function renderWarn() {
+    var items = [];
+    if (tradeMaxed) {
+        items.push('该产品当前交易次数即将达到上限，完成本次交易后需完成<b>提货</b>。');
+    }
+    if (lifeShort) {
+        items.push('该产品市场<b>存续周期不足10天</b>，期满后不可再次交易，需尽快完成提货。');
+    }
+
+    var bar = document.getElementById('warnBar');
+    if (!items.length) {
+        bar.innerHTML = '';
+        bar.classList.remove('show');
+        return;
+    }
+    bar.innerHTML = items.map(function (txt) {
+        return '<div class="wb-item"><span class="wb-ico">!</span><span>' + txt + '</span></div>';
+    }).join('');
+    bar.classList.add('show');
+}
+
+/* ── 确认订单弹窗 ── */
 function openConfirm() {
-    document.getElementById('modalQty').textContent = qty;
     document.getElementById('modalDelivery').textContent = deliveryType === 0 ? '仓库暂存' : '立即提货';
     document.getElementById('modalMask').classList.add('show');
     document.getElementById('modalPanel').classList.add('show');
@@ -623,7 +494,7 @@ function closeConfirm() {
 }
 
 function updatePayState() {
-    var btn = document.getElementById('modalConfirmBtn');
+    var btn = document.getElementById('paySubmitBtn');
     var link = document.getElementById('payLink');
 
     if (walletOpened) {
@@ -633,11 +504,11 @@ function updatePayState() {
         btn.textContent = '请选择支付方式';
         btn.onclick = null;
         var opt = document.querySelector('.pay-option');
-        if (opt) selectPay(opt);
+        if (opt) { selectPay(opt); }
     } else {
         link.textContent = '去开户';
         link.className = 'pay-link show';
-        document.querySelectorAll('.pay-option .pay-radio').forEach(function(el) { el.classList.remove('checked'); });
+        document.querySelectorAll('.pay-option .pay-radio').forEach(function (el) { el.classList.remove('checked'); });
         btn.classList.remove('active');
         btn.textContent = '请先开通汇付钱包';
         btn.onclick = null;
@@ -646,94 +517,32 @@ function updatePayState() {
 
 function selectPay(opt) {
     if (!walletOpened) {
-        alert('请先开通汇付钱包');
+        showToast('请先开通汇付钱包');
         return;
     }
-    document.querySelectorAll('.pay-option').forEach(function(el) {
-        el.querySelector('.pay-radio').classList.remove('checked');
-    });
+    document.querySelectorAll('.pay-option .pay-radio').forEach(function (el) { el.classList.remove('checked'); });
     opt.querySelector('.pay-radio').classList.add('checked');
-    var btn = document.getElementById('modalConfirmBtn');
+    var btn = document.getElementById('paySubmitBtn');
     btn.classList.add('active');
-    var amount = 950 * qty;
-    btn.innerHTML = '去支付 ¥' + amount.toFixed(2);
-    btn.onclick = function() { alert('支付成功！'); };
+    btn.textContent = '去支付 ¥' + unitPrice.toFixed(2);
+    btn.onclick = function () {
+        closeConfirm();
+        showToast('支付成功（原型演示）');
+    };
 }
 
 function goRecharge() {
     if (walletOpened) {
-        alert('跳转到汇付钱包充值页面');
+        showToast('跳转汇付钱包充值页（原型演示）');
     } else {
-        alert('跳转到汇付钱包开户页面');
+        location.href = '我的钱包.html';
     }
 }
 
-function setWalletStatus(status) {
-    walletOpened = (status === 'opened');
-    var mask = document.getElementById('modalMask');
-    if (mask.classList.contains('show')) {
-        updatePayState();
-    }
-}
+/* 初始化 */
+renderWarn();
 </script>
 
-<!-- 浮动说明按钮（手机框外） -->
-<button onclick="toggleFuncModal()" style="position:fixed;top:12px;right:16px;z-index:99999;background:#fff;color:#666;padding:7px 16px;border-radius:20px;border:1px solid #ddd;font-size:13px;font-weight:500;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.08);font-family:inherit;display:inline-flex;align-items:center;gap:4px;">📖 说明</button>
-
-<!-- ====== 功能说明浮窗 ====== -->
-<div class="f-modal" id="funcModal">
-  <div class="fm-title">
-    <span>📖 功能说明</span>
-    <button class="fm-close" onclick="toggleFuncModal()">✕</button>
-  </div>
-  <div class="fm-body">
-    <h4><span class="badge">1</span> <span style="vertical-align:middle;">去掉宝付支付</span></h4>
-    <ul>
-      <li>去掉<b>宝付支付</b>，支付仅保留汇付钱包</li>
-      <li>根据<b>卖家寄售时选择的支付渠道</b>进行展示</li>
-      <li>保证<b>买卖双方必须都开通</b>同一个支付渠道</li>
-    </ul>
-    <h4><span class="badge">2</span> <span style="vertical-align:middle;">购买数量限制</span></h4>
-    <ul>
-      <li>一笔订单最大购买数量限制为90</b></li>
-    </ul>
-    <h4><span class="badge">2</span> <span style="vertical-align:middle;">零售市场分账逻辑</span></h4>
-    <div style="text-align:center;margin-top:6px;">
-      <a href="../asset/零售市场分账逻辑.png" target="_blank" title="点击查看原图">
-        <img src="../asset/零售市场分账逻辑.png" alt="零售市场分账逻辑" style="max-width:100%;border-radius:8px;border:1px solid #f0f0f0;cursor:zoom-in;" onclick="event.stopPropagation();">
-      </a>
-      <div style="font-size:12px;color:#86909c;margin-top:6px;">点击图片查看原图</div>
-    </div>
-  </div>
-</div>
-
-<script>
-function toggleFuncModal() {
-  var el = document.getElementById('funcModal');
-  el.classList.toggle('show');
-  if (el.classList.contains('show') && !el.dataset.dragged) {
-    el.style.left = '50%'; el.style.top = '50%'; el.style.transform = 'translate(-50%,-50%)';
-  }
-}
-(function() {
-  var modal, titleBar, offX, offY, dragging = false;
-  document.addEventListener('DOMContentLoaded', function() {
-    modal = document.getElementById('funcModal');
-    titleBar = modal.querySelector('.fm-title');
-    titleBar.addEventListener('mousedown', startDrag);
-    titleBar.addEventListener('touchstart', startDragTouch, {passive:true});
-    document.addEventListener('mousemove', onDrag);
-    document.addEventListener('mouseup', endDrag);
-    document.addEventListener('touchmove', onDragTouch, {passive:true});
-    document.addEventListener('touchend', endDrag);
-  });
-  function startDrag(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = e.clientX - rect.left; offY = e.clientY - rect.top; dragging = true; titleBar.style.cursor = 'grabbing'; }
-  function startDragTouch(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; var t = e.touches[0]; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = t.clientX - rect.left; offY = t.clientY - rect.top; dragging = true; }
-  function onDrag(e) { if (!dragging) return; modal.style.left = (e.clientX - offX) + 'px'; modal.style.top = (e.clientY - offY) + 'px'; }
-  function onDragTouch(e) { if (!dragging) return; var t = e.touches[0]; modal.style.left = (t.clientX - offX) + 'px'; modal.style.top = (t.clientY - offY) + 'px'; }
-  function endDrag() { dragging = false; if (titleBar) titleBar.style.cursor = 'grab'; }
-})();
-</script>
 
 </body>
 </html>

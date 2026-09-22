@@ -2,405 +2,530 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>零售市场列表</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>零售市场列表 - APP 原型</title>
+    <!-- ① 左侧目录：公用文件引用（菜单在 asset/admin-sidebar.js 的 MENU 中维护） -->
+    <link rel="stylesheet" href="asset/admin-sidebar.css">
     <style>
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
-            background: #f0f2f5;
-            color: #1a1a2e;
-            font-size: 14px;
-            min-height: 100vh;
-        }
-        .app-container {
-            max-width: 430px;
-            margin: 0 auto;
-            background: #f5f5f5;
-            min-height: 100vh;
-            position: relative;
-            padding-bottom: 70px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.06);
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        /* ===== 主色（沿用本模块移动端红粉调性，全页与右侧说明面板共用变量） ===== */
+        :root {
+            --accent: #e74c5e;
+            --accent-dark: #c45454;
+            --ink: #1a1a2e;
+            --ink-sub: #4e5a6e;
+            --ink-weak: #86909c;
+            --line: #f0f0f0;
+            --card-radius: 14px;
+            --border: #e0e0e0;
         }
 
-        /* 顶部 */
-        .top-bar {
-            background: linear-gradient(180deg, #ffe5e2 0%, #ffd2cc 100%);
-            padding: 16px 14px 12px;
+        html, body { background: #f5f5f7; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+            color: var(--ink); font-size: 14px; min-height: 100vh;
+            -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent;
         }
-        .page-title {
-            text-align: center;
-            font-size: 16px;
-            font-weight: 600;
-            color: #c0392b;
-            margin-bottom: 12px;
+
+        /* ===== ② 中间原型内容：面包屑 + 手机原型容器 ===== */
+        .breadcrumb {
+            padding: 16px 24px 0; font-size: 13px; color: var(--ink-weak);
+            display: flex; align-items: center; justify-content: space-between; gap: 12px;
         }
-        .search-row {
-            display: flex;
-            align-items: center;
-            gap: 8px;
+        .breadcrumb a { color: var(--ink-weak); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--accent); }
+        .breadcrumb .sep { margin: 0 4px; }
+        .breadcrumb .current { color: var(--ink); font-weight: 500; }
+
+        .main { padding: 16px 24px 40px; display: flex; justify-content: center; align-items: flex-start; }
+
+        /* 手机原型容器（430px 平铺；窄屏铺满） */
+        .app-container {
+            width: 100%; max-width: 430px; flex-shrink: 0;
+            height: calc(100vh - 120px); min-height: 600px;
+            background: #f5f5f5; border-radius: 18px; overflow: hidden;
+            box-shadow: 0 10px 34px rgba(30, 60, 120, 0.14);
+            display: flex; flex-direction: column; position: relative;
+        }
+        .app-scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+        .app-scroll::-webkit-scrollbar { width: 4px; }
+        .app-scroll::-webkit-scrollbar-thumb { background: #d8dce3; border-radius: 2px; }
+
+        /* ===== 顶部两段：状态栏 + 标题栏（sticky） ===== */
+        .page-top { position: sticky; top: 0; z-index: 80; flex-shrink: 0; }
+        .status-bar {
+            height: 44px; background: #fff; color: var(--ink);
+            display: flex; align-items: center; justify-content: space-between; padding: 0 20px;
+        }
+        .status-bar .sb-left { display: flex; align-items: baseline; gap: 8px; }
+        .status-bar .sb-time { font-size: 15px; font-weight: 600; letter-spacing: .3px; }
+        .status-bar .sb-date { font-size: 12px; color: #666; }
+        .status-bar .sb-right { display: flex; align-items: center; gap: 7px; color: var(--ink); }
+        .status-bar .sb-signal { display: inline-flex; align-items: flex-end; gap: 1.5px; height: 11px; }
+        .status-bar .sb-signal i { width: 3px; border-radius: 1px; background: currentColor; }
+        .status-bar .sb-signal i:nth-child(1) { height: 4px; }
+        .status-bar .sb-signal i:nth-child(2) { height: 6px; }
+        .status-bar .sb-signal i:nth-child(3) { height: 8px; }
+        .status-bar .sb-signal i:nth-child(4) { height: 11px; }
+        .status-bar .sb-wifi { width: 15px; height: 11px; position: relative; display: inline-block; }
+        .status-bar .sb-wifi::before {
+            content: ''; position: absolute; left: 50%; bottom: 0; transform: translateX(-50%);
+            width: 5px; height: 5px; border-radius: 50%; background: currentColor;
+        }
+        .status-bar .sb-wifi::after {
+            content: ''; position: absolute; left: 50%; bottom: 2px; transform: translateX(-50%);
+            width: 14px; height: 14px; box-sizing: border-box;
+            border-top: 2px solid currentColor; border-radius: 50%;
+        }
+        .status-bar .sb-batt {
+            width: 25px; height: 12px; border: 1.4px solid currentColor;
+            border-radius: 3px; padding: 1.5px; box-sizing: border-box; position: relative;
+        }
+        .status-bar .sb-batt::after {
+            content: ''; position: absolute; right: -3.5px; top: 50%; transform: translateY(-50%);
+            width: 2px; height: 5px; background: currentColor; border-radius: 0 1px 1px 0;
+        }
+        .status-bar .sb-batt i { display: block; height: 100%; width: 78%; background: currentColor; border-radius: 1px; }
+
+        .top-nav {
+            height: 50px; background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            display: flex; align-items: center; padding: 0 16px;
+        }
+        .top-nav .back-btn {
+            width: 32px; font-size: 24px; color: #fff; line-height: 1;
+            cursor: pointer; text-align: left; background: none; border: none; font-family: inherit;
+        }
+        .top-nav .top-nav-title { flex: 1; text-align: center; font-size: 17px; font-weight: 600; color: #fff; }
+        .top-nav .right-placeholder { width: 32px; }
+
+        /* ===== 搜索卡 ===== */
+        .search-card {
+            margin: 12px 16px 0; padding: 12px;
+            background: #fff; border-radius: var(--card-radius);
+            box-shadow: 0 4px 16px rgba(0,0,0,.06);
+            display: flex; align-items: center; gap: 8px;
         }
         .search-input-wrap {
-            flex: 1;
-            background: #fff;
-            border-radius: 20px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            padding: 0 14px;
-            gap: 8px;
+            flex: 1; height: 36px; background: #f5f6f8; border-radius: 18px;
+            padding: 0 14px; display: flex; align-items: center; gap: 8px;
         }
-        .search-icon { color: #86909c; font-size: 14px; }
+        .search-icon { font-size: 13px; color: var(--ink-weak); }
         .search-input-wrap input {
-            flex: 1;
-            border: none;
-            outline: none;
-            background: transparent;
-            font-size: 14px;
-            color: #1a1a2e;
-            font-family: inherit;
+            flex: 1; min-width: 0; border: none; outline: none; background: transparent;
+            font-size: 14px; color: var(--ink); font-family: inherit;
         }
         .search-input-wrap input::placeholder { color: #c0c8d4; }
         .btn-search-go {
-            background: #c0392b;
-            color: #fff;
-            border: none;
-            padding: 0 18px;
-            height: 36px;
-            border-radius: 20px;
-            font-size: 14px;
-            cursor: pointer;
+            height: 36px; padding: 0 18px; border-radius: 18px; flex-shrink: 0;
+            background: var(--accent); color: #fff; border: none;
+            font-size: 14px; font-family: inherit; cursor: pointer;
         }
+        .btn-search-go:active { background: var(--accent-dark); }
 
-        /* 标签栏 */
+        /* ===== 标签栏 ===== */
         .tabs-bar {
-            background: #fff;
-            padding: 0 16px;
-            display: flex;
-            gap: 18px;
-            border-bottom: 1px solid #f0f0f0;
-            overflow-x: auto;
+            margin: 12px 16px 0; padding: 0 14px;
+            background: #fff; border-radius: var(--card-radius);
+            box-shadow: 0 4px 16px rgba(0,0,0,.06);
+            display: flex; gap: 18px; overflow-x: auto;
         }
+        .tabs-bar::-webkit-scrollbar { height: 0; }
         .tab {
-            padding: 12px 0;
-            font-size: 14px;
-            color: #4e5a6e;
-            cursor: pointer;
-            position: relative;
-            white-space: nowrap;
+            padding: 12px 0; font-size: 14px; color: var(--ink-sub);
+            cursor: pointer; position: relative; white-space: nowrap; flex-shrink: 0;
         }
-        .tab.active { color: #c0392b; font-weight: 600; }
+        .tab.active { color: var(--accent); font-weight: 600; }
         .tab.active::after {
-            content: '';
-            position: absolute;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            height: 2px;
-            background: #c0392b;
-            border-radius: 2px;
+            content: ''; position: absolute; left: 0; right: 0; bottom: 0;
+            height: 2px; background: var(--accent); border-radius: 2px;
         }
 
-        /* 产品列表 */
-        .product-list { padding: 0; }
-        .product-item {
-            background: #fff;
-            padding: 14px 16px;
-            display: flex;
-            align-items: center;
-            gap: 14px;
+        /* ===== 产品列表卡 ===== */
+        .list-card {
+            background: #fff; margin: 12px 16px 24px;
+            border-radius: var(--card-radius); overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0,0,0,.06);
+        }
+        .list-title {
+            padding: 14px 16px; font-size: 15px; font-weight: 600; color: var(--ink);
+            display: flex; justify-content: space-between; align-items: center;
             border-bottom: 1px solid #f5f5f7;
-            cursor: pointer;
         }
-        .product-img {
-            width: 70px;
-            height: 70px;
-            border-radius: 8px;
-            background: #f5f6f8;
-            flex-shrink: 0;
-            background-image: linear-gradient(135deg, #f0e8d8 0%, #c9b88e 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 11px;
-            color: #fff;
-        }
-        .product-img.img2 {
-            background-image: linear-gradient(135deg, #f5e8b8 0%, #c9a04a 100%);
-        }
-        .product-img.img3 {
-            background-image: linear-gradient(135deg, #e6dccd 0%, #b8a47e 100%);
-        }
-        .product-img.img4 {
-            background-image: linear-gradient(135deg, #d8d2c5 0%, #a89778 100%);
-        }
-        .product-img.img5 {
-            background-image: linear-gradient(135deg, #e8c8a0 0%, #c08850 100%);
-        }
-        .product-img.img6 {
-            background-image: linear-gradient(135deg, #f7e8e0 0%, #d8a89a 100%);
-        }
-        .product-center {
-            flex: 1;
-            min-width: 0;
-        }
-        .product-name {
-            font-size: 15px;
-            font-weight: 600;
-            color: #1a1a2e;
-            margin-bottom: 6px;
-        }
-        .product-code {
-            font-size: 12px;
-            color: #86909c;
-        }
-        .product-right {
-            text-align: right;
-            flex-shrink: 0;
-        }
-        .product-tag {
-            font-size: 13px;
-            color: #86909c;
-            margin-bottom: 6px;
-        }
-        .product-price {
-            font-size: 13px;
-            color: #c0392b;
-            font-weight: 500;
-        }
-        .product-price b {
-            font-size: 18px;
-            font-weight: 700;
+        .list-title .count {
+            font-size: 12px; font-weight: 500; color: var(--accent);
+            background: #fde8ea; padding: 2px 10px; border-radius: 10px;
         }
 
-        /* tabbar */
+        .product-item {
+            padding: 14px 16px; display: flex; align-items: center; gap: 14px;
+            border-top: 1px solid #f5f5f7; cursor: pointer;
+        }
+        .product-item:active { background: #fafbfc; }
+        .product-img {
+            width: 70px; height: 70px; border-radius: 8px; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px; color: #fff;
+            background-image: linear-gradient(135deg, #f0e8d8 0%, #c9b88e 100%);
+        }
+        .product-img.img2 { background-image: linear-gradient(135deg, #f5e8b8 0%, #c9a04a 100%); }
+        .product-img.img3 { background-image: linear-gradient(135deg, #e6dccd 0%, #b8a47e 100%); }
+        .product-img.img4 { background-image: linear-gradient(135deg, #d8d2c5 0%, #a89778 100%); }
+        .product-img.img5 { background-image: linear-gradient(135deg, #e8c8a0 0%, #c08850 100%); }
+        .product-img.img6 { background-image: linear-gradient(135deg, #f7e8e0 0%, #d8a89a 100%); }
+        .product-center { flex: 1; min-width: 0; }
+        .product-name { font-size: 15px; font-weight: 600; color: var(--ink); margin-bottom: 6px; line-height: 1.3; }
+        .product-code { font-size: 12px; color: var(--ink-weak); }
+        .product-right { text-align: right; flex-shrink: 0; }
+        .product-tag { font-size: 13px; color: var(--ink-weak); margin-bottom: 6px; white-space: nowrap; }
+        .product-price { font-size: 13px; color: var(--accent); font-weight: 500; }
+        .product-price b { font-size: 18px; font-weight: 700; }
+
+        /* 空状态 */
+        .empty { padding: 48px 0; text-align: center; color: #9ba6b9; font-size: 13px; }
+        .empty .empty-ico { font-size: 40px; margin-bottom: 10px; opacity: .5; }
+
+        /* ===== 底部导航 TabBar ===== */
         .tabbar {
-            position: fixed;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100%;
-            max-width: 430px;
-            background: #fff;
-            border-top: 1px solid #f0f0f0;
-            display: flex;
-            z-index: 10;
+            flex-shrink: 0; background: #fff; border-top: 1px solid var(--line);
+            display: flex; padding: 8px 0 12px;
         }
         .tabbar-item {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            padding: 8px 0;
-            font-size: 11px;
-            color: #6b7588;
-            cursor: pointer;
+            flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+            font-size: 11px; color: #6b7588; cursor: pointer;
         }
-        .tabbar-item .icon {
-            width: 28px;
-            height: 28px;
-            border-radius: 8px;
-            background: #f5f6f8;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-            color: #6b7588;
-        }
-        .tabbar-item.active { color: #c0392b; }
-        .tabbar-item.active .icon {
-            background: #c0392b;
-            color: #fff;
-        }
+        .tabbar-item.active { color: var(--accent); }
+        .tabbar-icon { font-size: 22px; line-height: 1; }
 
-        /* 功能说明浮窗 */
+        /* 标注圆点 */
         .badge {
-            display: inline-block;
-            min-width: 18px;
-            height: 18px;
-            padding: 0 5px;
-            border-radius: 50%;
-            background: #ff2d55;
-            color: #fff;
-            font-size: 12px;
-            line-height: 18px;
-            text-align: center;
-            font-weight: 600;
+            display: inline-block; min-width: 18px; height: 18px; padding: 0 5px;
+            border-radius: 50%; background: #ff2d55; color: #fff; font-size: 12px;
+            line-height: 18px; text-align: center; font-weight: 600;
             box-shadow: 0 1px 3px rgba(255,45,85,0.3);
         }
-        .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 430px; max-width: 94vw; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 99999; padding: 22px; display: none; }
-        .f-modal.show { display: block; }
-        .f-modal .fm-title { font-size: 15px; font-weight: 600; color: #1a1a2e; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
-        .f-modal .fm-title:active { cursor: grabbing; }
-        .f-modal .fm-close { width: 26px; height: 26px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 13px; color: #666; border: none; flex-shrink: 0; }
-        .f-modal .fm-close:hover { background: #e8e8e8; }
-        .f-modal .fm-body { font-size: 13px; color: #555; line-height: 1.8; }
-        .f-modal .fm-body h4 { font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 14px 0 6px; }
-        .f-modal .fm-body ul { padding-left: 18px; margin: 0 0 8px; }
-        .f-modal .fm-body li { margin-bottom: 4px; }
+        .func-panel .fp-body .badge { vertical-align: 1px; }
+
+        /* 轻提示（z-index 高于目录栏 900 / 说明面板 890） */
+        .toast {
+            position: fixed; top: 70px; left: 50%;
+            transform: translateX(-50%) translateY(-14px);
+            background: rgba(26,26,46,.92); color: #fff; padding: 9px 20px;
+            border-radius: 9999px; font-size: 13px; max-width: 70vw;
+            opacity: 0; pointer-events: none; transition: all .25s; z-index: 9999;
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        /* ===== ③ 右侧功能说明面板（fix 右侧 340px，可折叠成 40px） ===== */
+        .func-panel {
+            position: fixed; top: 0; right: 0; bottom: 0; width: 340px; z-index: 890;
+            background: #fff; border-left: 1px solid #e3e6eb;
+            display: flex; flex-direction: column;
+        }
+        .func-panel .fp-inner { display: flex; flex-direction: column; height: 100%; min-width: 0; }
+        .func-panel .fp-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 15px 14px 13px 18px; border-bottom: 1px solid #f0f1f4; flex-shrink: 0;
+        }
+        .func-panel .fp-title { display: flex; align-items: center; gap: 9px; font-size: 15px; font-weight: 700; color: var(--ink); }
+        .func-panel .fp-title::before {
+            content: ''; width: 8px; height: 8px; border-radius: 50%;
+            background: var(--accent); box-shadow: 0 0 0 4px rgba(231, 76, 94, 0.14);
+        }
+        .func-panel .fp-fold-btn {
+            width: 28px; height: 28px; border: 1px solid var(--border); background: #fff;
+            border-radius: 50%; color: var(--ink-weak); font-size: 15px; line-height: 1;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            font-family: inherit; transition: all 0.2s;
+        }
+        .func-panel .fp-fold-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .func-panel .fp-body { flex: 1; overflow-y: auto; padding: 4px 18px 40px; font-size: 13px; color: #555; line-height: 1.9; }
+        .func-panel .fp-body::-webkit-scrollbar { width: 5px; }
+        .func-panel .fp-body::-webkit-scrollbar-thumb { background: #d8dce3; border-radius: 3px; }
+        .func-panel .fp-body h4 { font-size: 14px; font-weight: 600; color: var(--ink); margin: 18px 0 6px; }
+        .func-panel .fp-body h4:first-child { margin-top: 12px; }
+        .func-panel .fp-body p { font-size: 13px; color: #555; margin: 4px 0; }
+        .func-panel .fp-body ul { padding-left: 18px; margin: 0 0 8px; }
+        .func-panel .fp-body li { margin-bottom: 6px; font-size: 13px; color: #555; }
+        .func-panel .fp-body li b { color: var(--ink); }
+        .func-panel .fp-open {
+            display: none; position: absolute; top: 0; bottom: 0; left: 0; right: 0;
+            border: none; background: transparent; cursor: pointer;
+            writing-mode: vertical-rl; text-orientation: upright;
+            color: var(--ink-weak); font-size: 13px;
+            align-items: center; justify-content: center; font-family: inherit; transition: all 0.2s;
+        }
+        .func-panel .fp-open:hover { color: var(--accent); background: #fafbfc; }
+
+        /* ===== 三部分布局偏移：宽屏为左右两侧让位 ===== */
+        @media (min-width: 1024px) {
+            .breadcrumb, .main { margin-right: 340px; }
+            body.fp-collapsed .main,
+            body.fp-collapsed .breadcrumb { margin-right: 40px; }
+            body.fp-collapsed .func-panel { width: 40px; }
+            body.fp-collapsed .fp-inner { display: none; }
+            body.fp-collapsed .fp-open { display: flex; }
+        }
+        @media (max-width: 1023.98px) {
+            .func-panel { display: none; }
+            .main, .breadcrumb { margin-right: 0; }
+        }
+        /* 真机宽度：手机页铺满 */
+        @media (max-width: 540px) {
+            .main { padding: 12px 0 32px; }
+            .breadcrumb { padding: 12px 16px 0; }
+            .app-container { border-radius: 0; box-shadow: none; height: 100vh; min-height: 100vh; }
+        }
     </style>
 </head>
 <body>
 
-<div class="app-container">
-
-    <div class="top-bar">
-        <div class="page-title">数字艺术品共享超市</div>
-        <div class="search-row">
-            <div class="search-input-wrap">
-                <span class="search-icon">🔍</span>
-                <input type="text" placeholder="搜索">
-            </div>
-            <button class="btn-search-go">搜索</button>
-        </div>
-    </div>
-
-    <!-- 标签栏 -->
-    <div class="tabs-bar">
-        <div class="tab" onclick="switchTab(this)">自选</div>
-        <div class="tab" onclick="switchTab(this)">推荐</div>
-        <div class="tab active" onclick="switchTab(this)">全部</div>
-        <div class="tab" onclick="switchTab(this)">鉴赏</div>
-        <div class="tab" onclick="switchTab(this)">活动</div>
-        <div class="tab" onclick="switchTab(this)">期待</div>
-        <div class="tab" onclick="switchTab(this)">典</div>
-        <div class="tab" onclick="switchTab(this)">▲价格</div>
-    </div>
-
-    <!-- 产品列表 -->
-    <div class="product-list">
-        <div class="product-item">
-            <div class="product-img">山水空灵</div>
-            <div class="product-center">
-                <div class="product-name">山水空灵</div>
-                <div class="product-code">产品编码 XB000001</div>
-            </div>
-            <div class="product-right">
-                <div class="product-tag">暂无寄售</div>
-            </div>
-        </div>
-        <div class="product-item">
-            <div class="product-img img2">仙鹤</div>
-            <div class="product-center">
-                <div class="product-name">仙鹤莲池</div>
-                <div class="product-code">产品编码 XB000002</div>
-            </div>
-            <div class="product-right">
-                <div class="product-tag">暂无寄售</div>
-            </div>
-        </div>
-        <div class="product-item">
-            <div class="product-img img3">浮休</div>
-            <div class="product-center">
-                <div class="product-name">浮休东坡</div>
-                <div class="product-code">产品编码 XB000003</div>
-            </div>
-            <div class="product-right">
-                <div class="product-tag">暂无寄售</div>
-            </div>
-        </div>
-        <div class="product-item">
-            <div class="product-img img4">永淳</div>
-            <div class="product-center">
-                <div class="product-name">永淳·夏日帖</div>
-                <div class="product-code">产品编码 XB000004</div>
-            </div>
-            <div class="product-right">
-                <div class="product-tag">当前最低价</div>
-                <div class="product-price">¥<b>130.00</b></div>
-            </div>
-        </div>
-        <div class="product-item">
-            <div class="product-img img5">吃水</div>
-            <div class="product-center">
-                <div class="product-name">吃水不忘挖井人</div>
-                <div class="product-code">产品编码 XB000005</div>
-            </div>
-            <div class="product-right">
-                <div class="product-tag">当前最低价</div>
-                <div class="product-price">¥<b>699.00</b></div>
-            </div>
-        </div>
-        <div class="product-item">
-            <div class="product-img img6">榜样</div>
-            <div class="product-center">
-                <div class="product-name">榜样</div>
-                <div class="product-code">产品编码</div>
-            </div>
-            <div class="product-right">
-                <div class="product-tag">当前最低价</div>
-                <div class="product-price">¥<b>25.00</b></div>
-            </div>
-        </div>
-    </div>
-
+<!-- ② 中间原型内容：面包屑 + 手机页面 -->
+<div class="breadcrumb">
+    <span>
+        <a href="index.html">首页</a>
+        <span class="sep">&gt;</span>
+        <span>APP 端</span>
+        <span class="sep">&gt;</span>
+        <span class="current">零售市场列表</span>
+    </span>
 </div>
 
-<!-- tabbar -->
-<div class="tabbar">
-    <div class="tabbar-item">
-        <div class="icon">📦</div>
-        <div>批发市场</div>
-    </div>
-    <div class="tabbar-item active">
-        <div class="icon">🛒</div>
-        <div>共享超市</div>
-    </div>
-    <div class="tabbar-item">
-        <div class="icon">👤</div>
-        <div>我的</div>
-    </div>
-</div>
+<div class="main">
+    <div class="app-container">
 
-<!-- 浮动说明按钮 -->
-<button onclick="toggleFuncModal()" style="position:fixed;top:12px;right:16px;z-index:99999;background:#fff;color:#666;padding:7px 16px;border-radius:20px;border:1px solid #ddd;font-size:13px;font-weight:500;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.08);font-family:inherit;display:inline-flex;align-items:center;gap:4px;">📖 说明</button>
+        <!-- 顶部三段：状态栏 + 标题栏（sticky） -->
+        <div class="page-top">
+            <div class="status-bar">
+                <span class="sb-left">
+                    <span class="sb-time">9:41</span>
+                    <span class="sb-date">9月22日 星期二</span>
+                </span>
+                <span class="sb-right">
+                    <span class="sb-signal"><i></i><i></i><i></i><i></i></span>
+                    <span class="sb-wifi"></span>
+                    <span class="sb-batt"><i></i></span>
+                </span>
+            </div>
+            <div class="top-nav">
+                <button class="back-btn" onclick="goBack()" aria-label="返回">‹</button>
+                <span class="top-nav-title">数字艺术品共享超市</span>
+                <span class="right-placeholder"></span>
+            </div>
+        </div>
 
-<!-- ====== 功能说明浮窗 ====== -->
-<div class="f-modal" id="funcModal">
-  <div class="fm-title">
-    <span>📖 功能说明</span>
-    <button class="fm-close" onclick="toggleFuncModal()">✕</button>
-  </div>
-  <div class="fm-body">
-    <h4><span class="badge">1</span> <span style="vertical-align:middle;">自选</span></h4>
-    <ul>
-      <li>在「推荐」前增加「<b>自选</b>」标签列，展示用户加为自选的产品列表</li>
-      <li>用户可在产品详情页点击「加为自选」按钮，将产品加入自选列表，方便快速查看与再次购买</li>
-    </ul>
-  </div>
-</div>
+        <div class="app-scroll">
+
+            <!-- 搜索卡 -->
+            <div class="search-card">
+                <div class="search-input-wrap">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="searchInput" placeholder="搜索产品名称 / 编码" oninput="renderList()">
+                </div>
+                <button class="btn-search-go" onclick="renderList()">搜索</button>
+            </div>
+
+            <!-- 标签栏 -->
+            <div class="tabs-bar" id="tabsBar">
+                <span class="tab" data-tab="自选">自选</span>
+                <span class="tab" data-tab="推荐">推荐</span>
+                <span class="tab active" data-tab="全部">全部</span>
+                <span class="tab" data-tab="鉴赏">鉴赏</span>
+                <span class="tab" data-tab="活动">活动</span>
+                <span class="tab" data-tab="期待">期待</span>
+                <span class="tab" data-tab="典">典</span>
+                <span class="tab" data-sort="1" id="priceTab">▲价格</span>
+            </div>
+
+            <!-- 产品列表 -->
+            <div class="list-card">
+                <div class="list-title">产品列表<span class="count" id="listCount"></span></div>
+                <div id="productList"></div>
+                <div class="empty" id="emptyTip" style="display:none;">
+                    <div class="empty-ico">📭</div>
+                    <div>未找到相关产品，换个关键词试试</div>
+                </div>
+            </div>
+
+        </div><!-- /app-scroll -->
+
+        <!-- 底部导航 -->
+        <div class="tabbar">
+            <div class="tabbar-item" onclick="showToast('批发市场（原型演示）')">
+                <div class="tabbar-icon">📦</div>
+                <div>批发市场</div>
+            </div>
+            <div class="tabbar-item active">
+                <div class="tabbar-icon">🛒</div>
+                <div>共享超市</div>
+            </div>
+            <div class="tabbar-item" onclick="location.href='我的页面.html'">
+                <div class="tabbar-icon">👤</div>
+                <div>我的</div>
+            </div>
+        </div>
+
+    </div><!-- /app-container -->
+</div><!-- /main -->
+
+<!-- 轻提示 -->
+<div class="toast" id="toast"></div>
+
+<!-- ====== ③ 右侧功能说明面板（常驻，可折叠成 40px） ====== -->
+<aside class="func-panel" id="funcPanel">
+    <div class="fp-inner">
+        <div class="fp-header">
+            <span class="fp-title">零售市场列表 · 功能说明</span>
+            <button class="fp-fold-btn" onclick="togglePanel()" aria-label="折叠">›</button>
+        </div>
+        <div class="fp-body">
+
+            <h4>1、自选 <span class="badge">1</span></h4>
+            <ul>
+                <li>在「推荐」前增加「<b>自选</b>」标签列，展示用户加为自选的产品列表</li>
+                <li>用户可在产品详情页点击「<b>加为自选</b>」按钮，将产品加入自选列表，方便快速查看与再次购买</li>
+            </ul>
+
+            <h4>2、搜索</h4>
+            <ul>
+                <li>顶部搜索框支持按 <b>产品名称 / 产品编码</b> 模糊匹配，输入即时过滤，也可点「搜索」按钮触发</li>
+                <li>无匹配结果时列表区展示空状态提示</li>
+            </ul>
+
+            <h4>3、标签栏</h4>
+            <ul>
+                <li>自选 / 推荐 / 全部 / 鉴赏 / 活动 / 期待 / 典 为内容分类切换（原型中为切换高亮演示）</li>
+                <li><b>▲价格</b>：点击按「当前最低价」升序排列，再次点击变 <b>▼价格</b> 降序排列；暂无挂单的产品始终排在最后</li>
+            </ul>
+
+            <h4>4、产品列表</h4>
+            <ul>
+                <li>每行展示：产品图、产品名称、产品编码</li>
+                <li>有挂单时右侧显示「<b>当前最低价</b> + 价格」（主色突出）；无挂单时显示灰色「<b>暂无挂单</b>」</li>
+                <li>点击整行进入<b>零售市场详情</b>（产品详情）</li>
+            </ul>
+
+            <h4>5、底部导航</h4>
+            <ul>
+                <li>批发市场 / <b>共享超市（当前页）</b> / 我的 三个入口，原型中点击可跳转或提示</li>
+            </ul>
+        </div>
+    </div>
+    <button class="fp-open" onclick="togglePanel()" aria-label="展开说明">展<br>开<br>说<br>明</button>
+</aside>
+
+<!-- ① 左侧目录：公用文件引用 -->
+<script src="asset/admin-sidebar.js"></script>
 
 <script>
-function switchTab(el) {
-    document.querySelectorAll('.tabs-bar .tab').forEach(function(t){ t.classList.remove('active'); });
-    el.classList.add('active');
+/* ── 轻提示 ── */
+var toastTimer;
+function showToast(msg) {
+    var el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { el.classList.remove('show'); }, 2000);
 }
-function toggleFuncModal() {
-  var el = document.getElementById('funcModal');
-  el.classList.toggle('show');
-  if (el.classList.contains('show') && !el.dataset.dragged) {
-    el.style.left = '50%'; el.style.top = '50%'; el.style.transform = 'translate(-50%,-50%)';
-  }
+
+/* ── 顶部返回：history 有记录就后退，否则跳到本模块首页 ── */
+function goBack() {
+    if (history.length > 1) { history.back(); }
+    else { location.href = '我的页面.html'; }
 }
-(function() {
-  var modal, titleBar, offX, offY, dragging = false;
-  document.addEventListener('DOMContentLoaded', function() {
-    modal = document.getElementById('funcModal');
-    titleBar = modal.querySelector('.fm-title');
-    titleBar.addEventListener('mousedown', startDrag);
-    titleBar.addEventListener('touchstart', startDragTouch, {passive:true});
-    document.addEventListener('mousemove', onDrag);
-    document.addEventListener('mouseup', endDrag);
-    document.addEventListener('touchmove', onDragTouch, {passive:true});
-    document.addEventListener('touchend', endDrag);
-  });
-  function startDrag(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = e.clientX - rect.left; offY = e.clientY - rect.top; dragging = true; titleBar.style.cursor = 'grabbing'; }
-  function startDragTouch(e) { if (e.target && e.target.classList && e.target.classList.contains('fm-close')) return; var t = e.touches[0]; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = t.clientX - rect.left; offY = t.clientY - rect.top; dragging = true; }
-  function onDrag(e) { if (!dragging) return; modal.style.left = (e.clientX - offX) + 'px'; modal.style.top = (e.clientY - offY) + 'px'; }
-  function onDragTouch(e) { if (!dragging) return; var t = e.touches[0]; modal.style.left = (t.clientX - offX) + 'px'; modal.style.top = (t.clientY - offY) + 'px'; }
-  function endDrag() { dragging = false; if (titleBar) titleBar.style.cursor = 'grab'; }
-})();
+
+/* ── 右侧功能说明面板 折叠/展开 ── */
+function togglePanel() {
+    document.body.classList.toggle('fp-collapsed');
+}
+
+/* ── 产品数据（min 为当前最低挂单价，null 表示暂无挂单） ── */
+var products = [
+    { name: '山水空灵',       code: 'XB000001', tag: '山水', cls: '',     min: null   },
+    { name: '仙鹤莲池',       code: 'XB000002', tag: '仙鹤', cls: 'img2', min: null   },
+    { name: '浮休东坡',       code: 'XB000003', tag: '浮休', cls: 'img3', min: null   },
+    { name: '永淳·夏日帖',    code: 'XB000004', tag: '永淳', cls: 'img4', min: 130.00 },
+    { name: '吃水不忘挖井人', code: 'XB000005', tag: '吃水', cls: 'img5', min: 699.00 },
+    { name: '榜样',           code: 'XB000006', tag: '榜样', cls: 'img6', min:  25.00 }
+];
+
+var activeTab = '全部';
+var sortDir = 0;          /* 0 默认顺序 / 1 价格升序 / -1 价格降序 */
+
+function fmt(n) { return n.toFixed(2); }
+
+/* ── 取当前需展示的列表（搜索 + 价格排序） ── */
+function getList() {
+    var kw = (document.getElementById('searchInput').value || '').trim().toLowerCase();
+    var list = products.filter(function (p) {
+        if (!kw) return true;
+        return p.name.toLowerCase().indexOf(kw) > -1 || p.code.toLowerCase().indexOf(kw) > -1;
+    });
+    if (sortDir !== 0) {
+        list = list.slice().sort(function (a, b) {
+            var av = (a.min === null) ? Infinity : a.min;
+            var bv = (b.min === null) ? Infinity : b.min;
+            if (av === bv) return 0;
+            if (av === Infinity) return 1;      /* 无挂单始终排在最后 */
+            if (bv === Infinity) return -1;
+            return sortDir === 1 ? av - bv : bv - av;
+        });
+    }
+    return list;
+}
+
+/* ── 渲染产品列表 ── */
+function renderList() {
+    var list = getList();
+    document.getElementById('listCount').textContent = '共 ' + list.length + ' 件';
+
+    var html = '';
+    for (var i = 0; i < list.length; i++) {
+        var p = list[i];
+        var right = (p.min === null)
+            ? '<div class="product-tag">暂无挂单</div>'
+            : '<div class="product-tag">当前最低价</div><div class="product-price">¥<b>' + fmt(p.min) + '</b></div>';
+        html +=
+        '<div class="product-item" onclick="openDetail(\'' + p.code + '\')">' +
+            '<div class="product-img ' + p.cls + '">' + p.tag + '</div>' +
+            '<div class="product-center">' +
+                '<div class="product-name">' + p.name + '</div>' +
+                '<div class="product-code">产品编码 ' + p.code + '</div>' +
+            '</div>' +
+            '<div class="product-right">' + right + '</div>' +
+        '</div>';
+    }
+    document.getElementById('productList').innerHTML = html;
+    document.getElementById('emptyTip').style.display = list.length ? 'none' : 'block';
+}
+
+/* ── 点击整行进入产品详情 ── */
+function openDetail(code) {
+    location.href = '零售市场详情.html?code=' + encodeURIComponent(code);
+}
+
+/* ── 标签栏：分类切换 / ▲价格排序 ── */
+document.querySelectorAll('#tabsBar .tab').forEach(function (el) {
+    el.addEventListener('click', function () {
+        var tabs = document.querySelectorAll('#tabsBar .tab');
+        if (this.getAttribute('data-sort')) {
+            /* 价格排序：再次点击切换升降序 */
+            sortDir = (sortDir === 1) ? -1 : 1;
+            this.textContent = (sortDir === 1 ? '▲' : '▼') + '价格';
+            tabs.forEach(function (t) { t.classList.toggle('active', t === el); });
+        } else {
+            activeTab = this.getAttribute('data-tab');
+            sortDir = 0;
+            document.getElementById('priceTab').textContent = '▲价格';
+            tabs.forEach(function (t) { t.classList.toggle('active', t === el); });
+            showToast('已切换到「' + activeTab + '」（原型演示）');
+        }
+        renderList();
+    });
+});
+
+/* 初始化 */
+renderList();
 </script>
 
 </body>

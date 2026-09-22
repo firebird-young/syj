@@ -268,6 +268,16 @@
         }
         .empty .empty-ico { font-size: 44px; margin-bottom: 12px; opacity: .5; }
 
+        /* 轻提示 */
+        .toast {
+            position: fixed; top: 70px; left: 50%;
+            transform: translateX(-50%) translateY(-14px);
+            background: rgba(26,26,46,.92); color: #fff; padding: 9px 20px;
+            border-radius: 9999px; font-size: 13px; max-width: 70vw;
+            opacity: 0; pointer-events: none; transition: all .25s; z-index: 9999;
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
         /* ===== 撤销挂单 sheet ===== */
         .sheet {
             position: fixed; inset: 0; z-index: 9999;
@@ -546,10 +556,23 @@
     <button class="fp-open" onclick="togglePanel()" aria-label="展开说明">展<br>开<br>说<br>明</button>
 </aside>
 
+<!-- 轻提示 -->
+<div class="toast" id="toast"></div>
+
 <!-- ① 左侧目录：公用文件引用 -->
 <script src="asset/admin-sidebar.js"></script>
 
 <script>
+/* ── 轻提示 ── */
+var toastTimer;
+function showToast(msg) {
+    var el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { el.classList.remove('show'); }, 2000);
+}
+
 /* ── 顶部返回：history 有记录就后退，否则跳到本模块首页 ── */
 function goBack() {
     if (history.length > 1) { history.back(); }
@@ -575,6 +598,18 @@ var cancelIndex = -1;
 
 function fmt(n) { return n.toFixed(2); }
 
+/* ── 渲染统计卡（随列表状态实时刷新） ── */
+function renderStats() {
+    var selling = 0, sold = 0, amount = 0;
+    items.forEach(function (it) {
+        if (it.status === 'selling') selling++;
+        if (it.status === 'sold') { sold++; amount += it.deal || 0; }
+    });
+    document.getElementById('statSelling').textContent = selling;
+    document.getElementById('statSold').textContent = sold;
+    document.getElementById('statAmount').textContent = '¥' + fmt(amount);
+}
+
 /* ── 渲染列表 ── */
 function render() {
     var list = items.filter(function (it) {
@@ -582,6 +617,7 @@ function render() {
         return it.status === currentTab;
     });
 
+    renderStats();
     document.getElementById('listCount').textContent = '共 ' + list.length + ' 条';
 
     var html = '';
@@ -670,7 +706,7 @@ function confirmCancel() {
     it.time = '2026-09-01 10:30';
     closeCancelModal();
     render();
-    alert('「' + it.name + ' ' + it.code + '」已撤销挂单，产品已下架');
+    showToast('「' + it.name + ' ' + it.code + '」已撤销挂单，产品已下架');
 }
 
 /* 初始化 */
