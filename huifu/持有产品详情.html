@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>零售市场挂单 - 后台原型</title>
+    <title>持有产品详情 - 后台原型</title>
     <!-- ① 左侧目录：公用文件引用（菜单在 asset/admin-sidebar.js 的 MENU 中维护） -->
     <link rel="stylesheet" href="asset/admin-sidebar.css">
     <style>
@@ -149,45 +149,53 @@
         }
         .tip-btn:hover, .tip-btn:active { background: var(--accent); color: #fff; }
 
-        /* 筛选条 */
+        /* 筛选条（移动端样式） */
         .filter-bar {
-            padding: 10px 14px;
-            background: #fafbfc;
+            padding: 10px 12px;
+            background: #fff;
             border-bottom: 1px solid var(--line);
-            display: flex; flex-direction: column; gap: 8px;
+            display: flex; flex-direction: column; gap: 10px;
         }
-        .filter-row { display: flex; gap: 8px; align-items: center; }
-        .filter-item {
-            flex: 1; min-width: 0;
-            display: flex; align-items: center; gap: 4px;
-            font-size: 12px; color: var(--ink-sub);
+        .search-box { position: relative; }
+        .search-box input {
+            width: 100%; height: 36px;
+            border-radius: 18px; border: 1px solid #e8e8ee; background: #f5f5f7;
+            padding: 0 14px 0 36px; font-size: 13px; outline: none;
+            font-family: inherit; color: var(--ink); transition: all .15s;
         }
-        .filter-item > label {
-            white-space: nowrap; font-weight: 500; flex-shrink: 0;
+        .search-box input:focus { background: #fff; border-color: var(--accent); }
+        .search-box .s-ico {
+            position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+            color: #9ba6b9; font-size: 14px; pointer-events: none;
         }
-        .filter-item input,
-        .filter-item select {
-            flex: 1; min-width: 0;
-            border: 1px solid var(--border); background: #fff;
-            border-radius: 6px; padding: 4px 8px; font-size: 12px;
-            outline: none; font-family: inherit;
-            color: var(--ink);
+        .chip-row {
+            display: flex; gap: 8px; overflow-x: auto; padding-bottom: 2px;
+            -webkit-overflow-scrolling: touch;
         }
-        .filter-item input:focus,
-        .filter-item select:focus { border-color: var(--accent); }
-        .sort-group { display: flex; gap: 2px; flex-shrink: 0; }
-        .sort-btn {
-            width: 26px; height: 26px; border: 1px solid var(--border);
-            background: #fff; border-radius: 6px;
-            font-size: 12px; cursor: pointer; color: var(--ink-sub);
-            display: flex; align-items: center; justify-content: center;
-            font-family: inherit; transition: all .15s;
+        .chip-row::-webkit-scrollbar { display: none; }
+        .chip {
+            flex-shrink: 0; padding: 6px 14px; border-radius: 16px;
+            background: #f5f5f7; color: var(--ink-sub); font-size: 13px;
+            cursor: pointer; border: 1px solid transparent; transition: all .15s; white-space: nowrap;
         }
-        .sort-btn:hover { border-color: var(--accent); color: var(--accent); }
-        .sort-btn.active {
-            background: var(--accent); border-color: var(--accent); color: #fff;
-            font-weight: 600;
+        .chip.active {
+            background: #fbe4e0; color: var(--accent);
+            border-color: #f3b4ad; font-weight: 600;
         }
+        .sort-line { display: flex; align-items: center; justify-content: space-between; }
+        .sort-line > .sl-label { font-size: 12px; color: var(--ink-weak); }
+        .sort-pills { display: flex; gap: 8px; }
+        .sort-pill {
+            padding: 5px 12px; border-radius: 14px; background: #f5f5f7;
+            color: var(--ink-sub); font-size: 12px; border: 1px solid transparent;
+            cursor: pointer; display: inline-flex; align-items: center; gap: 3px;
+            transition: all .15s;
+        }
+        .sort-pill.active {
+            background: #fbe4e0; color: var(--accent);
+            border-color: #f3b4ad; font-weight: 600;
+        }
+        .sort-pill .arr { font-size: 10px; }
 
         /* 出售条件提示条（橙色 / 红色，复用于弹窗） */
         .sell-tip {
@@ -241,6 +249,28 @@
             padding: 2px 8px; border-radius: 4px;
             letter-spacing: .3px; flex-shrink: 0;
         }
+        .pr-more {
+            font-size: 12px; color: #1a78ff; background: none; border: none;
+            cursor: pointer; font-family: inherit; padding: 2px 4px;
+            flex-shrink: 0; display: inline-flex; align-items: center; gap: 1px;
+        }
+        .pr-more:active { opacity: .55; }
+
+        /* 资产信息弹窗 */
+        .asset-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 0; border-bottom: 1px solid #f0f0f5; gap: 12px;
+        }
+        .asset-row .ar-label { font-size: 13px; color: var(--ink-sub); flex-shrink: 0; }
+        .asset-row .ar-val { font-size: 14px; color: var(--ink); font-weight: 600; text-align: right; word-break: break-all; }
+        .asset-row .ar-val.mono { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12px; font-weight: 500; color: #1a78ff; }
+        .btn-certificate {
+            width: 100%; height: 42px; margin-top: 16px;
+            background: #fff; color: var(--accent); border: 1px solid var(--accent);
+            border-radius: 10px; font-size: 14px; font-weight: 600;
+            cursor: pointer; font-family: inherit;
+        }
+        .btn-certificate:active { background: #fbe4e0; }
         .pr-meta-line {
             font-size: 12px; color: var(--ink-sub);
             margin-bottom: 3px; line-height: 1.5;
@@ -292,6 +322,77 @@
             color: #fff; background: #f59e0b;
         }
         .pr-arrow.warning:active { background: #d97706; }
+
+        /* 多选模式 */
+        .product-row .pr-check {
+            width: 22px; height: 22px; border-radius: 50%;
+            border: 2px solid #d0d5dd; flex-shrink: 0;
+            display: none; align-items: center; justify-content: center;
+            color: #fff; font-size: 13px; background: #fff; transition: all .15s;
+        }
+        .app-container.select-mode .product-row .pr-check { display: flex; }
+        .app-container.select-mode .product-row .pr-arrow { display: none; }
+        .product-row.checked .pr-check {
+            background: var(--accent); border-color: var(--accent);
+        }
+        .product-row.sel-disabled { opacity: .45; cursor: not-allowed; }
+        .product-row.sel-disabled:active { background: #fff; }
+        .product-row.sel-disabled .pr-check {
+            border-color: #e5e6eb; background: #f5f5f7; cursor: not-allowed;
+        }
+
+        /* 收货地址弹窗 */
+        .addr-summary { font-size: 13px; color: var(--ink-sub); padding: 12px 0; border-bottom: 1px solid #f0f0f5; }
+        .addr-summary b { color: var(--accent); font-weight: 700; }
+        .addr-pick {
+            display: flex; align-items: center; gap: 8px;
+            padding: 16px 4px; border-bottom: 1px solid #f0f0f5; cursor: pointer;
+        }
+        .addr-pick .ap-label { font-size: 14px; color: var(--ink); font-weight: 600; flex-shrink: 0; }
+        .addr-pick .ap-value { flex: 1; font-size: 13px; color: var(--ink-weak); min-width: 0; }
+        .addr-pick .ap-arrow { color: var(--ink-weak); font-size: 18px; flex-shrink: 0; }
+        .addr-pick:hover .ap-value { color: var(--accent); }
+        .addr-pick:hover .ap-arrow { color: var(--accent); }
+        .addr-card {
+            display: flex; gap: 10px; padding: 14px 12px;
+            border: 1px solid #d0d5dd; border-radius: 10px; margin-top: 12px;
+            position: relative; cursor: pointer; transition: all .15s;
+        }
+        .addr-card.selected { border-color: var(--accent); background: #fff9f8; }
+        .addr-radio {
+            width: 18px; height: 18px; border-radius: 50%;
+            border: 2px solid #d0d5dd; flex-shrink: 0; margin-top: 2px;
+            transition: all .15s;
+        }
+        .addr-card.selected .addr-radio {
+            border-color: var(--accent);
+            background: radial-gradient(var(--accent) 0 4px, transparent 5px);
+        }
+        .addr-info { flex: 1; min-width: 0; }
+        .addr-name { font-size: 14px; font-weight: 600; color: var(--ink); }
+        .addr-name .phone { color: var(--ink-sub); font-weight: 400; margin-left: 8px; }
+        .addr-tag {
+            font-size: 11px; color: var(--accent); background: #fbe4e0;
+            padding: 1px 6px; border-radius: 3px; margin-left: 6px; font-weight: 600;
+        }
+        .addr-detail { font-size: 12px; color: var(--ink-sub); margin-top: 4px; line-height: 1.5; }
+        .addr-add {
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            padding: 12px; border: 1px dashed #d0d5dd; border-radius: 10px; margin-top: 12px;
+            color: var(--ink-sub); font-size: 13px; cursor: pointer;
+        }
+        .addr-add:hover { border-color: var(--accent); color: var(--accent); }
+        .addr-tip {
+            margin-top: 14px; padding: 10px 12px;
+            background: #fef0f0; border: 1px solid #fbcaca; border-radius: 8px;
+            font-size: 12px; color: #a82a2a; line-height: 1.6;
+            display: flex; gap: 6px; align-items: flex-start;
+        }
+        .addr-tip .at-ico {
+            flex-shrink: 0; width: 16px; height: 16px; border-radius: 50%;
+            background: var(--accent); color: #fff; font-size: 11px; font-weight: 700;
+            display: flex; align-items: center; justify-content: center; margin-top: 1px;
+        }
 
         /* 标注圆点 */
         .badge {
@@ -373,6 +474,17 @@
         .sa-amount { font-size: 18px; font-weight: 700; color: var(--accent); }
         .sa-tip { font-size: 11px; color: var(--ink-weak); }
 
+        /* 价格信息行 */
+        .sell-info { padding: 4px 0 8px; border-bottom: 1px solid #f0f0f5; }
+        .si-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; font-size: 13px; color: var(--ink-sub); }
+        .si-row .si-val { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+        .si-row .si-val.acc { color: var(--accent); }
+
+        /* 挂单参考范围提示 */
+        .sr-range { font-size: 12px; color: #1a78ff; }
+        .sr-range.err { color: var(--accent); }
+        .day-hint { font-size: 11px; color: var(--ink-weak); margin-top: -6px; padding-bottom: 12px; }
+
         .channel-card { padding: 12px 0; border-bottom: 1px solid #f0f0f5; }
         .channel-title { font-size: 14px; color: var(--ink); margin-bottom: 10px; }
         .channel-item {
@@ -432,9 +544,10 @@
             background: #fff; padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
             border-top: 1px solid var(--line);
             box-shadow: 0 -4px 12px rgba(0,0,0,.04);
+            display: flex; align-items: center; gap: 10px;
         }
         .batch-btn {
-            width: 100%; height: 44px;
+            flex: 1; height: 44px;
             background: #f59e0b; color: #fff; border: none;
             border-radius: 12px;
             font-size: 15px; font-weight: 600; cursor: pointer;
@@ -452,6 +565,20 @@
             background: #d8d8d8; cursor: not-allowed; color: #fff;
         }
         .batch-btn.disabled:active { background: #d8d8d8; }
+        .batch-cancel {
+            height: 44px; padding: 0 18px;
+            background: #f5f5f7; color: var(--ink-sub); border: 1px solid #e5e6eb;
+            border-radius: 12px; font-size: 14px; cursor: pointer; font-family: inherit;
+        }
+        .batch-count { font-size: 13px; color: var(--ink-sub); }
+        .batch-count b { color: var(--accent); font-weight: 700; font-size: 15px; }
+        .batch-confirm {
+            flex: 1; height: 44px; border: none; border-radius: 12px;
+            background: var(--accent); color: #fff; font-size: 15px; font-weight: 600;
+            cursor: pointer; font-family: inherit; transition: background .15s;
+        }
+        .batch-confirm:active { background: var(--accent-dark); }
+        .batch-confirm.disabled { background: #f0a8a8; cursor: not-allowed; }
 
         /* 说明弹窗（居中卡片） */
         .tip-popup {
@@ -572,7 +699,7 @@
         <span class="sep">&gt;</span>
         <span>APP 端</span>
         <span class="sep">&gt;</span>
-        <span class="current">零售市场挂单</span>
+        <span class="current">持有产品详情</span>
     </span>
 </div>
 
@@ -610,42 +737,24 @@
                     <button class="tip-btn" onclick="openTipPopup()">说明</button>
                 </div>
 
-                <!-- 筛选 / 排序条 -->
+                <!-- 筛选 / 排序条（移动端样式） -->
                 <div class="filter-bar">
-                    <div class="filter-row">
-                        <div class="filter-item">
-                            <label>剩余交易次数 ≤</label>
-                            <input type="number" id="filterRemain" placeholder="不限" min="0" oninput="onFilterChange()">
-                        </div>
-                        <div class="filter-item">
-                            <label>编号</label>
-                            <input type="text" id="filterCode" placeholder="搜索编号" oninput="onFilterChange()">
-                        </div>
-                        <div class="filter-item">
-                            <label>状态</label>
-                            <select id="filterStatus" onchange="onFilterChange()">
-                                <option value="">全部</option>
-                                <option value="unsatisfied">未满足</option>
-                                <option value="sellable">可售</option>
-                                <option value="listing">出售中</option>
-                                <option value="expired">已满期</option>
-                            </select>
-                        </div>
+                    <div class="search-box">
+                        <span class="s-ico">🔍</span>
+                        <input type="text" id="filterCode" placeholder="搜索编号，如 #0025" oninput="onFilterChange()">
                     </div>
-                    <div class="filter-row">
-                        <div class="filter-item">
-                            <label>成交时间</label>
-                            <div class="sort-group">
-                                <button class="sort-btn active" id="sortTimeAsc" onclick="toggleSort('time','asc')">↑</button>
-                                <button class="sort-btn" id="sortTimeDesc" onclick="toggleSort('time','desc')">↓</button>
-                            </div>
-                        </div>
-                        <div class="filter-item">
-                            <label>上次成交金额</label>
-                            <div class="sort-group">
-                                <button class="sort-btn" id="sortPriceAsc" onclick="toggleSort('price','asc')">↑</button>
-                                <button class="sort-btn" id="sortPriceDesc" onclick="toggleSort('price','desc')">↓</button>
-                            </div>
+                    <div class="chip-row" id="chipRow">
+                        <span class="chip active" data-status="" onclick="setStatus('')">全部</span>
+                        <span class="chip" data-status="unsatisfied" onclick="setStatus('unsatisfied')">不可售</span>
+                        <span class="chip" data-status="sellable" onclick="setStatus('sellable')">可售</span>
+                        <span class="chip" data-status="listing" onclick="setStatus('listing')">出售中</span>
+                        <span class="chip" data-status="expired" onclick="setStatus('expired')">已锁定</span>
+                    </div>
+                    <div class="sort-line">
+                        <span class="sl-label">排序</span>
+                        <div class="sort-pills">
+                            <span class="sort-pill active" id="sortTime" onclick="cycleSort('time')">成交时间<span class="arr">↑</span></span>
+                            <span class="sort-pill" id="sortPrice" onclick="cycleSort('price')">成交金额<span class="arr"></span></span>
                         </div>
                     </div>
                 </div>
@@ -653,8 +762,13 @@
                 <div id="productList"></div>
 
                 <!-- 批量提货 sticky 操作栏 -->
-                <div class="batch-bar">
-                    <button class="batch-btn" id="batchBtn" onclick="batchPickup()">批量提货<span class="batch-num" id="batchNum">0</span></button>
+                <div class="batch-bar" id="batchBar">
+                    <!-- 普通态 -->
+                    <button class="batch-btn" id="batchBtn" onclick="enterSelectMode()">批量提货</button>
+                    <!-- 多选态（默认隐藏） -->
+                    <button class="batch-cancel" id="batchCancel" onclick="exitSelectMode()" style="display:none;">取消</button>
+                    <span class="batch-count" id="batchSelInfo" style="display:none;">已选 <b id="batchSelNum">0</b> 份</span>
+                    <button class="batch-confirm disabled" id="batchConfirm" onclick="confirmPickup()" style="display:none;">确认提货</button>
                 </div>
             </div>
         </div>
@@ -666,13 +780,13 @@
 <aside class="func-panel" id="funcPanel">
     <div class="fp-inner">
         <div class="fp-header">
-            <span class="fp-title">零售市场挂单 · 功能说明</span>
+            <span class="fp-title">持有产品详情 · 功能说明</span>
             <button class="fp-fold-btn" onclick="togglePanel()" aria-label="折叠">›</button>
         </div>
         <div class="fp-body">
 
-            <h4>1、未满足 <span class="badge">1</span></h4>
-            <p>持有份还未达到可出售条件，列表行右侧按钮为灰色「未满足」，不可点击。</p>
+            <h4>1、不可售 <span class="badge">1</span></h4>
+            <p>持有份还未达到可出售条件，列表行右侧按钮为灰色「不可售」，不可点击。</p>
             <ul>
                 <li><b>触发条件</b>：持有份未满 T+5 周期，或未完成价值注入</li>
                 <li><b>操作</b>：按钮置灰、不可点击，无任何后续动作</li>
@@ -682,25 +796,33 @@
             <p>持有份已满足 T+5 周期且已完成价值注入，列表行右侧显示红色「出售」按钮。</p>
             <ul>
                 <li><b>操作</b>：点击按钮弹出底部 sheet「出售数字资产」，填写出售价格与持续时间，勾选协议后确定出售</li>
-                <li><b>参考范围</b>：出售价格 = 上次成交价 ± 10%，默认带入上次成交价</li>
+                <li><b>挂单价格规则</b>：
+                    <ul>
+                        <li>挂单价格需在该单品设定的挂单范围内，且<b>最低不低于批发价</b>、<b>最高不超过评估价的 80%</b></li>
+                        <li>零售市场第一天：只能挂<b>涨幅 80% 以内</b>，且<b>不能降价</b></li>
+                        <li>后续每天：以<b>上次成交价</b>为基准，涨跌幅按该产品实际设置比例（如 <b>±25%</b>）为准</li>
+                    </ul>
+                </li>
+                <li><b>参考范围</b>：本次挂单参考范围 = <b>上次成交价 ± 上次成交价*25%</b> 以内，默认带入上次成交价</li>
+                <li><b>出售时间</b>：出售持续时间<b>不能大于 10 天</b></li>
+                <li><b>结算渠道</b>：查询用户当前已经开通的支付渠道，可以多选，当前只有一个汇付。如果没有开通任何支付渠道，则展示为开通引导去开通，参考支付的时候。此时不能挂单</b></li>
             </ul>
 
             <h4>3、出售中 <span class="badge">3</span></h4>
             <p>该持有份已上架到零售市场（已有挂单在售），列表行右侧显示「管理」按钮。</p>
             <ul>
-                <li><b>操作</b>：点击「管理」跳转 <b>我的寄售</b> 页面，查看 / 调整 / 撤单当前挂单</li>
-                <li><b>跳转目标</b>：我的寄售.html</li>
+                <li><b>操作</b>：点击「管理」跳转 <b>我的挂单</b> 页面，查看 / 调整 / 撤单当前挂单</li>
+                <li><b>跳转目标</b>：我的挂单.html</li>
             </ul>
 
-            <h4>4、已满期 <span class="badge">4</span></h4>
+            <h4>4、已锁定 <span class="badge">4</span></h4>
             <p>持有份达到满期条件，无法再出售，只能走提货流程，按钮显示橙色「提货」。</p>
             <ul>
-                <li><b>触发条件</b>（满足任一即视为已满期）：<br>
+                <li><b>触发条件</b>（满足任一即视为已锁定）：<br>
                     a) 持有份的<b>已交易次数</b>超过该产品最大交易次数；<br>
                     b) 该产品在零售市场的<b>存续周期</b>超过最大周期；<br>
                     c) 用户<b>持有该产品超过 10 天</b>，且在这 10 天内没有任何挂单操作</li>
-                <li><b>操作</b>：点击「提货」跳转 <b>产品提取</b> 页面，按提货流程提取实物</li>
-                <li><b>跳转目标</b>：产品提取.html</li>
+                <li><b>操作</b>：点击「提货」弹出<b>选择收货地址</b>浮层（与批量提货共用），选择地址后确认提货</li>
             </ul>
 
             <h4>5、流程图</h4>
@@ -712,15 +834,14 @@
 
             <h4>6、原型说明</h4>
             <ul>
-                <li>本页面采用后台原型三部分布局：左侧公用目录 + 中间手机原型 + 右侧功能说明</li>
-                <li>中间展示 430px 手机原型（含状态栏、标题栏、列表、底部 sheet 出售弹窗、说明弹窗）</li>
                 <li>顶部标题栏左侧「‹」返回按钮，中间为产品名称「永淳·夏日帖」</li>
                 <li>列表标题栏右侧「说明」按钮：点击弹出两条业务规则（橙色 = 出售条件，红色 = 锁定规则）</li>
-                <li>筛选 / 排序条：剩余交易次数 ≤ X、编号模糊查询、状态下拉；成交时间升降序、上次成交金额升降序</li>
-                <li>未满足状态行不展示按钮；其它三态分别走「出售 / 管理 / 提货」</li>
-                <li>行内显示：已交易次数 / 共 X 次 / 剩余次数、上次成交价、剩余存续时间（剩 ≤ 2 天时高亮）</li>
-                <li>列表底部「批量提货」按钮：自动统计所有「已满期」行并执行</li>
-                <li>右侧说明面板可点击右上角「›」折叠成 40px 窄条，再次点击展开</li>
+                <li>筛选 / 排序条：编号搜索框 + 状态横向 chip 切换 + 成交时间 / 成交金额排序（点击切换升降序）</li>
+                <li>不可售状态行不展示按钮；其它三态分别走「出售 / 管理 / 提货」</li>
+                <li>行内显示：已交易次数 / 共 X 次、上次成交价、剩余存续时间（剩 ≤ 2 天时高亮）</li>
+                <li>产品编号后「更多」按钮：点击弹窗展示<b>产品编号 / 区块链地址 / 查看证书</b>（按钮逻辑未实现）</li>
+                <li>列表底部「批量提货」按钮：点击后列表进入多选态，<b>出售中</b>行置灰不可选；勾选后底部变为「取消 / 已选 N 份 / 确认提货」</li>
+                <li>点击「确认提货」弹出底部 sheet，「选择收货地址 ›」文字按钮跳转<b>地址选择页</b>（复用已有页面），底部红字提示：<b>实物提货后预计 30 个工作日内发货，该数字资产将从区块链上销毁</b></li>
             </ul>
 
         </div>
@@ -749,6 +870,26 @@
     </div>
 </div>
 
+<!-- ====== 资产信息弹窗（产品编号 / 区块链地址 / 查看证书） ====== -->
+<div class="tip-popup" id="assetPopup">
+    <div class="tip-overlay" onclick="closeAssetPopup()"></div>
+    <div class="tip-card">
+        <div class="tip-head">
+            <span class="tip-title">资产信息</span>
+            <button class="tip-close" onclick="closeAssetPopup()" aria-label="关闭">×</button>
+        </div>
+        <div class="asset-row">
+            <span class="ar-label">产品编号</span>
+            <span class="ar-val" id="apCode">#0025</span>
+        </div>
+        <div class="asset-row">
+            <span class="ar-label">区块链地址</span>
+            <span class="ar-val mono" id="apChain">0x7a3f…c92e</span>
+        </div>
+        <button class="btn-certificate" onclick="showToast('查看证书（原型演示）')">查看证书</button>
+    </div>
+</div>
+
 <!-- ====== 出售数字资产 弹窗（底部 sheet） ====== -->
 <div class="sell-sheet" id="sellSheet">
     <div class="sheet-overlay" onclick="closeSellModal()"></div>
@@ -764,6 +905,11 @@
                 <div class="sp-name" id="spName">永淳·夏日帖</div>
                 <div class="sp-code" id="spCode">#0025</div>
             </div>
+        </div>
+
+        <div class="sell-info">
+            <div class="si-row"><span>批发价</span><span class="si-val" id="siWholesale">¥60.00</span></div>
+            <div class="si-row"><span>上次成交价</span><span class="si-val acc" id="siLast">¥95.00</span></div>
         </div>
 
         <div class="sell-row" style="border-bottom:none;">
@@ -786,10 +932,11 @@
         <div class="sell-row">
             <div class="sr-label">出售持续时间</div>
             <div class="sr-right">
-                <input type="number" id="sellDaysInput" placeholder="请输入出售时间" oninput="onFormChange()">
+                <input type="number" id="sellDaysInput" placeholder="请输入出售时间" min="1" max="10" oninput="onFormChange()">
                 <span class="sr-unit">天</span>
             </div>
         </div>
+        <div class="day-hint">出售时间不能大于 10 天</div>
 
         <div class="channel-card">
             <div class="channel-title">结算渠道</div>
@@ -807,6 +954,32 @@
         </div>
 
         <button class="btn-submit" id="submitBtn" disabled onclick="submitSell()">确定出售</button>
+    </div>
+</div>
+
+<!-- ====== 确认提货 / 收货地址 弹窗（底部 sheet） ====== -->
+<div class="sell-sheet" id="addrSheet">
+    <div class="sheet-overlay" onclick="closeAddrSheet()"></div>
+    <div class="sheet-body">
+        <div class="sheet-title">
+            <span>确认提货</span>
+            <button class="btn-cancel" onclick="closeAddrSheet()">取消</button>
+        </div>
+
+        <div class="addr-summary">已选 <b id="addrCount">0</b> 份数字资产，将转为实物发货</div>
+
+        <div class="addr-pick">
+            <span class="ap-label">收货地址</span>
+            <span class="ap-value" id="addrPickText">请选择收货地址</span>
+            <span class="ap-arrow">›</span>
+        </div>
+
+        <div class="addr-tip">
+            <span class="at-ico">!</span>
+            <span>实物提货后预计 <b>30 个工作日</b>内发货，该数字资产将从区块链上<b>销毁</b>。</span>
+        </div>
+
+        <button class="btn-submit" onclick="submitPickup()">确认提货</button>
     </div>
 </div>
 
@@ -839,34 +1012,30 @@ function togglePanel() {
 
 /* ── 产品数据：4 种状态演示 ── */
 var statusMeta = {
-    unsatisfied: { label: '未满足',  cls: 'unsatisfied', btnText: null,    showBtn: false },
+    unsatisfied: { label: '不可售',  cls: 'unsatisfied', btnText: null,    showBtn: false },
     sellable:    { label: '可售',    cls: 'sellable',    btnText: '出售',  showBtn: true },
     listing:     { label: '出售中',  cls: 'listing',     btnText: '管理',  showBtn: true },
-    expired:     { label: '已满期',  cls: 'expired',     btnText: '提货',  showBtn: true }
+    expired:     { label: '已锁定',  cls: 'expired',     btnText: '提货',  showBtn: true }
 };
 
 var MAX_TRADE_COUNT = 15;  // 单个产品允许的最大交易次数
 
 var products = [
-    { code:'#0025', name:'永淳·夏日帖', img:'../asset/永淳·夏日帖.png', tradeCount: 3,  lastPrice:  95.00, holdDate:'2026-08-02 16:42:18', status:'unsatisfied', remainingDays:'7天 23小时' },
-    { code:'#0026', name:'永淳·夏日帖', img:'../asset/永淳·夏日帖.png', tradeCount: 5,  lastPrice: 100.00, holdDate:'2026-08-01 10:20:05', status:'unsatisfied', remainingDays:'8天 10小时' },
-    { code:'#0027', name:'永淳·夏日帖', img:'../asset/永淳·夏日帖.png', tradeCount: 8,  lastPrice:  92.00, holdDate:'2026-07-30 14:23:40', status:'sellable',    remainingDays:'5天 12小时' },
-    { code:'#0028', name:'永淳·夏日帖', img:'../asset/永淳·夏日帖.png', tradeCount: 2,  lastPrice: 110.00, holdDate:'2026-07-28 09:45:12', status:'listing',     remainingDays:'2天 08小时' },
-    { code:'#0029', name:'永淳·夏日帖', img:'../asset/永淳·夏日帖.png', tradeCount: 12, lastPrice:  88.00, holdDate:'2026-07-25 11:30:30', status:'expired',     remainingDays:'已过期' }
+    { code:'#0025', name:'永淳·夏日帖', img:'../asset/永淳·夏日帖.png', tradeCount: 3,  lastPrice:  95.00, wholesalePrice: 60.00, evaluationPrice: 120.00, ratio: 0.25, holdDate:'2026-08-02 16:42:18', status:'unsatisfied', remainingDays:'7天 23小时' },
+    { code:'#0026', name:'永淳·夏日帖', img:'../asset/永淳·夏日帖.png', tradeCount: 5,  lastPrice: 100.00, wholesalePrice: 65.00, evaluationPrice: 130.00, ratio: 0.25, holdDate:'2026-08-01 10:20:05', status:'unsatisfied', remainingDays:'8天 10小时' },
+    { code:'#0027', name:'永淳·夏日帖', img:'../asset/永淳·夏日帖.png', tradeCount: 8,  lastPrice:  92.00, wholesalePrice: 58.00, evaluationPrice: 115.00, ratio: 0.25, holdDate:'2026-07-30 14:23:40', status:'sellable',    remainingDays:'5天 12小时' },
+    { code:'#0028', name:'永淳·夏日帖', img:'../asset/永淳·夏日帖.png', tradeCount: 2,  lastPrice: 110.00, wholesalePrice: 70.00, evaluationPrice: 140.00, ratio: 0.25, holdDate:'2026-07-28 09:45:12', status:'listing',     remainingDays:'2天 08小时' },
+    { code:'#0029', name:'永淳·夏日帖', img:'../asset/永淳·夏日帖.png', tradeCount: 12, lastPrice:  88.00, wholesalePrice: 55.00, evaluationPrice: 110.00, ratio: 0.25, holdDate:'2026-07-25 11:30:30', status:'expired',     remainingDays:'已过期' }
 ];
 
 /* ── 筛选 / 排序状态 ── */
-var filterState = { remain: '', code: '', status: '' };
+var filterState = { code: '', status: '' };
 var sortState = { key: 'time', dir: 'asc' }; // 默认：成交时间升序
+var selectMode = false;
+var selected = {}; // code -> true
 
 function getFilteredSorted() {
     var list = products.slice();
-    if (filterState.remain !== '') {
-        var max = parseInt(filterState.remain, 10);
-        if (!isNaN(max)) {
-            list = list.filter(function (p) { return (MAX_TRADE_COUNT - p.tradeCount) <= max; });
-        }
-    }
     if (filterState.code) {
         var c = filterState.code.toLowerCase();
         list = list.filter(function (p) { return p.code.toLowerCase().indexOf(c) !== -1; });
@@ -878,7 +1047,6 @@ function getFilteredSorted() {
         if (sortState.key === 'price') {
             return sortState.dir === 'asc' ? a.lastPrice - b.lastPrice : b.lastPrice - a.lastPrice;
         }
-        // time
         var ta = new Date(a.holdDate.replace(/-/g, '/')).getTime();
         var tb = new Date(b.holdDate.replace(/-/g, '/')).getTime();
         return sortState.dir === 'asc' ? ta - tb : tb - ta;
@@ -894,104 +1062,196 @@ function renderList() {
         var remainCls = 'pr-meta-line remain';
         if (remaining <= 2) { remainCls += ' urgent'; }
 
-        // 行 onclick：根据状态决定
+        // 多选模式：出售中不可选；其余可勾选
+        var rowCls = 'product-row';
         var rowOnclick = '';
-        var btnHtml = '';
-        if (meta.showBtn) {
-            var arrowCls = 'pr-arrow';
+        var checkHtml = '<div class="pr-check">✓</div>';
+        if (selectMode) {
             if (p.status === 'listing') {
-                arrowCls += ' outline';
-                rowOnclick = 'onList(\'' + p.code + '\')';
-            } else if (p.status === 'expired') {
-                arrowCls += ' warning';
-                rowOnclick = 'onPickup(\'' + p.code + '\')';
-            } else if (p.status === 'sellable') {
-                rowOnclick = 'openSellModal(\'' + p.name + '\', \'' + p.code + '\', ' + p.tradeCount + ', ' + p.lastPrice + ')';
+                rowCls += ' sel-disabled';
+                rowOnclick = '';
+            } else {
+                rowOnclick = 'toggleSelect(\'' + p.code + '\')';
+                if (selected[p.code]) { rowCls += ' checked'; }
             }
-            btnHtml = '<button class="' + arrowCls + '">' + meta.btnText + '</button>';
         } else {
-            // 未满足：行不可点击
-            rowOnclick = '';
+            // 普通态：根据状态决定行/按钮动作
+            if (meta.showBtn) {
+                var arrowCls = 'pr-arrow';
+                if (p.status === 'listing') {
+                    arrowCls += ' outline';
+                    rowOnclick = 'onList(\'' + p.code + '\')';
+                } else if (p.status === 'expired') {
+                    arrowCls += ' warning';
+                    rowOnclick = 'onPickup(\'' + p.code + '\')';
+                } else if (p.status === 'sellable') {
+                    rowOnclick = 'openSellModal(\'' + p.code + '\')';
+                }
+                var btnHtml = '<button class="' + arrowCls + '">' + meta.btnText + '</button>';
+                checkHtml = '<div class="pr-right"><span class="pr-status ' + meta.cls + '">' + meta.label + '</span>' + btnHtml + '</div>';
+            } else {
+                checkHtml = '<div class="pr-right"><span class="pr-status ' + meta.cls + '">' + meta.label + '</span></div>';
+            }
+        }
+
+        // 多选态下右侧只显示状态（按钮隐藏）
+        var rightHtml;
+        if (selectMode) {
+            rightHtml = '<div class="pr-right"><span class="pr-status ' + meta.cls + '">' + meta.label + '</span></div>';
+        } else {
+            rightHtml = checkHtml;
         }
 
         html += [
-            '<div class="product-row" onclick="' + rowOnclick + '">',
+            '<div class="' + rowCls + '" onclick="' + rowOnclick + '">',
+            (selectMode ? checkHtml : ''),
             '    <div class="pr-img"><img src="' + p.img + '" alt="' + p.name + '"></div>',
             '    <div class="pr-info">',
-            '        <div class="pr-name">' + p.name + '<span class="pr-code">' + p.code + '</span></div>',
-            '        <div class="pr-meta-line">已交易 <b>' + p.tradeCount + '</b> / 共 <b>' + MAX_TRADE_COUNT + '</b> 次 · 剩余 <b>' + remaining + '</b> 次</div>',
+            '        <div class="pr-name">' + p.name + '<span class="pr-code">' + p.code + '</span><button class="pr-more" onclick="event.stopPropagation();openAssetPopup(\'' + p.code + '\')">更多<span>›</span></button></div>',
+            '        <div class="pr-meta-line">已交易 <b>' + p.tradeCount + '</b> / 共 <b>' + MAX_TRADE_COUNT + '</b> 次</div>',
             '        <div class="' + remainCls + '">上次成交<span class="pr-price">¥' + p.lastPrice.toFixed(2) + '</span>· 剩余存续 <b class="pr-dur">' + p.remainingDays + '</b></div>',
             '        <div class="pr-time">' + p.holdDate + '</div>',
             '    </div>',
-            '    <div class="pr-right">',
-            '        <span class="pr-status ' + meta.cls + '">' + meta.label + '</span>',
-            '        ' + btnHtml,
-            '    </div>',
+            rightHtml,
             '</div>'
         ].join('');
     });
     if (!html) { html = '<div style="padding:32px 16px;text-align:center;color:#86909c;font-size:13px;">暂无符合条件的持有份</div>'; }
     document.getElementById('productList').innerHTML = html;
 
-    // 同步底部批量提货按钮的可执行数
-    var expiredCount = products.filter(function (p) { return p.status === 'expired'; }).length;
-    var btn = document.getElementById('batchBtn');
-    document.getElementById('batchNum').textContent = expiredCount;
-    if (expiredCount === 0) { btn.classList.add('disabled'); }
-    else { btn.classList.remove('disabled'); }
+    // 同步底部操作栏
+    syncBatchBar();
+}
+
+function syncBatchBar() {
+    var appEl = document.querySelector('.app-container');
+    var normalEls = ['batchBtn'];
+    var selEls = ['batchCancel', 'batchSelInfo', 'batchConfirm'];
+    if (selectMode) {
+        appEl.classList.add('select-mode');
+        document.getElementById('batchBtn').style.display = 'none';
+        document.getElementById('batchCancel').style.display = '';
+        document.getElementById('batchSelInfo').style.display = '';
+        document.getElementById('batchConfirm').style.display = '';
+        var n = getSelectedCodes().length;
+        document.getElementById('batchSelNum').textContent = n;
+        document.getElementById('batchConfirm').classList.toggle('disabled', n === 0);
+        document.getElementById('batchConfirm').textContent = '确认提货(' + n + ')';
+    } else {
+        appEl.classList.remove('select-mode');
+        document.getElementById('batchBtn').style.display = '';
+        document.getElementById('batchCancel').style.display = 'none';
+        document.getElementById('batchSelInfo').style.display = 'none';
+        document.getElementById('batchConfirm').style.display = 'none';
+    }
+}
+
+function getSelectedCodes() {
+    return Object.keys(selected).filter(function (c) { return selected[c]; });
 }
 
 /* ── 筛选 / 排序 交互 ── */
 function onFilterChange() {
-    filterState.remain = document.getElementById('filterRemain').value.trim();
-    filterState.code   = document.getElementById('filterCode').value.trim();
-    filterState.status = document.getElementById('filterStatus').value;
+    filterState.code = document.getElementById('filterCode').value.trim();
     renderList();
 }
-
-function toggleSort(key, dir) {
-    sortState.key = key;
-    sortState.dir = dir;
-    // 切换高亮：每个排序组只高亮一个方向
-    [['sortTimeAsc','sortTimeDesc'],['sortPriceAsc','sortPriceDesc']].forEach(function (group) {
-        group.forEach(function (id) {
-            var el = document.getElementById(id);
-            if (!el) return;
-            var isThis = (id === 'sort' + (key === 'time' ? 'Time' : 'Price') + (dir === 'asc' ? 'Asc' : 'Desc'));
-            el.classList.toggle('active', isThis);
-        });
+function setStatus(s) {
+    filterState.status = s;
+    document.querySelectorAll('.chip-row .chip').forEach(function (c) {
+        c.classList.toggle('active', c.getAttribute('data-status') === s);
     });
     renderList();
 }
+function cycleSort(key) {
+    if (sortState.key === key) {
+        sortState.dir = (sortState.dir === 'asc' ? 'desc' : 'asc');
+    } else {
+        sortState.key = key;
+        sortState.dir = 'asc';
+    }
+    var arr = sortState.dir === 'asc' ? '↑' : '↓';
+    var timeEl = document.getElementById('sortTime');
+    var priceEl = document.getElementById('sortPrice');
+    timeEl.classList.toggle('active', sortState.key === 'time');
+    priceEl.classList.toggle('active', sortState.key === 'price');
+    timeEl.querySelector('.arr').textContent = sortState.key === 'time' ? arr : '';
+    priceEl.querySelector('.arr').textContent = sortState.key === 'price' ? arr : '';
+    renderList();
+}
 
-/* ── 批量提货（已满期行） ── */
-function batchPickup() {
-    var expired = products.filter(function (p) { return p.status === 'expired'; });
-    if (expired.length === 0) {
-        showToast('当前没有可提货的产品');
-        return;
-    }
-    if (confirm('确认批量提货 ' + expired.length + ' 份已满期产品？')) {
-        // 演示：从列表中移除已提货产品
-        var codes = expired.map(function (p) { return p.code; });
-        products = products.filter(function (p) { return codes.indexOf(p.code) === -1; });
-        renderList();
-        showToast('已批量提货 ' + expired.length + ' 份');
-    }
+/* ── 多选 / 批量提货 ── */
+function enterSelectMode() {
+    selectMode = true;
+    selected = {};
+    syncBatchBar();
+    renderList();
+}
+function exitSelectMode() {
+    selectMode = false;
+    selected = {};
+    syncBatchBar();
+    renderList();
+}
+function toggleSelect(code) {
+    if (selected[code]) { delete selected[code]; } else { selected[code] = true; }
+    syncBatchBar();
+    renderList();
+}
+function confirmPickup() {
+    var codes = getSelectedCodes();
+    if (codes.length === 0) { showToast('请先选择要提货的产品'); return; }
+    document.getElementById('addrCount').textContent = codes.length;
+    document.getElementById('addrSheet').classList.add('show');
+}
+function closeAddrSheet() {
+    document.getElementById('addrSheet').classList.remove('show');
+}
+function selectAddr(id) {
+    document.querySelectorAll('#addrList .addr-card').forEach(function (c) {
+        c.classList.toggle('selected', c.getAttribute('data-id') === id);
+    });
+}
+function submitPickup() {
+    var codes = getSelectedCodes();
+    closeAddrSheet();
+    products = products.filter(function (p) { return codes.indexOf(p.code) === -1; });
+    selectMode = false;
+    selected = {};
+    syncBatchBar();
+    renderList();
+    showToast('已提交提货 ' + codes.length + ' 份，预计 30 个工作日内发货');
 }
 
 /* ── 操作跳转 ── */
-function onList(code)  { location.href = '我的寄售.html'; }
-function onPickup(code){ location.href = '产品提取.html'; }
+function onList(code)  { location.href = '我的挂单.html'; }
+function onPickup(code){
+    // 单个提货：同样弹出选择收货地址浮层
+    selected = {}; selected[code] = true;
+    document.getElementById('addrCount').textContent = 1;
+    document.getElementById('addrSheet').classList.add('show');
+}
 
 /* ── 出售弹窗（可售） ── */
-function openSellModal(name, code, count, lastPrice) {
-    document.getElementById('spName').textContent = name;
+var curSellMin = 0, curSellMax = 0;
+function findProduct(code) {
+    for (var i = 0; i < products.length; i++) { if (products[i].code === code) return products[i]; }
+    return null;
+}
+function openSellModal(code) {
+    var p = findProduct(code);
+    if (!p) return;
+    document.getElementById('spName').textContent = p.name;
     document.getElementById('spCode').textContent = code;
-    var low = (lastPrice * 0.9).toFixed(2);
-    var high = (lastPrice * 1.1).toFixed(2);
-    document.getElementById('rangeTip').textContent = '本次挂单参考范围：¥' + low + ' ~ ¥' + high;
-    document.getElementById('sellPriceInput').value = lastPrice || '';
+    document.getElementById('siWholesale').textContent = '¥' + p.wholesalePrice.toFixed(2);
+    document.getElementById('siLast').textContent = '¥' + p.lastPrice.toFixed(2);
+    // 本次挂单参考范围：以上次成交价 ± ratio 为准（如 ±25%）
+    var ratio = p.ratio || 0.25;
+    curSellMin = p.lastPrice * (1 - ratio);
+    curSellMax = p.lastPrice * (1 + ratio);
+    document.getElementById('rangeTip').textContent =
+        '本次挂单参考范围：¥' + curSellMin.toFixed(2) + ' ~ ¥' + curSellMax.toFixed(2);
+    document.getElementById('rangeTip').classList.remove('err');
+    document.getElementById('sellPriceInput').value = p.lastPrice || '';
     document.getElementById('sellDaysInput').value = '';
     document.getElementById('agreeRadio').checked = false;
     updateActual();
@@ -1010,7 +1270,11 @@ function onFormChange() {
     var price = parseFloat(document.getElementById('sellPriceInput').value) || 0;
     var days  = parseFloat(document.getElementById('sellDaysInput').value) || 0;
     var agree = document.getElementById('agreeRadio').checked;
-    document.getElementById('submitBtn').disabled = !(price > 0 && days > 0 && agree);
+    var rangeEl = document.getElementById('rangeTip');
+    var priceOk = price >= curSellMin && price <= curSellMax;
+    rangeEl.classList.toggle('err', price > 0 && !priceOk);
+    var daysOk = days > 0 && days <= 10;
+    document.getElementById('submitBtn').disabled = !(price > 0 && priceOk && daysOk && agree);
 }
 function submitSell() {
     closeSellModal();
@@ -1020,6 +1284,24 @@ function submitSell() {
 /* ── 说明弹窗 ── */
 function openTipPopup()  { document.getElementById('tipPopup').classList.add('show'); }
 function closeTipPopup() { document.getElementById('tipPopup').classList.remove('show'); }
+
+/* ── 资产信息弹窗（更多） ── */
+var chainMap = {
+    '#0025': '0x7a3f9c1e8b4d2a6f5c8e1d9b7a3f0c92e',
+    '#0026': '0x3b8e2d1f4a6c9b7e5d2a8f1c3b9e4d67a',
+    '#0027': '0x9c1d4e8b2a6f3c7e5d1b8a4f2c9e6d7b3a',
+    '#0028': '0x5e2a8f3c1b7d9e4a6c2f8b1d3e7a5c9d4f',
+    '#0029': '0x1d7c2b8e5a4f6c3d9e1b7a2c8f5d4e3b9a'
+};
+function openAssetPopup(code) {
+    document.getElementById('apCode').textContent = code;
+    document.getElementById('apChain').textContent = chainMap[code] || '—';
+    document.getElementById('assetPopup').classList.add('show');
+}
+function closeAssetPopup() { document.getElementById('assetPopup').classList.remove('show'); }
+
+/* ── 跳转收货地址选择页（复用已有页面） ── */
+function goAddrPage() { location.href = '提货页面.html'; }
 
 renderList();
 </script>

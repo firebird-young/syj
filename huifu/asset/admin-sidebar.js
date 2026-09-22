@@ -33,12 +33,12 @@
         {
             group: '挂单和共享超市',
             items: [
-                { name: '零售市场挂单',   href: '零售市场挂单.html' },
+                { name: '持有产品详情',   href: '持有产品详情.html' },
+                { name: '我的挂单',       href: '我的挂单.html' },
 
                 { name: '零售市场列表',   href: '零售市场列表.html' },
                 { name: '零售市场详情',   href: '零售市场详情_v2.html' },
-                { name: '零售市场支付',   href: '零售市场支付_v2.html' },
-                { name: '我的寄售',       href: '我的寄售.html' }
+                { name: '零售市场支付',   href: '零售市场支付_v2.html' }
             ]
         },
         {

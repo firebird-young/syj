@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的挂单 - 后台原型</title>
+    <!-- ① 左侧目录：公用文件引用（菜单在 asset/admin-sidebar.js 的 MENU 中维护） -->
+    <link rel="stylesheet" href="asset/admin-sidebar.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        /* ===== 主色（沿用本页面原本的红粉调性，与右侧说明面板共用变量） ===== */
+        :root {
+            --accent: #D62828;
+            --accent-dark: #c41e1e;
+            --ink: #1a1a2e;
+            --ink-sub: #4e5a6e;
+            --ink-weak: #86909c;
+            --line: #f0f0f0;
+            --card-radius: 14px;
+            --border: #e0e0e0;
+        }
+
+        html, body { background: #f5f5f7; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+            color: var(--ink);
+            font-size: 14px;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* ===== ② 中间原型内容：面包屑 + 手机原型容器 ===== */
+        .breadcrumb {
+            padding: 16px 24px 0; font-size: 13px; color: var(--ink-weak);
+            display: flex; align-items: center; justify-content: space-between; gap: 12px;
+        }
+        .breadcrumb a { color: var(--ink-weak); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--accent); }
+        .breadcrumb .sep { margin: 0 4px; }
+        .breadcrumb .current { color: var(--ink); font-weight: 500; }
+
+        .main {
+            padding: 16px 24px 40px;
+            display: flex; justify-content: center; align-items: flex-start;
+        }
+
+        /* 手机原型容器（430px 平铺；窄屏铺满） */
+        .app-container {
+            width: 100%; max-width: 430px; flex-shrink: 0;
+            height: calc(100vh - 130px); min-height: 600px;
+            background: #f5f5f5; border-radius: 18px; overflow: hidden;
+            box-shadow: 0 10px 34px rgba(30, 60, 120, 0.14);
+            display: flex; flex-direction: column;
+            position: relative;
+        }
+        .app-scroll {
+            flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
+        }
+        .app-scroll::-webkit-scrollbar { width: 0; }
+
+        /* ===== 顶部：状态栏 + 标题栏（sticky） ===== */
+        .page-top { position: sticky; top: 0; z-index: 80; flex-shrink: 0; }
+        .status-bar {
+            height: 44px; background: #fff; color: var(--ink);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 20px;
+        }
+        .status-bar .sb-left { display: flex; align-items: baseline; gap: 8px; }
+        .status-bar .sb-time { font-size: 15px; font-weight: 600; letter-spacing: 0.3px; }
+        .status-bar .sb-date { font-size: 12px; color: #666; }
+        .status-bar .sb-right { display: flex; align-items: center; gap: 7px; color: var(--ink); }
+        .status-bar .sb-signal { display: inline-flex; align-items: flex-end; gap: 1.5px; height: 11px; }
+        .status-bar .sb-signal i { width: 3px; border-radius: 1px; background: currentColor; }
+        .status-bar .sb-signal i:nth-child(1) { height: 4px; }
+        .status-bar .sb-signal i:nth-child(2) { height: 6px; }
+        .status-bar .sb-signal i:nth-child(3) { height: 8px; }
+        .status-bar .sb-signal i:nth-child(4) { height: 11px; }
+        .status-bar .sb-wifi { width: 15px; height: 11px; position: relative; display: inline-block; }
+        .status-bar .sb-wifi::before {
+            content: ''; position: absolute; left: 50%; bottom: 0;
+            transform: translateX(-50%);
+            width: 5px; height: 5px; border-radius: 50%; background: currentColor;
+        }
+        .status-bar .sb-wifi::after {
+            content: ''; position: absolute; left: 50%; bottom: 2px;
+            transform: translateX(-50%);
+            width: 14px; height: 14px; box-sizing: border-box;
+            border-top: 2px solid currentColor; border-radius: 50%;
+        }
+        .status-bar .sb-batt {
+            width: 25px; height: 12px; border: 1.4px solid currentColor;
+            border-radius: 3px; padding: 1.5px; box-sizing: border-box; position: relative;
+        }
+        .status-bar .sb-batt::after {
+            content: ''; position: absolute; right: -3.5px; top: 50%;
+            transform: translateY(-50%);
+            width: 2px; height: 5px; background: currentColor; border-radius: 0 1px 1px 0;
+        }
+        .status-bar .sb-batt i { display: block; height: 100%; width: 78%; background: currentColor; border-radius: 1px; }
+
+        .top-nav {
+            height: 50px; background: #fff; color: var(--ink);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 8px; border-bottom: 1px solid var(--line);
+        }
+        .top-nav .back-btn {
+            width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;
+            color: var(--ink); font-size: 24px; font-weight: 400; line-height: 1;
+            cursor: pointer; background: none; border: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .top-nav .back-btn:active { opacity: .55; }
+        .top-nav .top-title {
+            flex: 1; text-align: center;
+            font-size: 17px; font-weight: 600; color: var(--ink);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            padding: 0 6px;
+        }
+        .top-nav .top-placeholder { width: 44px; height: 44px; flex-shrink: 0; }
+
+        /* ===== 统计卡 ===== */
+        .stat-card {
+            margin: 12px 16px 0;
+            background: #fff;
+            border-radius: var(--card-radius);
+            padding: 18px 0;
+            display: flex;
+            box-shadow: 0 2px 10px rgba(0,0,0,.04);
+        }
+        .stat-item {
+            flex: 1; text-align: center; position: relative;
+        }
+        .stat-item + .stat-item::before {
+            content: ''; position: absolute; left: 0; top: 20%;
+            height: 60%; width: 1px; background: var(--line);
+        }
+        .stat-num {
+            font-size: 22px; font-weight: 700; color: var(--ink);
+            margin-bottom: 6px; line-height: 1;
+        }
+        .stat-num.red { color: var(--accent); }
+        .stat-num.green { color: #1aab67; }
+        .stat-label { font-size: 12px; color: var(--ink-weak); }
+
+        /* ===== Tab 切换 ===== */
+        .tab-bar {
+            display: flex; margin: 12px 16px 0;
+            background: #fff; border-radius: var(--card-radius);
+            padding: 4px;
+            box-shadow: 0 2px 10px rgba(0,0,0,.04);
+        }
+        .tab-item {
+            flex: 1; text-align: center; padding: 9px 0;
+            font-size: 13px; color: var(--ink-sub);
+            border-radius: 10px; cursor: pointer;
+            transition: all .15s; font-weight: 500;
+        }
+        .tab-item.active {
+            background: var(--accent); color: #fff; font-weight: 600;
+        }
+
+        /* ===== 列表卡 ===== */
+        .list-card {
+            background: #fff; margin: 12px 16px 24px;
+            border-radius: var(--card-radius); overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,.04);
+        }
+        .list-title {
+            padding: 14px 16px; font-size: 15px; font-weight: 600; color: var(--ink);
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid #f5f5f7;
+        }
+        .list-title .count {
+            font-size: 12px; font-weight: 500; color: var(--accent);
+            background: #fbe4e0; padding: 2px 10px; border-radius: 10px;
+        }
+
+        /* 出售条件提示条 */
+        .sell-tip {
+            display: flex; align-items: flex-start; gap: 8px;
+            margin: 12px 14px; padding: 10px 12px;
+            background: #fff7e6; border: 1px solid #ffe1a8;
+            border-radius: 8px;
+            font-size: 12px; line-height: 1.7; color: #8a5a00;
+        }
+        .sell-tip .st-ico {
+            flex-shrink: 0; width: 16px; height: 16px;
+            margin-top: 2px; border-radius: 50%;
+            background: #e6a23c; color: #fff;
+            font-size: 11px; font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .sell-tip b { color: #a05c00; }
+
+        /* 列表行 */
+        .sell-row {
+            display: flex; gap: 12px; align-items: center;
+            padding: 16px 16px; border-top: 1px solid #f5f5f7;
+        }
+        .sr-img {
+            width: 64px; height: 64px; border-radius: 8px;
+            background: #fafbfc; flex-shrink: 0; overflow: hidden;
+        }
+        .sr-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .sr-info { flex: 1; min-width: 0; }
+        .sr-name {
+            font-size: 15px; font-weight: 600; color: var(--ink);
+            margin-bottom: 10px; display: flex; align-items: center;
+            gap: 6px; line-height: 1.3;
+        }
+        .sr-code {
+            font-size: 11px; color: #1a78ff;
+            font-weight: 600; background: #e6f4ff;
+            border: 1px solid #b7dcff;
+            padding: 2px 8px; border-radius: 4px;
+            flex-shrink: 0;
+        }
+        .sr-meta { font-size: 12px; color: var(--ink-sub); margin-bottom: 6px; line-height: 1.4; }
+        .sr-meta:last-child { margin-bottom: 0; }
+        .sr-meta .price { color: var(--accent); font-weight: 700; font-size: 16px; margin-left: 2px; }
+        .sr-meta .price.green { color: #1aab67; }
+        .sr-meta .fee { color: var(--ink-weak); }
+        .sr-time { font-size: 11px; color: #9ba6b9; line-height: 1.4; }
+        .sr-right {
+            flex-shrink: 0;
+            display: flex; flex-direction: column;
+            align-items: flex-end; gap: 8px;
+        }
+
+        /* 状态标签 */
+        .status-tag {
+            font-size: 12px; padding: 4px 12px;
+            border-radius: 12px; font-weight: 500; white-space: nowrap;
+        }
+        .status-tag.selling { color: var(--accent); background: #fbe4e0; }
+        .status-tag.sold    { color: #1aab67; background: #e8f8f0; }
+        .status-tag.off     { color: var(--ink-weak); background: #f2f3f5; }
+
+        /* 操作按钮 */
+        .btn-outline {
+            background: #fff; border: 1px solid var(--accent);
+            color: var(--accent); font-size: 13px; font-weight: 500;
+            padding: 7px 18px; border-radius: 12px;
+            cursor: pointer; font-family: inherit;
+        }
+        .btn-outline:active { background: #fbe4e0; }
+        .btn-gray {
+            background: #fafbfc; border: 1px solid #e5e6eb;
+            color: var(--ink-weak); font-size: 13px;
+            padding: 7px 18px; border-radius: 12px;
+            cursor: default; font-family: inherit;
+        }
+
+        /* 剩余天数 */
+        .remain {
+            font-size: 11px; color: #e6a23c;
+            background: #fff7e6; border: 1px solid #ffe1a8;
+            padding: 3px 9px; border-radius: 10px;
+            white-space: nowrap;
+        }
+
+        /* 空状态 */
+        .empty {
+            padding: 56px 0; text-align: center;
+            color: #9ba6b9; font-size: 13px;
+        }
+        .empty .empty-ico { font-size: 44px; margin-bottom: 12px; opacity: .5; }
+
+        /* ===== 撤销挂单 sheet ===== */
+        .sheet {
+            position: fixed; inset: 0; z-index: 9999;
+            display: none;
+        }
+        .sheet.show { display: block; }
+        .sheet-overlay {
+            position: absolute; inset: 0; background: rgba(0,0,0,0.4);
+        }
+        .sheet-body {
+            position: absolute; bottom: 0; left: 50%;
+            transform: translateX(-50%);
+            width: 100%; max-width: 430px;
+            background: #fff; border-radius: 16px 16px 0 0;
+            padding: 16px 16px calc(20px + env(safe-area-inset-bottom));
+            max-height: 90vh; overflow-y: auto;
+            animation: slideUp .25s ease;
+        }
+        @keyframes slideUp {
+            from { transform: translateX(-50%) translateY(100%); }
+            to   { transform: translateX(-50%) translateY(0); }
+        }
+        .sheet-title {
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 16px; font-weight: 600; color: var(--ink);
+            padding-bottom: 12px; border-bottom: 1px solid var(--line);
+            margin-bottom: 4px;
+        }
+        .sheet-title .btn-cancel {
+            background: none; border: none; color: var(--ink-sub);
+            font-size: 14px; cursor: pointer; padding: 4px 8px;
+        }
+        .cancel-product {
+            display: flex; align-items: center; gap: 12px;
+            padding: 14px 0; border-bottom: 1px solid var(--line);
+        }
+        .cp-img {
+            width: 48px; height: 48px; border-radius: 8px;
+            background: #fafbfc; overflow: hidden; flex-shrink: 0;
+        }
+        .cp-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .cp-info { flex: 1; min-width: 0; }
+        .cp-name { font-size: 14px; font-weight: 500; color: var(--ink); margin-bottom: 4px; }
+        .cp-code { font-size: 12px; color: #9ba6b9; }
+        .cancel-note {
+            padding: 14px 0; font-size: 13px; color: var(--ink-sub); line-height: 1.8;
+        }
+        .cancel-note b { color: var(--accent); }
+        .btn-submit {
+            width: 100%; height: 48px; background: var(--accent); color: #fff;
+            border: none; border-radius: 12px;
+            font-size: 16px; font-weight: 600; cursor: pointer;
+            margin-top: 6px; font-family: inherit;
+        }
+        .btn-submit:active { background: var(--accent-dark); }
+        .btn-submit.plain {
+            background: #f5f5f5; color: var(--ink-sub); margin-top: 10px;
+        }
+
+        /* ===== ③ 右侧功能说明面板（fix 右侧 340px，可折叠成 40px） ===== */
+        .func-panel {
+            position: fixed; top: 0; right: 0; bottom: 0;
+            width: 340px; z-index: 890;
+            background: #fff; border-left: 1px solid #e3e6eb;
+            display: flex; flex-direction: column;
+        }
+        .func-panel .fp-inner { display: flex; flex-direction: column; height: 100%; min-width: 0; }
+        .func-panel .fp-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 15px 14px 13px 18px; border-bottom: 1px solid #f0f1f4; flex-shrink: 0;
+        }
+        .func-panel .fp-title { display: flex; align-items: center; gap: 9px; font-size: 15px; font-weight: 700; color: var(--ink); }
+        .func-panel .fp-title::before {
+            content: ''; width: 8px; height: 8px; border-radius: 50%;
+            background: var(--accent); box-shadow: 0 0 0 4px rgba(214, 40, 40, 0.14);
+        }
+        .func-panel .fp-fold-btn {
+            width: 28px; height: 28px; border: 1px solid var(--border); background: #fff;
+            border-radius: 50%; color: var(--ink-weak); font-size: 15px; line-height: 1;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            font-family: inherit; transition: all 0.2s;
+        }
+        .func-panel .fp-fold-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .func-panel .fp-body { flex: 1; overflow-y: auto; padding: 4px 18px 40px; font-size: 13px; color: #555; line-height: 1.9; }
+        .func-panel .fp-body::-webkit-scrollbar { width: 5px; }
+        .func-panel .fp-body::-webkit-scrollbar-thumb { background: #d8dce3; border-radius: 3px; }
+        .func-panel .fp-body h4 { font-size: 14px; font-weight: 600; color: var(--ink); margin: 18px 0 6px; }
+        .func-panel .fp-body h4:first-child { margin-top: 12px; }
+        .func-panel .fp-body p { font-size: 13px; color: #555; margin: 4px 0; }
+        .func-panel .fp-body ul { padding-left: 18px; margin: 0 0 8px; }
+        .func-panel .fp-body li { margin-bottom: 6px; font-size: 13px; color: #555; }
+        .func-panel .fp-body li b { color: var(--ink); }
+        .func-panel .fp-body .badge { vertical-align: 1px; }
+        .func-panel .fp-open {
+            display: none; position: absolute; top: 0; bottom: 0; left: 0; right: 0;
+            border: none; background: transparent; cursor: pointer;
+            writing-mode: vertical-rl; text-orientation: upright;
+            color: var(--ink-weak); font-size: 13px;
+            align-items: center; justify-content: center; font-family: inherit; transition: all 0.2s;
+        }
+        .func-panel .fp-open:hover { color: var(--accent); background: #fafbfc; }
+
+        /* 标注圆点 */
+        .badge {
+            display: inline-block; min-width: 18px; height: 18px;
+            padding: 0 5px; border-radius: 50%;
+            background: var(--accent); color: #fff;
+            font-size: 12px; line-height: 18px;
+            text-align: center; font-weight: 600;
+            box-shadow: 0 1px 3px rgba(214,40,40,0.3);
+        }
+
+        /* ===== 三部分布局偏移：宽屏为左右两侧让位 ===== */
+        @media (min-width: 1024px) {
+            .breadcrumb,
+            .main { margin-right: 340px; }
+            body.fp-collapsed .main,
+            body.fp-collapsed .breadcrumb { margin-right: 40px; }
+            body.fp-collapsed .func-panel { width: 40px; }
+            body.fp-collapsed .fp-inner { display: none; }
+            body.fp-collapsed .fp-open { display: flex; }
+        }
+        @media (max-width: 1023.98px) {
+            .func-panel { display: none; }
+            .main, .breadcrumb { margin-right: 0; }
+        }
+        /* 真机宽度：手机页铺满 */
+        @media (max-width: 540px) {
+            .main { padding: 12px 0 32px; }
+            .breadcrumb { padding: 12px 16px 0; }
+            .app-container { border-radius: 0; box-shadow: none; height: 100vh; min-height: 100vh; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ② 中间原型内容：面包屑 + 手机页面 -->
+<div class="breadcrumb">
+    <span>
+        <a href="index.html">首页</a>
+        <span class="sep">&gt;</span>
+        <span>APP 端</span>
+        <span class="sep">&gt;</span>
+        <span class="current">我的挂单</span>
+    </span>
+</div>
+
+<div class="main">
+    <div class="app-container">
+
+        <!-- 顶部三段：状态栏 + 标题栏（sticky） -->
+        <div class="page-top">
+            <div class="status-bar">
+                <span class="sb-left">
+                    <span class="sb-time">9:41</span>
+                    <span class="sb-date">9月22日 星期二</span>
+                </span>
+                <span class="sb-right">
+                    <span class="sb-signal"><i></i><i></i><i></i><i></i></span>
+                    <span class="sb-wifi"></span>
+                    <span class="sb-batt"><i></i></span>
+                </span>
+            </div>
+            <div class="top-nav">
+                <button class="back-btn" onclick="goBack()" aria-label="返回">‹</button>
+                <span class="top-title">我的挂单</span>
+                <span class="top-placeholder"></span>
+            </div>
+        </div>
+
+        <div class="app-scroll">
+
+            <!-- 统计卡 -->
+            <div class="stat-card">
+                <div class="stat-item">
+                    <div class="stat-num red" id="statSelling">3</div>
+                    <div class="stat-label">挂单中</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-num green" id="statSold">2</div>
+                    <div class="stat-label">已售出</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-num" id="statAmount">¥346.00</div>
+                    <div class="stat-label">累计成交</div>
+                </div>
+            </div>
+
+            <!-- Tab 切换 -->
+            <div class="tab-bar" id="tabBar">
+                <div class="tab-item active" data-tab="all">全部</div>
+                <div class="tab-item" data-tab="selling">挂单中</div>
+                <div class="tab-item" data-tab="sold">已售出</div>
+                <div class="tab-item" data-tab="off">已下架</div>
+            </div>
+
+            <!-- 挂单记录列表 -->
+            <div class="list-card">
+                <div class="list-title">挂单记录<span class="count" id="listCount"></span></div>
+
+
+                <div id="sellList"></div>
+                <div class="empty" id="emptyTip" style="display:none;">
+                    <div class="empty-ico">📭</div>
+                    <div>该分类下暂无挂单记录</div>
+                </div>
+            </div>
+
+        </div><!-- /app-scroll -->
+    </div><!-- /app-container -->
+</div><!-- /main -->
+
+<!-- ====== 撤销挂单弹窗（底部 sheet） ====== -->
+<div class="sheet" id="cancelSheet">
+    <div class="sheet-overlay" onclick="closeCancelModal()"></div>
+    <div class="sheet-body">
+        <div class="sheet-title">
+            <span>撤销挂单</span>
+            <button class="btn-cancel" onclick="closeCancelModal()">取消</button>
+        </div>
+
+        <div class="cancel-product">
+            <div class="cp-img"><img id="cpImg" src="../asset/永淳·夏日帖.png" alt=""></div>
+            <div class="cp-info">
+                <div class="cp-name" id="cpName">永淳·夏日帖</div>
+                <div class="cp-code" id="cpCode">#0027</div>
+            </div>
+        </div>
+
+        <div class="cancel-note">
+            挂单价格：<b id="cpPrice">¥92.00</b><br>
+            撤销后该产品将从挂单市场下架，此操作不可撤销，是否确认撤销？
+        </div>
+
+        <button class="btn-submit" onclick="confirmCancel()">确认撤销</button>
+        <button class="btn-submit plain" onclick="closeCancelModal()">再想想</button>
+    </div>
+</div>
+
+<!-- ====== ③ 右侧功能说明面板（常驻，可折叠成 40px） ====== -->
+<aside class="func-panel" id="funcPanel">
+    <div class="fp-inner">
+        <div class="fp-header">
+            <span class="fp-title">我的挂单 · 功能说明</span>
+            <button class="fp-fold-btn" onclick="togglePanel()" aria-label="折叠">›</button>
+        </div>
+        <div class="fp-body">
+
+            <h4><span class="badge">1</span> 顶部统计卡</h4>
+            <ul>
+                <li>展示三个统计项：<b>挂单中</b>件数、<b>已售出</b>件数、<b>累计成交金额</b></li>
+                <li>数字会随下方列表 / 状态变化实时刷新</li>
+            </ul>
+
+            <h4><span class="badge">2</span> 状态 Tab</h4>
+            <ul>
+                <li>支持按 <b>全部 / 挂单中 / 已售出 / 已下架</b> 切换查看挂单记录</li>
+                <li>列表标题实时显示当前分类下的<b>记录条数</b></li>
+            </ul>
+
+            <h4><span class="badge">3</span> 挂单记录</h4>
+            <ul>
+                <li>每行展示：产品图、产品名称、产品编号、<b>挂单价格</b>（深红突出）、挂单时间</li>
+                <li><b>挂单中</b>：展示剩余挂单天数（黄色标签），可点击「撤销」下架该产品</li>
+                <li><b>已售出</b>：展示成交价（绿色）、成交时间与收取的交易手续费</li>
+                <li><b>已下架</b>：展示下架时间，无操作按钮</li>
+            </ul>
+
+            <h4><span class="badge">4</span> 撤销挂单</h4>
+            <ul>
+                <li>点击「撤销」弹出底部确认弹窗，展示产品信息与挂单价格</li>
+                <li>确认后该产品状态变为<b>已下架</b>，挂单中件数与统计同步更新</li>
+            </ul>
+        </div>
+    </div>
+    <button class="fp-open" onclick="togglePanel()" aria-label="展开说明">展<br>开<br>说<br>明</button>
+</aside>
+
+<!-- ① 左侧目录：公用文件引用 -->
+<script src="asset/admin-sidebar.js"></script>
+
+<script>
+/* ── 顶部返回：history 有记录就后退，否则跳到本模块首页 ── */
+function goBack() {
+    if (history.length > 1) { history.back(); }
+    else { location.href = '我的页面.html'; }
+}
+
+/* ── 右侧功能说明面板 折叠/展开 ── */
+function togglePanel() {
+    document.body.classList.toggle('fp-collapsed');
+}
+
+/* ── 挂单数据（status: selling 挂单中 / sold 已售出 / off 已下架） ── */
+var items = [
+    { img: '永淳·夏日帖.png', name: '永淳·夏日帖', code: '#0027', status: 'selling', price:  92.00, time: '2026-07-30 14:23', remain: 5 },
+    { img: '兰亭序.png',     name: '兰亭序',     code: '#0031', status: 'selling', price: 128.00, time: '2026-08-01 09:15', remain: 9 },
+    { img: '永淳·夏日帖.png', name: '永淳·夏日帖', code: '#0029', status: 'selling', price:  88.00, time: '2026-07-25 11:30', remain: 2 },
+    { img: '永淳·夏日帖.png', name: '永淳·夏日帖', code: '#0025', status: 'sold',    price:  98.00, deal:  96.00, fee: 3.46, time: '2026-07-28 16:42' },
+    { img: '山水空灵.png',     name: '山水空灵',     code: '#0012', status: 'sold',    price: 256.00, deal: 250.00, fee: 9.00, time: '2026-07-22 15:30' },
+    { img: '永淳·夏日帖.png', name: '永淳·夏日帖', code: '#0028', status: 'off',     price: 110.00, time: '2026-07-28 09:45' }
+];
+var currentTab = 'all';
+var cancelIndex = -1;
+
+function fmt(n) { return n.toFixed(2); }
+
+/* ── 渲染列表 ── */
+function render() {
+    var list = items.filter(function (it) {
+        if (currentTab === 'all') return true;
+        return it.status === currentTab;
+    });
+
+    document.getElementById('listCount').textContent = '共 ' + list.length + ' 条';
+
+    var html = '';
+    for (var i = 0; i < list.length; i++) {
+        var it = list[i];
+        var idx = items.indexOf(it);
+        if (it.status === 'selling') {
+            html +=
+            '<div class="sell-row">' +
+                '<div class="sr-img"><img src="../asset/' + it.img + '" alt="' + it.name + '"></div>' +
+                '<div class="sr-info">' +
+                    '<div class="sr-name">' + it.name + '<span class="sr-code">' + it.code + '</span></div>' +
+                    '<div class="sr-meta">挂单价格<span class="price">¥' + fmt(it.price) + '</span></div>' +
+                    '<div class="sr-time">挂单 ' + it.time + '</div>' +
+                '</div>' +
+                '<div class="sr-right">' +
+                    '<span class="status-tag selling">挂单中</span>' +
+                    '<span class="remain">剩余 ' + it.remain + ' 天</span>' +
+                    '<button class="btn-outline" onclick="openCancelModal(' + idx + ')">撤销</button>' +
+                '</div>' +
+            '</div>';
+        } else if (it.status === 'sold') {
+            html +=
+            '<div class="sell-row">' +
+                '<div class="sr-img"><img src="../asset/' + it.img + '" alt="' + it.name + '"></div>' +
+                '<div class="sr-info">' +
+                    '<div class="sr-name">' + it.name + '<span class="sr-code">' + it.code + '</span></div>' +
+                    '<div class="sr-meta">成交价<span class="price green">¥' + fmt(it.deal) + '</span></div>' +
+                    '<div class="sr-meta">交易手续费 <span class="fee">¥' + fmt(it.fee) + '</span></div>' +
+                    '<div class="sr-time">成交 ' + it.time + '</div>' +
+                '</div>' +
+                '<div class="sr-right">' +
+                    '<span class="status-tag sold">已售出</span>' +
+                    '<span class="btn-gray">查看订单</span>' +
+                '</div>' +
+            '</div>';
+        } else {
+            html +=
+            '<div class="sell-row">' +
+                '<div class="sr-img"><img src="../asset/' + it.img + '" alt="' + it.name + '"></div>' +
+                '<div class="sr-info">' +
+                    '<div class="sr-name">' + it.name + '<span class="sr-code">' + it.code + '</span></div>' +
+                    '<div class="sr-meta">挂单价格<span class="price">¥' + fmt(it.price) + '</span></div>' +
+                    '<div class="sr-time">下架 ' + it.time + '</div>' +
+                '</div>' +
+                '<div class="sr-right">' +
+                    '<span class="status-tag off">已下架</span>' +
+                '</div>' +
+            '</div>';
+        }
+    }
+    document.getElementById('sellList').innerHTML = html;
+    document.getElementById('emptyTip').style.display = list.length ? 'none' : 'block';
+}
+
+/* ── Tab 切换 ── */
+document.querySelectorAll('.tab-item').forEach(function (el) {
+    el.addEventListener('click', function () {
+        currentTab = this.getAttribute('data-tab');
+        document.querySelectorAll('.tab-item').forEach(function (t) {
+            t.classList.toggle('active', t.getAttribute('data-tab') === currentTab);
+        });
+        render();
+    });
+});
+
+/* ── 撤销挂单弹窗 ── */
+function openCancelModal(idx) {
+    cancelIndex = idx;
+    var it = items[idx];
+    document.getElementById('cpImg').src = '../asset/' + it.img;
+    document.getElementById('cpName').textContent = it.name;
+    document.getElementById('cpCode').textContent = it.code;
+    document.getElementById('cpPrice').textContent = '¥' + fmt(it.price);
+    document.getElementById('cancelSheet').classList.add('show');
+    document.body.style.overflow = 'hidden';
+}
+function closeCancelModal() {
+    document.getElementById('cancelSheet').classList.remove('show');
+    document.body.style.overflow = '';
+}
+function confirmCancel() {
+    if (cancelIndex < 0) return;
+    var it = items[cancelIndex];
+    it.status = 'off';
+    it.time = '2026-09-01 10:30';
+    closeCancelModal();
+    render();
+    alert('「' + it.name + ' ' + it.code + '」已撤销挂单，产品已下架');
+}
+
+/* 初始化 */
+render();
+</script>
+
+</body>
+</html>
