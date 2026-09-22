@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>零售市场挂单 - 后台原型</title>
+    <!-- ① 左侧目录：公用文件引用（菜单在 asset/admin-sidebar.js 的 MENU 中维护） -->
+    <link rel="stylesheet" href="asset/admin-sidebar.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        /* ===== 主色（沿用本页面原本的红粉调性，与右侧说明面板共用变量） ===== */
+        :root {
+            --accent: #D62828;
+            --accent-dark: #c41e1e;
+            --ink: #1a1a2e;
+            --ink-sub: #4e5a6e;
+            --ink-weak: #86909c;
+            --line: #f0f0f0;
+            --card-radius: 14px;
+            --border: #e0e0e0;
+        }
+
+        html, body { background: #f5f5f7; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+            color: var(--ink);
+            font-size: 14px;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* ===== ② 中间原型内容：面包屑 + 手机原型容器 ===== */
+        .breadcrumb {
+            padding: 16px 24px 0; font-size: 13px; color: var(--ink-weak);
+            display: flex; align-items: center; justify-content: space-between; gap: 12px;
+        }
+        .breadcrumb a { color: var(--ink-weak); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--accent); }
+        .breadcrumb .sep { margin: 0 4px; }
+        .breadcrumb .current { color: var(--ink); font-weight: 500; }
+
+        .main {
+            padding: 16px 24px 40px;
+            display: flex; justify-content: center; align-items: flex-start;
+        }
+
+        /* 手机原型容器（430px 平铺；窄屏铺满） */
+        .app-container {
+            width: 100%; max-width: 430px; flex-shrink: 0;
+            height: calc(100vh - 130px); min-height: 600px;
+            background: #f5f5f5; border-radius: 18px; overflow: hidden;
+            box-shadow: 0 10px 34px rgba(30, 60, 120, 0.14);
+            display: flex; flex-direction: column;
+            position: relative;
+        }
+        .app-scroll {
+            flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
+        }
+        .app-scroll::-webkit-scrollbar { width: 4px; }
+        .app-scroll::-webkit-scrollbar-thumb { background: #d8dce3; border-radius: 2px; }
+
+        /* 顶部：状态栏 */
+        .page-top { position: sticky; top: 0; z-index: 80; }
+        .status-bar {
+            height: 44px; background: #fff; color: var(--ink);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 20px;
+        }
+        .status-bar .sb-left { display: flex; align-items: baseline; gap: 8px; }
+        .status-bar .sb-time { font-size: 15px; font-weight: 600; letter-spacing: .3px; }
+        .status-bar .sb-date { font-size: 12px; color: #666; }
+        .status-bar .sb-right { display: flex; align-items: center; gap: 7px; }
+        .status-bar .sb-signal { display: inline-flex; align-items: flex-end; gap: 1.5px; height: 11px; }
+        .status-bar .sb-signal i { width: 3px; border-radius: 1px; background: currentColor; }
+        .status-bar .sb-signal i:nth-child(1) { height: 4px; }
+        .status-bar .sb-signal i:nth-child(2) { height: 6px; }
+        .status-bar .sb-signal i:nth-child(3) { height: 8px; }
+        .status-bar .sb-signal i:nth-child(4) { height: 11px; }
+        .status-bar .sb-wifi { width: 15px; height: 11px; position: relative; display: inline-block; }
+        .status-bar .sb-wifi::before {
+            content: ''; position: absolute; left: 50%; bottom: 0; transform: translateX(-50%);
+            width: 5px; height: 5px; border-radius: 50%; background: currentColor;
+        }
+        .status-bar .sb-wifi::after {
+            content: ''; position: absolute; left: 50%; bottom: 2px; transform: translateX(-50%);
+            width: 14px; height: 14px; box-sizing: border-box;
+            border-top: 2px solid currentColor; border-radius: 50%;
+        }
+        .status-bar .sb-batt {
+            width: 25px; height: 12px; border: 1.4px solid currentColor;
+            border-radius: 3px; padding: 1.5px; position: relative;
+        }
+        .status-bar .sb-batt::after {
+            content: ''; position: absolute; right: -3.5px; top: 50%; transform: translateY(-50%);
+            width: 2px; height: 5px; background: currentColor; border-radius: 0 1px 1px 0;
+        }
+        .status-bar .sb-batt i { display: block; height: 100%; width: 78%; background: currentColor; border-radius: 1px; }
+
+        /* 顶部标题栏：返回按钮 + 中间产品名 */
+        .top-nav {
+            height: 50px; background: #fff; color: var(--ink);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 8px; border-bottom: 1px solid var(--line);
+        }
+        .top-nav .back-btn {
+            width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;
+            color: var(--ink); font-size: 24px; font-weight: 400; line-height: 1;
+            cursor: pointer; background: none; border: none;
+            font-family: -apple-system, "PingFang SC", sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .top-nav .back-btn:active { opacity: .55; }
+        .top-nav .top-title {
+            flex: 1; text-align: center;
+            font-size: 17px; font-weight: 600; color: var(--ink);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            padding: 0 6px;
+        }
+        .top-nav .top-placeholder { width: 44px; height: 44px; flex-shrink: 0; }
+
+        /* 持有详情列表卡 */
+        .list-card {
+            background: #fff;
+            margin: 12px 16px 16px;
+            border-radius: var(--card-radius);
+            box-shadow: 0 4px 16px rgba(0,0,0,.06);
+            overflow: hidden;
+        }
+        .list-title {
+            padding: 14px 16px;
+            font-size: 15px; font-weight: 600; color: var(--ink);
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid var(--line);
+            gap: 8px;
+        }
+        .list-title .count {
+            font-size: 12px; font-weight: 500; color: var(--accent);
+            background: #fbe4e0; padding: 2px 10px; border-radius: 10px;
+        }
+        /* 标题栏右侧的小按钮（说明 / 批量提货） */
+        .tip-btn {
+            font-size: 12px; color: var(--accent);
+            background: #fbe4e0; border: none;
+            padding: 4px 12px; border-radius: 10px;
+            cursor: pointer; font-family: inherit; font-weight: 500;
+            transition: all .15s;
+        }
+        .tip-btn:hover, .tip-btn:active { background: var(--accent); color: #fff; }
+
+        /* 筛选条 */
+        .filter-bar {
+            padding: 10px 14px;
+            background: #fafbfc;
+            border-bottom: 1px solid var(--line);
+            display: flex; flex-direction: column; gap: 8px;
+        }
+        .filter-row { display: flex; gap: 8px; align-items: center; }
+        .filter-item {
+            flex: 1; min-width: 0;
+            display: flex; align-items: center; gap: 4px;
+            font-size: 12px; color: var(--ink-sub);
+        }
+        .filter-item > label {
+            white-space: nowrap; font-weight: 500; flex-shrink: 0;
+        }
+        .filter-item input,
+        .filter-item select {
+            flex: 1; min-width: 0;
+            border: 1px solid var(--border); background: #fff;
+            border-radius: 6px; padding: 4px 8px; font-size: 12px;
+            outline: none; font-family: inherit;
+            color: var(--ink);
+        }
+        .filter-item input:focus,
+        .filter-item select:focus { border-color: var(--accent); }
+        .sort-group { display: flex; gap: 2px; flex-shrink: 0; }
+        .sort-btn {
+            width: 26px; height: 26px; border: 1px solid var(--border);
+            background: #fff; border-radius: 6px;
+            font-size: 12px; cursor: pointer; color: var(--ink-sub);
+            display: flex; align-items: center; justify-content: center;
+            font-family: inherit; transition: all .15s;
+        }
+        .sort-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .sort-btn.active {
+            background: var(--accent); border-color: var(--accent); color: #fff;
+            font-weight: 600;
+        }
+
+        /* 出售条件提示条（橙色 / 红色，复用于弹窗） */
+        .sell-tip {
+            display: flex; align-items: flex-start; gap: 8px;
+            padding: 10px 12px;
+            background: #fff7e6;
+            border: 1px solid #ffe1a8;
+            border-radius: 8px;
+            font-size: 12px; line-height: 1.7; color: #8a5a00;
+        }
+        .sell-tip .st-ico {
+            flex-shrink: 0; width: 16px; height: 16px;
+            margin-top: 2px; border-radius: 50%;
+            background: #e6a23c; color: #fff;
+            font-size: 11px; font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .sell-tip b { color: #a05c00; }
+        .sell-tip + .sell-tip { margin-top: 10px; }
+        .sell-tip.lock {
+            background: #fef0f0;
+            border-color: #fbcaca;
+            color: #a82a2a;
+        }
+        .sell-tip.lock .st-ico { background: var(--accent); }
+        .sell-tip.lock b { color: var(--accent-dark); }
+
+        /* 持有行 */
+        .product-row {
+            display: flex; gap: 12px; align-items: center;
+            padding: 12px 14px;
+            border-top: 1px solid #f5f5f7;
+            cursor: pointer;
+        }
+        .product-row:active { background: #fafbfc; }
+        .pr-img {
+            width: 60px; height: 60px; border-radius: 8px;
+            background: #fafbfc; flex-shrink: 0; overflow: hidden;
+        }
+        .pr-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .pr-info { flex: 1; min-width: 0; }
+        .pr-name {
+            font-size: 15px; font-weight: 600; color: var(--ink);
+            margin-bottom: 6px; display: flex; align-items: center;
+            gap: 6px; line-height: 1.3;
+        }
+        .pr-code {
+            font-size: 11px; color: #1a78ff;
+            font-weight: 600; background: #e6f4ff;
+            border: 1px solid #b7dcff;
+            padding: 2px 8px; border-radius: 4px;
+            letter-spacing: .3px; flex-shrink: 0;
+        }
+        .pr-meta-line {
+            font-size: 12px; color: var(--ink-sub);
+            margin-bottom: 3px; line-height: 1.5;
+        }
+        .pr-meta-line b { color: var(--ink); font-weight: 600; }
+        .pr-meta-line .pr-price {
+            color: var(--accent); font-weight: 700; font-size: 14px;
+            margin: 0 2px;
+        }
+        .pr-meta-line.remain .pr-dur {
+            color: #1a78ff; font-weight: 600;
+        }
+        .pr-meta-line.remain.urgent .pr-dur {
+            color: var(--accent); font-weight: 700;
+        }
+        .pr-time { font-size: 11px; color: var(--ink-weak); line-height: 1; margin-top: 2px; }
+
+        /* 右侧：状态 + 操作 */
+        .pr-right {
+            flex-shrink: 0; display: flex; flex-direction: column;
+            align-items: flex-end; gap: 8px;
+        }
+        .pr-status {
+            font-size: 11px; padding: 2px 8px; border-radius: 4px;
+            font-weight: 500; white-space: nowrap;
+        }
+        .pr-status.unsatisfied { background: #f5f5f5; color: var(--ink-weak); }
+        .pr-status.sellable    { background: #e8f5e9; color: #00B57A; }
+        .pr-status.listing     { background: #e6f4ff; color: #1a78ff; }
+        .pr-status.expired     { background: #fff3e0; color: #e6a23c; }
+
+        .pr-arrow {
+            color: #fff; background: var(--accent); border: none;
+            font-size: 13px; font-weight: 600;
+            padding: 7px 18px; border-radius: 12px;
+            cursor: pointer; font-family: inherit;
+            white-space: nowrap;
+        }
+        .pr-arrow:active { background: var(--accent-dark); }
+        .pr-arrow.disabled {
+            color: var(--ink-weak); background: #f0f2f5;
+            border: 1px solid #e5e6eb; cursor: not-allowed;
+        }
+        .pr-arrow.outline {
+            color: var(--accent); background: #fff;
+            border: 1px solid var(--accent);
+        }
+        .pr-arrow.warning {
+            color: #fff; background: #f59e0b;
+        }
+        .pr-arrow.warning:active { background: #d97706; }
+
+        /* 标注圆点 */
+        .badge {
+            display: inline-block; min-width: 18px; height: 18px; padding: 0 5px;
+            border-radius: 50%; background: #ff2d55; color: #fff; font-size: 12px;
+            line-height: 18px; text-align: center; font-weight: 600;
+            box-shadow: 0 1px 3px rgba(255,45,85,0.3);
+        }
+
+        /* ── 出售弹窗（底部 sheet） ── */
+        .sell-sheet {
+            position: fixed; inset: 0; z-index: 9999; display: none;
+        }
+        .sell-sheet.show { display: block; }
+        .sheet-overlay {
+            position: absolute; inset: 0; background: rgba(0,0,0,0.4);
+        }
+        .sheet-body {
+            position: absolute; bottom: 0; left: 50%;
+            transform: translateX(-50%);
+            width: 100%; max-width: 430px;
+            background: #fff;
+            border-radius: 16px 16px 0 0;
+            padding: 16px 16px calc(20px + env(safe-area-inset-bottom));
+            max-height: 90vh; overflow-y: auto;
+            animation: slideUp .25s ease;
+        }
+        @keyframes slideUp {
+            from { transform: translateX(-50%) translateY(100%); }
+            to   { transform: translateX(-50%) translateY(0); }
+        }
+        .sheet-title {
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 16px; font-weight: 600; color: var(--ink);
+            padding-bottom: 12px; border-bottom: 1px solid var(--line);
+            margin-bottom: 4px;
+        }
+        .sheet-title .btn-cancel {
+            background: none; border: none; color: var(--ink-sub);
+            font-size: 14px; cursor: pointer; padding: 4px 8px;
+            font-family: inherit;
+        }
+        .sell-product {
+            display: flex; align-items: center; gap: 12px;
+            padding: 14px 0; border-bottom: 1px solid #f0f0f5;
+        }
+        .sp-img {
+            width: 48px; height: 48px; border-radius: 8px;
+            background: #fafbfc; display: flex; align-items: center; justify-content: center;
+            overflow: hidden; flex-shrink: 0;
+        }
+        .sp-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .sp-info { flex: 1; min-width: 0; }
+        .sp-name { font-size: 14px; font-weight: 500; color: var(--ink); margin-bottom: 4px; }
+        .sp-code { font-size: 12px; color: var(--ink-weak); }
+
+        .sell-row {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 0; border-bottom: 1px solid #f0f0f5;
+        }
+        .sr-label { font-size: 14px; color: var(--ink); }
+        .sr-right { display: flex; align-items: center; gap: 6px; }
+        .sr-yen { color: var(--accent); font-size: 14px; }
+        .sr-right input {
+            border: none; background: transparent;
+            font-size: 14px; color: var(--ink); outline: none;
+            text-align: right; width: 160px; font-family: inherit;
+        }
+        .sr-right input::placeholder { color: #c0c8d4; }
+        .sr-unit { font-size: 13px; color: var(--ink-weak); margin-left: 2px; }
+        .sr-range {
+            font-size: 12px; color: #1a78ff;
+            padding: 0 0 12px; margin-top: -6px;
+            border-bottom: 1px solid var(--line);
+        }
+        .sell-actual { padding: 12px 0; border-bottom: 1px solid #f0f0f5; }
+        .sa-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+        .sa-row .sa-label { font-size: 14px; color: var(--ink-sub); }
+        .sa-amount { font-size: 18px; font-weight: 700; color: var(--accent); }
+        .sa-tip { font-size: 11px; color: var(--ink-weak); }
+
+        .channel-card { padding: 12px 0; border-bottom: 1px solid #f0f0f5; }
+        .channel-title { font-size: 14px; color: var(--ink); margin-bottom: 10px; }
+        .channel-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 12px; border: 1px solid #d0d5dd;
+            border-radius: 8px; position: relative;
+        }
+        .channel-item.selected { border-color: var(--accent); }
+        .channel-logo {
+            width: 32px; height: 32px; border-radius: 8px;
+            background: linear-gradient(135deg, #f5a623, #e0941e);
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 11px; font-weight: 600; flex-shrink: 0;
+        }
+        .channel-name { font-size: 14px; color: var(--ink); }
+        .channel-status { margin-left: auto; font-size: 13px; color: #1aab67; }
+        .channel-check {
+            position: absolute; right: -1px; bottom: -1px;
+            width: 20px; height: 20px; background: var(--accent);
+            color: #fff; border-radius: 50% 0 6px 0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px;
+            border-top: 2px solid #fff; border-left: 2px solid #fff;
+        }
+        .agree-row {
+            padding: 14px 0; display: flex; align-items: flex-start; gap: 8px;
+            font-size: 13px; color: var(--ink-sub);
+        }
+        .agree-row input[type="radio"] {
+            margin-top: 2px; accent-color: var(--accent); cursor: pointer;
+        }
+        .link-red { color: var(--accent); cursor: pointer; }
+        .btn-submit {
+            width: 100%; height: 48px; background: var(--accent);
+            color: #fff; border: none; border-radius: 12px;
+            font-size: 16px; font-weight: 600; cursor: pointer;
+            margin-top: 14px; font-family: inherit;
+        }
+        .btn-submit:active { background: var(--accent-dark); }
+        .btn-submit:disabled {
+            background: #f0a8a8; cursor: not-allowed;
+        }
+
+        /* 轻提示 */
+        .toast {
+            position: fixed; top: 70px; left: 50%;
+            transform: translateX(-50%) translateY(-14px);
+            background: rgba(26,26,46,.92); color: #fff; padding: 9px 20px;
+            border-radius: 9999px; font-size: 13px; max-width: 70vw;
+            opacity: 0; pointer-events: none; transition: all .25s; z-index: 9999;
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        /* 批量提货 sticky 操作栏（手机原型底部） */
+        .batch-bar {
+            position: sticky; bottom: 0; z-index: 60;
+            background: #fff; padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
+            border-top: 1px solid var(--line);
+            box-shadow: 0 -4px 12px rgba(0,0,0,.04);
+        }
+        .batch-btn {
+            width: 100%; height: 44px;
+            background: #f59e0b; color: #fff; border: none;
+            border-radius: 12px;
+            font-size: 15px; font-weight: 600; cursor: pointer;
+            font-family: inherit;
+            display: flex; align-items: center; justify-content: center;
+            gap: 6px; transition: background .15s;
+        }
+        .batch-btn:active { background: #d97706; }
+        .batch-btn .batch-num {
+            background: rgba(255,255,255,.25);
+            padding: 1px 8px; border-radius: 10px;
+            font-size: 12px; font-weight: 600;
+        }
+        .batch-btn.disabled {
+            background: #d8d8d8; cursor: not-allowed; color: #fff;
+        }
+        .batch-btn.disabled:active { background: #d8d8d8; }
+
+        /* 说明弹窗（居中卡片） */
+        .tip-popup {
+            position: fixed; inset: 0; z-index: 9999;
+            display: none; align-items: center; justify-content: center;
+            padding: 20px;
+        }
+        .tip-popup.show { display: flex; }
+        .tip-overlay {
+            position: absolute; inset: 0; background: rgba(0,0,0,0.4);
+        }
+        .tip-card {
+            position: relative; width: 100%; max-width: 380px;
+            background: #fff; border-radius: 14px; padding: 16px 16px 18px;
+            box-shadow: 0 20px 60px rgba(0,0,0,.2);
+            animation: tipPopIn .22s ease;
+        }
+        @keyframes tipPopIn {
+            from { opacity: 0; transform: scale(.94); }
+            to   { opacity: 1; transform: scale(1); }
+        }
+        .tip-card .tip-head {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 12px;
+        }
+        .tip-card .tip-title {
+            font-size: 15px; font-weight: 600; color: var(--ink);
+        }
+        .tip-close {
+            width: 28px; height: 28px; border: none; background: #f0f2f5;
+            border-radius: 50%; cursor: pointer;
+            font-size: 16px; color: var(--ink-sub);
+            display: flex; align-items: center; justify-content: center;
+            font-family: inherit; line-height: 1;
+        }
+        .tip-close:hover { background: #e6e8ec; }
+
+        /* ===== ③ 右侧功能说明面板（fix 右侧 340px，可折叠成 40px） ===== */
+        .func-panel {
+            position: fixed; top: 0; right: 0; bottom: 0;
+            width: 340px; z-index: 890;
+            background: #fff; border-left: 1px solid #e3e6eb;
+            box-shadow: -1px 0 12px rgba(20, 30, 60, 0.04);
+            display: flex; flex-direction: column;
+        }
+        .func-panel .fp-inner { display: flex; flex-direction: column; height: 100%; min-width: 0; }
+        .func-panel .fp-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 15px 14px 13px 18px; border-bottom: 1px solid #f0f1f4; flex-shrink: 0;
+        }
+        .func-panel .fp-title { display: flex; align-items: center; gap: 9px; font-size: 15px; font-weight: 700; color: var(--ink); }
+        .func-panel .fp-title::before {
+            content: ''; width: 8px; height: 8px; border-radius: 50%;
+            background: var(--accent); box-shadow: 0 0 0 4px rgba(214, 40, 40, 0.14);
+        }
+        .func-panel .fp-fold-btn {
+            width: 28px; height: 28px; border: 1px solid var(--border); background: #fff;
+            border-radius: 50%; color: var(--ink-weak); font-size: 15px; line-height: 1;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+            font-family: inherit;
+        }
+        .func-panel .fp-fold-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .func-panel .fp-body { flex: 1; overflow-y: auto; padding: 4px 18px 40px; font-size: 13px; color: #555; line-height: 1.9; }
+        .func-panel .fp-body::-webkit-scrollbar { width: 5px; }
+        .func-panel .fp-body::-webkit-scrollbar-thumb { background: #d8dce3; border-radius: 3px; }
+        .func-panel .fp-body h4 { font-size: 14px; font-weight: 600; color: var(--ink); margin: 18px 0 6px; }
+        .func-panel .fp-body h4:first-child { margin-top: 12px; }
+        .func-panel .fp-body p { font-size: 13px; color: #555; margin: 4px 0; }
+        .func-panel .fp-body ul { padding-left: 18px; margin: 0 0 8px; }
+        .func-panel .fp-body li { margin-bottom: 6px; font-size: 13px; color: #555; }
+        .func-panel .fp-body li b { color: var(--ink); }
+        .func-panel .fp-body .badge { vertical-align: 1px; }
+        .func-panel .doc-image {
+            display: block; width: 100%; height: auto;
+            border-radius: 10px; border: 1px solid #e0e0e0;
+            margin: 10px 0 6px; cursor: zoom-in;
+            transition: transform .2s, box-shadow .2s;
+            box-shadow: 0 2px 10px rgba(0,0,0,.06);
+        }
+        .func-panel .doc-image:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,.12); }
+        .func-panel .doc-image-caption { font-size: 12px; color: var(--ink-weak); text-align: center; margin: 0 0 8px; }
+        .func-panel .fp-open {
+            display: none; position: absolute; top: 0; bottom: 0; left: 0; right: 0;
+            border: none; background: transparent; cursor: pointer;
+            writing-mode: vertical-rl; text-orientation: upright;
+            font-size: 13px; font-weight: 600; letter-spacing: 6px; color: var(--ink-weak);
+            align-items: center; justify-content: center; font-family: inherit; transition: all 0.2s;
+        }
+        .func-panel .fp-open:hover { color: var(--accent); background: #fafbfc; }
+
+        /* ===== 三部分布局偏移：宽屏为左右两侧让位 ===== */
+        @media (min-width: 1024px) {
+            .main, .breadcrumb { margin-right: 340px; }
+            body.fp-collapsed .main,
+            body.fp-collapsed .breadcrumb { margin-right: 40px; }
+            body.fp-collapsed .func-panel { width: 40px; }
+            body.fp-collapsed .fp-inner { display: none; }
+            body.fp-collapsed .fp-open { display: flex; }
+        }
+        @media (max-width: 1023.98px) {
+            .func-panel { display: none; }
+            .main, .breadcrumb { margin-right: 0; }
+        }
+        /* 真机宽度：手机页铺满 */
+        @media (max-width: 540px) {
+            .main { padding: 12px 0 32px; }
+            .breadcrumb { padding: 12px 16px 0; }
+            .app-container { border-radius: 0; box-shadow: none; height: 100vh; min-height: 100vh; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ② 中间原型内容：面包屑 + 手机页面 -->
+<div class="breadcrumb">
+    <span>
+        <a href="index.html">首页</a>
+        <span class="sep">&gt;</span>
+        <span>APP 端</span>
+        <span class="sep">&gt;</span>
+        <span class="current">零售市场挂单</span>
+    </span>
+</div>
+
+<div class="main">
+    <div class="app-container">
+
+        <!-- 顶部三段：状态栏 + 标题栏（sticky） -->
+        <div class="page-top">
+            <div class="status-bar">
+                <span class="sb-left">
+                    <span class="sb-time">9:41</span>
+                    <span class="sb-date">9月22日 星期二</span>
+                </span>
+                <span class="sb-right">
+                    <span class="sb-signal"><i></i><i></i><i></i><i></i></span>
+                    <span class="sb-wifi"></span>
+                    <span class="sb-batt"><i></i></span>
+                </span>
+            </div>
+
+            <!-- 顶部标题栏：返回按钮 + 中间产品名 -->
+            <div class="top-nav">
+                <button class="back-btn" onclick="goBack()" aria-label="返回">‹</button>
+                <span class="top-title">永淳·夏日帖</span>
+                <span class="top-placeholder"></span>
+            </div>
+        </div>
+
+        <!-- 内容滚动区 -->
+        <div class="app-scroll">
+            <!-- 持有详情列表 -->
+            <div class="list-card">
+                <div class="list-title">
+                    <span>持有详情<span class="count">共 5 份</span></span>
+                    <button class="tip-btn" onclick="openTipPopup()">说明</button>
+                </div>
+
+                <!-- 筛选 / 排序条 -->
+                <div class="filter-bar">
+                    <div class="filter-row">
+                        <div class="filter-item">
+                            <label>剩余交易次数 ≤</label>
+                            <input type="number" id="filterRemain" placeholder="不限" min="0" oninput="onFilterChange()">
+                        </div>
+                        <div class="filter-item">
+                            <label>编号</label>
+                            <input type="text" id="filterCode" placeholder="搜索编号" oninput="onFilterChange()">
+                        </div>
+                        <div class="filter-item">
+                            <label>状态</label>
+                            <select id="filterStatus" onchange="onFilterChange()">
+                                <option value="">全部</option>
+                                <option value="unsatisfied">未满足</option>
+                                <option value="sellable">可售</option>
+                                <option value="listing">出售中</option>
+                                <option value="expired">已满期</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="filter-row">
+                        <div class="filter-item">
+                            <label>成交时间</label>
+                            <div class="sort-group">
+                                <button class="sort-btn active" id="sortTimeAsc" onclick="toggleSort('time','asc')">↑</button>
+                                <button class="sort-btn" id="sortTimeDesc" onclick="toggleSort('time','desc')">↓</button>
+                            </div>
+                        </div>
+                        <div class="filter-item">
+                            <label>上次成交金额</label>
+                            <div class="sort-group">
+                                <button class="sort-btn" id="sortPriceAsc" onclick="toggleSort('price','asc')">↑</button>
+                                <button class="sort-btn" id="sortPriceDesc" onclick="toggleSort('price','desc')">↓</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="productList"></div>
+
+                <!-- 批量提货 sticky 操作栏 -->
+                <div class="batch-bar">
+                    <button class="batch-btn" id="batchBtn" onclick="batchPickup()">批量提货<span class="batch-num" id="batchNum">0</span></button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- ③ 右侧功能说明面板（常驻，可折叠成 40px） -->
+<aside class="func-panel" id="funcPanel">
+    <div class="fp-inner">
+        <div class="fp-header">
+            <span class="fp-title">零售市场挂单 · 功能说明</span>
+            <button class="fp-fold-btn" onclick="togglePanel()" aria-label="折叠">›</button>
+        </div>
+        <div class="fp-body">
+
+            <h4>1、未满足 <span class="badge">1</span></h4>
+            <p>持有份还未达到可出售条件，列表行右侧按钮为灰色「未满足」，不可点击。</p>
+            <ul>
+                <li><b>触发条件</b>：持有份未满 T+5 周期，或未完成价值注入</li>
+                <li><b>操作</b>：按钮置灰、不可点击，无任何后续动作</li>
+            </ul>
+
+            <h4>2、可售 <span class="badge">2</span></h4>
+            <p>持有份已满足 T+5 周期且已完成价值注入，列表行右侧显示红色「出售」按钮。</p>
+            <ul>
+                <li><b>操作</b>：点击按钮弹出底部 sheet「出售数字资产」，填写出售价格与持续时间，勾选协议后确定出售</li>
+                <li><b>参考范围</b>：出售价格 = 上次成交价 ± 10%，默认带入上次成交价</li>
+            </ul>
+
+            <h4>3、出售中 <span class="badge">3</span></h4>
+            <p>该持有份已上架到零售市场（已有挂单在售），列表行右侧显示「管理」按钮。</p>
+            <ul>
+                <li><b>操作</b>：点击「管理」跳转 <b>我的寄售</b> 页面，查看 / 调整 / 撤单当前挂单</li>
+                <li><b>跳转目标</b>：我的寄售.html</li>
+            </ul>
+
+            <h4>4、已满期 <span class="badge">4</span></h4>
+            <p>持有份达到满期条件，无法再出售，只能走提货流程，按钮显示橙色「提货」。</p>
+            <ul>
+                <li><b>触发条件</b>（满足任一即视为已满期）：<br>
+                    a) 持有份的<b>已交易次数</b>超过该产品最大交易次数；<br>
+                    b) 该产品在零售市场的<b>存续周期</b>超过最大周期；<br>
+                    c) 用户<b>持有该产品超过 10 天</b>，且在这 10 天内没有任何挂单操作</li>
+                <li><b>操作</b>：点击「提货」跳转 <b>产品提取</b> 页面，按提货流程提取实物</li>
+                <li><b>跳转目标</b>：产品提取.html</li>
+            </ul>
+
+            <h4>5、流程图</h4>
+            <p>挂单状态流转 / 交易流程参考下图，点击可看原图。</p>
+            <a href="../asset/零售市场挂单和交易流程图.png" target="_blank" rel="noopener" title="点击查看原图">
+                <img class="doc-image" src="../asset/零售市场挂单和交易流程图.png" alt="零售市场挂单和交易流程图">
+            </a>
+            <p class="doc-image-caption">图：零售市场挂单 &amp; 交易流程图（点击可放大查看原图）</p>
+
+            <h4>6、原型说明</h4>
+            <ul>
+                <li>本页面采用后台原型三部分布局：左侧公用目录 + 中间手机原型 + 右侧功能说明</li>
+                <li>中间展示 430px 手机原型（含状态栏、标题栏、列表、底部 sheet 出售弹窗、说明弹窗）</li>
+                <li>顶部标题栏左侧「‹」返回按钮，中间为产品名称「永淳·夏日帖」</li>
+                <li>列表标题栏右侧「说明」按钮：点击弹出两条业务规则（橙色 = 出售条件，红色 = 锁定规则）</li>
+                <li>筛选 / 排序条：剩余交易次数 ≤ X、编号模糊查询、状态下拉；成交时间升降序、上次成交金额升降序</li>
+                <li>未满足状态行不展示按钮；其它三态分别走「出售 / 管理 / 提货」</li>
+                <li>行内显示：已交易次数 / 共 X 次 / 剩余次数、上次成交价、剩余存续时间（剩 ≤ 2 天时高亮）</li>
+                <li>列表底部「批量提货」按钮：自动统计所有「已满期」行并执行</li>
+                <li>右侧说明面板可点击右上角「›」折叠成 40px 窄条，再次点击展开</li>
+            </ul>
+
+        </div>
+    </div>
+    <button class="fp-open" onclick="togglePanel()" aria-label="展开说明">展<br>开<br>说<br>明</button>
+</aside>
+
+<!-- ====== 说明弹窗（两条提示，居中卡片） ====== -->
+<div class="tip-popup" id="tipPopup">
+    <div class="tip-overlay" onclick="closeTipPopup()"></div>
+    <div class="tip-card">
+        <div class="tip-head">
+            <span class="tip-title">说明</span>
+            <button class="tip-close" onclick="closeTipPopup()" aria-label="关闭">×</button>
+        </div>
+        <!-- 出售条件提示条（橙色） -->
+        <div class="sell-tip">
+            <span class="st-ico">i</span>
+            <span>产品需同时满足两个条件才可出售：<b>① 持有满 T+5 周期</b>；<b>② 已完成价值注入</b>。</span>
+        </div>
+        <!-- 锁定告警提示条（红色） -->
+        <div class="sell-tip lock">
+            <span class="st-ico">!</span>
+            <span>产品达到<b>最大交易次数</b>或者产品在市场的<b>最大存续周期</b>或者<b>持有超过 10 天无任何操作</b>将进行<b>锁定</b>，锁定后的产品请及时进行<b>提货操作</b>。</span>
+        </div>
+    </div>
+</div>
+
+<!-- ====== 出售数字资产 弹窗（底部 sheet） ====== -->
+<div class="sell-sheet" id="sellSheet">
+    <div class="sheet-overlay" onclick="closeSellModal()"></div>
+    <div class="sheet-body">
+        <div class="sheet-title">
+            <span>出售产品</span>
+            <button class="btn-cancel" onclick="closeSellModal()">取消</button>
+        </div>
+
+        <div class="sell-product">
+            <div class="sp-img"><img src="../asset/永淳·夏日帖.png" alt="永淳·夏日帖"></div>
+            <div class="sp-info">
+                <div class="sp-name" id="spName">永淳·夏日帖</div>
+                <div class="sp-code" id="spCode">#0025</div>
+            </div>
+        </div>
+
+        <div class="sell-row" style="border-bottom:none;">
+            <div class="sr-label">出售价格</div>
+            <div class="sr-right">
+                <span class="sr-yen">¥</span>
+                <input type="number" id="sellPriceInput" placeholder="请输入出售价格" oninput="onFormChange()">
+            </div>
+        </div>
+        <div class="sr-range" id="rangeTip">本次挂单参考范围：¥85.50 ~ ¥104.50</div>
+
+        <div class="sell-actual">
+            <div class="sa-row">
+                <span class="sa-label">预计此次出售实际可得</span>
+                <span class="sa-amount" id="actualAmount">0.00 元</span>
+            </div>
+            <div class="sa-tip">出售成功后平台会收取交易服务费1.6%（含第三方支付平台收取0.6%手续费）</div>
+        </div>
+
+        <div class="sell-row">
+            <div class="sr-label">出售持续时间</div>
+            <div class="sr-right">
+                <input type="number" id="sellDaysInput" placeholder="请输入出售时间" oninput="onFormChange()">
+                <span class="sr-unit">天</span>
+            </div>
+        </div>
+
+        <div class="channel-card">
+            <div class="channel-title">结算渠道</div>
+            <div class="channel-item selected">
+                <div class="channel-logo">汇付</div>
+                <span class="channel-name">汇付钱包</span>
+                <span class="channel-status">已开通</span>
+                <span class="channel-check">✓</span>
+            </div>
+        </div>
+
+        <div class="agree-row">
+            <input type="radio" id="agreeRadio" name="agree" onclick="onFormChange()">
+            <label for="agreeRadio">我已阅读并同意《<span class="link-red">委托寄售协议</span>》及《<span class="link-red">委托保管协议</span>》</label>
+        </div>
+
+        <button class="btn-submit" id="submitBtn" disabled onclick="submitSell()">确定出售</button>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ① 左侧目录：公用文件引用 -->
+<script src="asset/admin-sidebar.js"></script>
+
+<script>
+/* ── 轻提示 ── */
+var toastTimer;
+function showToast(msg) {
+    var el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { el.classList.remove('show'); }, 2000);
+}
+
+/* ── 顶部返回：history 有记录就后退，否则跳到本模块首页 ── */
+function goBack() {
+    if (history.length > 1) { history.back(); }
+    else { location.href = '我的页面.html'; }
+}
+
+/* ── 右侧功能说明面板 折叠/展开 ── */
+function togglePanel() {
+    document.body.classList.toggle('fp-collapsed');
+}
+
+/* ── 产品数据：4 种状态演示 ── */
+var statusMeta = {
+    unsatisfied: { label: '未满足',  cls: 'unsatisfied', btnText: null,    showBtn: false },
+    sellable:    { label: '可售',    cls: 'sellable',    btnText: '出售',  showBtn: true },
+    listing:     { label: '出售中',  cls: 'listing',     btnText: '管理',  showBtn: true },
+    expired:     { label: '已满期',  cls: 'expired',     btnText: '提货',  showBtn: true }
+};
+
+var MAX_TRADE_COUNT = 15;  // 单个产品允许的最大交易次数
+
+var products = [
+    { code:'#0025', name:'永淳·夏日帖', img:'../asset/永淳·夏日帖.png', tradeCount: 3,  lastPrice:  95.00, holdDate:'2026-08-02 16:42:18', status:'unsatisfied', remainingDays:'7天 23小时' },
+    { code:'#0026', name:'永淳·夏日帖', img:'../asset/永淳·夏日帖.png', tradeCount: 5,  lastPrice: 100.00, holdDate:'2026-08-01 10:20:05', status:'unsatisfied', remainingDays:'8天 10小时' },
+    { code:'#0027', name:'永淳·夏日帖', img:'../asset/永淳·夏日帖.png', tradeCount: 8,  lastPrice:  92.00, holdDate:'2026-07-30 14:23:40', status:'sellable',    remainingDays:'5天 12小时' },
+    { code:'#0028', name:'永淳·夏日帖', img:'../asset/永淳·夏日帖.png', tradeCount: 2,  lastPrice: 110.00, holdDate:'2026-07-28 09:45:12', status:'listing',     remainingDays:'2天 08小时' },
+    { code:'#0029', name:'永淳·夏日帖', img:'../asset/永淳·夏日帖.png', tradeCount: 12, lastPrice:  88.00, holdDate:'2026-07-25 11:30:30', status:'expired',     remainingDays:'已过期' }
+];
+
+/* ── 筛选 / 排序状态 ── */
+var filterState = { remain: '', code: '', status: '' };
+var sortState = { key: 'time', dir: 'asc' }; // 默认：成交时间升序
+
+function getFilteredSorted() {
+    var list = products.slice();
+    if (filterState.remain !== '') {
+        var max = parseInt(filterState.remain, 10);
+        if (!isNaN(max)) {
+            list = list.filter(function (p) { return (MAX_TRADE_COUNT - p.tradeCount) <= max; });
+        }
+    }
+    if (filterState.code) {
+        var c = filterState.code.toLowerCase();
+        list = list.filter(function (p) { return p.code.toLowerCase().indexOf(c) !== -1; });
+    }
+    if (filterState.status) {
+        list = list.filter(function (p) { return p.status === filterState.status; });
+    }
+    list.sort(function (a, b) {
+        if (sortState.key === 'price') {
+            return sortState.dir === 'asc' ? a.lastPrice - b.lastPrice : b.lastPrice - a.lastPrice;
+        }
+        // time
+        var ta = new Date(a.holdDate.replace(/-/g, '/')).getTime();
+        var tb = new Date(b.holdDate.replace(/-/g, '/')).getTime();
+        return sortState.dir === 'asc' ? ta - tb : tb - ta;
+    });
+    return list;
+}
+
+function renderList() {
+    var html = '';
+    getFilteredSorted().forEach(function (p) {
+        var meta = statusMeta[p.status];
+        var remaining = MAX_TRADE_COUNT - p.tradeCount;
+        var remainCls = 'pr-meta-line remain';
+        if (remaining <= 2) { remainCls += ' urgent'; }
+
+        // 行 onclick：根据状态决定
+        var rowOnclick = '';
+        var btnHtml = '';
+        if (meta.showBtn) {
+            var arrowCls = 'pr-arrow';
+            if (p.status === 'listing') {
+                arrowCls += ' outline';
+                rowOnclick = 'onList(\'' + p.code + '\')';
+            } else if (p.status === 'expired') {
+                arrowCls += ' warning';
+                rowOnclick = 'onPickup(\'' + p.code + '\')';
+            } else if (p.status === 'sellable') {
+                rowOnclick = 'openSellModal(\'' + p.name + '\', \'' + p.code + '\', ' + p.tradeCount + ', ' + p.lastPrice + ')';
+            }
+            btnHtml = '<button class="' + arrowCls + '">' + meta.btnText + '</button>';
+        } else {
+            // 未满足：行不可点击
+            rowOnclick = '';
+        }
+
+        html += [
+            '<div class="product-row" onclick="' + rowOnclick + '">',
+            '    <div class="pr-img"><img src="' + p.img + '" alt="' + p.name + '"></div>',
+            '    <div class="pr-info">',
+            '        <div class="pr-name">' + p.name + '<span class="pr-code">' + p.code + '</span></div>',
+            '        <div class="pr-meta-line">已交易 <b>' + p.tradeCount + '</b> / 共 <b>' + MAX_TRADE_COUNT + '</b> 次 · 剩余 <b>' + remaining + '</b> 次</div>',
+            '        <div class="' + remainCls + '">上次成交<span class="pr-price">¥' + p.lastPrice.toFixed(2) + '</span>· 剩余存续 <b class="pr-dur">' + p.remainingDays + '</b></div>',
+            '        <div class="pr-time">' + p.holdDate + '</div>',
+            '    </div>',
+            '    <div class="pr-right">',
+            '        <span class="pr-status ' + meta.cls + '">' + meta.label + '</span>',
+            '        ' + btnHtml,
+            '    </div>',
+            '</div>'
+        ].join('');
+    });
+    if (!html) { html = '<div style="padding:32px 16px;text-align:center;color:#86909c;font-size:13px;">暂无符合条件的持有份</div>'; }
+    document.getElementById('productList').innerHTML = html;
+
+    // 同步底部批量提货按钮的可执行数
+    var expiredCount = products.filter(function (p) { return p.status === 'expired'; }).length;
+    var btn = document.getElementById('batchBtn');
+    document.getElementById('batchNum').textContent = expiredCount;
+    if (expiredCount === 0) { btn.classList.add('disabled'); }
+    else { btn.classList.remove('disabled'); }
+}
+
+/* ── 筛选 / 排序 交互 ── */
+function onFilterChange() {
+    filterState.remain = document.getElementById('filterRemain').value.trim();
+    filterState.code   = document.getElementById('filterCode').value.trim();
+    filterState.status = document.getElementById('filterStatus').value;
+    renderList();
+}
+
+function toggleSort(key, dir) {
+    sortState.key = key;
+    sortState.dir = dir;
+    // 切换高亮：每个排序组只高亮一个方向
+    [['sortTimeAsc','sortTimeDesc'],['sortPriceAsc','sortPriceDesc']].forEach(function (group) {
+        group.forEach(function (id) {
+            var el = document.getElementById(id);
+            if (!el) return;
+            var isThis = (id === 'sort' + (key === 'time' ? 'Time' : 'Price') + (dir === 'asc' ? 'Asc' : 'Desc'));
+            el.classList.toggle('active', isThis);
+        });
+    });
+    renderList();
+}
+
+/* ── 批量提货（已满期行） ── */
+function batchPickup() {
+    var expired = products.filter(function (p) { return p.status === 'expired'; });
+    if (expired.length === 0) {
+        showToast('当前没有可提货的产品');
+        return;
+    }
+    if (confirm('确认批量提货 ' + expired.length + ' 份已满期产品？')) {
+        // 演示：从列表中移除已提货产品
+        var codes = expired.map(function (p) { return p.code; });
+        products = products.filter(function (p) { return codes.indexOf(p.code) === -1; });
+        renderList();
+        showToast('已批量提货 ' + expired.length + ' 份');
+    }
+}
+
+/* ── 操作跳转 ── */
+function onList(code)  { location.href = '我的寄售.html'; }
+function onPickup(code){ location.href = '产品提取.html'; }
+
+/* ── 出售弹窗（可售） ── */
+function openSellModal(name, code, count, lastPrice) {
+    document.getElementById('spName').textContent = name;
+    document.getElementById('spCode').textContent = code;
+    var low = (lastPrice * 0.9).toFixed(2);
+    var high = (lastPrice * 1.1).toFixed(2);
+    document.getElementById('rangeTip').textContent = '本次挂单参考范围：¥' + low + ' ~ ¥' + high;
+    document.getElementById('sellPriceInput').value = lastPrice || '';
+    document.getElementById('sellDaysInput').value = '';
+    document.getElementById('agreeRadio').checked = false;
+    updateActual();
+    onFormChange();
+    document.getElementById('sellSheet').classList.add('show');
+}
+function closeSellModal() {
+    document.getElementById('sellSheet').classList.remove('show');
+}
+function updateActual() {
+    var p = parseFloat(document.getElementById('sellPriceInput').value) || 0;
+    document.getElementById('actualAmount').textContent = (p * 0.964).toFixed(2) + ' 元';
+}
+function onFormChange() {
+    updateActual();
+    var price = parseFloat(document.getElementById('sellPriceInput').value) || 0;
+    var days  = parseFloat(document.getElementById('sellDaysInput').value) || 0;
+    var agree = document.getElementById('agreeRadio').checked;
+    document.getElementById('submitBtn').disabled = !(price > 0 && days > 0 && agree);
+}
+function submitSell() {
+    closeSellModal();
+    showToast('出售上架成功');
+}
+
+/* ── 说明弹窗 ── */
+function openTipPopup()  { document.getElementById('tipPopup').classList.add('show'); }
+function closeTipPopup() { document.getElementById('tipPopup').classList.remove('show'); }
+
+renderList();
+</script>
+
+</body>
+</html>
