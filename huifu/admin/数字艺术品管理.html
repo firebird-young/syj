@@ -123,6 +123,9 @@
             font-size: 12px; font-weight: 500; background: #eef3ff; color: var(--accent);
         }
         .stage-tag.whole { background: #fff2e8; color: #e6702c; }
+        .status-tag.pending { background: #eef3ff; color: var(--accent); }
+        .status-tag.confirming { background: #fff7e6; color: #e67e22; }
+        .status-tag.rejected { background: #fdecee; color: #e74c5e; }
 
         /* 通用弹窗 */
         .modal-overlay {
@@ -161,6 +164,35 @@
         }
         .btn-primary:hover { background: var(--accent-hover); }
         .btn-primary:disabled { background: #c0c8d4; cursor: not-allowed; }
+        .btn-danger {
+            height: 34px; padding: 0 20px; border-radius: var(--radius-pill);
+            background: #fff; border: 1px solid #f7c2c9; color: #e74c5e;
+            font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit;
+            margin-right: auto;
+        }
+        .btn-danger:hover { background: #fdecee; border-color: #e74c5e; }
+
+        /* 价值评估弹窗 */
+        .eval-name { font-size: 14px; font-weight: 600; }
+        .eval-row { display: flex; align-items: flex-start; margin-bottom: 16px; }
+        .eval-row:last-child { margin-bottom: 0; }
+        .eval-label {
+            width: 132px; flex-shrink: 0; text-align: right; padding-right: 12px;
+            padding-top: 9px; font-size: 13px; color: var(--ink);
+        }
+        .eval-label.req::before { content: '*'; color: #e74c5e; margin-right: 3px; }
+        .eval-control { flex: 1; min-width: 0; }
+        .eval-input, .eval-textarea {
+            width: 100%; height: 36px; padding: 0 14px;
+            border: 1px solid var(--border); border-radius: 10px;
+            font-size: 13px; font-family: inherit; color: var(--ink);
+            background: #fff; outline: none;
+        }
+        .eval-input:focus, .eval-textarea:focus { border-color: var(--accent); }
+        .eval-input.invalid, .eval-textarea.invalid { border-color: #e74c5e; background: #fffafa; }
+        .eval-textarea { height: auto; min-height: 84px; padding: 9px 14px; resize: vertical; line-height: 1.6; }
+        .eval-error { display: none; font-size: 12px; color: #e74c5e; margin-top: 6px; }
+        .eval-error.show { display: block; }
 
         /* 退市弹窗 */
         .rate-box { background: #f7f8fc; border-radius: 12px; padding: 14px 18px; margin-bottom: 16px; }
@@ -252,7 +284,81 @@
             box-shadow: 0 1px 3px rgba(255,45,85,.3);
         }
 
-        /* ===== 右侧功能说明面板 ===== */
+        /* ===== 产品信息浮层（居中覆盖中间原型区域，不遮挡右侧功能说明） ===== */
+.drawer-overlay {
+    position: fixed; top: 0; bottom: 0; left: 0; right: 340px;
+    z-index: 880; display: none; overflow: hidden;
+}
+.drawer-overlay.show { display: flex; align-items: center; justify-content: center; }
+.drawer-overlay .drawer-shade {
+    position: absolute; inset: 0; background: rgba(0,0,0,.25);
+}
+.drawer-box {
+    position: relative; width: 720px; max-width: calc(100% - 64px);
+    max-height: calc(100% - 64px);
+    background: #fff; border-radius: 12px;
+    box-shadow: 0 12px 40px rgba(20,30,60,.18);
+    display: flex; flex-direction: column; overflow: hidden;
+    animation: pmIn .18s ease-out;
+}
+@keyframes pmIn {
+    from { opacity: 0; transform: translateY(8px) scale(.98); }
+    to { opacity: 1; transform: none; }
+}
+.drawer-header {
+    height: 56px; padding: 0 20px; border-bottom: 1px solid #f0f0f0;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-shrink: 0;
+}
+.drawer-title { font-size: 16px; font-weight: 600; }
+.drawer-close { font-size: 24px; color: #86909c; cursor: pointer; line-height: 1; }
+.drawer-close:hover { color: var(--ink); }
+.drawer-body { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 20px 24px 28px; }
+.drawer-section { margin-bottom: 24px; }
+.drawer-section:last-child { margin-bottom: 0; }
+.drawer-label { font-size: 13px; color: var(--ink-subtle); margin-bottom: 8px; }
+.drawer-value { font-size: 14px; color: var(--ink); font-weight: 500; line-height: 1.6; }
+.drawer-cover {
+    width: 120px; height: 120px; border-radius: 10px;
+    background-size: cover; background-position: center;
+    border: 1px solid var(--border);
+}
+.type-tag {
+    display: inline-block; padding: 4px 12px; border-radius: 9999px;
+    background: #eef3ff; color: var(--accent); font-size: 13px; font-weight: 500;
+}
+.drawer-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+    border-top: 1px solid #f0f0f0; padding-top: 18px; margin-top: 18px;
+}
+.drawer-grid .dg-cell {
+    display: flex; flex-direction: column; gap: 8px; min-width: 0;
+    background: #fafbfc; border: 1px solid #eef0f3; border-radius: 10px;
+    padding: 14px 16px;
+}
+.drawer-grid .dg-label { font-size: 12px; color: var(--ink-subtle); }
+.drawer-grid .dg-value {
+    font-size: 13px; color: var(--ink); font-weight: 600;
+    word-break: break-all; overflow-wrap: anywhere;
+}
+.drawer-table {
+    width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px;
+    table-layout: fixed;
+}
+.drawer-table th:nth-child(1), .drawer-table td:nth-child(1) { width: 128px; }
+.drawer-table th:nth-child(2), .drawer-table td:nth-child(2) { width: 150px; }
+.drawer-table th {
+    background: #fafbfc; padding: 8px 10px; text-align: left; font-weight: 600;
+    color: var(--ink-subtle); border-bottom: 1px solid #f0f0f0;
+}
+.drawer-table td {
+    padding: 8px 10px; border-bottom: 1px solid #f5f5f5; color: var(--ink-muted);
+    vertical-align: top; line-height: 1.5;
+}
+.drawer-table th, .drawer-table td { word-break: break-word; overflow-wrap: anywhere; }
+body.drawer-open { overflow: hidden; }
+
+/* ===== 右侧功能说明面板 ===== */
         .func-panel {
             position: fixed; top: 0; right: 0; bottom: 0;
             width: 340px; z-index: 890;
@@ -302,6 +408,8 @@
         @media (max-width: 1023.98px) {
             .func-panel { display: none; }
             .main, .breadcrumb { margin-right: 0; }
+            .drawer-overlay { right: 0; }
+            .drawer-box { max-width: calc(100% - 32px); max-height: calc(100% - 32px); }
         }
     </style>
 </head>
@@ -316,7 +424,7 @@
 <div class="main">
     <div class="page-header">
         <h2>数字艺术品管理</h2>
-        <span class="total-text">共 <strong>9</strong> 条</span>
+        <span class="total-text">共 <strong>10</strong> 条</span>
     </div>
 
     <!-- 搜索区 -->
@@ -331,11 +439,13 @@
                 <input type="text" placeholder="请输入产品名">
             </div>
             <div class="search-item">
-                <label>市场</label>
-                <select>
-                    <option>全部</option>
-                    <option>零售市场</option>
-                    <option>批发市场</option>
+                <label>阶段</label>
+                <select id="filterStage">
+                    <option value="">全部阶段</option>
+                    <option value="批发市场">批发市场</option>
+                    <option value="零售市场">零售市场</option>
+                    <option value="批发完成">批发完成</option>
+                    <option value="other">其他阶段（阶段为空）</option>
                 </select>
             </div>
             <div class="search-item">
@@ -368,7 +478,8 @@
         <button class="tab" data-status="confirming" onclick="selectTab(this)">待确认</button>
         <button class="tab" data-status="uploading" onclick="selectTab(this)">上链中</button>
         <button class="tab" data-status="canceled" onclick="selectTab(this)">已驳回</button>
-        <button class="tab" data-status="offline" onclick="selectTab(this)">待上市</button>
+        <button class="tab" data-status="offline" onclick="selectTab(this)">待上货</button>
+        <button class="tab" data-status="online" onclick="selectTab(this)">已上货</button>
         <button class="tab" data-status="delisted" onclick="selectTab(this)">已退市</button>
     </div>
 
@@ -396,7 +507,7 @@
                         <td><span class="product-name">西路财宝</span></td>
                         <td>成都市天府新区明昌博物馆</td>
                         <td>2026-07-21 09:51:02</td>
-                        <td><span class="status-tag online">已上线</span></td>
+                        <td><span class="status-tag online">已上货</span></td>
                         <td class="show-state"><span class="status-tag visible">显示</span></td>
                         <td><span class="stage-tag">零售市场</span></td>
                         <td class="actions-cell"><a>产品信息</a><a>企业信息</a><a onclick="openSetting('西路财宝')">设置</a><a>评估报告</a><a>推荐</a><a class="danger" onclick="openDelist('西路财宝')">退市</a></td>
@@ -407,7 +518,7 @@
                         <td><span class="product-name">中路财童</span></td>
                         <td>成都市天府新区明昌博物馆</td>
                         <td>2026-07-14 09:22:25</td>
-                        <td><span class="status-tag online">已上线</span></td>
+                        <td><span class="status-tag online">已上货</span></td>
                         <td class="show-state"><span class="status-tag visible">显示</span></td>
                         <td><span class="stage-tag">零售市场</span></td>
                         <td class="actions-cell"><a>产品信息</a><a>企业信息</a><a onclick="openSetting('中路财童')">设置</a><a>评估报告</a><a>推荐</a><a class="danger" onclick="openDelist('中路财童')">退市</a></td>
@@ -418,7 +529,7 @@
                         <td><span class="product-name">榜样-统一</span></td>
                         <td>成都市天府新区明昌博物馆</td>
                         <td>2026-07-01 15:49:11</td>
-                        <td><span class="status-tag online">已上线</span></td>
+                        <td><span class="status-tag online">已上货</span></td>
                         <td class="show-state"><span class="status-tag visible">显示</span></td>
                         <td><span class="stage-tag">零售市场</span></td>
                         <td class="actions-cell"><a>产品信息</a><a>企业信息</a><a onclick="openSetting('榜样-统一')">设置</a><a>评估报告</a><a>推荐</a><a class="danger" onclick="openDelist('榜样-统一')">退市</a></td>
@@ -429,7 +540,7 @@
                         <td><span class="product-name">青莲-舒展</span></td>
                         <td>成都市天府新区明昌博物馆</td>
                         <td>2026-06-30 14:19:34</td>
-                        <td><span class="status-tag online">已上线</span></td>
+                        <td><span class="status-tag online">已上货</span></td>
                         <td class="show-state"><span class="status-tag visible">显示</span></td>
                         <td><span class="stage-tag">零售市场</span></td>
                         <td class="actions-cell"><a>产品信息</a><a>企业信息</a><a onclick="openSetting('青莲-舒展')">设置</a><a>评估报告</a><a>推荐</a><a class="danger" onclick="openDelist('青莲-舒展')">退市</a></td>
@@ -440,7 +551,7 @@
                         <td><span class="product-name">东坡-惜春</span></td>
                         <td>成都市天府新区明昌博物馆</td>
                         <td>2026-06-12 13:39:55</td>
-                        <td><span class="status-tag online">已上线</span></td>
+                        <td><span class="status-tag online">已上货</span></td>
                         <td class="show-state"><span class="status-tag visible">显示</span></td>
                         <td><span class="stage-tag">零售市场</span></td>
                         <td class="actions-cell"><a>产品信息</a><a>企业信息</a><a onclick="openSetting('东坡-惜春')">设置</a><a>评估报告</a><a>推荐</a><a class="danger" onclick="openDelist('东坡-惜春')">退市</a></td>
@@ -451,7 +562,7 @@
                         <td><span class="product-name">东坡-虚静</span></td>
                         <td>成都市天府新区明昌博物馆</td>
                         <td>2026-06-12 11:16:48</td>
-                        <td><span class="status-tag online">已上线</span></td>
+                        <td><span class="status-tag online">已上货</span></td>
                         <td class="show-state"><span class="status-tag visible">显示</span></td>
                         <td><span class="stage-tag">零售市场</span></td>
                         <td class="actions-cell"><a>产品信息</a><a>企业信息</a><a onclick="openSetting('东坡-虚静')">设置</a><a>评估报告</a><a>推荐</a><a class="danger" onclick="openDelist('东坡-虚静')">退市</a></td>
@@ -484,10 +595,21 @@
                         <td><span class="product-name">青莲-映月</span></td>
                         <td>北京观唐文化艺术有限公司</td>
                         <td>2026-09-18 10:22:36</td>
-                        <td><span class="status-tag online">已上线</span></td>
+                        <td><span class="status-tag online">已上货</span></td>
                         <td class="show-state"><span class="status-tag visible">显示</span></td>
                         <td class="stage-tag-cell"><span class="stage-tag whole">批发完成</span></td>
                         <td class="actions-cell row-stage-actions"><a>产品信息</a><a>企业信息</a><a onclick="openSetting('青莲-映月')">设置</a><a>评估报告</a><a class="strong" onclick="joinRetail(this)">加入零售市场</a></td>
+                    </tr>
+                    <tr id="row10" data-status="pending" data-visible="1" data-qty="100">
+                        <td class="seq-cell">10</td>
+                        <td><span class="product-img" style="background-image:linear-gradient(135deg,#e8dcc8,#b09070);"></span></td>
+                        <td><span class="product-name">青莲-听雨</span></td>
+                        <td>北京观唐文化艺术有限公司</td>
+                        <td>2026-09-22 10:08:15</td>
+                        <td><span class="status-tag pending">待评估</span></td>
+                        <td class="show-state"><span class="status-tag visible">显示</span></td>
+                        <td></td>
+                        <td class="actions-cell"><a>产品信息</a><a>企业信息</a><a class="strong" onclick="openEvaluate(this)">价值评估</a><a>评估报告</a></td>
                     </tr>
                 </tbody>
             </table>
@@ -701,6 +823,162 @@
     </div>
 </div>
 
+<!-- 价值评估弹窗（待评估产品） -->
+<div class="modal-overlay" id="evaluateModal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <div class="modal-title">价值评估</div>
+            <div class="modal-close" onclick="closeEvaluate()">×</div>
+        </div>
+        <div class="modal-body">
+            <div class="rate-box">
+                <div class="rate-row">
+                    <span class="rate-label">产品名称</span>
+                    <span class="eval-name" id="evalProductName">—</span>
+                </div>
+                <div class="rate-row">
+                    <span class="rate-label">数量</span>
+                    <span class="eval-name" id="evalQty">—</span>
+                </div>
+            </div>
+
+            <div class="eval-row">
+                <div class="eval-label req">评估价格（单件元）</div>
+                <div class="eval-control">
+                    <input class="eval-input" id="evalPrice" type="number" min="0" step="0.01" placeholder="请输入单件评估价格">
+                    <div class="eval-error" id="evalPriceError"></div>
+                </div>
+            </div>
+
+            <div class="eval-row">
+                <div class="eval-label">备注</div>
+                <div class="eval-control">
+                    <textarea class="eval-textarea" id="evalRemark" placeholder="请输入备注（驳回时必填）"></textarea>
+                    <div class="eval-error" id="evalRemarkError"></div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-danger" onclick="rejectEvaluate()">驳回</button>
+            <button class="btn-default" onclick="closeEvaluate()">取消</button>
+            <button class="btn-primary" onclick="submitEvaluate()">确定</button>
+        </div>
+    </div>
+</div>
+
+<!-- 产品信息浮层（居中于中间原型区域，不遮挡功能说明面板） -->
+<div class="drawer-overlay" id="productDrawer">
+    <div class="drawer-shade" onclick="closeProductDrawer()"></div>
+    <div class="drawer-box">
+        <div class="drawer-header">
+            <div class="drawer-title">产品信息</div>
+            <div class="drawer-close" onclick="closeProductDrawer()">×</div>
+        </div>
+        <div class="drawer-body">
+            <div class="drawer-section">
+                <div class="drawer-label">名称</div>
+                <div class="drawer-value" id="pdName">—</div>
+            </div>
+
+            <div class="drawer-section">
+                <div class="drawer-label">封面图片</div>
+                <div class="drawer-cover" id="pdCover"></div>
+            </div>
+
+            <div class="drawer-section">
+                <div class="drawer-label">详细说明</div>
+                <div class="drawer-value" id="pdDesc">—</div>
+            </div>
+
+            <div class="drawer-section">
+                <div class="drawer-label">类型</div>
+                <span class="type-tag" id="pdType">文化酒</span>
+            </div>
+
+            <div class="drawer-section">
+                <div class="drawer-grid">
+                    <div class="dg-cell">
+                        <span class="dg-label">所属链</span>
+                        <span class="dg-value" id="pdChain">艺海链</span>
+                    </div>
+                    <div class="dg-cell">
+                        <span class="dg-label">合约地址</span>
+                        <span class="dg-value" id="pdContract">0x9A7c4b1E3f2D58a6C0b4E7d19F3a8B2c5D6e7F80</span>
+                    </div>
+                    <div class="dg-cell">
+                        <span class="dg-label">评估单价</span>
+                        <span class="dg-value" id="pdEvalPrice">—</span>
+                    </div>
+                    <div class="dg-cell">
+                        <span class="dg-label">实际单价</span>
+                        <span class="dg-value" id="pdRealPrice">—</span>
+                    </div>
+                    <div class="dg-cell">
+                        <span class="dg-label">发行总数量</span>
+                        <span class="dg-value" id="pdIssueQty">10</span>
+                    </div>
+                    <div class="dg-cell">
+                        <span class="dg-label">实际售卖数量</span>
+                        <span class="dg-value" id="pdSoldQty">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="drawer-section">
+                <div class="drawer-label">历史记录</div>
+                <table class="drawer-table">
+                    <thead>
+                        <tr>
+                            <th style="width:120px;">时间</th>
+                            <th>操作人</th>
+                            <th>结果</th>
+                            <th>原因</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pdHistory">
+                        <tr>
+                            <td>2026-08-05 15:01:19</td>
+                            <td>四川艺海智能科技有限公司</td>
+                            <td>创建产品并提交评估。</td>
+                            <td>创建产品并提交评估。</td>
+                        </tr>
+                        <tr>
+                            <td>2026-08-05 15:01:31</td>
+                            <td>艺术金融</td>
+                            <td>评估通过，评估价值 ¥1000.00。</td>
+                            <td>评估通过，评估价值 ¥1000.00。</td>
+                        </tr>
+                        <tr>
+                            <td>2026-08-05 15:01:40</td>
+                            <td>四川艺海智能科技有限公司</td>
+                            <td>确认价值 ¥1000.00。</td>
+                            <td>确认价值 ¥1000.00。</td>
+                        </tr>
+                        <tr>
+                            <td>2026-08-05 15:02:30</td>
+                            <td>艺术金融</td>
+                            <td>建仓成功，建仓数量：10。</td>
+                            <td>建仓成功，建仓数量：10。</td>
+                        </tr>
+                        <tr>
+                            <td>2026-08-05 15:02:38</td>
+                            <td>艺术金融</td>
+                            <td>上链完成。</td>
+                            <td>上链完成。</td>
+                        </tr>
+                        <tr>
+                            <td>2026-08-05 15:02:41</td>
+                            <td>艺术金融</td>
+                            <td>批发成功，数量10。</td>
+                            <td>批发成功，数量10。</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- ===== 右侧功能说明面板 ===== -->
 <aside class="func-panel">
     <div class="fp-inner">
@@ -711,7 +989,7 @@
         <div class="fp-body">
             <h4>一、退市</h4>
             <ul>
-                <li><strong>入口</strong>：列表操作列「退市」按钮，<strong>已上线且处于零售市场</strong>的产品显示红色「退市」</li>
+                <li><strong>入口</strong>：列表操作列「退市」按钮，<strong>已上货且处于零售市场</strong>的产品显示红色「退市」</li>
                 <li><strong>退市条件（提货率校验）</strong>：点击「退市」弹出弹窗并读取该产品提货率 —— <strong>达到 100%</strong> 时显示上传附件区、「提交」可点击；<strong>未达 100%</strong>（如 70%）时隐藏上传与提交，提示「当前提货率未达到100%，暂不可退市」</li>
                 <li><strong>上传退市审批文件</strong>：提货率达 100% 后可上传，支持 <strong>pdf / doc</strong>，上传后可更换</li>
                 <li><strong>提交退市</strong>：提交后该产品的<strong>状态列</strong>与<strong>阶段列</strong>更新为「已退市」，弹窗关闭</li>
@@ -732,6 +1010,26 @@
                 <li>点击「<strong>加入零售市场</strong>」，去掉原来的指导价设置。产品进入零售市场第一天的挂单价的涨幅为批发价的80%,只涨不跌。后面每天的涨跌幅为设置的产品的涨跌幅（+25%以内），基准价是该产品（按照编号）的成交价</li>
                 <li>加入零售市场时需要判断必须在批发市场结束（售罄或者提前手动结束）t+5才能点击）</li>
             </ul>
+
+            <h4>四、价值评估（待评估）</h4>
+            <ul>
+                <li><strong>价值评估弹窗</strong>：待评估的产品点击「价值评估」弹出，展示<strong>产品名称</strong>与<strong>数量</strong>，可填写「<strong>评估价格（单件元）</strong>」与<strong>备注</strong></li>
+                <li><strong>确定</strong>：评估价格<strong>必填</strong>（未填提示「请输入评估价格（单件元），且必须大于 0」），<strong>备注选填</strong>；提交后状态更新为「待确认」</li>
+                <li><strong>驳回</strong>：<strong>备注必填</strong>，未填写时提示「驳回时备注必填，请填写驳回原因」且<strong>不提交</strong>；驳回后状态更新为「已驳回」</li>
+            </ul>
+
+            <h4>五、产品信息浮层（信息卡片）</h4>
+            <ul>
+                <li>卡片共 <strong>6 项</strong>：<strong>所属链、合约地址、评估单价、实际单价、发行总数量、实际售卖数量</strong></li>
+            </ul>
+
+            <h4>六、列表筛选与状态 Tab</h4>
+            <ul>
+                <li><strong>状态 Tab</strong>：全部 / 待评估 / 待确认 / 上链中 / 已驳回 / 待上货 / 已上货 / 已退市，与搜索条件、显示状态筛选取交集</li>
+                <li><strong>阶段筛选</strong>：原「市场」筛选框改为「<strong>阶段</strong>」，含 全部阶段 / 批发市场 / 零售市场 / 批发完成 / 其他阶段（阶段为空）</li>
+                <li>选择「<strong>其他阶段（阶段为空）</strong>」可查出<strong>阶段列为空</strong>的产品（如待评估、待确认状态的产品）</li>
+                <li>点击「加入零售市场」后阶段列更新为「零售市场」，提交退市后阶段列更新为「已退市」，筛选结果随之变化</li>
+            </ul>
         </div>
     </div>
     <button class="fp-open" onclick="toggleFuncPanel()" title="展开功能说明">功能说明‹</button>
@@ -749,17 +1047,22 @@ function filterRows() {
     var tab = document.querySelector('.tab.active');
     var status = tab ? (tab.dataset.status || 'all') : 'all';
     var vis = document.getElementById('filterVisible').value;
+    var stage = document.getElementById('filterStage').value;
     document.querySelectorAll('tbody tr').forEach(function (row) {
         var st = row.getAttribute('data-status') || '';
         var v = row.getAttribute('data-visible') || '';
+        var stageEl = row.querySelector('.stage-tag');
+        var sg = stageEl ? stageEl.textContent.trim() : '';
         var okStatus = status === 'all' || st === status;
         var okVis = vis === '' || v === vis;
-        row.style.display = (okStatus && okVis) ? '' : 'none';
+        var okStage = stage === '' || (stage === 'other' ? sg === '' : sg === stage);
+        row.style.display = (okStatus && okVis && okStage) ? '' : 'none';
     });
 }
 
 function resetFilter() {
     document.getElementById('filterVisible').value = '';
+    document.getElementById('filterStage').value = '';
     document.querySelectorAll('.tab').forEach(function (t) { t.classList.remove('active'); });
     document.querySelector('.tab[data-status="all"]').classList.add('active');
     filterRows();
@@ -874,6 +1177,112 @@ function joinRetail(link) {
         '<a class="danger" onclick="openDelist(\'' + name + '\')">退市</a>';
     alert('已加入零售市场');
 }
+
+/* ===== 价值评估（待评估状态） ===== */
+var evalTargetRow = null;
+
+function openEvaluate(link) {
+    evalTargetRow = link.closest('tr');
+    document.getElementById('evalProductName').textContent = evalTargetRow.querySelector('.product-name').textContent;
+    document.getElementById('evalQty').textContent = (evalTargetRow.getAttribute('data-qty') || '—') + ' 件';
+    document.getElementById('evalPrice').value = '';
+    document.getElementById('evalRemark').value = '';
+    clearEvalError();
+    document.getElementById('evaluateModal').classList.add('show');
+}
+
+function closeEvaluate() {
+    document.getElementById('evaluateModal').classList.remove('show');
+}
+
+function clearEvalError() {
+    ['evalPrice', 'evalRemark'].forEach(function (id) {
+        document.getElementById(id).classList.remove('invalid');
+    });
+    ['evalPriceError', 'evalRemarkError'].forEach(function (id) {
+        document.getElementById(id).classList.remove('show');
+    });
+}
+
+function showEvalError(id, msg) {
+    var el = document.getElementById(id);
+    el.textContent = msg;
+    el.classList.add('show');
+}
+
+/* 确定：评估价格必填，备注选填 */
+function submitEvaluate() {
+    clearEvalError();
+    var price = document.getElementById('evalPrice').value.trim();
+    if (price === '' || isNaN(Number(price)) || Number(price) <= 0) {
+        document.getElementById('evalPrice').classList.add('invalid');
+        showEvalError('evalPriceError', '请输入评估价格（单件元），且必须大于 0');
+        return;
+    }
+    if (evalTargetRow) {
+        evalTargetRow.setAttribute('data-status', 'confirming');
+        evalTargetRow.querySelectorAll('td')[5].innerHTML = '<span class="status-tag confirming">待确认</span>';
+    }
+    alert('评估已提交：单件评估价格 ¥' + price + '，状态更新为「待确认」');
+    closeEvaluate();
+}
+
+/* 驳回：备注必填，未填写不提交 */
+function rejectEvaluate() {
+    clearEvalError();
+    var remark = document.getElementById('evalRemark').value.trim();
+    if (remark === '') {
+        document.getElementById('evalRemark').classList.add('invalid');
+        showEvalError('evalRemarkError', '驳回时备注必填，请填写驳回原因');
+        return;
+    }
+    if (evalTargetRow) {
+        evalTargetRow.setAttribute('data-status', 'canceled');
+        evalTargetRow.querySelectorAll('td')[5].innerHTML = '<span class="status-tag rejected">已驳回</span>';
+    }
+    alert('已驳回：' + remark);
+    closeEvaluate();
+}
+
+['evalPrice', 'evalRemark'].forEach(function (id) {
+    document.getElementById(id).addEventListener('input', clearEvalError);
+});
+
+/* ===== 右侧产品信息抽屉 ===== */
+function openProductDrawer(link) {
+    var row = link.closest('tr');
+    var name = row.querySelector('.product-name').textContent;
+    var imgEl = row.querySelector('.product-img');
+    var bg = imgEl ? imgEl.style.backgroundImage : '';
+    var qty = row.getAttribute('data-qty') || '10';
+    var evalPrice = row.getAttribute('data-eval-price') || '100.00';
+    var realPrice = row.getAttribute('data-real-price') || '88.00';
+    var soldQty = row.getAttribute('data-sold-qty') || String(Math.round(Number(qty) * 0.6));
+
+    document.getElementById('pdName').textContent = name;
+    document.getElementById('pdDesc').textContent = '批发最后一次';
+    document.getElementById('pdCover').style.backgroundImage = bg;
+    document.getElementById('pdIssueQty').textContent = qty;
+    document.getElementById('pdEvalPrice').textContent = '¥' + evalPrice;
+    document.getElementById('pdRealPrice').textContent = '¥' + realPrice;
+    document.getElementById('pdSoldQty').textContent = soldQty;
+
+    document.getElementById('productDrawer').classList.add('show');
+    document.body.classList.add('drawer-open');
+}
+
+function closeProductDrawer() {
+    document.getElementById('productDrawer').classList.remove('show');
+    document.body.classList.remove('drawer-open');
+}
+
+/* 已上货（及后续动态生成）的产品信息链接统一绑定抽屉打开 */
+document.querySelector('tbody').addEventListener('click', function (e) {
+    if (e.target.tagName === 'A' && e.target.textContent === '产品信息') {
+        e.preventDefault();
+        openProductDrawer(e.target);
+    }
+});
 
 /* ===== 右侧功能说明面板：收起 / 展开 ===== */
 function toggleFuncPanel() {

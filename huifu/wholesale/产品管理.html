@@ -85,6 +85,20 @@
     .filter-input:focus { border-color: var(--accent); }
     .filter-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; }
 
+    /* 状态 Tab（列表内） */
+    .tabs {
+        display: flex; flex-wrap: wrap; gap: 8px;
+        padding: 0 24px 14px; border-bottom: 1px solid #f0f1f4;
+    }
+    .tab {
+        height: 30px; padding: 0 14px; border-radius: var(--radius-pill);
+        background: #fff; border: 1px solid var(--border);
+        font-size: 13px; color: var(--ink-muted); font-weight: 500;
+        display: inline-flex; align-items: center; cursor: pointer; font-family: inherit;
+    }
+    .tab:hover { color: var(--accent); border-color: var(--accent); }
+    .tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
     /* 表格卡片 */
     .table-wrap {
         background: #fff; border-radius: var(--radius-card);
@@ -115,6 +129,7 @@
     .product-img.img4 { background-image: linear-gradient(135deg, #d8b8a0 0%, #a87850 100%); }
     .product-img.img5 { background-image: linear-gradient(135deg, #d4d8d4 0%, #98a098 100%); }
     .product-img.img6 { background-image: linear-gradient(135deg, #f7e8d4 0%, #c8a888 100%); }
+    .product-img.img7 { background-image: linear-gradient(135deg, #d8e8f5 0%, #6b9bc8 100%); }
 
     .product-name { font-weight: 600; white-space: nowrap; }
     .type-cell { color: var(--ink-muted); }
@@ -149,6 +164,63 @@
     .actions a:hover { text-decoration: underline; }
     .actions a.disabled { color: #c0c8d4; cursor: default; }
     .actions a.disabled:hover { text-decoration: none; }
+    .actions a.strong { font-weight: 600; }
+    .empty-cell { color: var(--ink-faint); }
+
+    /* 状态标签（按状态 key 着色） */
+    .status-tag.evaluate    { background: var(--accent-bg); color: var(--accent); }
+    .status-tag.confirming  { background: var(--orange-bg); color: var(--orange); }
+    .status-tag.uploading   { background: var(--purple-bg); color: var(--purple); }
+    .status-tag.rejected    { background: #fdecee; color: var(--red); }
+    .status-tag.offline     { background: #fdf6e3; color: #b8860b; }
+    .status-tag.delisted    { background: #f2f3f5; color: var(--ink-subtle); }
+
+    /* ===== 确认评估价格浮层 ===== */
+    .modal-overlay {
+        position: fixed; inset: 0; background: rgba(0,0,0,.45);
+        display: none; align-items: center; justify-content: center; z-index: 1200;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal-box {
+        background: #fff; border-radius: var(--radius-card);
+        width: 520px; max-width: 94vw; max-height: 90vh;
+        display: flex; flex-direction: column; overflow: hidden;
+    }
+    .modal-header {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 18px 24px; border-bottom: 1px solid #f0f0f0; flex-shrink: 0;
+    }
+    .modal-title { font-size: 16px; font-weight: 600; }
+    .modal-close { font-size: 22px; color: #86909c; cursor: pointer; line-height: 1; }
+    .modal-close:hover { color: var(--ink); }
+    .modal-body { padding: 20px 24px; overflow-y: auto; overflow-x: hidden; flex: 1; }
+    .modal-footer {
+        display: flex; justify-content: flex-end; gap: 10px;
+        padding: 14px 24px; border-top: 1px solid #f0f0f0; flex-shrink: 0;
+    }
+    .rate-box { background: #f7f8fc; border-radius: 12px; padding: 6px 18px; margin-bottom: 18px; }
+    .rate-row { display: flex; align-items: flex-start; gap: 16px; padding: 10px 0; border-bottom: 1px dashed #e6e9f0; }
+    .rate-row:last-child { border-bottom: none; }
+    .rate-label { width: 132px; flex-shrink: 0; font-size: 13px; color: var(--ink-subtle); }
+    .rate-value { font-size: 13px; font-weight: 600; color: var(--ink); word-break: break-word; overflow-wrap: anywhere; }
+    .rate-value.accent { color: var(--accent); font-size: 15px; }
+    .eval-row { display: flex; align-items: flex-start; }
+    .eval-label {
+        width: 132px; flex-shrink: 0; text-align: right; padding-right: 12px;
+        padding-top: 9px; font-size: 13px; color: var(--ink);
+    }
+    .eval-label.req::before { content: '*'; color: var(--red); margin-right: 3px; }
+    .eval-control { flex: 1; min-width: 0; }
+    .eval-input {
+        width: 100%; height: 36px; padding: 0 14px; border: 1px solid var(--border);
+        border-radius: 10px; font-size: 13px; font-family: inherit; color: var(--ink);
+        background: #fff; outline: none;
+    }
+    .eval-input:focus { border-color: var(--accent); }
+    .eval-input.invalid { border-color: var(--red); background: #fffafa; }
+    .eval-tip { font-size: 12px; color: var(--ink-subtle); margin-top: 6px; }
+    .eval-error { display: none; font-size: 12px; color: var(--red); margin-top: 6px; }
+    .eval-error.show { display: block; }
 
     /* 标注圆点（功能说明序号） */
     .badge {
@@ -259,6 +331,7 @@
                 <option>批发市场</option>
                 <option>批发完成</option>
                 <option>零售市场</option>
+                <option value="other">其他阶段（阶段为空）</option>
             </select>
         </div>
         <div class="filter-actions">
@@ -271,7 +344,17 @@
     <section class="table-wrap">
         <div class="table-head">
             <span class="th-title">产品列表</span>
-            <span class="th-extra">货款提取入口已废弃，仅供老企业查看历史数据</span>
+        </div>
+        <!-- 状态 Tab -->
+        <div class="tabs">
+            <button class="tab active" data-status="all" onclick="selectStatusTab(this)">全部</button>
+            <button class="tab" data-status="evaluate" onclick="selectStatusTab(this)">待评估</button>
+            <button class="tab" data-status="confirming" onclick="selectStatusTab(this)">待确认</button>
+            <button class="tab" data-status="uploading" onclick="selectStatusTab(this)">上链中</button>
+            <button class="tab" data-status="rejected" onclick="selectStatusTab(this)">已驳回</button>
+            <button class="tab" data-status="offline" onclick="selectStatusTab(this)">待上货</button>
+            <button class="tab" data-status="online" onclick="selectStatusTab(this)">已上货</button>
+            <button class="tab" data-status="delisted" onclick="selectStatusTab(this)">已退市</button>
         </div>
         <div class="table-scroll">
             <table class="table">
@@ -298,6 +381,49 @@
             <button class="page-btn">›</button>
         </div>
     </section>
+</div>
+
+<!-- 确认评估价格浮层（待确认产品） -->
+<div class="modal-overlay" id="confirmModal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <div class="modal-title">确认评估价格</div>
+            <div class="modal-close" onclick="closeConfirm()">×</div>
+        </div>
+        <div class="modal-body">
+            <div class="rate-box">
+                <div class="rate-row">
+                    <span class="rate-label">产品名称</span>
+                    <span class="rate-value" id="cfName">—</span>
+                </div>
+                <div class="rate-row">
+                    <span class="rate-label">数量</span>
+                    <span class="rate-value" id="cfQty">—</span>
+                </div>
+                <div class="rate-row">
+                    <span class="rate-label">评估价格（单件元）</span>
+                    <span class="rate-value accent" id="cfEvalPrice">—</span>
+                </div>
+                <div class="rate-row">
+                    <span class="rate-label">评估备注</span>
+                    <span class="rate-value" id="cfEvalRemark">—</span>
+                </div>
+            </div>
+
+            <div class="eval-row">
+                <div class="eval-label req">确认价格（单件元）</div>
+                <div class="eval-control">
+                    <input class="eval-input" id="cfPrice" type="number" min="0" step="0.01" placeholder="请输入确认价格（单件元）">
+                    <div class="eval-tip" id="cfPriceTip"></div>
+                    <div class="eval-error" id="cfPriceError"></div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-ghost" onclick="closeConfirm()">取消</button>
+            <button class="btn btn-primary" onclick="submitConfirm()">确认</button>
+        </div>
+    </div>
 </div>
 
 <!-- ====== 右侧功能说明 ====== -->
@@ -327,9 +453,23 @@
                 <li>「<strong>批发分账申请</strong>」：发起批发货款分账申请</li>
                 <li>「<strong>批发固定风险保证金分账申请</strong>」：进入<strong>批发固定风险保证金分账管理</strong>，发起固定风险保证金释放申请</li>
             </ul>
+            <h4><span class="badge">4</span> <span style="vertical-align:middle;">商家确认评估价格（待确认）</span></h4>
+            <ul>
+                <li><strong>列表数据</strong>：新增「<strong>待确认</strong>」状态产品，<strong>批发模式为空</strong>、<strong>阶段为空</strong>（列表显示「—」）</li>
+                <li><strong>操作列</strong>：该状态产品只有「<strong>产品详情</strong>」与「<strong>确认</strong>」两个按钮</li>
+                <li><strong>确认浮层</strong>：点击「确认」弹出，展示管理端的评估内容 —— <strong>产品名称、数量、评估价格（单件元）、评估备注</strong></li>
+                <li><strong>确认价格（单件元）</strong>：默认自动填入<strong>评估价格</strong>，可手动修改，但<strong>只能比评估价格小</strong>；大于或等于时提示「确认价格必须小于评估价格 ¥xxx」且不提交</li>
+                <li><strong>确认提交</strong>：校验通过后产品状态更新为「<strong>上链中</strong>」</li>
+            </ul>
+            <h4>状态 Tab</h4>
+            <ul>
+                <li>产品列表上方新增<strong>状态 Tab</strong>，分类为：<strong>全部、待评估、待确认、上链中、已驳回、待上货、已上货、已退市</strong></li>
+                <li>点击 Tab 即时过滤列表，与<strong>产品名称</strong>、<strong>阶段</strong>筛选取交集</li>
+            </ul>
             <h4>筛选说明</h4>
             <ul>
                 <li>支持按<strong>产品名称</strong>模糊搜索、按<strong>阶段</strong>（批发市场 / 批发完成 / 零售市场）筛选</li>
+                <li>阶段新增「<strong>其他阶段（阶段为空）</strong>」选项，用于查出<strong>阶段为空</strong>的产品（如待确认状态产品）</li>
             </ul>
         </div>
     </div>
@@ -339,12 +479,13 @@
 <script>
 /* ================= 产品数据 ================= */
 var products = [
-    { img: 'img1', name: '青莲-初心',  type: '鉴赏', status: '已上货', modes: ['draw', 'open'],                       stage: '批发市场', stageKey: 'wholesale', created: '2026-07-29 13:56:46', updated: '2026-07-30 15:38:13', price: 1562.50, qty: 8,  sold: 6 },
-    { img: 'img2', name: '西路财童',  type: '鉴赏', status: '已上货', modes: ['prior'],                              stage: '批发完成', stageKey: 'done',      created: '2026-07-21 09:51:04', updated: '2026-07-22 15:30:19', price: 2500,   qty: 5,  sold: 5 },
-    { img: 'img3', name: '中路财童',  type: '鉴赏', status: '已上货', modes: ['draw'],                                stage: '批发市场', stageKey: 'wholesale', created: '2026-07-14 09:22:25', updated: '2026-07-31 08:00:01', price: 250,    qty: 50, sold: 40 },
-    { img: 'img4', name: '榜样-统一', type: '期待', status: '已上货', modes: ['prior', 'draw'],                       stage: '零售市场', stageKey: 'retail',    created: '2026-07-01 15:49:11', updated: '2026-07-13 15:29:54', price: 1200,   qty: 20, sold: 12 },
-    { img: 'img5', name: '青莲-舒展', type: '期待', status: '已上货', modes: ['open'],                                stage: '批发完成', stageKey: 'done',      created: '2026-06-30 14:19:34', updated: '2026-07-22 09:39:56', price: 800,    qty: 30, sold: 25 },
-    { img: 'img6', name: '东坡-惜春', type: '活动', status: '已上货', modes: ['prior', 'draw', 'open'],                stage: '批发市场', stageKey: 'wholesale', created: '2026-06-12 13:39:55', updated: '2026-07-31 08:00:01', price: 3000,   qty: 10, sold: 8 }
+    { img: 'img1', name: '青莲-初心',  type: '鉴赏', status: '已上货', statusKey: 'online',    modes: ['draw', 'open'],                       stage: '批发市场', stageKey: 'wholesale', created: '2026-07-29 13:56:46', updated: '2026-07-30 15:38:13', price: 1562.50, qty: 8,  sold: 6 },
+    { img: 'img2', name: '西路财童',  type: '鉴赏', status: '已上货', statusKey: 'online',    modes: ['prior'],                              stage: '批发完成', stageKey: 'done',      created: '2026-07-21 09:51:04', updated: '2026-07-22 15:30:19', price: 2500,   qty: 5,  sold: 5 },
+    { img: 'img3', name: '中路财童',  type: '鉴赏', status: '已上货', statusKey: 'online',    modes: ['draw'],                                stage: '批发市场', stageKey: 'wholesale', created: '2026-07-14 09:22:25', updated: '2026-07-31 08:00:01', price: 250,    qty: 50, sold: 40 },
+    { img: 'img4', name: '榜样-统一', type: '期待', status: '已上货', statusKey: 'online',    modes: ['prior', 'draw'],                       stage: '零售市场', stageKey: 'retail',    created: '2026-07-01 15:49:11', updated: '2026-07-13 15:29:54', price: 1200,   qty: 20, sold: 12 },
+    { img: 'img5', name: '青莲-舒展', type: '期待', status: '已上货', statusKey: 'online',    modes: ['open'],                                stage: '批发完成', stageKey: 'done',      created: '2026-06-30 14:19:34', updated: '2026-07-22 09:39:56', price: 800,    qty: 30, sold: 25 },
+    { img: 'img6', name: '东坡-惜春', type: '活动', status: '已上货', statusKey: 'online',    modes: ['prior', 'draw', 'open'],                stage: '批发市场', stageKey: 'wholesale', created: '2026-06-12 13:39:55', updated: '2026-07-31 08:00:01', price: 3000,   qty: 10, sold: 8 },
+    { img: 'img7', name: '青莲-听雨', type: '鉴赏', status: '待确认', statusKey: 'confirming', modes: [], stage: '', stageKey: '', created: '2026-09-22 10:08:15', updated: '2026-09-23 09:12:40', price: 1000, qty: 100, sold: 0, pendingConfirm: true, evalPrice: 1000, evalRemark: '按同系列产品近期成交价评估' }
 ];
 
 var modeText = { prior: '优先购', draw: '抽签购', open: '全民购' };
@@ -354,35 +495,50 @@ var stageText = { wholesale: '批发市场', done: '批发完成', retail: '零�
 function renderTable() {
     var fName = (document.getElementById('fName').value || '').trim();
     var fStage = document.getElementById('fStage').value;
+    var tabEl = document.querySelector('.tabs .tab.active');
+    var fStatus = tabEl ? (tabEl.dataset.status || 'all') : 'all';
     var list = products.filter(function (p) {
         if (fName && p.name.indexOf(fName) < 0) return false;
-        if (fStage && stageText[p.stageKey] !== fStage) return false;
+        if (fStage === 'other') {
+            if (p.stage) return false;
+        } else if (fStage && stageText[p.stageKey] !== fStage) {
+            return false;
+        }
+        if (fStatus !== 'all' && (p.statusKey || '') !== fStatus) return false;
         return true;
     });
     var html = '';
     list.forEach(function (p, i) {
         var isFirst = (i === 0);
-        var modes = p.modes.map(function (m) {
-            return '<span class="mode-tag ' + m + '">' + modeText[m] + '</span>';
-        }).join('');
+        var modes = p.modes.length
+            ? p.modes.map(function (m) {
+                return '<span class="mode-tag ' + m + '">' + modeText[m] + '</span>';
+            }).join('')
+            : '<span class="empty-cell">—</span>';
+        var stage = p.stage
+            ? '<span class="stage-tag ' + p.stageKey + '">' + p.stage + '</span>'
+            : '<span class="empty-cell">—</span>';
+        var statusCls = p.statusKey ? ' ' + p.statusKey : '';
+        var actions = p.pendingConfirm
+            ? '  <a onclick="todo(\'产品详情\')">产品详情</a>' +
+              '  <a class="strong" onclick="openConfirm(' + products.indexOf(p) + ')">确认<span class="badge">4</span></a>'
+            : '  <a onclick="todo(\'产品详情\')">产品详情</a>' +
+              '  <a onclick="todo(\'批发管理\')">批发管理</a>' +
+              '  <a onclick="todo(\'文本价值要素标注\')">文本价值要素标注</a>' +
+              '  <a onclick="todo(\'文本价值要素数据集\')">文本价值要素数据集</a>' +
+              '  <a onclick="location.href=\'批发市场分账申请.html?name=' + encodeURIComponent(p.name) + '&price=' + p.price + '&qty=' + p.qty + '&sold=' + p.sold + '&img=' + p.img + '\'">批发分账申请' + (isFirst ? '<span class="badge">3</span>' : '') + '</a>' +
+              '  <a onclick="location.href=\'固定风险保证金分账申请.html\'">固定风险保证金分账申请</a>' +
+              '  <a class="disabled">货款提取（已废弃）' + (isFirst ? '<span class="badge">2</span>' : '') + '</a>';
         html += '<tr>' +
             '<td><span class="product-img ' + p.img + '"></span></td>' +
             '<td><span class="product-name">' + p.name + '</span></td>' +
             '<td class="type-cell">' + p.type + '</td>' +
-            '<td><span class="status-tag">' + p.status + '</span></td>' +
+            '<td><span class="status-tag' + statusCls + '">' + p.status + '</span></td>' +
             '<td class="mode-cell">' + modes + (isFirst ? '<span class="badge">1</span>' : '') + '</td>' +
-            '<td class="stage-cell"><span class="stage-tag ' + p.stageKey + '">' + p.stage + '</span></td>' +
+            '<td class="stage-cell">' + stage + '</td>' +
             '<td class="time-cell">' + p.created + '</td>' +
             '<td class="time-cell">' + p.updated + '</td>' +
-            '<td class="actions">' +
-            '  <a onclick="todo(\'产品详情\')">产品详情</a>' +
-            '  <a onclick="todo(\'批发管理\')">批发管理</a>' +
-            '  <a onclick="todo(\'文本价值要素标注\')">文本价值要素标注</a>' +
-            '  <a onclick="todo(\'文本价值要素数据集\')">文本价值要素数据集</a>' +
-            '  <a onclick="location.href=\'批发市场分账申请.html?name=' + encodeURIComponent(p.name) + '&price=' + p.price + '&qty=' + p.qty + '&sold=' + p.sold + '&img=' + p.img + '\'">批发分账申请' + (isFirst ? '<span class="badge">3</span>' : '') + '</a>' +
-            '  <a onclick="location.href=\'固定风险保证金分账申请.html\'">固定风险保证金分账申请</a>' +
-            '  <a class="disabled">货款提取（已废弃）' + (isFirst ? '<span class="badge">2</span>' : '') + '</a>' +
-            '</td>' +
+            '<td class="actions">' + actions + '</td>' +
             '</tr>';
     });
     if (!list.length) {
@@ -392,15 +548,85 @@ function renderTable() {
     document.getElementById('totalCount').textContent = '共 ' + list.length + ' 条';
 }
 
+function selectStatusTab(el) {
+    document.querySelectorAll('.tabs .tab').forEach(function (t) { t.classList.remove('active'); });
+    el.classList.add('active');
+    renderTable();
+}
+
 function resetFilter() {
     document.getElementById('fName').value = '';
     document.getElementById('fStage').value = '';
+    document.querySelectorAll('.tabs .tab').forEach(function (t) { t.classList.remove('active'); });
+    document.querySelector('.tabs .tab[data-status="all"]').classList.add('active');
     renderTable();
 }
 
 function todo(action) {
     alert('原型演示：「' + action + '」入口');
 }
+
+/* ── 待确认产品：确认评估价格浮层 ── */
+var confirmTarget = null;
+
+function openConfirm(idx) {
+    var p = products[idx];
+    if (!p) return;
+    confirmTarget = p;
+    var base = Number(p.evalPrice || 0);
+    document.getElementById('cfName').textContent = p.name;
+    document.getElementById('cfQty').textContent = p.qty + ' 件';
+    document.getElementById('cfEvalPrice').textContent = '¥' + base.toFixed(2);
+    document.getElementById('cfEvalRemark').textContent = p.evalRemark || '—';
+    document.getElementById('cfPrice').value = base.toFixed(2);
+    document.getElementById('cfPriceTip').textContent = '默认为评估价格，可手动修改，只能小于评估价格 ¥' + base.toFixed(2);
+    clearConfirmError();
+    document.getElementById('confirmModal').classList.add('show');
+}
+
+function closeConfirm() {
+    document.getElementById('confirmModal').classList.remove('show');
+}
+
+function clearConfirmError() {
+    document.getElementById('cfPrice').classList.remove('invalid');
+    document.getElementById('cfPriceError').classList.remove('show');
+}
+
+function showConfirmError(msg) {
+    var el = document.getElementById('cfPriceError');
+    el.textContent = msg;
+    el.classList.add('show');
+}
+
+function submitConfirm() {
+    clearConfirmError();
+    var input = document.getElementById('cfPrice');
+    var raw = input.value.trim();
+    var val = Number(raw);
+    var base = confirmTarget ? Number(confirmTarget.evalPrice || 0) : 0;
+    if (raw === '' || isNaN(val) || val <= 0) {
+        input.classList.add('invalid');
+        showConfirmError('请输入确认价格（单件元），且必须大于 0');
+        return;
+    }
+    if (val >= base) {
+        input.classList.add('invalid');
+        showConfirmError('确认价格必须小于评估价格 ¥' + base.toFixed(2));
+        return;
+    }
+    if (confirmTarget) {
+        confirmTarget.confirmedPrice = val;
+        confirmTarget.status = '上链中';
+        confirmTarget.statusKey = 'uploading';
+        confirmTarget.updated = '2026-09-23 09:12:40';
+    }
+    closeConfirm();
+    renderTable();
+    alert('确认成功：确认价格 ¥' + val.toFixed(2) + '，产品状态更新为「上链中」');
+}
+
+document.getElementById('cfPrice').addEventListener('input', clearConfirmError);
 
 /* ── 右侧功能说明面板：收起 / 展开 ── */
 function toggleFuncPanel() {
