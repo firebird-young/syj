@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的产品 - APP 原型</title>
+    <!-- ① 左侧目录：公用文件引用 -->
+    <link rel="stylesheet" href="asset/admin-sidebar.css">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+
+        :root {
+            --accent:#D62828; --accent-dark:#c41e1e; --accent-soft:#fde8e8;
+            --ink:#1a1a2e; --ink-sub:#4e5a6e; --ink-weak:#86909c;
+            --line:#f0f0f0; --card-radius:14px; --border:#e0e0e0;
+        }
+
+        body {
+            font-family:-apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+            background:#f5f5f7; color:var(--ink); font-size:14px; min-height:100vh;
+            -webkit-font-smoothing:antialiased; -webkit-tap-highlight-color:transparent;
+        }
+
+        .breadcrumb { padding:16px 24px 0; font-size:13px; color:var(--ink-weak); display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+        .breadcrumb a { color:var(--ink-weak); text-decoration:none; }
+        .breadcrumb a:hover { color:var(--accent); }
+        .breadcrumb .sep { margin:0 4px; }
+        .breadcrumb .current { color:var(--ink); font-weight:500; }
+        .bc-tip { font-size:12px; color:var(--ink-weak); }
+
+        .main { padding:16px 24px 40px; display:flex; justify-content:center; align-items:flex-start; }
+        .app-container { width:100%; max-width:430px; flex-shrink:0; height:calc(100vh - 120px); min-height:600px; background:#f5f5f5; border-radius:18px; overflow:hidden; box-shadow:0 10px 34px rgba(30,60,120,.14); display:flex; flex-direction:column; position:relative; }
+        .app-scroll { flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; padding-bottom:16px; }
+        .app-scroll::-webkit-scrollbar { width:4px; }
+        .app-scroll::-webkit-scrollbar-thumb { background:#d8dce3; border-radius:2px; }
+
+        /* 顶部两段：状态栏 + 标题栏 */
+        .page-top { flex-shrink:0; }
+        .status-bar { height:44px; background:#fff; color:var(--ink); display:flex; align-items:center; justify-content:space-between; padding:0 20px; }
+        .status-bar .sb-left { display:flex; align-items:baseline; gap:8px; }
+        .status-bar .sb-time { font-size:15px; font-weight:600; letter-spacing:.3px; }
+        .status-bar .sb-date { font-size:12px; color:#666; }
+        .status-bar .sb-right { display:flex; align-items:center; gap:7px; }
+        .status-bar .sb-signal { display:inline-flex; align-items:flex-end; gap:1.5px; height:11px; }
+        .status-bar .sb-signal i { width:3px; border-radius:1px; background:currentColor; }
+        .status-bar .sb-signal i:nth-child(1) { height:4px; }
+        .status-bar .sb-signal i:nth-child(2) { height:6px; }
+        .status-bar .sb-signal i:nth-child(3) { height:8px; }
+        .status-bar .sb-signal i:nth-child(4) { height:11px; }
+        .status-bar .sb-wifi { width:15px; height:11px; position:relative; display:inline-block; }
+        .status-bar .sb-wifi::before { content:''; position:absolute; left:50%; bottom:0; transform:translateX(-50%); width:5px; height:5px; border-radius:50%; background:currentColor; }
+        .status-bar .sb-wifi::after { content:''; position:absolute; left:50%; bottom:2px; transform:translateX(-50%); width:14px; height:14px; box-sizing:border-box; border-top:2px solid currentColor; border-radius:50%; }
+        .status-bar .sb-batt { width:25px; height:12px; border:1.4px solid currentColor; border-radius:3px; padding:1.5px; position:relative; }
+        .status-bar .sb-batt::after { content:''; position:absolute; right:-3.5px; top:50%; transform:translateY(-50%); width:2px; height:5px; background:currentColor; border-radius:0 1px 1px 0; }
+        .status-bar .sb-batt i { display:block; height:100%; width:78%; background:currentColor; border-radius:1px; }
+
+        .top-nav { height:50px; background:var(--accent); display:flex; align-items:center; padding:0 16px; }
+        .top-nav .back-btn { width:32px; font-size:24px; color:#fff; line-height:1; cursor:pointer; text-align:left; background:none; border:none; font-family:inherit; }
+        .top-nav .top-nav-title { flex:1; text-align:center; font-size:17px; font-weight:600; color:#fff; }
+        .top-nav .right-placeholder { width:32px; }
+
+        /* 产品列表 */
+        .product-list { padding:16px; display:flex; flex-direction:column; gap:12px; }
+        .product-card { background:#fff; border-radius:var(--card-radius); padding:16px; box-shadow:0 4px 16px rgba(0,0,0,.06); cursor:pointer; transition:transform .15s, box-shadow .15s; }
+        .product-card:active { transform:scale(.99); box-shadow:0 2px 10px rgba(0,0,0,.08); }
+        .pc-header { display:flex; gap:12px; align-items:flex-start; }
+        .pc-thumb { width:64px; height:64px; border-radius:10px; overflow:hidden; flex-shrink:0; background:#f5f5f5; border:1px solid var(--border); display:flex; align-items:center; justify-content:center; }
+        .pc-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
+        .pc-thumb .thumb-txt { width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-family:"STKaiti","KaiTi","Songti SC",serif; font-size:22px; color:#fff; }
+        .pc-info { flex:1; min-width:0; }
+        .pc-name { font-size:16px; font-weight:600; color:var(--ink); }
+        .pc-code { margin-top:6px; font-size:13px; color:var(--ink-weak); }
+        .pc-value { margin-top:6px; font-size:13px; color:var(--ink-weak); }
+        .pc-value .view-link { color:var(--accent); margin-left:4px; cursor:pointer; }
+
+        .pc-stats { display:flex; align-items:center; margin:14px 0; background:#f8f9fa; border-radius:10px; padding:12px 0; }
+        .stat { flex:1; text-align:center; }
+        .stat-label { display:block; font-size:12px; color:var(--ink-weak); margin-bottom:4px; }
+        .stat-num { font-size:17px; font-weight:600; color:var(--ink); }
+        .stat-divider { width:1px; height:32px; background:var(--border); }
+
+        .pc-actions { display:flex; justify-content:flex-end; gap:10px; }
+        .btn-outline { font-size:14px; padding:7px 18px; border-radius:9999px; border:1px solid var(--accent); color:var(--accent); background:#fff; cursor:pointer; font-family:inherit; transition:all .2s; }
+        .btn-outline:active { background:var(--accent-soft); }
+
+        /* ③ 右侧功能说明面板 */
+        .func-panel { position:fixed; top:0; right:0; bottom:0; width:340px; z-index:890; background:#fff; border-left:1px solid #e3e6eb; box-shadow:-1px 0 12px rgba(20,30,60,.04); display:flex; flex-direction:column; }
+        .func-panel .fp-inner { display:flex; flex-direction:column; height:100%; min-width:0; }
+        .func-panel .fp-header { display:flex; align-items:center; justify-content:space-between; padding:15px 14px 13px 18px; border-bottom:1px solid #f0f1f4; flex-shrink:0; }
+        .func-panel .fp-title { display:flex; align-items:center; gap:9px; font-size:15px; font-weight:700; color:var(--ink); }
+        .func-panel .fp-title::before { content:''; width:8px; height:8px; border-radius:50%; background:var(--accent); box-shadow:0 0 0 4px rgba(214,40,40,.12); }
+        .func-panel .fp-fold-btn { width:28px; height:28px; border:1px solid var(--border); background:#fff; border-radius:50%; color:var(--ink-weak); font-size:15px; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all .2s; font-family:inherit; }
+        .func-panel .fp-fold-btn:hover { border-color:var(--accent); color:var(--accent); }
+        .func-panel .fp-body { flex:1; overflow-y:auto; padding:18px; font-size:13px; color:#555; line-height:1.9; }
+        .func-panel .fp-body::-webkit-scrollbar { width:5px; }
+        .func-panel .fp-body::-webkit-scrollbar-thumb { background:#d8dce3; border-radius:3px; }
+        .func-panel .fp-open { display:none; position:absolute; top:0; bottom:0; left:0; right:0; border:none; background:transparent; cursor:pointer; writing-mode:vertical-rl; text-orientation:upright; font-size:13px; font-weight:600; letter-spacing:6px; color:var(--ink-weak); align-items:center; justify-content:center; font-family:inherit; transition:all .2s; }
+        .func-panel .fp-open:hover { color:var(--accent); background:#fafbfc; }
+
+        @media (min-width:1024px) {
+            .main, .breadcrumb { margin-right:340px; }
+            body.fp-collapsed .main, body.fp-collapsed .breadcrumb { margin-right:40px; }
+            body.fp-collapsed .func-panel { width:40px; }
+            body.fp-collapsed .fp-inner { display:none; }
+            body.fp-collapsed .fp-open { display:flex; }
+        }
+        @media (max-width:1023.98px) {
+            .func-panel { display:none; }
+            .main, .breadcrumb { margin-right:0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="breadcrumb">
+    <span>
+        <a href="index.html">深艺交原型</a>
+        <span class="sep">&gt;</span>
+        <span>APP 端</span>
+        <span class="sep">&gt;</span>
+        <span class="current">我的产品</span>
+    </span>
+    <span class="bc-tip">参考截图布局，新增「我要售卖」按钮</span>
+</div>
+
+<div class="main">
+    <div class="app-container">
+
+        <div class="page-top">
+            <div class="status-bar">
+                <span class="sb-left">
+                    <span class="sb-time">9:41</span>
+                    <span class="sb-date">9月23日 星期三</span>
+                </span>
+                <span class="sb-right">
+                    <span class="sb-signal"><i></i><i></i><i></i><i></i></span>
+                    <span class="sb-wifi"></span>
+                    <span class="sb-batt"><i></i></span>
+                </span>
+            </div>
+            <div class="top-nav">
+                <button class="back-btn" onclick="goBack()" aria-label="返回">‹</button>
+                <span class="top-nav-title">我的产品</span>
+                <span class="right-placeholder"></span>
+            </div>
+        </div>
+
+        <div class="app-scroll">
+            <div class="product-list" id="productList"></div>
+        </div>
+
+    </div><!-- /app-container -->
+</div><!-- /main -->
+
+<!-- ③ 右侧功能说明面板 -->
+<aside class="func-panel">
+    <div class="fp-inner">
+        <div class="fp-header">
+            <span class="fp-title">功能说明</span>
+            <button class="fp-fold-btn" onclick="toggleFuncPanel()" title="收起">›</button>
+        </div>
+        <div class="fp-body">
+            原功能业务
+        </div>
+    </div>
+    <button class="fp-open" onclick="toggleFuncPanel()" title="展开功能说明">功能说明‹</button>
+</aside>
+
+<!-- ① 左侧目录：公用文件引用 -->
+<script src="asset/admin-sidebar.js"></script>
+
+<script>
+/* ── 右侧功能说明面板：收起 / 展开 ── */
+function toggleFuncPanel() {
+    document.body.classList.toggle('fp-collapsed');
+}
+
+function goBack() {
+    if (history.length > 1) { history.back(); } else { location.href = '我的页面.html'; }
+}
+
+/* ── 产品数据（原型演示） ── */
+var PRODUCTS = [
+    {
+        name:'东坡东坡-测试数据',
+        code:'TS000006',
+        hold:33,
+        sellable:33,
+        thumbType:'text',
+        thumbText:'东坡',
+        thumbBg:'linear-gradient(135deg,#d4af37 0%,#8b6914 100%)'
+    },
+    {
+        name:'永淳·夏日帖',
+        code:'XB000004',
+        hold:1,
+        sellable:1,
+        thumbType:'img',
+        thumbSrc:'../asset/永淳·夏日帖.png'
+    }
+];
+
+function renderProducts() {
+    var listEl = document.getElementById('productList');
+    listEl.innerHTML = PRODUCTS.map(function (p) {
+        var thumb = '';
+        if (p.thumbType === 'img') {
+            thumb = '<img src="' + p.thumbSrc + '" alt="' + p.name + '">';
+        } else {
+            thumb = '<span class="thumb-txt" style="background:' + p.thumbBg + '">' + p.thumbText + '</span>';
+        }
+        return '' +
+        '<div class="product-card" onclick="location.href=\'持有产品详情.html\'">' +
+            '<div class="pc-header">' +
+                '<div class="pc-thumb">' + thumb + '</div>' +
+                '<div class="pc-info">' +
+                    '<div class="pc-name">' + p.name + '</div>' +
+                    '<div class="pc-code">代码 ' + p.code + '</div>' +
+                    '<div class="pc-value">价值数据 <span class="view-link" onclick="event.stopPropagation();alert(\'价值数据弹窗（原型演示）\')">查看</span></div>' +
+                '</div>' +
+            '</div>' +
+            '<div class="pc-stats">' +
+                '<div class="stat">' +
+                    '<span class="stat-label">持有数量</span>' +
+                    '<span class="stat-num">' + p.hold + '</span>' +
+                '</div>' +
+                '<div class="stat-divider"></div>' +
+                '<div class="stat">' +
+                    '<span class="stat-label">可售数量</span>' +
+                    '<span class="stat-num">' + p.sellable + '</span>' +
+                '</div>' +
+            '</div>' +
+            '<div class="pc-actions">' +
+                '<button class="btn-outline" type="button">我要售卖</button>' +
+                '<button class="btn-outline" type="button" onclick="event.stopPropagation();location.href=\'零售市场详情.html\'">查看市场</button>' +
+            '</div>' +
+        '</div>';
+    }).join('');
+}
+
+/* ── 状态栏时间：实时取当前时间 ── */
+(function () {
+    var d = new Date();
+    var hh = String(d.getHours()).padStart(2, '0');
+    var mm = String(d.getMinutes()).padStart(2, '0');
+    var week = ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'][d.getDay()];
+    var t = document.querySelector('.sb-time'), dt = document.querySelector('.sb-date');
+    if (t) { t.textContent = hh + ':' + mm; }
+    if (dt) { dt.textContent = (d.getMonth() + 1) + '月' + d.getDate() + '日 ' + week; }
+})();
+
+renderProducts();
+</script>
+
+</body>
+</html>

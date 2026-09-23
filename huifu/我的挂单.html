@@ -250,8 +250,10 @@
             background: #fafbfc; border: 1px solid #e5e6eb;
             color: var(--ink-weak); font-size: 13px;
             padding: 7px 18px; border-radius: 12px;
-            cursor: default; font-family: inherit;
+            cursor: pointer; font-family: inherit;
         }
+        .btn-gray:hover { border-color: var(--accent); color: var(--accent); }
+        .btn-gray:active { background: #fbe4e0; }
 
         /* 剩余天数 */
         .remain {
@@ -542,7 +544,7 @@
             <ul>
                 <li>每行展示：产品图、产品名称、产品编号、<b>挂单价格</b>（深红突出）、挂单时间</li>
                 <li><b>挂单中</b>：展示剩余挂单天数（黄色标签），可点击「撤销」下架该产品</li>
-                <li><b>已售出</b>：展示成交价（绿色）、成交时间与收取的交易手续费</li>
+                <li><b>已售出</b>：展示成交价（绿色）、成交时间与收取的交易手续费，点击查看订单跳到我的卖单的该订单的详情页</li>
                 <li><b>已下架</b>：展示下架时间，无操作按钮</li>
             </ul>
 
@@ -579,6 +581,20 @@ function goBack() {
     else { location.href = '我的页面.html'; }
 }
 
+/* ── 已售出：查看订单 → 卖单详情（带上该笔卖单数据，原型演示） ── */
+function viewOrder(idx) {
+    var it = items[idx];
+    if (!it) { return; }
+    var q = [
+        'name=' + encodeURIComponent(it.name),
+        'no=' + encodeURIComponent(it.code),
+        'deal=' + fmt(it.deal),
+        'fee=' + fmt(it.fee),
+        'time=' + encodeURIComponent(it.time)
+    ].join('&');
+    location.href = '我的卖单详情.html?' + q;
+}
+
 /* ── 右侧功能说明面板 折叠/展开 ── */
 function togglePanel() {
     document.body.classList.toggle('fp-collapsed');
@@ -589,8 +605,8 @@ var items = [
     { img: '永淳·夏日帖.png', name: '永淳·夏日帖', code: '#0027', status: 'selling', price:  92.00, time: '2026-07-30 14:23', remain: 5 },
     { img: '兰亭序.png',     name: '兰亭序',     code: '#0031', status: 'selling', price: 128.00, time: '2026-08-01 09:15', remain: 9 },
     { img: '永淳·夏日帖.png', name: '永淳·夏日帖', code: '#0029', status: 'selling', price:  88.00, time: '2026-07-25 11:30', remain: 2 },
-    { img: '永淳·夏日帖.png', name: '永淳·夏日帖', code: '#0025', status: 'sold',    price:  98.00, deal:  96.00, fee: 3.46, time: '2026-07-28 16:42' },
-    { img: '山水空灵.png',     name: '山水空灵',     code: '#0012', status: 'sold',    price: 256.00, deal: 250.00, fee: 9.00, time: '2026-07-22 15:30' },
+    { img: '永淳·夏日帖.png', name: '永淳·夏日帖', code: '#0025', status: 'sold',    price:  98.00, deal:  96.00, fee: 1.54, time: '2026-07-28 16:42' },
+    { img: '山水空灵.png',     name: '山水空灵',     code: '#0012', status: 'sold',    price: 256.00, deal: 250.00, fee: 4.00, time: '2026-07-22 15:30' },
     { img: '永淳·夏日帖.png', name: '永淳·夏日帖', code: '#0028', status: 'off',     price: 110.00, time: '2026-07-28 09:45' }
 ];
 var currentTab = 'all';
@@ -651,7 +667,7 @@ function render() {
                 '</div>' +
                 '<div class="sr-right">' +
                     '<span class="status-tag sold">已售出</span>' +
-                    '<span class="btn-gray">查看订单</span>' +
+                    '<span class="btn-gray" onclick="viewOrder(' + idx + ')">查看订单</span>' +
                 '</div>' +
             '</div>';
         } else {

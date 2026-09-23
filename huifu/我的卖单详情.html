@@ -2,279 +2,366 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>卖单详情</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>卖单详情 - APP 原型</title>
+    <!-- ① 左侧目录：公用文件引用（菜单在 asset/admin-sidebar.js 的 MENU 中维护） -->
+    <link rel="stylesheet" href="asset/admin-sidebar.css">
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        html, body { height: 100%; }
+        * { margin:0; padding:0; box-sizing:border-box; }
+
+        /* ===== 主色（沿用本模块移动端红粉调性，全页与右侧说明面板共用变量） ===== */
+        :root {
+            --accent:#e74c5e; --accent-dark:#c45454; --accent-soft:#fbe4e0;
+            --ink:#1a1a2e; --ink-sub:#4e5a6e; --ink-weak:#86909c;
+            --line:#f0f0f0; --card-radius:14px; --border:#e0e0e0;
+            --ok:#1aab67; --ok-bg:#e6f7eb; --link:#1a78ff;
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", "Microsoft YaHei", sans-serif;
-            background: #e9eaec;
-            color: #1a1a2e;
-            font-size: 14px;
-            line-height: 1.5;
-            -webkit-font-smoothing: antialiased;
-        }
-        .page-wrap {
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            gap: 36px;
-            padding: 24px 20px;
-            min-height: 100vh;
-        }
-        .app {
-            width: 375px;
-            flex-shrink: 0;
-            background: #f2f3f5;
-            border-radius: 24px;
-            box-shadow: 0 4px 24px rgba(0, 0, 0, .10);
-            overflow: hidden;
+            font-family:-apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+            background:#f5f5f7; color:var(--ink); font-size:14px; min-height:100vh;
+            -webkit-font-smoothing:antialiased; -webkit-tap-highlight-color:transparent;
         }
 
-        /* iOS 状态栏 */
-        .status-bar {
-            height: 44px; padding: 0 22px 0 24px;
-            display: flex; align-items: center; justify-content: space-between;
-            font-size: 15px; font-weight: 600;
-            color: #1a1a2e;
-        }
-        .status-bar .right { display: flex; align-items: center; gap: 5px; }
-        .status-bar svg { display: block; }
-        .battery {
-            display: inline-block; border: 1px solid #1a1a2e; border-radius: 3px;
-            padding: 1px 3px; font-size: 11px; font-weight: 500;
-            position: relative; line-height: 1;
-        }
-        .battery::after {
-            content: ''; position: absolute; right: -3px; top: 50%;
-            transform: translateY(-50%);
-            width: 2px; height: 6px; background: #1a1a2e; border-radius: 0 1px 1px 0;
-        }
+        /* ===== ② 中间原型内容：面包屑 + 手机原型容器 ===== */
+        .breadcrumb { padding:16px 24px 0; font-size:13px; color:var(--ink-weak); display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+        .breadcrumb a { color:var(--ink-weak); text-decoration:none; }
+        .breadcrumb a:hover { color:var(--accent); }
+        .breadcrumb .sep { margin:0 4px; }
+        .breadcrumb .current { color:var(--ink); font-weight:500; }
+        .bc-tip { font-size:12px; color:var(--ink-weak); }
+        .bc-tip b { color:var(--ink-sub); }
 
-        /* 顶部导航 */
-        .nav {
-            height: 44px;
-            display: flex; align-items: center; justify-content: center;
-            position: relative;
-            background: #f2f3f5;
-        }
-        .nav .back {
-            position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
-            width: 32px; height: 32px;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer;
-        }
-        .nav .title { font-size: 17px; font-weight: 600; color: #1a1a2e; }
+        .main { padding:16px 24px 40px; display:flex; justify-content:center; align-items:flex-start; }
 
-        /* 卡片 */
-        .card {
-            background: #fff;
-            margin: 8px 12px 16px;
-            border-radius: 8px;
-            padding: 16px;
-        }
-        /* 头部产品 */
-        .prod-head { display: flex; align-items: center; gap: 12px; padding-bottom: 16px; border-bottom: 1px solid #f0f0f0; }
-        .prod-img {
-            width: 64px; height: 64px; border-radius: 4px;
-            background:
-                linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(0,0,0,0.18) 100%),
-                linear-gradient(135deg, #d4c4a8 0%, #b59b76 50%, #8b7355 100%);
-            position: relative; flex-shrink: 0;
-            display: flex; align-items: center; justify-content: center;
-            overflow: hidden;
-        }
-        .prod-img::before {
-            content: "永 淳";
-            writing-mode: vertical-rl;
-            text-orientation: upright;
-            font-family: "STKaiti", "KaiTi", "Songti SC", serif;
-            font-size: 13px;
-            color: rgba(255,255,255,0.85);
-            letter-spacing: 4px;
-            line-height: 1.2;
-        }
-        .prod-img::after {
-            content: "";
-            position: absolute; right: 6px; top: 6px; bottom: 6px;
-            border-right: 1px solid rgba(255,255,255,0.25);
-        }
-        .prod-info { flex: 1; min-width: 0; }
-        .prod-name { font-size: 15px; font-weight: 600; color: #1a1a2e; margin-bottom: 6px; }
-        .prod-id { font-size: 12px; color: #8a8f99; margin-bottom: 2px; }
-        .prod-qty { font-size: 12px; color: #8a8f99; }
-        .prod-right { text-align: right; flex-shrink: 0; }
-        .status-pill {
-            display: inline-block;
-            background: #e8f5ec; color: #16a34a;
-            font-size: 12px; padding: 2px 8px; border-radius: 4px;
-            margin-bottom: 8px;
-        }
-        .prod-price { font-size: 17px; font-weight: 600; color: #1a1a2e; }
+        /* 手机页面容器：固定屏高 + 内部滚动（430px） */
+        .app-container { width:100%; max-width:430px; flex-shrink:0; height:calc(100vh - 120px); min-height:600px; background:#f5f5f5; border-radius:18px; overflow:hidden; box-shadow:0 10px 34px rgba(30,60,120,.14); display:flex; flex-direction:column; position:relative; }
+        .app-scroll { flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; padding-bottom:16px; }
+        .app-scroll::-webkit-scrollbar { width:4px; }
+        .app-scroll::-webkit-scrollbar-thumb { background:#d8dce3; border-radius:2px; }
 
-        /* 列表项 */
-        .row {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 12px 0;
-            font-size: 14px;
-        }
-        .row .label { color: #8a8f99; flex-shrink: 0; }
-        .row .value { color: #1a1a2e; text-align: right; max-width: 65%; word-break: break-all; }
-        .row .value.price { font-weight: 600; }
-        .row .value.link { color: #3b82f6; }
-        .row + .row { border-top: 1px solid #f5f5f7; }
+        /* 顶部两段：状态栏 + 标题栏 */
+        .page-top { flex-shrink:0; }
+        .status-bar { height:44px; background:#fff; color:var(--ink); display:flex; align-items:center; justify-content:space-between; padding:0 20px; }
+        .status-bar .sb-left { display:flex; align-items:baseline; gap:8px; }
+        .status-bar .sb-time { font-size:15px; font-weight:600; letter-spacing:.3px; }
+        .status-bar .sb-date { font-size:12px; color:#666; }
+        .status-bar .sb-right { display:flex; align-items:center; gap:7px; }
+        .status-bar .sb-signal { display:inline-flex; align-items:flex-end; gap:1.5px; height:11px; }
+        .status-bar .sb-signal i { width:3px; border-radius:1px; background:currentColor; }
+        .status-bar .sb-signal i:nth-child(1) { height:4px; }
+        .status-bar .sb-signal i:nth-child(2) { height:6px; }
+        .status-bar .sb-signal i:nth-child(3) { height:8px; }
+        .status-bar .sb-signal i:nth-child(4) { height:11px; }
+        .status-bar .sb-wifi { width:15px; height:11px; position:relative; display:inline-block; }
+        .status-bar .sb-wifi::before { content:''; position:absolute; left:50%; bottom:0; transform:translateX(-50%); width:5px; height:5px; border-radius:50%; background:currentColor; }
+        .status-bar .sb-wifi::after { content:''; position:absolute; left:50%; bottom:2px; transform:translateX(-50%); width:14px; height:14px; box-sizing:border-box; border-top:2px solid currentColor; border-radius:50%; }
+        .status-bar .sb-batt { width:25px; height:12px; border:1.4px solid currentColor; border-radius:3px; padding:1.5px; position:relative; }
+        .status-bar .sb-batt::after { content:''; position:absolute; right:-3.5px; top:50%; transform:translateY(-50%); width:2px; height:5px; background:currentColor; border-radius:0 1px 1px 0; }
+        .status-bar .sb-batt i { display:block; height:100%; width:78%; background:currentColor; border-radius:1px; }
 
-        /* ── 功能说明面板 ── */
-        .doc-panel {
-            width: 560px;
-            background: #fff;
-            border-radius: 16px;
-            box-shadow: 0 2px 20px rgba(0, 0, 0, .08);
-            padding: 24px 28px;
-            max-height: calc(100vh - 40px);
-            overflow-y: auto;
-            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', Arial, sans-serif;
-            line-height: 1.7;
-            font-size: 14px;
-            color: #333;
+        .top-nav { height:50px; background:linear-gradient(135deg, var(--accent), var(--accent-dark)); display:flex; align-items:center; padding:0 16px; }
+        .top-nav .back-btn { width:32px; font-size:24px; color:#fff; line-height:1; cursor:pointer; text-align:left; background:none; border:none; font-family:inherit; }
+        .top-nav .top-nav-title { flex:1; text-align:center; font-size:17px; font-weight:600; color:#fff; }
+        .top-nav .right-placeholder { width:32px; }
+
+        /* ===== 商品信息卡片 ===== */
+        .order-card { background:#fff; border-radius:var(--card-radius); margin:12px 16px 0; padding:14px 16px; box-shadow:0 4px 16px rgba(0,0,0,.06); }
+        .product-top { display:flex; gap:12px; }
+        .product-img { width:76px; height:76px; border-radius:8px; background:linear-gradient(135deg,#d4c4a8 0%,#8b7355 100%); flex-shrink:0; display:flex; align-items:center; justify-content:center; font-family:"STKaiti","KaiTi","Songti SC",serif; font-size:20px; color:rgba(255,255,255,.92); letter-spacing:2px; }
+        .product-info { flex:1; min-width:0; position:relative; }
+        .product-name { font-size:15px; font-weight:600; color:var(--ink); padding-right:64px; }
+        .product-code { font-size:12px; color:var(--ink-weak); margin-top:6px; }
+        .status-tag { position:absolute; top:0; right:0; background:var(--ok-bg); color:var(--ok); font-size:12px; padding:3px 10px; border-radius:4px; font-weight:500; }
+        .product-price { margin-top:10px; font-size:15px; font-weight:600; color:var(--accent); }
+
+        /* ===== 卡片内分组 ===== */
+        .sec-title { display:flex; align-items:center; gap:7px; font-size:13px; font-weight:600; color:var(--ink); padding:14px 0 2px; }
+        .sec-title::before { content:''; width:3px; height:12px; border-radius:2px; background:var(--accent); }
+        .divider { height:1px; background:var(--line); margin:12px 0 0; }
+
+        .info-row { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:10px 0; font-size:13px; }
+        .info-row:last-child { padding-bottom:2px; }
+        .info-label { color:#6b7588; flex-shrink:0; }
+        .info-value { color:var(--ink); font-weight:500; text-align:right; word-break:break-all; }
+        .info-value.price-red { color:var(--accent); font-weight:600; font-size:15px; }
+        .info-value .link { color:var(--link); cursor:pointer; font-weight:500; }
+        .info-value .code-chip { display:inline-block; background:var(--accent-soft); color:var(--accent); border-radius:4px; padding:1px 7px; font-size:12px; font-weight:600; }
+
+        /* 金额合计条 */
+        .total-bar { display:flex; align-items:baseline; justify-content:space-between; background:var(--accent-soft); border-radius:10px; padding:12px 14px; margin:12px 16px 0; }
+        .total-bar .tb-label { font-size:13px; color:var(--ink-sub); }
+        .total-bar .tb-value { font-size:18px; font-weight:700; color:var(--accent); }
+
+        /* 轻提示（z-index 高于目录栏 900 / 说明面板 890） */
+        .toast { position:fixed; top:70px; left:50%; transform:translateX(-50%) translateY(-14px); background:rgba(26,26,46,.92); color:#fff; padding:9px 20px; border-radius:9999px; font-size:13px; max-width:70vw; opacity:0; pointer-events:none; transition:all .25s; z-index:9999; }
+        .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+        /* ===== ③ 右侧功能说明面板（配色复用页面变量） ===== */
+        .func-panel { position:fixed; top:0; right:0; bottom:0; width:340px; z-index:890; background:#fff; border-left:1px solid #e3e6eb; box-shadow:-1px 0 12px rgba(20,30,60,.04); display:flex; flex-direction:column; }
+        .func-panel .fp-inner { display:flex; flex-direction:column; height:100%; min-width:0; }
+        .func-panel .fp-header { display:flex; align-items:center; justify-content:space-between; padding:15px 14px 13px 18px; border-bottom:1px solid #f0f1f4; flex-shrink:0; }
+        .func-panel .fp-title { display:flex; align-items:center; gap:9px; font-size:15px; font-weight:700; color:var(--ink); }
+        .func-panel .fp-title::before { content:''; width:8px; height:8px; border-radius:50%; background:var(--accent); box-shadow:0 0 0 4px rgba(231,76,94,.14); }
+        .func-panel .fp-fold-btn { width:28px; height:28px; border:1px solid var(--border); background:#fff; border-radius:50%; color:var(--ink-weak); font-size:15px; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all .2s; font-family:inherit; }
+        .func-panel .fp-fold-btn:hover { border-color:var(--accent); color:var(--accent); }
+        .func-panel .fp-body { flex:1; overflow-y:auto; padding:4px 18px 40px; font-size:13px; color:#555; line-height:1.9; }
+        .func-panel .fp-body::-webkit-scrollbar { width:5px; }
+        .func-panel .fp-body::-webkit-scrollbar-thumb { background:#d8dce3; border-radius:3px; }
+        .func-panel .fp-body h4 { font-size:14px; font-weight:600; color:var(--ink); margin:18px 0 6px; }
+        .func-panel .fp-body h4:first-child { margin-top:12px; }
+        .func-panel .fp-body ul { padding-left:18px; margin:0 0 8px; }
+        .func-panel .fp-body li { margin-bottom:6px; }
+        .func-panel .fp-body strong { color:#333; }
+        .func-panel .fp-body .demo-box { background:#fafbfc; border:1px solid #eef1f5; border-radius:10px; padding:10px 12px; margin:6px 0 8px; font-size:12.5px; line-height:1.85; }
+        .func-panel .fp-body .demo-box em { font-style:normal; color:var(--accent); font-weight:700; }
+        .func-panel .fp-open { display:none; position:absolute; top:0; bottom:0; left:0; right:0; border:none; background:transparent; cursor:pointer; writing-mode:vertical-rl; text-orientation:upright; font-size:13px; font-weight:600; letter-spacing:6px; color:var(--ink-weak); align-items:center; justify-content:center; font-family:inherit; transition:all .2s; }
+        .func-panel .fp-open:hover { color:var(--accent); background:#fafbfc; }
+
+        @media (min-width:1024px) {
+            .main, .breadcrumb { margin-right:340px; }
+            body.fp-collapsed .main, body.fp-collapsed .breadcrumb { margin-right:40px; }
+            body.fp-collapsed .func-panel { width:40px; }
+            body.fp-collapsed .fp-inner { display:none; }
+            body.fp-collapsed .fp-open { display:flex; }
         }
-        .doc-panel::-webkit-scrollbar { width: 5px; }
-        .doc-panel::-webkit-scrollbar-thumb { background: #d0d5e0; border-radius: 3px; }
-        .doc-panel .doc-title {
-            font-size: 20px;
-            font-weight: 700;
-            color: #1F3864;
-            border-bottom: 2px solid #2E75B6;
-            padding-bottom: 10px;
-            margin-bottom: 16px;
+        @media (max-width:1023.98px) {
+            .func-panel { display:none; }
+            .main, .breadcrumb { margin-right:0; }
         }
-        .doc-panel h3 { font-size: 16px; font-weight: 600; color: #2E75B6; margin: 16px 0 8px; }
-        .doc-panel p { font-size: 13px; color: #555; margin-bottom: 6px; }
-        .doc-panel ul { padding-left: 20px; margin: 4px 0 8px; }
-        .doc-panel li { margin-bottom: 3px; font-size: 13px; color: #555; }
-        @media (max-width: 1100px) {
-            .page-wrap { flex-direction: column; align-items: center; }
-            .doc-panel { width: 100%; max-width: 375px; max-height: none; }
+        /* 真机宽度：手机页铺满 */
+        @media (max-width:540px) {
+            .main { padding:12px 0 32px; }
+            .breadcrumb { padding:12px 16px 0; }
+            .app-container { border-radius:0; box-shadow:none; height:100vh; min-height:100vh; }
         }
     </style>
 </head>
 <body>
-<div class="page-wrap">
 
-    <!-- 手机原型 -->
-    <div class="app">
+<!-- ② 中间原型内容：面包屑 + 手机页面 -->
+<div class="breadcrumb">
+    <span>
+        <a href="index.html">首页</a>
+        <span class="sep">&gt;</span>
+        <span>APP 端</span>
+        <span class="sep">&gt;</span>
+        <span class="current">卖单详情</span>
+    </span>
+    <span class="bc-tip">卖单状态：<b>已成交</b>（原型演示数据）</span>
+</div>
 
-    <!-- iOS 状态栏 -->
-    <div class="status-bar">
-        <span>10:00</span>
-        <div class="right">
-            <svg width="16" height="11" viewBox="0 0 16 11">
-                <rect x="0" y="7" width="3" height="4" fill="#1a1a2e" rx="0.5"/>
-                <rect x="4.5" y="5" width="3" height="6" fill="#1a1a2e" rx="0.5"/>
-                <rect x="9" y="2.5" width="3" height="8.5" fill="#1a1a2e" rx="0.5"/>
-                <rect x="13.5" y="0" width="3" height="11" fill="#1a1a2e" rx="0.5"/>
-            </svg>
-            <svg width="16" height="11" viewBox="0 0 16 11">
-                <path d="M8 1.5C5.4 1.5 3 2.7 1 4.6l1.4 1.4C4 4.5 5.9 3.5 8 3.5s4 1 5.6 2.5L15 4.6C13 2.7 10.6 1.5 8 1.5z" fill="#1a1a2e"/>
-                <path d="M8 4.8c-1.7 0-3.3.6-4.5 1.7L5 8c.8-.7 1.9-1.2 3-1.2s2.2.5 3 1.2l1.5-1.5C11.3 5.4 9.7 4.8 8 4.8z" fill="#1a1a2e"/>
-                <path d="M8 8.2c-.7 0-1.4.3-1.9.7L8 11l1.9-2.1c-.5-.4-1.2-.7-1.9-.7z" fill="#1a1a2e"/>
-            </svg>
-            <svg width="16" height="11" viewBox="0 0 16 11">
-                <path d="M1 5.5C2.7 3.9 5.2 3 8 3s5.3.9 7 2.5l-1 1C12.5 5.1 10.3 4.3 8 4.3S3.5 5.1 2 6.5l-1-1z" fill="#1a1a2e"/>
-            </svg>
-            <span class="battery">29</span>
-        </div>
-    </div>
+<div class="main">
+    <div class="app-container">
 
-    <!-- 顶部导航 -->
-    <div class="nav">
-        <div class="back" onclick="history.back()">
-            <svg width="11" height="18" viewBox="0 0 11 18" fill="none">
-                <path d="M10 1L1 9l9 8" stroke="#1a1a2e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-        </div>
-        <div class="title">卖单详情</div>
-    </div>
-
-    <!-- 详情卡片 -->
-    <div class="card">
-        <!-- 头部产品信息 -->
-        <div class="prod-head">
-            <div class="prod-img"></div>
-            <div class="prod-info">
-                <div class="prod-name">永淳·夏日帖</div>
-                <div class="prod-id">XB000004</div>
-                <div class="prod-qty">x1</div>
+        <!-- 顶部两段：状态栏 + 标题栏 -->
+        <div class="page-top">
+            <div class="status-bar">
+                <span class="sb-left">
+                    <span class="sb-time">9:41</span>
+                    <span class="sb-date">9月22日 星期二</span>
+                </span>
+                <span class="sb-right">
+                    <span class="sb-signal"><i></i><i></i><i></i><i></i></span>
+                    <span class="sb-wifi"></span>
+                    <span class="sb-batt"><i></i></span>
+                </span>
             </div>
-            <div class="prod-right">
-                <div class="status-pill">已成交</div>
-                <div class="prod-price">¥70.00</div>
+            <div class="top-nav">
+                <button class="back-btn" onclick="goBack()" aria-label="返回">‹</button>
+                <span class="top-nav-title">卖单详情</span>
+                <span class="right-placeholder"></span>
             </div>
         </div>
 
-        <!-- 详情字段 -->
-        <div class="row">
-            <div class="label">实际到手</div>
-            <div class="value price">¥67.48</div>
+        <div class="app-scroll">
+
+            <!-- 商品信息 -->
+            <div class="order-card">
+                <div class="product-top">
+                    <div class="product-img" id="prodImg">永</div>
+                    <div class="product-info">
+                        <div class="product-name" id="prodName">永淳·夏日帖</div>
+                        <div class="product-code">产品编码 XB000004</div>
+                        <span class="status-tag">已成交</span>
+                        <div class="product-price"><span id="prodPrice">¥70.00</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 交易信息 -->
+            <div class="order-card">
+                <div class="sec-title">交易信息</div>
+                <div class="divider"></div>
+                <div class="info-row">
+                    <span class="info-label">成交价</span>
+                    <span class="info-value price-red" id="dealPrice">¥70.00</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">成交数量</span>
+                    <span class="info-value">1</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">交易手续费</span>
+                    <span class="info-value" id="feeValue">¥1.12</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">交易方</span>
+                    <span class="info-value">••••••2980</span>
+                </div>
+            </div>
+
+            <!-- 实际到手 -->
+            <div class="total-bar">
+                <span class="tb-label">实际到手</span>
+                <span class="tb-value" id="incomeValue">¥68.88</span>
+            </div>
+
+            <!-- 支付信息 -->
+            <div class="order-card">
+                <div class="sec-title">支付信息</div>
+                <div class="divider"></div>
+                <div class="info-row">
+                    <span class="info-label">创建时间</span>
+                    <span class="info-value" id="createTime">2025-11-14 10:31:01</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">支付时间</span>
+                    <span class="info-value" id="payTime">2025-11-14 10:31:08</span>
+                </div>
+            </div>
+
+            <!-- 订单信息 -->
+            <div class="order-card">
+                <div class="sec-title">订单信息</div>
+                <div class="divider"></div>
+                <div class="info-row">
+                    <span class="info-label">订单编号</span>
+                    <span class="info-value">XB-sell25111403786001</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">产品交割单</span>
+                    <span class="info-value"><span class="link" onclick="showToast('查看产品交割单（原型演示）')">查看</span></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">产品编号</span>
+                    <span class="info-value"><span class="code-chip" id="prodNo">#0002</span></span>
+                </div>
+            </div>
+
+        </div><!-- /app-scroll -->
+
+    </div><!-- /app-container -->
+</div><!-- /main -->
+
+<!-- ③ 右侧功能说明面板 -->
+<aside class="func-panel">
+    <div class="fp-inner">
+        <div class="fp-header">
+            <span class="fp-title">功能说明</span>
+            <button class="fp-fold-btn" onclick="toggleFuncPanel()" title="收起功能说明">›</button>
         </div>
-        <div class="row">
-            <div class="label">成交数量</div>
-            <div class="value">1</div>
-        </div>
-        <div class="row">
-            <div class="label">交易手续费</div>
-            <div class="value">¥2.52</div>
-        </div>
-        <div class="row">
-            <div class="label">交易方</div>
-            <div class="value">******2980</div>
-        </div>
-        <div class="row">
-            <div class="label">创建时间</div>
-            <div class="value">2025-11-14 10:31:01</div>
-        </div>
-        <div class="row">
-            <div class="label">支付时间</div>
-            <div class="value">2025-11-14 10:31:08</div>
-        </div>
-        <div class="row">
-            <div class="label">订单编号</div>
-            <div class="value">XB-sell25111403786001</div>
-        </div>
-        <div class="row">
-            <div class="label">产品交割单</div>
-            <div class="value link">查看</div>
-        </div>
-        <div class="row">
-            <div class="label">产品编号</div>
-            <div class="value">#0002</div>
+        <div class="fp-body">
+
+            <h4>1、交易手续费</h4>
+            <ul>
+                <li>每笔卖单仅收取一笔<strong>交易手续费</strong>，不再另行展示/收取第三方支付费用</li>
+                <li><strong>计算方式</strong>：手续费 = 成交价 × 成交数量 × <strong>1.6%</strong></li>
+                <li>详情以独立<strong>「实际到手」</strong>金额条展示：实际到手 = 成交总价 − 交易手续费</li>
+            </ul>
+            <div class="demo-box">
+                示例：¥70.00 × 1 × 1.6% = <em>¥1.12</em><br>
+                实际到手：¥70.00 − ¥1.12 = <em>¥68.88</em>
+            </div>
+
+            <h4>2、产品编号</h4>
+            <ul>
+                <li>页面底部展示该笔卖单对应的<strong>产品编号</strong>（如 #0002），用于卖单与产品维度的追溯、对账</li>
+                <li>零售市场<strong>一份一份成交</strong>，一笔卖单只对应<strong>一个产品编号</strong>，提货时按此编号出库</li>
+            </ul>
+
+            <h4>3、原型说明</h4>
+            <ul>
+                <li>顶部状态栏、标题栏为移动端公用骨架，返回按钮回上一页</li>
+                <li>商品名称、编码、成交价、时间等均按<strong>成交时的订单快照</strong>展示，不随产品后续变更</li>
+                <li>「产品交割单」为<strong>文字链接</strong>（位于产品编号上方），不做成按钮；点击为原型演示，给出轻提示</li>
+            </ul>
+
         </div>
     </div>
-</div>
+    <button class="fp-open" onclick="toggleFuncPanel()" title="展开功能说明">功能说明‹</button>
+</aside>
 
-    <!-- 功能说明面板（常驻展示） -->
-    <div class="doc-panel">
-        <div class="doc-title">卖单详情 - 功能说明</div>
-        <div class="doc-section">
-            <h3>1. 交易手续费</h3>
-            <p>交易手续费按照成交总价的 <b>3.6%</b> 计算并扣除。</p>
-            <ul>
-                <li><b>计算方式</b>：成交价 × 成交数量 × 3.6%</li>
-                <li><b>示例</b>：¥70.00 × 1 × 3.6% = ¥2.52</li>
-                <li><b>实际到手</b>：成交总价 − 交易手续费，本页示例为 ¥67.48</li>
-            </ul>
-        </div>
-        <div class="doc-section">
-            <h3>2. 新增产品编号</h3>
-            <p>页面底部新增「产品编号」字段，用于标识该笔卖单关联的产品编号。</p>
-            <ul>
-                <li><b>展示内容</b>：产品编号 #0002</li>
-                <li><b>作用</b>：便于卖单与产品维度的追溯、对账</li>
-            </ul>
-        </div>
-    </div>
+<div class="toast" id="toast"></div>
 
-</div>
+<!-- ① 左侧目录：公用文件引用 -->
+<script src="asset/admin-sidebar.js"></script>
+
+<script>
+/* ── 右侧功能说明面板：收起 / 展开 ── */
+function toggleFuncPanel() {
+    document.body.classList.toggle('fp-collapsed');
+}
+
+/* ── 轻提示 ── */
+var toastTimer;
+function showToast(msg) {
+    var el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { el.classList.remove('show'); }, 2000);
+}
+
+function goBack() {
+    if (history.length > 1) { history.back(); } else { location.href = '我的卖单列表.html'; }
+}
+
+/* 从「我的卖单 / 我的挂单」点进来的卖单数据回填（原型演示） */
+(function () {
+    var q = new URLSearchParams(location.search);
+    function setText(id, val) {
+        var el = document.getElementById(id);
+        if (el && val) { el.textContent = val; }
+    }
+    function money(v) { return '¥' + Number(v).toFixed(2); }
+
+    var name = q.get('name');
+    if (name) {
+        setText('prodName', name);
+        var imgEl = document.getElementById('prodImg');
+        if (imgEl) { imgEl.textContent = (name.split('·').pop() || name).slice(0, 1); }
+    }
+
+    var no = q.get('no');
+    if (no) { setText('prodNo', no.charAt(0) === '#' ? no : '#' + no); }
+
+    var time = q.get('time');
+    if (time) {
+        setText('createTime', time + ':01');
+        setText('payTime', time + ':08');
+    }
+
+    var deal = q.get('deal'), fee = q.get('fee');
+    if (deal) {
+        setText('prodPrice', money(deal));
+        setText('dealPrice', money(deal));
+    }
+    if (fee) { setText('feeValue', money(fee)); }
+    if (deal && fee) { setText('incomeValue', money(Number(deal) - Number(fee))); }
+})();
+
+/* 状态栏时间：实时取当前时间 */
+(function () {
+    var d = new Date();
+    var hh = String(d.getHours()).padStart(2, '0');
+    var mm = String(d.getMinutes()).padStart(2, '0');
+    var week = ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'][d.getDay()];
+    var t = document.querySelector('.sb-time'), dt = document.querySelector('.sb-date');
+    if (t) { t.textContent = hh + ':' + mm; }
+    if (dt) { dt.textContent = (d.getMonth() + 1) + '月' + d.getDate() + '日 ' + week; }
+})();
+</script>
+
 </body>
 </html>

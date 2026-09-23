@@ -3,279 +3,305 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>所有奖励</title>
+    <title>奖励列表 - APP 原型</title>
+    <!-- ① 左侧目录：公用文件引用（菜单在 asset/admin-sidebar.js 的 MENU 中维护） -->
+    <link rel="stylesheet" href="asset/admin-sidebar.css">
     <style>
         * { margin:0; padding:0; box-sizing:border-box; }
+
+        /* ===== 主色（沿用本模块移动端红粉调性，全页与右侧说明面板共用变量） ===== */
+        :root {
+            --accent:#e74c5e; --accent-dark:#c45454; --accent-soft:#fbe4e0;
+            --ink:#1a1a2e; --ink-sub:#4e5a6e; --ink-weak:#86909c;
+            --line:#f0f0f0; --card-radius:14px; --border:#e0e0e0;
+            --ok:#1aab67; --ok-bg:#e6f7eb; --warn:#e67e22; --warn-bg:#fff7e6;
+            --badge:#ff2d55;
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
-            background: #f0f2f5;
-            color: #1a1a2e;
-            font-size: 14px;
-            min-height: 100vh;
+            font-family:-apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+            background:#f5f5f7; color:var(--ink); font-size:14px; min-height:100vh;
+            -webkit-font-smoothing:antialiased; -webkit-tap-highlight-color:transparent;
         }
 
-        .app-container {
-            max-width: 430px;
-            margin: 0 auto;
-            background: #f5f5f5;
-            min-height: 100vh;
-            position: relative;
-            padding-bottom: 40px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.06);
-        }
+        /* ===== ② 中间原型内容：面包屑 + 手机原型容器 ===== */
+        .breadcrumb { padding:16px 24px 0; font-size:13px; color:var(--ink-weak); display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+        .breadcrumb a { color:var(--ink-weak); text-decoration:none; }
+        .breadcrumb a:hover { color:var(--accent); }
+        .breadcrumb .sep { margin:0 4px; }
+        .breadcrumb .current { color:var(--ink); font-weight:500; }
+        .bc-tip { font-size:12px; color:var(--ink-weak); }
+        .bc-tip b { color:var(--ink-sub); }
 
-        /* 顶部导航 */
-        .header {
-            background: #ffd9d6;
-            height: 56px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            font-size: 16px;
-            font-weight: 500;
-            color: #1a1a2e;
-        }
-        .header .back {
-            position: absolute;
-            left: 14px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 20px;
-            color: #1a1a2e;
-            cursor: pointer;
-            padding: 4px 8px;
-        }
+        .main { padding:16px 24px 40px; display:flex; justify-content:center; align-items:flex-start; }
 
-        /* 我的奖励 */
-        .reward-card {
-            background: #fff;
-            margin: 12px 12px 0;
-            border-radius: 10px;
-            padding: 16px 16px;
-        }
-        .reward-title {
-            font-size: 15px;
-            font-weight: 600;
-            color: #1a1a2e;
-            margin-bottom: 14px;
-        }
-        .reward-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-        }
-        .reward-item {
-            text-align: center;
-        }
-        .reward-amount {
-            font-size: 22px;
-            font-weight: 700;
-            color: #1a1a2e;
-            margin-bottom: 4px;
-        }
-        .reward-label {
-            font-size: 12px;
-            color: #86909c;
-        }
+        /* 手机页面容器：固定屏高 + 内部滚动（430px） */
+        .app-container { width:100%; max-width:430px; flex-shrink:0; height:calc(100vh - 120px); min-height:600px; background:#f5f5f5; border-radius:18px; overflow:hidden; box-shadow:0 10px 34px rgba(30,60,120,.14); display:flex; flex-direction:column; position:relative; }
+        .app-scroll { flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; padding-bottom:20px; }
+        .app-scroll::-webkit-scrollbar { width:4px; }
+        .app-scroll::-webkit-scrollbar-thumb { background:#d8dce3; border-radius:2px; }
 
-        /* 收益明细 */
-        .detail-card {
-            background: #fff;
-            margin: 12px 12px 0;
-            border-radius: 10px;
-            padding: 16px;
-        }
-        .detail-title {
-            font-size: 15px;
-            font-weight: 600;
-            color: #1a1a2e;
-            margin-bottom: 14px;
-        }
-        .detail-list .detail-item {
-            position: relative;
-            padding: 12px 0;
-            border-bottom: 1px solid #f5f5f7;
-        }
-        .detail-list .detail-item:last-child { border-bottom: none; }
-        .detail-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 4px;
-        }
-        .detail-name {
-            font-size: 14px;
-            font-weight: 500;
-            color: #1a1a2e;
-        }
-        .detail-amount {
-            font-size: 14px;
-            font-weight: 600;
-            color: #e67e22;
-        }
-        .detail-amount .coin {
-            color: #e67e22;
-            margin-right: 4px;
-        }
-        .detail-sub {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 12px;
-            color: #86909c;
-        }
-        .detail-time { color: #86909c; }
-        .detail-status {
-            color: #1aab67;
-            font-size: 12px;
-        }
+        /* 顶部两段：状态栏 + 标题栏 */
+        .page-top { flex-shrink:0; }
+        .status-bar { height:44px; background:#fff; color:var(--ink); display:flex; align-items:center; justify-content:space-between; padding:0 20px; }
+        .status-bar .sb-left { display:flex; align-items:baseline; gap:8px; }
+        .status-bar .sb-time { font-size:15px; font-weight:600; letter-spacing:.3px; }
+        .status-bar .sb-date { font-size:12px; color:#666; }
+        .status-bar .sb-right { display:flex; align-items:center; gap:7px; }
+        .status-bar .sb-signal { display:inline-flex; align-items:flex-end; gap:1.5px; height:11px; }
+        .status-bar .sb-signal i { width:3px; border-radius:1px; background:currentColor; }
+        .status-bar .sb-signal i:nth-child(1) { height:4px; }
+        .status-bar .sb-signal i:nth-child(2) { height:6px; }
+        .status-bar .sb-signal i:nth-child(3) { height:8px; }
+        .status-bar .sb-signal i:nth-child(4) { height:11px; }
+        .status-bar .sb-wifi { width:15px; height:11px; position:relative; display:inline-block; }
+        .status-bar .sb-wifi::before { content:''; position:absolute; left:50%; bottom:0; transform:translateX(-50%); width:5px; height:5px; border-radius:50%; background:currentColor; }
+        .status-bar .sb-wifi::after { content:''; position:absolute; left:50%; bottom:2px; transform:translateX(-50%); width:14px; height:14px; box-sizing:border-box; border-top:2px solid currentColor; border-radius:50%; }
+        .status-bar .sb-batt { width:25px; height:12px; border:1.4px solid currentColor; border-radius:3px; padding:1.5px; position:relative; }
+        .status-bar .sb-batt::after { content:''; position:absolute; right:-3.5px; top:50%; transform:translateY(-50%); width:2px; height:5px; background:currentColor; border-radius:0 1px 1px 0; }
+        .status-bar .sb-batt i { display:block; height:100%; width:78%; background:currentColor; border-radius:1px; }
 
-        /* 标注圆点 */
-        .badge {
-            display: inline-block;
-            min-width: 18px;
-            height: 18px;
-            padding: 0 5px;
-            border-radius: 50%;
-            background: #ff2d55;
-            color: #fff;
-            font-size: 12px;
-            line-height: 18px;
-            text-align: center;
-            font-weight: 600;
-            box-shadow: 0 1px 3px rgba(255,45,85,0.3);
-        }
-        .badge.sm {
-            min-width: 16px;
-            height: 16px;
-            font-size: 11px;
-            line-height: 16px;
-        }
+        .top-nav { height:50px; background:linear-gradient(135deg, var(--accent), var(--accent-dark)); display:flex; align-items:center; padding:0 16px; }
+        .top-nav .back-btn { width:32px; font-size:24px; color:#fff; line-height:1; cursor:pointer; text-align:left; background:none; border:none; font-family:inherit; }
+        .top-nav .top-nav-title { flex:1; text-align:center; font-size:17px; font-weight:600; color:#fff; }
+        .top-nav .right-placeholder { width:32px; }
 
-        /* ── 功能说明浮窗 ── */
-        .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 430px; max-width: 94vw; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 99999; padding: 22px; display: none; }
-        .f-modal.show { display: block; }
-        .f-modal .fm-title { font-size: 15px; font-weight: 600; color: #1a1a2e; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
-        .f-modal .fm-title:active { cursor: grabbing; }
-        .f-modal .fm-close { width: 26px; height: 26px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 13px; color: #666; border: none; flex-shrink: 0; }
-        .f-modal .fm-close:hover { background: #e8e8e8; }
-        .f-modal .fm-body { font-size: 13px; color: #555; line-height: 1.8; }
-        .f-modal .fm-body h4 { font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 14px 0 6px; }
-        .f-modal .fm-body h4:first-child { margin-top: 0; }
-        .f-modal .fm-body ul { padding-left: 18px; margin: 0 0 8px; }
-        .f-modal .fm-body li { margin-bottom: 4px; }
+        /* ===== 通用卡片 ===== */
+        .card { background:#fff; border-radius:var(--card-radius); box-shadow:0 4px 16px rgba(0,0,0,.06); }
+        .m16 { margin:12px 16px 0; }
+
+        /* ===== 我的奖励 ===== */
+        .reward-card { padding:14px 16px; }
+        .reward-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+        .reward-title { font-size:15px; font-weight:600; color:var(--ink); }
+        .reward-total { font-size:12px; color:var(--ink-weak); }
+        .reward-grid { display:grid; grid-template-columns:repeat(3,1fr); }
+        .reward-item { text-align:center; position:relative; padding:6px 0; }
+        .reward-item + .reward-item::before { content:''; position:absolute; left:0; top:50%; transform:translateY(-50%); width:1px; height:26px; background:var(--line); }
+        .reward-amount { font-size:22px; font-weight:700; color:var(--ink); margin-bottom:4px; }
+        .reward-amount .unit { font-size:13px; font-weight:500; margin-left:1px; }
+        .reward-label { font-size:12px; color:var(--ink-weak); }
+
+        /* ===== 收益明细 ===== */
+        .detail-card { padding:14px 16px; }
+        .detail-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; }
+        .detail-title { font-size:15px; font-weight:600; color:var(--ink); }
+        .detail-count { font-size:12px; color:var(--ink-weak); }
+        .detail-list .detail-item { position:relative; padding:12px 0; border-bottom:1px solid #f5f5f7; }
+        .detail-list .detail-item:last-child { border-bottom:none; }
+        .detail-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; }
+        .detail-name { font-size:14px; font-weight:500; color:var(--ink); }
+        .detail-amount { font-size:14px; font-weight:600; color:var(--warn); display:inline-flex; align-items:center; }
+        .detail-amount .coin { color:var(--warn); margin-right:4px; }
+        .detail-sub { display:flex; justify-content:space-between; align-items:center; font-size:12px; color:var(--ink-weak); }
+        .detail-status { color:var(--ok); font-size:12px; }
+
+        /* ===== 标注圆点 ===== */
+        .badge { display:inline-block; min-width:18px; height:18px; padding:0 5px; border-radius:50%; background:var(--badge); color:#fff; font-size:12px; line-height:18px; text-align:center; font-weight:600; box-shadow:0 1px 3px rgba(255,45,85,.3); }
+        .badge.sm { min-width:16px; height:16px; font-size:11px; line-height:16px; }
+
+        /* ===== 底部说明 ===== */
+        .page-foot { text-align:center; font-size:11px; color:var(--ink-weak); padding:14px 24px 6px; line-height:1.6; }
+    </style>
+    <style>
+        /* ===== ③ 右侧功能说明面板（配色复用页面变量） ===== */
+        .func-panel { position:fixed; top:0; right:0; bottom:0; width:340px; z-index:890; background:#fff; border-left:1px solid #e3e6eb; box-shadow:-1px 0 12px rgba(20,30,60,.04); display:flex; flex-direction:column; }
+        .func-panel .fp-inner { display:flex; flex-direction:column; height:100%; min-width:0; }
+        .func-panel .fp-header { display:flex; align-items:center; justify-content:space-between; padding:15px 14px 13px 18px; border-bottom:1px solid #f0f1f4; flex-shrink:0; }
+        .func-panel .fp-title { display:flex; align-items:center; gap:9px; font-size:15px; font-weight:700; color:var(--ink); }
+        .func-panel .fp-title::before { content:''; width:8px; height:8px; border-radius:50%; background:var(--accent); box-shadow:0 0 0 4px rgba(231,76,94,.14); }
+        .func-panel .fp-fold-btn { width:28px; height:28px; border:1px solid var(--border); background:#fff; border-radius:50%; color:var(--ink-weak); font-size:15px; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all .2s; font-family:inherit; }
+        .func-panel .fp-fold-btn:hover { border-color:var(--accent); color:var(--accent); }
+        .func-panel .fp-body { flex:1; overflow-y:auto; padding:4px 18px 40px; font-size:13px; color:#555; line-height:1.9; }
+        .func-panel .fp-body::-webkit-scrollbar { width:5px; }
+        .func-panel .fp-body::-webkit-scrollbar-thumb { background:#d8dce3; border-radius:3px; }
+        .func-panel .fp-body h4 { font-size:14px; font-weight:600; color:var(--ink); margin:18px 0 6px; }
+        .func-panel .fp-body h4:first-child { margin-top:12px; }
+        .func-panel .fp-body ul { padding-left:18px; margin:0 0 8px; }
+        .func-panel .fp-body li { margin-bottom:6px; }
+        .func-panel .fp-body strong { color:#333; }
+        .func-panel .fp-body .demo-box { background:#fafbfc; border:1px solid #eef1f5; border-radius:10px; padding:10px 12px; margin:6px 0 8px; font-size:12.5px; line-height:1.85; }
+        .func-panel .fp-body .demo-box em { font-style:normal; color:var(--accent); font-weight:700; }
+        .func-panel .fp-open { display:none; position:absolute; top:0; bottom:0; left:0; right:0; border:none; background:transparent; cursor:pointer; writing-mode:vertical-rl; text-orientation:upright; font-size:13px; font-weight:600; letter-spacing:6px; color:var(--ink-weak); align-items:center; justify-content:center; font-family:inherit; transition:all .2s; }
+        .func-panel .fp-open:hover { color:var(--accent); background:#fafbfc; }
+
+        @media (min-width:1024px) {
+            .main, .breadcrumb { margin-right:340px; }
+            body.fp-collapsed .main, body.fp-collapsed .breadcrumb { margin-right:40px; }
+            body.fp-collapsed .func-panel { width:40px; }
+            body.fp-collapsed .fp-inner { display:none; }
+            body.fp-collapsed .fp-open { display:flex; }
+        }
+        @media (max-width:1023.98px) {
+            .func-panel { display:none; }
+            .main, .breadcrumb { margin-right:0; }
+        }
+        /* 真机宽度：手机页铺满 */
+        @media (max-width:540px) {
+            .main { padding:12px 0 32px; }
+            .breadcrumb { padding:12px 16px 0; }
+            .app-container { border-radius:0; box-shadow:none; height:100vh; min-height:100vh; }
+        }
     </style>
 </head>
 <body>
-
-<div class="app-container">
-
-    <div class="header">
-        <span class="back">‹</span>
-        所有奖励
-    </div>
-
-    <!-- 我的奖励 -->
-    <div class="reward-card">
-        <div class="reward-title">我的奖励</div>
-        <div class="reward-grid">
-            <div class="reward-item">
-                <div class="reward-amount">50.00</div>
-                <div class="reward-label">现金奖励</div>
-            </div>
-            <div class="reward-item">
-                <div class="reward-amount">16</div>
-                <div class="reward-label">产品奖励</div>
-            </div>
-            <div class="reward-item">
-                <div class="reward-amount">2</div>
-                <div class="reward-label">新品优先权</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 收益明细 -->
-    <div class="detail-card">
-        <div class="detail-title">收益明细</div>
-        <div class="detail-list">
-            <div class="detail-item">
-                <div class="detail-row">
-                    <span class="detail-name">邀请绑卡</span>
-                    <span class="detail-amount"><span class="coin">¥</span>+2</span>
-                </div>
-                <div class="detail-sub">
-                    <span class="detail-time">获得时间：2025-04-25</span>
-                    <span class="detail-status">已到账</span>
-                </div>
-            </div>
-            <div class="detail-item">
-                <div class="detail-row">
-                    <span class="detail-name">邀请完成交易</span>
-                    <span class="detail-amount">+产品奖励</span>
-                </div>
-                <div class="detail-sub">
-                    <span class="detail-time">获得时间：2025-04-25</span>
-                    <span class="detail-status">已到账</span>
-                </div>
-            </div>
-            <div class="detail-item">
-                <div class="detail-row">
-                    <span class="detail-name">提货</span>
-                    <span class="detail-amount" style="position:relative;">新品优先权 +2<span class="badge sm" style="margin-left:6px;">1</span></span>
-                </div>
-                <div class="detail-sub">
-                    <span class="detail-time">获得时间：2025-04-25</span>
-                    <span class="detail-status">已到账</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
+<!-- ② 中间原型内容：面包屑 + 手机页面 -->
+<div class="breadcrumb">
+    <span>
+        <a href="index.html">首页</a>
+        <span class="sep">&gt;</span>
+        <span>任务</span>
+        <span class="sep">&gt;</span>
+        <span class="current">所有奖励</span>
+    </span>
+    <span class="bc-tip">汇总<b>该任务下全部已发放奖励</b>与逐条收益记录（原型演示数据）</span>
 </div>
 
-<!-- 浮动说明按钮（手机框外） -->
-<button onclick="toggleFuncModal()" style="position:fixed;top:12px;right:16px;z-index:99999;background:#fff;color:#666;padding:7px 16px;border-radius:20px;border:1px solid #ddd;font-size:13px;font-weight:500;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.08);font-family:inherit;display:inline-flex;align-items:center;gap:4px;">📖 说明</button>
+<div class="main">
+    <div class="app-container">
 
-<!-- ====== 功能说明浮窗 ====== -->
-<div class="f-modal" id="funcModal">
-  <div class="fm-title">
-    <span>📖 功能说明</span>
-    <button class="fm-close" onclick="toggleFuncModal()">✕</button>
-  </div>
-  <div class="fm-body">
-    <h4>1</h4>
-    <ul>
-      <li>每成功提货一次，奖励发放成功后，<b>新品优先权 = 次数 × 单次新品数量</b></li>
-      <li>一个任务用户只要没有达到最大奖励次数，是可以反复参加的，<b>每提一次发一次奖励</b>，这里就会存在多条记录</li>
-    </ul>
-  </div>
-</div>
+        <!-- 顶部两段：状态栏 + 标题栏 -->
+        <div class="page-top">
+            <div class="status-bar">
+                <span class="sb-left">
+                    <span class="sb-time">9:41</span>
+                    <span class="sb-date">9月23日 星期三</span>
+                </span>
+                <span class="sb-right">
+                    <span class="sb-signal"><i></i><i></i><i></i><i></i></span>
+                    <span class="sb-wifi"></span>
+                    <span class="sb-batt"><i></i></span>
+                </span>
+            </div>
+            <div class="top-nav">
+                <button class="back-btn" onclick="goBack()" aria-label="返回">‹</button>
+                <span class="top-nav-title">所有奖励</span>
+                <span class="right-placeholder"></span>
+            </div>
+        </div>
+
+        <div class="app-scroll">
+
+            <!-- 我的奖励 -->
+            <div class="card reward-card m16">
+                <div class="reward-header">
+                    <span class="reward-title">我的奖励</span>
+                    <span class="reward-total">累计发放</span>
+                </div>
+                <div class="reward-grid">
+                    <div class="reward-item">
+                        <div class="reward-amount">50.00</div>
+                        <div class="reward-label">现金奖励</div>
+                    </div>
+                    <div class="reward-item">
+                        <div class="reward-amount">16</div>
+                        <div class="reward-label">产品奖励</div>
+                    </div>
+                    <div class="reward-item">
+                        <div class="reward-amount">2</div>
+                        <div class="reward-label">新品优先权</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 收益明细 -->
+            <div class="card detail-card m16">
+                <div class="detail-header">
+                    <span class="detail-title">收益明细</span>
+                    <span class="detail-count">共 3 条</span>
+                </div>
+                <div class="detail-list">
+                    <div class="detail-item">
+                        <div class="detail-row">
+                            <span class="detail-name">邀请绑卡</span>
+                            <span class="detail-amount"><span class="coin">¥</span>+2</span>
+                        </div>
+                        <div class="detail-sub">
+                            <span class="detail-time">获得时间：2025-04-25</span>
+                            <span class="detail-status">已到账</span>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-row">
+                            <span class="detail-name">邀请完成交易</span>
+                            <span class="detail-amount">+产品奖励</span>
+                        </div>
+                        <div class="detail-sub">
+                            <span class="detail-time">获得时间：2025-04-25</span>
+                            <span class="detail-status">已到账</span>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-row">
+                            <span class="detail-name">提货</span>
+                            <span class="detail-amount">新品优先权 +2<span class="badge sm" style="margin-left:6px;">1</span></span>
+                        </div>
+                        <div class="detail-sub">
+                            <span class="detail-time">获得时间：2025-04-25</span>
+                            <span class="detail-status">已到账</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="page-foot">奖励发放后可在本页查看明细，现金与产品奖励以实际到账为准</div>
+
+        </div><!-- /app-scroll -->
+
+    </div><!-- /app-container -->
+</div><!-- /main -->
+
+<!-- ③ 右侧功能说明面板 -->
+<aside class="func-panel">
+    <div class="fp-inner">
+        <div class="fp-header">
+            <span class="fp-title">功能说明</span>
+            <button class="fp-fold-btn" onclick="toggleFuncPanel()" title="收起功能说明">›</button>
+        </div>
+        <div class="fp-body">
+
+            <h4>1、我的奖励（汇总）</h4>
+            <ul>
+                <li>按<strong>奖励类型</strong>汇总三类奖励：<strong>现金奖励</strong>（50.00 元）、<strong>产品奖励</strong>（16 件）、<strong>新品优先权</strong>（2 次）</li>
+                <li>数值为所有明细记录的<strong>累计值</strong>，与任务详情的「我的奖励」一致</li>
+                <li>三项等宽平铺、列间细分隔线，突出金额与数量</li>
+            </ul>
+
+            <h4>2、新品优先权计算规则</h4>
+            <ul>
+                <li>只要奖励数据记录成功就算发放，跟后台数据逻辑一样，一个规则对应有一条发放记录</li>
+            </ul>
+            <div class="demo-box">
+                示例：同一任务内提货满足<em>2</em>条规则，单次新品优先权为 1 → 共发放 <em>2</em> 次新品优先权，明细中出现 2 条记录
+            </div>
+
+        </div>
+    </div>
+    <button class="fp-open" onclick="toggleFuncPanel()" title="展开功能说明">功能说明‹</button>
+</aside>
+
+<!-- ① 左侧目录：公用文件引用 -->
+<script src="asset/admin-sidebar.js"></script>
 
 <script>
-function toggleFuncModal() {
-  var el = document.getElementById('funcModal');
-  el.classList.toggle('show');
-  if (el.classList.contains('show') && !el.dataset.dragged) {
-    el.style.left = '50%'; el.style.top = '50%'; el.style.transform = 'translate(-50%,-50%)';
-  }
+/* ── 右侧功能说明面板：收起 / 展开 ── */
+function toggleFuncPanel() {
+    document.body.classList.toggle('fp-collapsed');
 }
-(function() {
-  var modal, titleBar, offX, offY, dragging = false;
-  document.addEventListener('DOMContentLoaded', function() {
-    modal = document.getElementById('funcModal');
-    titleBar = modal.querySelector('.fm-title');
-    titleBar.addEventListener('mousedown', startDrag);
-    titleBar.addEventListener('touchstart', startDragTouch, {passive:true});
-    document.addEventListener('mousemove', onDrag);
-    document.addEventListener('mouseup', endDrag);
-    document.addEventListener('touchmove', onDragTouch, {passive:true});
-    document.addEventListener('touchend', endDrag);
-  });
-  function startDrag(e) { modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = e.clientX - rect.left; offY = e.clientY - rect.top; dragging = true; titleBar.style.cursor = 'grabbing'; }
-  function startDragTouch(e) { var t = e.touches[0]; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = t.clientX - rect.left; offY = t.clientY - rect.top; dragging = true; }
-  function onDrag(e) { if (!dragging) return; modal.style.left = (e.clientX - offX) + 'px'; modal.style.top = (e.clientY - offY) + 'px'; }
-  function onDragTouch(e) { if (!dragging) return; var t = e.touches[0]; modal.style.left = (t.clientX - offX) + 'px'; modal.style.top = (t.clientY - offY) + 'px'; }
-  function endDrag() { dragging = false; if (titleBar) titleBar.style.cursor = 'grab'; }
+
+function goBack() {
+    if (history.length > 1) { history.back(); } else { location.href = '任务详情.html'; }
+}
+
+/* ── 状态栏时间：实时取当前时间 ── */
+(function () {
+    var d = new Date();
+    var hh = String(d.getHours()).padStart(2, '0');
+    var mm = String(d.getMinutes()).padStart(2, '0');
+    var week = ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'][d.getDay()];
+    var t = document.querySelector('.sb-time'), dt = document.querySelector('.sb-date');
+    if (t) { t.textContent = hh + ':' + mm; }
+    if (dt) { dt.textContent = (d.getMonth() + 1) + '月' + d.getDate() + '日 ' + week; }
 })();
 </script>
 

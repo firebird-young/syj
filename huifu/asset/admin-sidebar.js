@@ -19,7 +19,10 @@
             group: '我的',
             items: [
                 { name: '我的页面',     href: '我的页面.html' },
-                { name: '我的钱包',     href: '我的钱包.html' }
+                { name: '我的钱包',     href: '我的钱包.html' },
+                { name: '提货记录',           href: '提货记录.html' },
+                { name: '提货详情',           href: '提货详情.html' },
+                { name: '我的产品',           href: '我的产品.html' },
             ]
         },
         {
@@ -38,25 +41,17 @@
                 { name: '零售市场列表',   href: '零售市场列表.html' },
                 { name: '零售市场详情',   href: '零售市场详情.html' },
                 { name: '零售市场支付',   href: '零售市场支付.html' },
-                { name: '零售订单详情',   href: '零售订单详情.html' }
-            ]
-        },
-        {
-            group: '共享市场',
-            items: [
                 { name: '零售订单详情',   href: '零售订单详情.html' },
                 { name: '我的卖单列表',   href: '我的卖单列表.html' },
                 { name: '我的卖单详情',   href: '我的卖单详情.html' }
             ]
         },
         {
-            group: '任务与产品',
+            group: '任务',
             items: [
                 { name: '任务详情',           href: '任务详情.html' },
                 { name: '提货页面',           href: '提货页面.html' },
                 { name: '奖励列表',           href: '奖励列表.html' },
-                { name: '产品提取',           href: '产品提取.html' },
-                { name: '我的产品-产品详情页', href: '我的产品的详情页.html' }
             ]
         }
     ];
