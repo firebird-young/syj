@@ -3,386 +3,379 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>深艺交系统升级功能说明</title>
+    <title>深艺交 · 原型页面目录</title>
     <style>
         * { margin:0; padding:0; box-sizing:border-box; }
+
+        :root {
+            --snav-bg:#304156;
+            --snav-item:#bfcbd9;
+            --accent:#409eff;
+            --accent-dark:#3a8ee6;
+            --ink:#1a1a2e;
+            --ink-sub:#4e5a6e;
+            --ink-weak:#9aa6b8;
+            --line:#f0f2f5;
+            --border:#dcdfe6;
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
-            background: #f0f2f5;
-            color: #1a1a2e;
-            font-size: 14px;
+            font-family:-apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+            background:#f0f2f5; color:var(--ink); font-size:14px; min-height:100vh;
+            -webkit-font-smoothing:antialiased;
         }
 
+        /* ===== 顶部条 ===== */
         .topbar {
-            background: #fff;
-            height: 56px;
-            display: flex;
-            align-items: center;
-            padding: 0 20px;
-            border-bottom: 1px solid #f0f0f0;
-            position: sticky;
-            top: 0;
-            z-index: 10;
+            height:60px; background:#fff; border-bottom:1px solid var(--line);
+            display:flex; align-items:center; justify-content:space-between; gap:16px;
+            padding:0 24px; position:sticky; top:0; z-index:20;
         }
-        .topbar-title {
-            font-size: 17px;
-            font-weight: 600;
-            color: #1a1a2e;
+        .tb-left { display:flex; align-items:center; gap:11px; min-width:0; }
+        .tb-logo {
+            width:26px; height:26px; border-radius:8px; flex-shrink:0;
+            background:linear-gradient(135deg, var(--accent), var(--accent-dark));
+            box-shadow:0 4px 10px rgba(64,158,255,.35);
+            display:flex; align-items:center; justify-content:center;
+            color:#fff; font-size:13px; font-weight:700;
         }
+        .tb-title { font-size:16.5px; font-weight:700; color:var(--ink); white-space:nowrap; }
+        .tb-right { display:flex; align-items:center; gap:16px; flex-shrink:0; }
+        .tb-count { font-size:12.5px; color:var(--ink-weak); }
+        .tb-count b { color:var(--accent); font-size:14px; }
+        .tb-link { font-size:13px; color:var(--accent); text-decoration:none; }
+        .tb-link:hover { text-decoration:underline; }
 
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 24px 16px;
-        }
+        /* ===== 两栏布局：左目录 + 右子目录 ===== */
+        .layout { display:flex; align-items:flex-start; min-height:calc(100vh - 60px); }
 
-        .page-title {
-            font-size: 22px;
-            font-weight: 700;
-            color: #1a1a2e;
-            text-align: center;
-            margin-bottom: 24px;
-            padding: 20px;
-            background: #fff;
-            border-radius: 6px;
+        .side {
+            width:236px; flex-shrink:0; background:var(--snav-bg);
+            position:sticky; top:60px; height:calc(100vh - 60px);
+            padding:16px 12px 40px; overflow-y:auto;
+            box-shadow:1px 0 10px rgba(0,0,0,.08);
         }
+        .side::-webkit-scrollbar { width:5px; }
+        .side::-webkit-scrollbar-thumb { background:#45566b; border-radius:3px; }
 
-        .req-section {
-            background: #fff;
-            border-radius: 6px;
-            margin-bottom: 16px;
-            overflow: hidden;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        .side-label {
+            font-size:11px; font-weight:600; color:#7a8aa0; letter-spacing:.6px;
+            padding:4px 10px 10px; user-select:none;
         }
-        .req-header {
-            padding: 14px 20px;
-            font-size: 16px;
-            font-weight: 600;
-            color: #1a1a2e;
-            border-bottom: 1px solid #f0f0f0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
+        .side-item {
+            display:flex; align-items:center; gap:8px; width:100%;
+            padding:11px 12px; margin-bottom:6px; border:none; border-radius:9px;
+            background:transparent; color:var(--snav-item); cursor:pointer;
+            font-family:inherit; text-align:left; transition:all .18s;
         }
-        .req-header .num {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background: #1a78ff;
-            color: #fff;
-            font-size: 14px;
+        .side-item:hover { background:rgba(255,255,255,.07); color:#fff; }
+        .side-item.active {
+            background:linear-gradient(90deg, var(--accent), var(--accent-dark));
+            color:#fff; box-shadow:0 6px 14px rgba(64,158,255,.32);
         }
-        .req-header .arrow {
-            margin-left: auto;
-            color: #9ba6b9;
-            font-size: 14px;
-            transition: transform 0.3s;
-        }
-        .req-section.open .req-header .arrow {
-            transform: rotate(180deg);
-        }
-        .req-body {
-            display: none;
-            padding: 16px 20px;
-        }
-        .req-section.open .req-body {
-            display: block;
-        }
+        .si-main { flex:1; min-width:0; display:flex; flex-direction:column; gap:3px; }
+        .si-name { font-size:14px; font-weight:600; }
+        .si-desc { font-size:11px; opacity:.72; }
+        .si-arrow { font-size:15px; opacity:0; transition:opacity .18s; }
+        .side-item.active .si-arrow, .side-item:hover .si-arrow { opacity:1; }
 
-        .req-list {
-            list-style: none;
-            padding: 0;
-        }
-        .req-list li {
-            padding: 8px 0 8px 20px;
-            position: relative;
-            color: #4e5a6e;
-            line-height: 1.6;
-        }
-        .req-list li::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 16px;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #1a78ff;
-        }
-        .req-list li .strong {
-            color: #1a1a2e;
-            font-weight: 600;
-        }
+        .content { flex:1; min-width:0; padding:22px 26px 48px; }
 
-        /* 分账比例表格 */
-        .fee-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 8px;
-            font-size: 13px;
+        /* 右栏头部 */
+        .content-head {
+            display:flex; align-items:flex-end; justify-content:space-between; gap:16px;
+            flex-wrap:wrap; margin-bottom:18px;
         }
-        .fee-table th {
-            background: #fafbfc;
-            padding: 10px 14px;
-            text-align: left;
-            color: #4e5a6e;
-            font-weight: 500;
-            border: 1px solid #f0f0f0;
+        .ch-title { font-size:21px; font-weight:700; color:var(--ink); display:flex; align-items:center; gap:9px; }
+        .ch-title .ch-dot { width:9px; height:9px; border-radius:50%; background:var(--accent); box-shadow:0 0 0 4px rgba(64,158,255,.16); }
+        .ch-meta { font-size:12.5px; color:var(--ink-weak); margin-top:7px; line-height:1.7; }
+        .ch-meta code {
+            font-family:Consolas, Monaco, monospace; font-size:12px; color:var(--ink-sub);
+            background:#eef2f8; border-radius:4px; padding:1px 6px;
         }
-        .fee-table td {
-            padding: 10px 14px;
-            border: 1px solid #f0f0f0;
-            color: #4e5a6e;
+        .search {
+            width:250px; height:38px; padding:0 13px; border:1px solid var(--border);
+            border-radius:10px; font-size:13.5px; font-family:inherit; color:var(--ink);
+            background:#fff; outline:none; transition:all .18s;
         }
-        .fee-table .label-cell {
-            color: #1a1a2e;
-            font-weight: 500;
-            background: #fafbfc;
-            white-space: nowrap;
-        }
+        .search::placeholder { color:#b8c0cc; }
+        .search:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(64,158,255,.12); }
 
-        .note {
-            margin-top: 8px;
-            padding: 10px 14px;
-            background: #fff8e6;
-            border-radius: 4px;
-            color: #e67e22;
-            font-size: 13px;
+        /* 分组卡片 */
+        .groups { display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:16px; align-items:start; }
+        .group {
+            background:#fff; border-radius:12px; overflow:hidden;
+            box-shadow:0 2px 10px rgba(20,30,60,.06);
         }
+        .group-head {
+            display:flex; align-items:center; gap:8px;
+            padding:13px 15px; border-bottom:1px solid var(--line);
+        }
+        .gh-dot { width:6px; height:6px; border-radius:50%; background:var(--accent); flex-shrink:0; }
+        .gh-name { flex:1; min-width:0; font-size:14px; font-weight:600; color:var(--ink); }
+        .gh-count {
+            font-size:11px; color:var(--ink-weak); background:#f4f6f9;
+            border-radius:20px; padding:1px 8px; flex-shrink:0;
+        }
+        .group-list { padding:8px; }
+        .item {
+            display:flex; align-items:center; gap:6px;
+            padding:9px 10px; border-radius:8px; text-decoration:none;
+            color:var(--ink-sub); font-size:13.5px; line-height:1.4; transition:all .15s;
+        }
+        .item:hover { background:#f2f8ff; color:var(--accent); }
+        .it-name { flex:0 0 auto; }
+        .it-note {
+            flex:1; min-width:0; font-size:12px; color:var(--ink-weak);
+            overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+        }
+        .it-go { margin-left:auto; font-size:12px; color:var(--ink-weak); opacity:0; transition:opacity .15s; }
+        .item:hover .it-go { opacity:1; color:var(--accent); }
+        .item.disabled { color:#b3bcc9; cursor:not-allowed; }
+        .item.disabled:hover { background:transparent; color:#b3bcc9; }
+        .it-tag {
+            margin-left:auto; flex-shrink:0; font-size:11px; line-height:16px;
+            padding:0 6px; border-radius:4px; background:#fff1f0; color:#f56c6c;
+        }
+        .it-tag.ghost { background:#f4f6f9; color:var(--ink-weak); }
 
-        /* 原功能迁移提示浮层 */
-        .migrate-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, .45);
-            z-index: 999;
-            display: none;
-            align-items: center;
-            justify-content: center;
+        .empty, .warn {
+            background:#fff; border-radius:12px; padding:26px; text-align:center;
+            color:var(--ink-weak); font-size:13px; line-height:1.9;
+            box-shadow:0 2px 10px rgba(20,30,60,.06);
         }
-        .migrate-modal.show { display: flex; }
-        .migrate-box {
-            background: #fff;
-            border-radius: 14px;
-            padding: 30px 36px 26px;
-            text-align: center;
-            width: 320px;
-            box-shadow: 0 8px 40px rgba(0, 0, 0, .18);
+        .warn { border-left:3px solid #e6a23c; text-align:left; color:var(--ink-sub); }
+        .warn code { font-family:Consolas, Monaco, monospace; font-size:12px; color:#e6a23c; }
+
+        .foot {
+            margin-top:22px; font-size:12px; color:var(--ink-weak); line-height:1.9;
         }
-        .migrate-icon { font-size: 40px; margin-bottom: 12px; }
-        .migrate-title { font-size: 17px; font-weight: 700; color: #1a1a2e; margin-bottom: 10px; }
-        .migrate-desc { font-size: 13px; color: #4e5a6e; line-height: 1.7; margin-bottom: 20px; }
-        .migrate-btn {
-            width: 100%;
-            padding: 9px 0;
-            border: none;
-            border-radius: 6px;
-            background: #1a78ff;
-            color: #fff;
-            font-size: 14px;
-            cursor: pointer;
+        .foot b { color:var(--ink-sub); }
+
+        @media (max-width:900px) {
+            .topbar { padding:0 16px; }
+            .tb-count { display:none; }
+            .layout { flex-direction:column; }
+            .side {
+                width:100%; height:auto; position:sticky; top:60px;
+                display:flex; gap:8px; padding:10px 12px; overflow-x:auto; overflow-y:hidden;
+            }
+            .side-label { display:none; }
+            .side-item { width:auto; flex-shrink:0; margin-bottom:0; padding:9px 14px; }
+            .si-desc { display:none; }
+            .si-arrow { display:none; }
+            .content { padding:18px 16px 40px; }
+            .search { width:100%; }
+            .groups { grid-template-columns:1fr; }
         }
-        .migrate-btn:hover { background: #1668e0; }
     </style>
 </head>
 <body>
 
-<div class="topbar">
-    <div class="topbar-title">深艺交系统升级功能说明</div>
-</div>
-
-<div class="container">
-    <div class="page-title">深艺交系统升级功能说明</div>
-
-    <!-- 产品退市功能 -->
-    <div class="req-section open">
-        <div class="req-header">
-            <span class="num">1</span>
-            产品退市功能
-            <span class="arrow">▾</span>
-        </div>
-        <div class="req-body">
-            <ul class="req-list">
-                <li>产品提货完后进入退市，零售市场不可见，批发市场可见<a href="admin/数字艺术品管理.html" target="_blank" style="margin-left:8px;color:#1a78ff;text-decoration:underline;">查看</a></li>
-            </ul>
-        </div>
+<!-- 顶部条 -->
+<header class="topbar">
+    <div class="tb-left">
+        <span class="tb-logo">深</span>
+        <span class="tb-title">深艺交 · 原型页面目录</span>
     </div>
-
-    <div class="req-section open">
-        <div class="req-header">
-            <span class="num">2</span>
-            服务商分佣和任务管理
-            <span class="arrow">▾</span>
-        </div>
-        <div class="req-body">
-            <ul class="req-list">
-                <li>交易手续费及批发市场分佣比例由各批发商自行决定分成比例。分成比例设置界面更换到批发商后台<a href="wholesale/业务参数管理.html" target="_blank" style="margin-left:8px;color:#1a78ff;text-decoration:underline;">查看</a></li>
-                <li>增加提货任务功能：指定提货产品（一个或多个）
-                    <div style="margin-top:6px;line-height:1.9;">
-                        <div><a href="service/addtask.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">任务设置（后台）</a></div>
-                        <div><a href="service/任务奖励.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">任务奖励列表（后台）</a></div>
-                        <div><a href="任务详情.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">任务详情（APP）</a></div>
-                        <div><a href="提货页面.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">提货详情（APP）</a></div>
-                        <div><a href="奖励列表.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">奖励列表（APP）</a></div>
-                    </div>
-                </li>
-            </ul>
-        </div>
+    <div class="tb-right">
+        <span class="tb-count">共 <b id="totalCount">0</b> 个原型页面</span>
+        <a class="tb-link" href="需求说明.html" target="_blank" rel="noopener">系统升级功能说明 ›</a>
     </div>
+</header>
 
-    <!-- 用户端显示优化 -->
-    <div class="req-section open">
-        <div class="req-header">
-            <span class="num">3</span>
-            用户端显示优化
-            <span class="arrow">▾</span>
+<!-- 两栏：左目录（APP端 / 后台管理端 / 批发商端） + 右子目录 -->
+<div class="layout">
+    <aside class="side" id="side"></aside>
+
+    <main class="content">
+        <div class="content-head">
+            <div>
+                <div class="ch-title"><span class="ch-dot"></span><span id="chName">—</span></div>
+                <div class="ch-meta" id="chMeta"></div>
+            </div>
+            <input class="search" id="search" type="text" placeholder="搜索该端页面名称…">
         </div>
-        <div class="req-body">
-            <ul class="req-list">
-                <li>产品上传的图片及视频尺寸要自适应手机屏幕</li>
-                <li>我的自选功能</li>
-                    <div style="margin-top:6px;line-height:1.9;">
-                        <div><a href="零售市场详情.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">添加自选（APP）</a></div>
-                        <div><a href="零售市场列表.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">自选列表（APP）</a></div>
-                    </div>
-            </ul>
-        </div>
-    </div>
 
-    <!-- 支付系统更换 -->
-    <div class="req-section open">
-        <div class="req-header">
-            <span class="num">5</span>
-            支付系统更换成汇付
-            <span class="arrow">▾</span>
-        </div>
-        <div class="req-body">
-            <ul class="req-list">
-                <li>
-                    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding-left:0;">
-                        <div>
-                            <div style="font-weight:600;color:#1a1a2e;margin-bottom:6px;">APP</div>
-                            <div style="line-height:1.9;">
-                                <div><a href="我的页面.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">我的页面</a></div>
-                                <div><a href="我的钱包.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">我的钱包</a></div>
-                                <div><a href="批发市场支付.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">批发市场支付</a></div>
-                                <div><a href="批发订单.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">批发订单</a></div>
-                                <div><a href="批发订单详情.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">批发订单详情</a></div>
-                                <div><a href="零售市场寄售.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">零售市场寄售</a></div>
-                                <div><a href="零售市场支付.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">零售市场支付</a></div>
-                                <div><a href="零售订单详情.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">零售订单详情</a></div>
-                                <div><a href="我的挂单.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">我的挂单</a></div>
-                                <div><a href="我的卖单列表.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">我的卖单</a></div>
-                                <div><a href="我的卖单详情.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">我的卖单详情</a></div>
-                                <div><a href="我的产品的详情页.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">我的产品-点击某个产品-产品详情页</a></div>
-                                <div><a href="提货记录.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">提货记录</a></div>
-                                <div><a href="提货详情.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">提货详情</a></div>
-                                <div><a href="我的产品.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">我的产品</a></div>
-                            </div>
-                        </div>
-                        <div>
-                            <div style="font-weight:600;color:#1a1a2e;margin-bottom:6px;">平台</div>
-                            <div style="line-height:1.9;">
-                                <div><a href="admin/wallet-admin.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">钱包管理（新增）</a></div>
-                                <div><a href="admin/平台账户.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">平台账户</a></div>
-                                <br>
-                                <div><a href="admin/批发市场订单.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">批发市场订单</a></div>
-                                <div><a href="admin/产品分账管理.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">产品分账管理（新增）</a></div>
-                                <div><a href="admin/零售市场订单.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">零售市场订单</a></div>
-                                <div><a href="admin/挂单详情管理.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">挂单详情管理(新增)</div>
-                                <div><a href="admin/产品详情管理.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">产品详情管理(新增)</div>  
-                                <br>
-                                <div><a href="admin/企业用户详情.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">企业用户详情</a></div>
-                                <div><a href="admin/个人认证详情.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">个人用户详情</a></div>
-                                <br>
-                                <div><a href="admin/数字艺术品管理.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">数字艺术品管理（含产品上线设置）</a></div>
-                                <div><a href="admin/业务参数配置.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">业务参数配置</a></div>
-                                <br>
-                                <div><a href="admin/批发市场分账审核.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">批发市场分账审核（新增）</a></div>
-                                <div><a href="admin/固定风险保证金分账审核.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">固定风险保证金分账审核（新增）</a></div>
-                                <div><a href="admin/批发商提现审核.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">批发商提现审核（新增）</a></div>
-                                <div><a href="admin/运营资金提现审核.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">运营资金提现审核（新增）</a></div>
-                                <br>
-                                <div><a href="admin/平台产品销售报表.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">平台产品销售报表（新增）</a></div>
-                                <div><a href="admin/区块链服务管理.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">区块链服务管理（新增）</a></div>
-                                <div><a href="#" target="_blank" style="color:#1a78ff;text-decoration:underline;">接入新支付后，需要适配原数据统计模版，注意不改变原统计的业务含义）</a></div>
-                            </div>
-                        </div>
-                        <div>
-                        <div>
-                            <div style="font-weight:600;color:#1a1a2e;margin-bottom:6px;">批发商</div>
-                                <div style="line-height:1.9;">
-                                <div><a href="wholesale/注册.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">注册</a></div>
-                                <div><a href="wholesale/登录.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">企业注册</a></div>    
-                                <div><a href="wholesale/企业注册.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">企业认证</a></div>
-                                <div><a href="wholesale/信息查看.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">信息查看</a></div>
+        <div class="groups" id="groups"></div>
 
-                                <div><a href="wholesale/账户管理.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">账户管理（新增）</a></div>
-                                <div><a href="wholesale/运营资金管理.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">运营资金管理（新增）</a></div>
-
-                                <div><a href="wholesale/产品管理.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">产品管理</a></div>
-                                <div><a href="wholesale/产品详情管理.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">产品详情管理（新增）</a></div>
-
-                                <div><a href="wholesale/固定风险保证金分账申请.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">固定风险保证金分账申请（新增）</a></div>
-                                <div><a href="wholesale/批发市场分账申请.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">批发市场分账申请（新增）</a></div>
-                                <div><a href="wholesale/分佣管理.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">分佣管理（新增）</a></div>
-
-                                <div><a href="wholesale/发货管理.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">发货管理（新增）</a></div>
-
-                                <div><a href="wholesale/区块链服务.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">区块链服务（新增）</a></div>
-                                <div><a href="wholesale/业务参数管理.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">业务参数管理（新增）</a></div>
-                                <div><a href="wholesale/用户管理.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">用户管理（新增）</a></div>
-                                <div><a href="wholesale/角色管理.html" target="_blank" style="color:#1a78ff;text-decoration:underline;">角色管理（新增）</a></div>
-
-                                <div><a href="#" target="_blank" style="color:#1a78ff;text-decoration:underline;">任务管理（原服务商功能迁移过来）</a></div>
-                                <div><a href="#" target="_blank" style="color:#1a78ff;text-decoration:underline;">价值管理（原服务商功能迁移过来）</a></div>
-                                <div><a href="#" target="_blank" style="color:#1a78ff;text-decoration:underline;">系统公告（原服务商功能迁移过来）</a></div>
-                                <div><a href="#" target="_blank" style="color:#1a78ff;text-decoration:underline;">运营数据统计（原服务商功能迁移过来）</a></div>
-                            </div>
-                        </div>
-                    </div>
-                </li>
-            </ul>
-        </div>
-    </div>
-
-</div>
-
-<!-- 原功能迁移提示浮层 -->
-<div class="migrate-modal" id="migrateModal" onclick="if(event.target===this)closeMigrate()">
-    <div class="migrate-box">
-        <div class="migrate-icon">🚚</div>
-        <div class="migrate-title">原功能迁移</div>
-        <div class="migrate-desc">原功能迁移</div>
-        <button class="migrate-btn" onclick="closeMigrate()">知道了</button>
-    </div>
+        <div class="foot" id="foot"></div>
+    </main>
 </div>
 
 <script>
-document.querySelectorAll('.req-header').forEach(function(header) {
-    header.addEventListener('click', function() {
-        this.closest('.req-section').classList.toggle('open');
-    });
-});
+/* 目录数据来源：三个端各自的 asset/admin-sidebar.js（只读取数据，不注入目录栏） */
+window.PROTO_NO_SIDEBAR = true;
+window.PROTO_MENUS = {};
+</script>
+<script src="asset/admin-sidebar.js"></script>
+<script src="admin/asset/admin-sidebar.js"></script>
+<script src="wholesale/asset/admin-sidebar.js"></script>
+<script>
+(function () {
+    'use strict';
 
-// 所有 href="#" 的链接：点击后弹出「原功能迁移」提示浮层
-document.querySelectorAll('a[href="#"]').forEach(function(a) {
-    a.addEventListener('click', function(e) {
-        e.preventDefault();
-        document.getElementById('migrateModal').classList.add('show');
-    });
-});
+    /* ↓↓↓ 三个端：与各自 asset/admin-sidebar.js 一一对应（dir 为该端页面所在目录前缀）↓↓↓ */
+    var MODULES = [
+        {
+            key: 'app', name: 'APP端', tag: '移动原型',
+            dir: '', src: 'asset/admin-sidebar.js',
+            desc: '手机端用户页面（430px 移动原型）'
+        },
+        {
+            key: 'admin', name: '后台管理端', tag: 'PC 管理端',
+            dir: 'admin/', src: 'admin/asset/admin-sidebar.js',
+            desc: '平台运营后台页面（PC 管理端）'
+        },
+        {
+            key: 'wholesale', name: '批发商端', tag: 'PC 管理端',
+            dir: 'wholesale/', src: 'wholesale/asset/admin-sidebar.js',
+            desc: '批发商工作台页面（PC 管理端）'
+        }
+    ];
+    /* ↑↑↑ 端配置到此为止 ↑↑↑ */
 
-function closeMigrate() {
-    document.getElementById('migrateModal').classList.remove('show');
-}
+    var DATA = window.PROTO_MENUS || {};
+    var sideEl   = document.getElementById('side');
+    var chName   = document.getElementById('chName');
+    var chMeta   = document.getElementById('chMeta');
+    var groupsEl = document.getElementById('groups');
+    var footEl   = document.getElementById('foot');
+    var searchEl = document.getElementById('search');
+    var totalEl  = document.getElementById('totalCount');
+    var keyword  = '';
+
+    function modOf(key) {
+        for (var i = 0; i < MODULES.length; i++) { if (MODULES[i].key === key) { return MODULES[i]; } }
+        return MODULES[0];
+    }
+    function groupsOf(mod) {
+        var d = DATA[mod.key];
+        return (d && d.menu) ? d.menu : [];
+    }
+    function countOf(mod) {
+        return groupsOf(mod).reduce(function (n, g) { return n + ((g.items || []).length); }, 0);
+    }
+    function esc(s) {
+        return String(s == null ? '' : s)
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    /* 「发货管理（原实物提取管理）」→ 主名称 + 备注 */
+    function splitName(name) {
+        var m = String(name).match(/^([^（(]+)[（(](.+)[）)]\s*$/);
+        return m ? { main: m[1].trim(), note: m[2].trim() } : { main: String(name), note: '' };
+    }
+    function activeKey() {
+        var k = decodeURIComponent((location.hash || '').slice(1));
+        for (var i = 0; i < MODULES.length; i++) { if (MODULES[i].key === k) { return k; } }
+        return MODULES[0].key;
+    }
+
+    /* ── 左栏：三个端 ── */
+    function renderSide() {
+        var cur = activeKey();
+        var html = '<div class="side-label">目录 / 端</div>';
+        MODULES.forEach(function (m) {
+            html += '<button class="side-item' + (m.key === cur ? ' active' : '') + '" data-key="' + m.key + '">'
+                + '<span class="si-main">'
+                + '<span class="si-name">' + esc(m.name) + '</span>'
+                + '<span class="si-desc">' + esc(m.tag) + ' · ' + countOf(m) + ' 个页面</span>'
+                + '</span>'
+                + '<span class="si-arrow">›</span>'
+                + '</button>';
+        });
+        sideEl.innerHTML = html;
+
+        Array.prototype.forEach.call(sideEl.querySelectorAll('.side-item'), function (btn) {
+            btn.addEventListener('click', function () { setModule(btn.getAttribute('data-key')); });
+        });
+    }
+
+    /* ── 右栏：该端的子目录（分组 + 链接） ── */
+    function renderContent() {
+        var mod = modOf(activeKey());
+        var groups = groupsOf(mod);
+        var kw = keyword.trim().toLowerCase();
+
+        chName.textContent = mod.name;
+        chMeta.innerHTML = '共 <b>' + countOf(mod) + '</b> 个页面 · ' + esc(mod.desc)
+            + ' · 菜单来源 <code>' + esc(mod.src) + '</code>';
+
+        if (!groups.length) {
+            groupsEl.innerHTML = '<div class="warn">未读取到该端菜单数据，请确认 <code>' + esc(mod.src)
+                + '</code> 存在且可正常访问（本目录页直接读取该文件中的 MENU 配置）。</div>';
+            footEl.textContent = '';
+            return;
+        }
+
+        var html = '';
+        var shown = 0;
+        groups.forEach(function (g) {
+            var items = (g.items || []).filter(function (it) {
+                if (!kw) { return true; }
+                return (String(it.name) + ' ' + String(it.href || '')).toLowerCase().indexOf(kw) !== -1;
+            });
+            if (!items.length) { return; }
+
+            html += '<section class="group">'
+                + '<div class="group-head"><span class="gh-dot"></span>'
+                + '<span class="gh-name">' + esc(g.group) + '</span>'
+                + '<span class="gh-count">' + items.length + '</span></div>'
+                + '<div class="group-list">';
+
+            items.forEach(function (it) {
+                shown++;
+                var p = splitName(it.name);
+                var href = String(it.href || '').trim();
+                var legacy = /废弃/.test(p.note);
+                var noteHtml = (p.note && !legacy) ? '<span class="it-note">' + esc(p.note) + '</span>' : '';
+
+                if (href === '' || href === '#') {
+                    /* 废弃 / 仅保留入口的功能：不跳转 */
+                    html += '<span class="item disabled" title="' + esc(it.name) + '，仅保留入口与数据展示，暂无原型页面">'
+                        + '<span class="it-name">' + esc(p.main) + '</span>'
+                        + '<span class="it-tag' + (legacy ? '' : ' ghost') + '">' + (legacy ? '废弃' : '入口保留') + '</span>'
+                        + '</span>';
+                } else {
+                    html += '<a class="item" href="' + esc(mod.dir + href) + '" target="_blank" rel="noopener">'
+                        + '<span class="it-name">' + esc(p.main) + '</span>' + noteHtml
+                        + '<span class="it-go">↗</span>'
+                        + '</a>';
+                }
+            });
+
+            html += '</div></section>';
+        });
+
+        groupsEl.innerHTML = html || '<div class="empty">没有匹配「' + esc(keyword) + '」的页面</div>';
+
+        footEl.innerHTML = kw
+            ? '当前筛选出 <b>' + shown + '</b> 个页面（关键字：' + esc(keyword) + '），清空搜索框可查看全部。'
+            : '以上链接均在新标签页打开。左侧「' + esc(MODULES.map(function (m) { return m.name; }).join(' / ')) + '」可切换对应端的目录。';
+    }
+
+    function render() {
+        renderSide();
+        renderContent();
+    }
+
+    function setModule(key) {
+        if (activeKey() === key) { render(); return; }
+        location.hash = key;   /* 触发 hashchange → render */
+    }
+
+    /* 顶部统计：三端页面总数 */
+    totalEl.textContent = MODULES.reduce(function (n, m) { return n + countOf(m); }, 0);
+
+    searchEl.addEventListener('input', function () {
+        keyword = searchEl.value;
+        renderContent();
+    });
+    window.addEventListener('hashchange', render);
+
+    render();
+})();
 </script>
 
 </body>

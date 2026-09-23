@@ -78,6 +78,10 @@
     ];
     /* ↑↑↑ MENU 配置到此为止 ↑↑↑ */
 
+    /* ↓↓↓ 供 index.html 目录总览读取本模块菜单数据（不影响各页面自动渲染）↓↓↓ */
+    window.PROTO_MENUS = window.PROTO_MENUS || {};
+    window.PROTO_MENUS.wholesale = { title: SIDEBAR_TITLE, menu: MENU };
+
     function currentFile() {
         return decodeURIComponent(location.pathname.split('/').pop() || '').toLowerCase();
     }
@@ -102,6 +106,9 @@
         document.body.insertAdjacentHTML('afterbegin', html);
         document.body.classList.add('has-sidenav');
     }
+
+    /* index.html 目录总览：只读取菜单数据，不注入目录栏 */
+    if (window.PROTO_NO_SIDEBAR) { return; }
 
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', render);
