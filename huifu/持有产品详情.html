@@ -538,9 +538,9 @@
         }
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-        /* 批量提货 sticky 操作栏（手机原型底部） */
+        /* 批量提货固定底栏（手机原型底部，不随内容滚动） */
         .batch-bar {
-            position: sticky; bottom: 0; z-index: 60;
+            flex-shrink: 0; z-index: 60;
             background: #fff; padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
             border-top: 1px solid var(--line);
             box-shadow: 0 -4px 12px rgba(0,0,0,.04);
@@ -760,17 +760,17 @@
                 </div>
 
                 <div id="productList"></div>
-
-                <!-- 批量提货 sticky 操作栏 -->
-                <div class="batch-bar" id="batchBar">
-                    <!-- 普通态 -->
-                    <button class="batch-btn" id="batchBtn" onclick="enterSelectMode()">批量提货</button>
-                    <!-- 多选态（默认隐藏） -->
-                    <button class="batch-cancel" id="batchCancel" onclick="exitSelectMode()" style="display:none;">取消</button>
-                    <span class="batch-count" id="batchSelInfo" style="display:none;">已选 <b id="batchSelNum">0</b> 份</span>
-                    <button class="batch-confirm disabled" id="batchConfirm" onclick="confirmPickup()" style="display:none;">确认提货</button>
-                </div>
             </div>
+        </div>
+
+        <!-- 批量提货固定底栏（手机框内固定，不随内容滚动） -->
+        <div class="batch-bar" id="batchBar">
+            <!-- 普通态 -->
+            <button class="batch-btn" id="batchBtn" onclick="enterSelectMode()">批量提货</button>
+            <!-- 多选态（默认隐藏） -->
+            <button class="batch-cancel" id="batchCancel" onclick="exitSelectMode()" style="display:none;">取消</button>
+            <span class="batch-count" id="batchSelInfo" style="display:none;">已选 <b id="batchSelNum">0</b> 份</span>
+            <button class="batch-confirm disabled" id="batchConfirm" onclick="confirmPickup()" style="display:none;">确认提货</button>
         </div>
 
     </div>
@@ -840,7 +840,7 @@
                 <li>不可售状态行不展示按钮；其它三态分别走「出售 / 管理 / 提货」</li>
                 <li>行内显示：已交易次数 / 共 X 次、上次成交价、剩余存续时间（剩 ≤ 2 天时高亮）</li>
                 <li>产品编号后「更多」按钮：点击弹窗展示<b>产品编号 / 区块链地址 / 查看证书</b>（按钮逻辑未实现）</li>
-                <li>列表底部「批量提货」按钮：点击后列表进入多选态，<b>出售中</b>行置灰不可选；勾选后底部变为「取消 / 已选 N 份 / 确认提货」</li>
+                <li><b>批量提货固定底栏</b>：固定在页面（手机框）底部、不随列表滚动；点击「批量提货」后列表进入多选态，<b>出售中</b>行置灰不可选；勾选后底栏变为「取消 / 已选 N 份 / 确认提货」</li>
                 <li>点击「确认提货」弹出底部 sheet，「选择收货地址 ›」文字按钮跳转<b>地址选择页</b>（复用已有页面），底部红字提示：<b>实物提货后预计 30 个工作日内发货，该数字资产将从区块链上销毁</b></li>
             </ul>
 
