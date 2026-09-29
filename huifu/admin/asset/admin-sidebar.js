@@ -39,8 +39,8 @@
             group: '数字艺术品管理',
             items: [
                 { name: '数字艺术品管理',     href: '数字艺术品管理.html' },
-                { name: '价值注入审核',     href: '价值注入审核.html' },
-                { name: '价值管理',     href: '价值管理.html' }
+                { name: '价值注入审核',     href: '原功能页面.html' },
+                { name: '价值管理',     href: '原功能页面.html' }
             ]
         },
         {
