@@ -270,73 +270,7 @@
                 <li>字段：订单编号、产品名称、用户账号、数量 / 单价、总价、第三方支付手续费、创建时间、首次分账时间</li>
                 <li>分账字段：<strong>批发商分账、平台分账（上线服务费 / 平台管理服务费 / 补第三方支付手续费）、零售市场分账、剩余金额、零售市场最后分账时间</strong></li>
             </ul>
-            <h4>二、首次分账规则</h4>
-            <ul>
-                <li><strong>平台分账（上线服务费）</strong>：固定 <strong>5%</strong>，不变</li>
-                <li><strong>平台分账（补第三方支付手续费）</strong>：固定 <strong>0.6%</strong>，不变</li>
-                <li><strong>平台分账（平台管理服务费）</strong>：按「最终批发金额」所属档位确定为 <strong>10% / 8% / 6% / 5%</strong>，详见下方档位规则</li>
-                <li><strong>批发商分账</strong>：基础 <strong>40% − 0.6%</strong>，加上按档位匹配的增量 <strong>0% / 2% / 4% / 5%</strong>（与平台管理服务费呈镜像：批发商增量 = 10% − 档位费率）</li>
-                <li>分账链路仅含「批发商 + 平台」两方，不涉及其他角色</li>
-            </ul>
-            <h4>三、批发金额档位规则</h4>
-            <ul>
-                <li>系统依据每笔订单的「最终批发金额」匹配以下档位，档位在订单生成时即确定并固化</li>
-                <li>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>档位</th>
-                                <th>最终批发金额</th>
-                                <th>平台管理服务费</th>
-                                <th>批发商增量</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><strong>A 类</strong></td>
-                                <td>500 万以内</td>
-                                <td><span class="em">10%</span></td>
-                                <td>0%</td>
-                            </tr>
-                            <tr>
-                                <td><strong>B 类</strong></td>
-                                <td>500 万 ~ 800 万</td>
-                                <td><span class="em">8%</span></td>
-                                <td>2%</td>
-                            </tr>
-                            <tr>
-                                <td><strong>C 类</strong></td>
-                                <td>800 万 ~ 1000 万</td>
-                                <td><span class="em">6%</span></td>
-                                <td>4%</td>
-                            </tr>
-                            <tr>
-                                <td><strong>D 类</strong></td>
-                                <td>1000 万以上</td>
-                                <td><span class="em">5%</span></td>
-                                <td>5%</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </li>
-                <li>批发商实际分账比例 = <strong>40% − 0.6% + 档位增量</strong></li>
-                <li>档位一经确定不再变更，订单详情与列表均按该档位计算与展示</li>
-            </ul>
-            <h4>四、平台分账与批发商分账关系</h4>
-            <ul>
-                <li>平台管理服务费随批发金额档位<strong>阶梯下调</strong>（A→B→C→D：10% → 8% → 6% → 5%）；批发商分账则对应<strong>阶梯上调</strong>（+0% → +2% → +4% → +5%）</li>
-                <li>无论档位如何，「<strong>批发商分账 + 平台管理服务费</strong>」恒为 <strong>40% − 0.6% + 10% = 49.4%</strong></li>
-                <li>批发金额越大，批发商实际分账越多；批发金额越小，平台管理服务费占比越大 —— 二者呈<strong>镜像关系</strong></li>
-            </ul>
-            <h4>五、计算公式</h4>
-            <ul>
-                <li><strong>第三方支付手续费</strong> = 总价 × 0.6%</li>
-                <li><strong>平台管理服务费</strong> = 总价 × 档位费率（10% / 8% / 6% / 5%）</li>
-                <li><strong>批发商分账</strong> = 总价 × (40% − 0.6% + 档位增量) = 总价 × (40% − 0.6% + (10% − 档位费率))</li>
-                <li><strong>平台分账（合计）</strong> = 上线服务费 5% + 平台管理服务费 + 补第三方支付手续费 0.6%</li>
-                <li><strong>零售市场分账总金额</strong> =（总价 − 批发商分账 − 平台分账合计）/ 总数量 × 零售市场分账总数量</li>
-                <li><strong>剩余金额</strong> = 总价 − 批发商分账 − 平台分账合计 − 零售市场分账总金额</li>
-            </ul>
+
         </div>
     </div>
     <button class="fp-open" onclick="toggleFuncPanel()" title="展开功能说明">功能说明‹</button>
