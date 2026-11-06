@@ -38,7 +38,6 @@
         {
             group: '数字艺术品管理',
             items: [
-                { name: '数字艺术品管理',     href: '数字艺术品管理.html' },
                 { name: '价值注入审核',     href: '原功能页面.html' },
                 { name: '价值管理',     href: '原功能页面.html' }
             ]
@@ -47,10 +46,7 @@
             group: '订单产品管理',
             items: [
                 { name: '零售市场订单',       href: '零售市场订单.html' },
-                { name: '批发市场订单',       href: '批发市场订单.html' },
-                { name: '挂单详情管理',       href: '挂单详情管理.html' },
-                { name: '产品详情管理',       href: '产品详情管理.html' },
-                { name: '产品分账管理',       href: '产品分账管理.html' }
+                { name: '批发市场订单',       href: '批发市场订单.html' }
             ]
         },
         {
@@ -65,7 +61,6 @@
             items: [
                 { name: '仓库列表',       href: '原功能页面.html' },
                 { name: '发货管理（原实物提取管理）',       href: '发货管理.html' },
-                { name: '货款提取审核（废弃功能，入口和数据展示保留）',       href: '#' },
                 { name: '数字艺术品存储',       href: '原功能页面.html' },
               
             ]

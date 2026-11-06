@@ -435,14 +435,6 @@
         </div>
         <div class="fp-body">
             <div class="fp-role">批发商 · 产品管理</div>
-            <h4><span class="badge">1</span> <span style="vertical-align:middle;">迁移说明：服务商产品管理</span></h4>
-            <div class="dim">
-                本次将<strong>服务商的产品管理功能</strong>迁移至批发商后台：<br>
-                ① 新增列：<strong>批发模式</strong>（优先购 / 抽签购 / 全民购，支持组合）、<strong>阶段</strong>（批发市场 / 批发完成 / 零售市场）；<br>
-                ② 操作栏新增按钮：<strong>批发管理</strong>、<strong>文本价值要素标注</strong>、<strong>文本价值要素数据集</strong>；<br>
-                功能逻辑沿用之前服务商版本，不做变更。
-            </div>
-            <h4><span class="badge">2</span> <span style="vertical-align:middle;">货款提取（已废弃）</span></h4>
             <ul>
                 <li>老入口灰色展示，点开后的数据展示保留</li>
                 <li>只针对之前开通了<strong>宝付</strong>的企业展示</li>

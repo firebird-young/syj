@@ -33,7 +33,6 @@
          {
             group: '产品管理',
             items: [
-                { name: '我的产品',     href: '产品管理.html' },
                 { name: '产品详情管理', href: '产品详情管理.html' },
             ]
         },
@@ -41,9 +40,7 @@
             group: '账户资金管理',
             items: [
                 { name: '我的资产(原宝付对应的功能，只针对老的批发商保留数据和菜单，新的批发商不展示)',           href: '#' },
-                { name: '账户管理',           href: '账户管理.html' },
-                { name: '批发市场分账申请',   href: '批发市场分账申请.html' },
-                { name: '固定风险保证金分账申请', href: '固定风险保证金分账申请.html' }
+                { name: '账户管理',           href: '账户管理.html' }
             ]
         },
         {
@@ -58,12 +55,6 @@
             items: [
                 { name: '价值注入', href: '原功能页面.html' },
                 { name: '价值字典', href: '原功能页面.html' }
-            ]
-        },
-        {
-            group: '仓管管理',
-            items: [
-                { name: '发货管理', href: '发货管理.html' }
             ]
         },
         {

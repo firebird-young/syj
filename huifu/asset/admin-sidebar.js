@@ -28,7 +28,6 @@
         {
             group: '批发市场',
             items: [
-                { name: '批发市场支付',   href: '批发市场支付.html' },
                 { name: '批发订单',       href: '批发订单.html' },
                 { name: '批发订单详情',   href: '批发订单详情.html' },
             ]
@@ -36,14 +35,8 @@
         {
             group: '挂单和共享超市',
             items: [
-                { name: '持有产品详情',   href: '持有产品详情.html' },
                 { name: '我的挂单',       href: '我的挂单.html' },
-                { name: '零售市场列表',   href: '零售市场列表.html' },
-                { name: '零售市场详情',   href: '零售市场详情.html' },
-                { name: '零售市场支付',   href: '零售市场支付.html' },
-                { name: '零售订单详情',   href: '零售订单详情.html' },
-                { name: '我的卖单列表',   href: '我的卖单列表.html' },
-                { name: '我的卖单详情',   href: '我的卖单详情.html' }
+                { name: '我的卖单列表',   href: '我的卖单列表.html' }
             ]
         },
         {
